@@ -1,42 +1,35 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* src/app/globals.css */
+/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+
+/* Custom styles agar chahiye */
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    background-color: #ffffff;
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 font-medium transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply border border-black text-black px-6 py-3 rounded-lg hover:bg-gray-50 font-medium transition-colors;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   }
 }
