@@ -48,9 +48,9 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-gray-200 mt-8 pt-8 text-center">
+        <div className="mt-8 pt-8 text-center">
           <p className="text-gray-500 text-sm">
-            © 2024 JustBecho. Premium resale marketplace.
+            © 2025 JustBecho. Premium resale marketplace.
           </p>
         </div>
       </div>

@@ -2,20 +2,27 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { FiUser, FiHeart, FiShoppingBag } from 'react-icons/fi'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    
+    // Initialize on mount
+    handleScroll()
+    
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${
         isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
       }`}
     >
@@ -28,7 +35,7 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="Search for products..."
-                className={`flex-1 bg-transparent outline-none py-1.5 text-[14px] lg:text-[15px] w-full ${
+                className={`flex-1 bg-transparent outline-none py-1.5 text-[14px] lg:text-[15px] w-full font-light tracking-wide ${
                   isScrolled
                     ? 'text-gray-800 placeholder-gray-500'
                     : 'text-white placeholder-white/80'
@@ -55,16 +62,16 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Sell Now Button */}
+            {/* Sell Now Button - SAME STYLE WITHOUT UNDERLINE */}
             <Link
               href="/sell"
-              className={`px-4 lg:px-5 py-1.5 rounded-full font-medium text-[14px] lg:text-[15px] transition-all duration-300 whitespace-nowrap ${
+              className={`text-[14px] lg:text-[15px] font-light tracking-widest uppercase transition-all duration-300 whitespace-nowrap px-4 lg:px-5 py-1.5 rounded-full ${
                 isScrolled
                   ? 'bg-black text-white hover:bg-gray-800'
                   : 'bg-white text-black hover:bg-gray-100'
               }`}
             >
-              Sell Now
+              SELL NOW
             </Link>
           </div>
 
@@ -72,19 +79,19 @@ export default function Header() {
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link href="/" className="flex items-center justify-center">
               <Image
-                src="/Just Becho Logo JB.png"
+                src="/Just Becho Logo Golden.png"
                 alt="Just Becho"
                 width={isScrolled ? 70 : 80}
                 height={isScrolled ? 70 : 80}
                 className={`transition-all duration-500 ${
-                  isScrolled ? 'h-16 w-auto' : 'h-18 w-auto'
+                  isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
                 }`}
                 priority
               />
             </Link>
           </div>
 
-          {/* RIGHT: Icons */}
+          {/* RIGHT: Icons - REACT ICONS WITH SAME SIZE */}
           <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
             {/* Mobile Menu Button */}
             <button
@@ -115,43 +122,22 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* Desktop Options */}
-            <div className="hidden md:flex items-center space-x-4 lg:space-x-5 text-[14px] lg:text-[15px]">
-              <Link href="/login" className="hover:text-primary whitespace-nowrap">
-                Login / Signup
+            {/* Desktop Options - REACT ICONS WITH EXACT SAME SIZE */}
+            <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+              {/* Profile Icon */}
+              <Link href="/profile" className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110">
+                <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
               </Link>
 
-              <Link href="/wishlist" className="hover:text-primary">
-                <svg
-                  className="w-5 h-5 lg:w-6 lg:h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-8.682a4.5 4.5 0 010-6.364z"
-                  />
-                </svg>
+              {/* Wishlist Icon */}
+              <Link href="/wishlist" className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110">
+                <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
               </Link>
 
-              <Link href="/cart" className="relative hover:text-primary">
-                <svg
-                  className="w-5 h-5 lg:w-6 lg:h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] rounded-full w-3 h-3 lg:w-4 lg:h-4 flex items-center justify-center">
+              {/* Cart Icon */}
+              <Link href="/cart" className="relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110">
+                <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
                   0
                 </span>
               </Link>
@@ -165,7 +151,7 @@ export default function Header() {
             <input
               type="text"
               placeholder="Search for products..."
-              className={`flex-1 bg-white/20 backdrop-blur-sm border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full ${
+              className={`flex-1 bg-white/20 backdrop-blur-sm border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
                 isScrolled
                   ? 'text-gray-800 placeholder-gray-500 bg-white'
                   : 'text-white placeholder-white/80 bg-white/10'
@@ -194,25 +180,25 @@ export default function Header() {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE MENU - UPDATED WITH PROFILE */}
       {isMenuOpen && (
         <div
-          className={`md:hidden transition-all duration-300 ${
+          className={`md:hidden transition-all duration-300 font-light tracking-widest uppercase ${
             isScrolled ? 'bg-white text-gray-800 shadow-lg' : 'bg-black/95 text-white'
           }`}
         >
-          <nav className="flex flex-col px-6 py-4 space-y-4 text-base font-medium">
-            <Link href="/sell" className="py-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-              Sell Now
+          <nav className="flex flex-col px-6 py-4 space-y-4 text-base">
+            <Link href="/sell" className="py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+              SELL NOW
             </Link>
-            <Link href="/login" className="py-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-              Login / Signup
+            <Link href="/profile" className="py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+              PROFILE
             </Link>
-            <Link href="/wishlist" className="py-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-              Wishlist
+            <Link href="/wishlist" className="py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+              WISHLIST
             </Link>
-            <Link href="/cart" className="py-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-              Cart
+            <Link href="/cart" className="py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+              CART
             </Link>
           </nav>
         </div>

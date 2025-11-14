@@ -5,66 +5,58 @@ import Image from 'next/image'
 
 export default function Home() {
 
-  // Brands data with better logo URLs
-  const brands = [
-    { 
-      name: "H&M", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/2560px-H%26M-Logo.svg.png" 
-    },
-    { 
-      name: "Louis Vuitton", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Louis_Vuitton_logo_and_wordmark.svg/2560px-Louis_Vuitton_logo_and_wordmark.svg.png" 
-    },
-    { 
-      name: "Jordan", 
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/3/37/Jumpman_logo.svg/800px-Jumpman_logo.svg.png" 
-    },
-    { 
-      name: "Nike", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/2560px-Logo_NIKE.svg.png" 
-    },
-    { 
-      name: "Adidas", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/2560px-Adidas_Logo.svg.png" 
-    },
-    { 
-      name: "Chanel", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Chanel_logo.png/800px-Chanel_logo.png" 
-    },
-    { 
-      name: "Zara", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Zara_Logo.svg/2560px-Zara_Logo.svg.png" 
-    },
-    { 
-      name: "Gucci", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Gucci_Logo.svg/2560px-Gucci_Logo.svg.png" 
-    },
-    { 
-      name: "Puma", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Puma_logo.svg/1200px-Puma_logo.svg.png" 
-    },
-    { 
-      name: "Apple", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/488px-Apple_logo_black.svg.png" 
-    },
-    { 
-      name: "Samsung", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/2560px-Samsung_Logo.svg.png" 
-    },
-    { 
-      name: "Sony", 
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/2560px-Sony_logo.svg.png" 
-    },
-  ]
-
-  // Duplicate brands for seamless loop
-  const duplicatedBrands = [...brands, ...brands, ...brands]
+  // Category-wise brands data with proper folder structure
+  const categoryBrands = {
+    "Men's Fashion": [
+      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/balenciaga.png" },
+      { name: "Armani", logo: "/brandslogo/mens-fashion/armani.png" },
+      { name: "Prada", logo: "/brandslogo/mens-fashion/prada.png" },
+      { name: "Versace", logo: "/brandslogo/mens-fashion/versace.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/mens-fashion/gucci.png" },
+      { name: "Burberry", logo: "/brandslogo/mens-fashion/burberry.png" },
+      { name: "Fendi", logo: "/brandslogo/mens-fashion/fendi.png" }
+    ],
+    "Women's Fashion": [
+      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png" },
+      { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png" },
+      { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png" },
+      { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png" },
+      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png" }
+    ],
+    "Footwear": [
+      { name: "Balenciaga", logo: "/brandslogo/footwear/Balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/Jimmy Choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/Prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/Puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/Gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/Reebok.png" }
+    ],
+    "Accessories": [
+      { name: "Woodland", logo: "/brandslogo/accessories/Woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/accessories/Baggit.png" },
+      
+      { name: "Ray-Ban", logo: "/brandslogo/accessories/Ray-Ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/accessories/Wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/accessories/Nike.png" }
+    ],
+    "Electronics": [
+      { name: "Apple", logo: "/brandslogo/electronics/Apple.png" },
+      { name: "Samsung", logo: "/brandslogo/electronics/Samsung.jpg" },
+      { name: "Sony", logo: "/brandslogo/electronics/Sony.png" },
+      { name: "JBL", logo: "/brandslogo/electronics/JBL.png" },
+      { name: "LG", logo: "/brandslogo/electronics/LG.png" }
+    ]
+  }
 
   // Category-wise products
   const categorySections = [
     {
       name: "Men's Fashion",
       href: '/categories/men',
+      brands: ["Balenciaga", "Armani", "Prada", "Versace", "Louis Vuitton", "Gucci", "Burberry", "Fendi"],
       products: [
         { id: 1, name: "Zara Leather Jacket", price: "₹8,499", image: "/products/bag.jpg", isBestseller: true },
         { id: 2, name: "Denim Shirt", price: "₹2,499", image: "/products/bag.jpg", isBestseller: false },
@@ -75,6 +67,7 @@ export default function Home() {
     {
       name: "Women's Fashion",
       href: '/categories/women',
+      brands: ["H&M", "Zara", "Chanel", "Louis Vuitton", "Gucci", "Nike", "Adidas"],
       products: [
         { id: 1, name: "H&M Summer Dress", price: "₹2,499", image: "/products/bag.jpg", isBestseller: true },
         { id: 2, name: "Designer Saree", price: "₹3,999", image: "/products/bag.jpg", isBestseller: false },
@@ -85,6 +78,7 @@ export default function Home() {
     {
       name: "Footwear",
       href: '/categories/footwear',
+      brands: ["Nike", "Adidas", "Jordan", "Puma", "Gucci", "Louis Vuitton"],
       products: [
         { id: 1, name: "Nike Air Jordan 1", price: "₹12,499", image: "/products/bag.jpg", isBestseller: true },
         { id: 2, name: "Adidas Running Shoes", price: "₹8,999", image: "/products/bag.jpg", isBestseller: false },
@@ -95,6 +89,7 @@ export default function Home() {
     {
       name: "Accessories",
       href: '/categories/accessories',
+      brands: ["Chanel", "Louis Vuitton", "Gucci", "Apple", "Samsung", "Sony"],
       products: [
         { id: 1, name: "Leather Handbag", price: "₹4,999", image: "/products/bag.jpg", isBestseller: true },
         { id: 2, name: "Sunglasses", price: "₹1,999", image: "/products/bag.jpg", isBestseller: false },
@@ -105,6 +100,7 @@ export default function Home() {
     {
       name: "Electronics",
       href: '/categories/electronics',
+      brands: ["Apple", "Samsung", "Sony", "Nike", "Adidas"],
       products: [
         { id: 1, name: "Apple AirPods Pro", price: "₹18,999", image: "/products/bag.jpg", isBestseller: true },
         { id: 2, name: "Smart Watch", price: "₹5,999", image: "/products/bag.jpg", isBestseller: false },
@@ -141,19 +137,21 @@ export default function Home() {
         </section>
 
         {/* Categories Section */}
-        <section className="py-12 sm:py-20 bg-white">
+        <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-10 sm:mb-16">
-              <h2 className="text-2xl sm:text-4xl text-text-primary mb-3 sm:mb-4 tracking-tight">
-                SHOP BY CATEGORY
+            
+            {/* Section Heading - SAME STYLE WITHOUT UNDERLINE */}
+            <div className="text-center mb-16 sm:mb-20">
+              <h2 className="text-gray-900 text-3xl sm:text-5xl font-light tracking-widest uppercase">
+                EXPLORE CATEGORIES
               </h2>
-              <p className="text-sm sm:text-lg text-text-secondary max-w-2xl mx-auto font-normal px-4">
-                Discover collections curated for every style and need
+              <p className="text-gray-900 text-lg sm:text-xl font-light tracking-widest uppercase mt-4">
+                DISCOVER PRE-LOVED LUXURY ITEMS
               </p>
             </div>
 
-            {/* Circular Category Cards - Mobile Responsive */}
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-6 lg:gap-10">
+            {/* Circular Category Cards */}
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-8 sm:gap-10 lg:gap-12">
               {[
                 { name: "MEN'S FASHION", img: '/categories/backpacks.jpg', href: '/categories/men' },
                 { name: "WOMEN'S FASHION", img: '/categories/doffel.jpg', href: '/categories/women' },
@@ -166,17 +164,19 @@ export default function Home() {
                 <Link
                   href={cat.href}
                   key={index}
-                  className="group flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-1"
+                  className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-3"
                 >
-                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full overflow-hidden shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 xl:w-52 xl:h-52 rounded-full overflow-hidden shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500">
                     <Image
                       src={cat.img}
                       alt={cat.name}
                       fill
-                      className="object-cover object-center"
+                      className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
                     />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500"></div>
                   </div>
-                  <h3 className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-base text-text-primary group-hover:text-primary transition-colors duration-300 leading-tight px-1">
+                  {/* SAME STYLE WITHOUT UNDERLINE */}
+                  <h3 className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mt-6 sm:mt-8">
                     {cat.name}
                   </h3>
                 </Link>
@@ -185,108 +185,117 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Category-wise Sections - All White Background */}
-        {categorySections.map((category) => (
-          <section key={category.name} className="py-12 sm:py-20 bg-white">
-            <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-              {/* Heading */}
-              <div className="text-center mb-10 sm:mb-16">
-                <h2 className="text-2xl sm:text-4xl text-gray-900 mb-2 sm:mb-3 tracking-tight">
-                  {category.name}
-                </h2>
-                <p className="text-sm sm:text-lg text-gray-500 font-normal px-4">
-                  Explore our curated collection of {category.name.toLowerCase()}
-                </p>
-              </div>
+        {/* Category-wise Sections with Brand Carousels */}
+        {categorySections.map((category) => {
+          // Get brands for this specific category from categoryBrands object
+          const categoryBrandsData = categoryBrands[category.name] || []
+          const duplicatedCategoryBrands = [...categoryBrandsData, ...categoryBrandsData, ...categoryBrandsData]
 
-              {/* Product Grid - Mobile Responsive */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-                {category.products.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group cursor-pointer"
-                  >
-                    {/* Image Container */}
-                    <div className="relative w-full aspect-square overflow-hidden mb-2 sm:mb-3 rounded-lg">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                      />
+          return (
+            <section key={category.name} className="py-16 sm:py-24 bg-white border-t border-gray-100">
+              <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+                {/* SAME HEADING STYLE WITHOUT UNDERLINE */}
+                <div className="text-center mb-16 sm:mb-20">
+                  <h2 className="text-gray-900 text-3xl sm:text-5xl font-light tracking-widest uppercase">
+                    {category.name.toUpperCase()}
+                  </h2>
+                  <p className="text-gray-900 text-lg sm:text-xl font-light tracking-widest uppercase mt-4">
+                    EXPLORE OUR CURATED COLLECTION
+                  </p>
+                </div>
 
-                      {/* Bestseller Badge */}
-                      {item.isBestseller && (
-                        <div className="absolute top-1 sm:top-2 left-1 sm:left-2">
-                          <span className="bg-black text-white px-2 py-1 text-xs font-medium">
-                            Bestseller
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="text-left px-1">
-                      <h3 className="text-gray-800 font-normal text-sm sm:text-base mb-1 leading-tight line-clamp-2">
-                        {item.name}
-                      </h3>
-                      <p className="text-gray-900 font-medium text-sm sm:text-base">{item.price}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* View More Link */}
-              <div className="text-center mt-10 sm:mt-16">
-                <Link
-                  href={category.href}
-                  className="text-gray-900 font-medium text-base sm:text-lg hover:underline underline-offset-4 transition-all duration-300"
-                >
-                  View More in {category.name}
-                </Link>
-              </div>
-            </div>
-          </section>
-        ))}
-
-        {/* Brands Carousel Section - Mobile Responsive */}
-        <section className="py-10 sm:py-16 bg-white border-t border-gray-100">
-          <div className="w-full overflow-hidden">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
-                Featured Brands
-              </h2>
-            </div>
-            
-            {/* Infinite Moving Carousel - Mobile Responsive */}
-            <div className="relative">
-              <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap">
-                {duplicatedBrands.map((brand, index) => (
-                  <div
-                    key={index}
-                    className="inline-flex items-center justify-center mx-3 sm:mx-6 group"
-                  >
-                    <div className="flex flex-col items-center space-y-2 sm:space-y-3">
-                      {/* Brand Logo Container - Mobile Size */}
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white rounded-full shadow-sm sm:shadow-lg flex items-center justify-center p-1 sm:p-2 group-hover:shadow-md sm:group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 sm:group-hover:scale-110 border border-gray-100 sm:border-gray-200 overflow-hidden">
-                        <img
-                          src={brand.logo}
-                          alt={brand.name}
-                          className="w-full h-full object-contain"
-                          loading="lazy"
+                {/* Product Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
+                  {category.products.map((item) => (
+                    <div
+                      key={item.id}
+                      className="group cursor-pointer transform hover:-translate-y-2 transition-all duration-300"
+                    >
+                      {/* Image Container */}
+                      <div className="relative w-full aspect-square overflow-hidden mb-4 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
                         />
+
+                        {/* Bestseller Badge - SAME STYLE WITHOUT UNDERLINE */}
+                        {item.isBestseller && (
+                          <div className="absolute top-3 left-3">
+                            <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-3 py-2 rounded-full">
+                              BESTSELLER
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {/* Brand Name - Mobile Size */}
-                      <span className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">
-                        {brand.name}
-                      </span>
+
+                      {/* Product Info - SAME STYLE WITHOUT UNDERLINE */}
+                      <div className="text-left px-2">
+                        <h3 className="text-gray-800 text-base sm:text-lg font-light tracking-widest uppercase mb-2">
+                          {item.name.toUpperCase()}
+                        </h3>
+                        <p className="text-gray-900 text-lg sm:text-xl font-light tracking-widest uppercase">
+                          {item.price}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Popular Brands Carousel - WORKING VERSION */}
+                <div className="mt-20 sm:mt-24">
+                  <div className="text-center mb-12">
+                    <h3 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
+                      POPULAR BRANDS IN {category.name.toUpperCase()}
+                    </h3>
+                    <p className="text-gray-900 text-lg font-light tracking-widest uppercase mt-4">
+                      AUTHENTIC LUXURY BRANDS YOU CAN TRUST
+                    </p>
+                  </div>
+                  
+                  {/* Logo Carousel - WORKING VERSION */}
+                  <div className="w-full overflow-hidden py-4">
+                    <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap">
+                      {duplicatedCategoryBrands.map((brand, index) => (
+                        <div
+                          key={index}
+                          className="inline-flex items-center justify-center mx-8 sm:mx-12 group"
+                        >
+                          <div className="flex items-center justify-center p-4 group-hover:scale-110 transition-all duration-500">
+                            {/* SIMPLE LOGO WITH VISIBLE STYLING */}
+                            <img
+                              src={brand.logo}
+                              alt={brand.name}
+                              className="h-20 w-auto sm:h-24 md:h-28 object-contain transition-all duration-500"
+                              style={{ 
+                                minWidth: '80px',
+                                maxWidth: '120px'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* VIEW MORE BUTTON - ONLY THIS HAS UNDERLINE */}
+                <div className="text-center mt-16 sm:mt-20">
+                  <Link
+                    href={category.href}
+                    className="text-gray-900 text-xl font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative"
+                  >
+                    <span className="relative">
+                      → {category.name.toUpperCase()}
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-700 group-hover:delay-100"></span>
+                    </span>
+                  </Link>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
+          )
+        })}
 
       </main>
 
