@@ -246,34 +246,6 @@ export default function Header() {
           }
         ]
       }
-    },
-    {
-      name: "BRAND NEW",
-      href: '/categories/brandnew',
-      dropdown: {
-        sections: [
-          {
-            title: "MEN'S FASHION",
-            items: ["T-Shirts", "Shirts", "Jeans", "Jackets", "Suits", "Activewear"]
-          },
-          {
-            title: "WOMEN'S FASHION",
-            items: ["Dresses", "Tops", "Jeans", "Kurtis", "Lehengas", "Activewear"]
-          },
-          {
-            title: "FOOTWEAR",
-            items: ["Sneakers", "Formal Shoes", "Heels", "Sandals", "Sports Shoes"]
-          },
-          {
-            title: "ACCESSORIES",
-            items: ["Watches", "Bags", "Jewelry", "Sunglasses", "Belts"]
-          },
-          {
-            title: "ELECTRONICS",
-            items: ["Smartphones", "Laptops", "Headphones", "Smart Watches", "Tablets"]
-          }
-        ]
-      }
     }
   ]
 
