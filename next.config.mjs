@@ -9,9 +9,7 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  experimental: {
-    reactCompiler: true,  // ✅ Enable React Compiler
-  },
+  // NO reactCompiler - Next.js 15 doesn't support it
 };
 
 export default nextConfig;
