@@ -9,7 +9,9 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  // NO reactCompiler here - Clean config for deployment
-}
+  experimental: {
+    reactCompiler: true,  // ✅ Enable React Compiler
+  },
+};
 
 export default nextConfig;
