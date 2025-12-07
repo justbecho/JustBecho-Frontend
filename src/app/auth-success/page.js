@@ -1,8 +1,14 @@
 'use client'
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function AuthSuccess() {
+// ✅ Dynamic export for Netlify
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Main component ko alag banao
+function AuthSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -20,7 +26,9 @@ export default function AuthSuccess() {
         console.log('🔐 Token received');
         
         // ✅ Save token to localStorage
-        localStorage.setItem('token', token);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token', token);
+        }
         
         let userData = null;
 
@@ -47,7 +55,7 @@ export default function AuthSuccess() {
         }
 
         // ✅ Save user data to localStorage
-        if (userData) {
+        if (userData && typeof window !== 'undefined') {
           localStorage.setItem('user', JSON.stringify(userData));
           console.log('💾 User data saved');
 
@@ -70,8 +78,10 @@ export default function AuthSuccess() {
         setError(err.message);
         
         // Clear any stored data
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
         
         // Redirect to home after delay
         setTimeout(() => {
@@ -120,4 +130,20 @@ export default function AuthSuccess() {
   }
 
   return null;
+}
+
+// ✅ Main component with Suspense wrapper
+export default function AuthSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="text-center bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-auto">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading authentication...</p>
+        </div>
+      </div>
+    }>
+      <AuthSuccessContent />
+    </Suspense>
+  );
 }
