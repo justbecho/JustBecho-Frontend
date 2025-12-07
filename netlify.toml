@@ -1,0 +1,14 @@
+# netlify.toml (root folder mein)
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+  
+[build.environment]
+  NODE_VERSION = "18.17.0"
+  NEXT_TELEMETRY_DISABLED = "1"
+  
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://just-becho-backend.vercel.app"

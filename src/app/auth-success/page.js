@@ -3,11 +3,9 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// ✅ Dynamic export for Netlify
+// ✅ Client component ke liye dynamic declaration
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-// Main component ko alag banao
 function AuthSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,7 +64,7 @@ function AuthSuccessContent() {
             return;
           }
 
-          // ✅ Redirect to home page (no verification check needed)
+          // ✅ Redirect to home page
           console.log('🚀 Redirecting to home page');
           router.push('/');
         } else {
@@ -132,7 +130,6 @@ function AuthSuccessContent() {
   return null;
 }
 
-// ✅ Main component with Suspense wrapper
 export default function AuthSuccess() {
   return (
     <Suspense fallback={
