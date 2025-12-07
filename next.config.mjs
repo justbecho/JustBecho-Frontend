@@ -7,16 +7,9 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-    unoptimized: true, // Netlify ke liye required
+    unoptimized: true,
   },
   reactCompiler: true,
-  // ✅ Netlify ke liye optimize
-  swcMinify: true,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-  // ❌ output: 'export' HATA DO
-  // ❌ output: 'standalone' bhi hata do
 }
 
 export default nextConfig
