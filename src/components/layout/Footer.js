@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200 mt-16">
+    <footer className="bg-white border-t border-gray-200 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company */}
@@ -23,6 +23,9 @@ export default function Footer() {
               <Link href="/categories/kids" className="block text-gray-600 hover:text-black">Kids</Link>
               <Link href="/categories/accessories" className="block text-gray-600 hover:text-black">Accessories</Link>
               <Link href="/categories/footwear" className="block text-gray-600 hover:text-black">Footwear</Link>
+              <Link href="/categories/toys" className="block text-gray-600 hover:text-black">Footwear</Link>
+              <Link href="/categories/watches" className="block text-gray-600 hover:text-black">Footwear</Link>
+              <Link href="/categories/perfumes" className="block text-gray-600 hover:text-black">Footwear</Link>
             </div>
           </div>
 
@@ -41,8 +44,9 @@ export default function Footer() {
           <div>
             <h4 className="font-medium text-black mb-4">Legal</h4>
             <div className="space-y-2 text-sm">
-              <Link href="/privacy" className="block text-gray-600 hover:text-black">Privacy Policy</Link>
-              <Link href="/terms" className="block text-gray-600 hover:text-black">Terms of Service</Link>
+              <Link href="/terms/seller-terms" className="block text-gray-600 hover:text-black">Seller Terms & Condition</Link>
+              <Link href="/terms/buyer-terms" className="block text-gray-600 hover:text-black">Buyer Terms & Condition</Link>
+              <Link href="/privacy-policy" className="block text-gray-600 hover:text-black">Privacy Policy</Link>
               <Link href="/authenticity" className="block text-gray-600 hover:text-black">Authenticity Guarantee</Link>
             </div>
           </div>
