@@ -6,6 +6,7 @@ const quicksand = Quicksand({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
+  variable: '--font-quicksand', // Add this for CSS variable
 })
 
 export const metadata = {
@@ -15,7 +16,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={quicksand.className}>
+    <html lang="en" className={`${quicksand.variable} ${quicksand.className}`}>
       <body className="font-sans">
         {children}
       </body>
