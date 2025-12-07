@@ -1,13 +1,14 @@
 [build]
-  command = "npm ci && npm run build"
+  command = "rm -rf node_modules && npm install next@15.1.6 react@18.2.0 react-dom@18.2.0 && npm install && npm run build"
   publish = ".next"
   
 [build.environment]
+  NEXT_VERSION = "15.1.6"
   NODE_VERSION = "18"
   NEXT_TELEMETRY_DISABLED = "1"
+  # Force specific versions
+  NEXT_IGNORED_DEPLOYMENT_ERRORS = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[context.production.environment]
-  NODE_ENV = "production"
+  inputs = {}
