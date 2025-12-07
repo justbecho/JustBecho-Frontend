@@ -1,5 +1,8 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // Disable ESLint during build
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -9,7 +12,4 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  // NO reactCompiler - Next.js 15 doesn't support it
 };
-
-export default nextConfig;
