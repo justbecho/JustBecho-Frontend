@@ -1,10 +1,14 @@
+// app/complete-profile/page.js
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import RoleSelectionModal from '@/components/ui/RoleSelectionModal'
 
-export default function CompleteProfile() {
+// ✅ Add dynamic export
+export const dynamic = 'force-dynamic'
+
+function CompleteProfileContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [token, setToken] = useState('')
@@ -53,20 +57,17 @@ export default function CompleteProfile() {
             
             // If converting to seller, automatically set role to seller
             if (isConverting && userData.user.role === 'seller') {
-              // Auto-select seller role in modal
               console.log('🔄 User is converting to seller')
             }
             
             // Check if profile already completed
             if (userData.user.profileCompleted && userData.user.role !== 'seller') {
-              // If profile completed and not seller, redirect to dashboard
               router.push('/dashboard')
               return
             }
             
             // If profile completed but seller, still show modal for seller details
             if (userData.user.profileCompleted && userData.user.role === 'seller' && !userData.user.sellerVerified) {
-              // Seller needs to complete seller profile (bank details, etc.)
               console.log('🏪 Seller needs to complete seller profile')
             }
           }
@@ -85,13 +86,11 @@ export default function CompleteProfile() {
   }, [searchParams, router])
 
   const handleModalClose = () => {
-    // Clear conversion flags
     localStorage.removeItem('changingRoleToSeller')
     localStorage.removeItem('sellerConversionInProgress')
     
     setIsModalOpen(false)
     
-    // Redirect based on user role
     if (userRole === 'seller') {
       router.push('/dashboard?section=listings')
     } else {
@@ -123,5 +122,21 @@ export default function CompleteProfile() {
         />
       )}
     </div>
+  )
+}
+
+// ✅ Main component with Suspense wrapper
+export default function CompleteProfile() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    }>
+      <CompleteProfileContent />
+    </Suspense>
   )
 }
