@@ -224,7 +224,7 @@ function HomeContent() {
     }
   ], [])
 
-  // ✅ UPDATED: Fetch products using NEW CATEGORY-WISE ROUTE
+  // ✅ FIXED: Use the CORRECT API endpoint
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       try {
@@ -234,8 +234,17 @@ function HomeContent() {
         // Har category ke liye products fetch karo
         for (const category of categories) {
           try {
-            // ✅ UPDATED: Use new category-wise route with PRODUCTION URL
-            const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${encodeURIComponent(category.apiCategory)}?limit=4`
+            // ✅ CRITICAL FIX: Use the WORKING backend route
+            // Your backend has BOTH routes now:
+            // 1. /api/products?category=... (query parameter) - WORKING
+            // 2. /api/products/category/... (path parameter) - NOW ADDED
+            
+            // OPTION 1: Use query parameter (RECOMMENDED - already working)
+            const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
+            
+            // OPTION 2: Use path parameter (if backend adds it)
+            // const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${encodeURIComponent(category.apiCategory)}?limit=4`
+            
             console.log(`📡 Fetching ${category.name} from:`, apiUrl)
             
             const response = await fetch(apiUrl)
@@ -245,7 +254,7 @@ function HomeContent() {
               const data = await response.json()
               console.log(`📦 ${category.name} API response:`, data)
               
-              // ✅ UPDATED: Check new response structure
+              // ✅ FIXED: Check response structure
               if (data.success && data.products) {
                 console.log(`✅ ${category.name} products found:`, data.products.length)
                 // Sirf active products lo aur maximum 4 products
@@ -274,7 +283,52 @@ function HomeContent() {
     }
 
     fetchCategoryProducts()
-  }, [categories]) // ✅ categories ko dependency mein add karo
+  }, [categories])
+
+  // ✅ OPTIONAL: Temporary test with mock data
+  useEffect(() => {
+    // If you want to test without API, use this mock data
+    const useMockData = false; // Set to true for testing
+    
+    if (useMockData) {
+      const mockProducts = {
+        "Men's Fashion": [
+          {
+            _id: "mock1",
+            productName: "Designer Shirt",
+            brand: "Armani",
+            finalPrice: 7999,
+            originalPrice: 12000,
+            images: [{ url: "/products/shirt.jpg" }],
+            condition: "New"
+          },
+          {
+            _id: "mock2",
+            productName: "Leather Jacket",
+            brand: "Gucci",
+            finalPrice: 24999,
+            originalPrice: 35000,
+            images: [{ url: "/products/jacket.jpg" }],
+            condition: "Like New"
+          }
+        ],
+        "Women's Fashion": [
+          {
+            _id: "mock3",
+            productName: "Evening Gown",
+            brand: "Dior",
+            finalPrice: 44999,
+            originalPrice: 60000,
+            images: [{ url: "/products/gown.jpg" }],
+            condition: "New"
+          }
+        ]
+      }
+      
+      setCategoryProducts(mockProducts);
+      setLoading(false);
+    }
+  }, [])
 
   const nextTestimonials = () => {
     if (isAnimating) return;
@@ -298,43 +352,50 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ UPDATED: Product card render function with Link to product page
-  const renderProductCard = (product) => (
-    <Link 
-      href={`/products/${product._id}`}
-      key={product._id}
-      className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300 block"
-    >
-      <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-        <img
-          src={product.images?.[0]?.url || '/placeholder-image.jpg'}
-          alt={product.productName}
-          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
-        />
-        {/* Condition Badge */}
-        {product.condition && (
-          <div className="absolute top-2 left-2">
-            <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
-              {product.condition.toUpperCase()}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="text-left px-1">
-        <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
-          {product.productName?.toUpperCase()}
-        </h3>
-        <p className="text-gray-900 text-base font-light tracking-widest uppercase">
-          ₹{product.finalPrice?.toLocaleString()}
-        </p>
-        {product.originalPrice && product.originalPrice > product.finalPrice && (
-          <p className="text-gray-500 text-sm line-through">
-            ₹{product.originalPrice.toLocaleString()}
+  // ✅ FIXED: Product card render function with better error handling
+  const renderProductCard = (product) => {
+    if (!product || !product._id) return null;
+    
+    return (
+      <Link 
+        href={`/products/${product._id}`}
+        key={product._id}
+        className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300 block"
+      >
+        <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+          <img
+            src={product.images?.[0]?.url || '/placeholder-image.jpg'}
+            alt={product.productName || 'Product'}
+            className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.target.src = '/placeholder-image.jpg';
+            }}
+          />
+          {/* Condition Badge */}
+          {product.condition && (
+            <div className="absolute top-2 left-2">
+              <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
+                {product.condition.toUpperCase()}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="text-left px-1">
+          <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
+            {product.productName?.toUpperCase() || 'PRODUCT'}
+          </h3>
+          <p className="text-gray-900 text-base font-light tracking-widest uppercase">
+            ₹{product.finalPrice?.toLocaleString() || '0'}
           </p>
-        )}
-      </div>
-    </Link>
-  )
+          {product.originalPrice && product.originalPrice > product.finalPrice && (
+            <p className="text-gray-500 text-sm line-through">
+              ₹{product.originalPrice.toLocaleString()}
+            </p>
+          )}
+        </div>
+      </Link>
+    )
+  }
 
   return (
     <>
@@ -402,7 +463,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ FIXED: Categories Section - CUSTOM IMAGES ONLY */}
+        {/* ✅ FIXED: Categories Section */}
         <section className="py-16 bg-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
@@ -427,6 +488,9 @@ function HomeContent() {
                       alt={cat.name}
                       fill
                       className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-image.jpg';
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
                   </div>
@@ -503,6 +567,9 @@ function HomeContent() {
                       alt={collection.title}
                       fill
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-image.jpg';
+                      }}
                     />
                   </div>
 
@@ -525,7 +592,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Category-wise Sections with Banners - UPDATED API CALLS */}
+        {/* Category-wise Sections with Banners - FIXED API CALLS */}
         {categories.map((category, index) => {
           const categoryBrandsData = categoryBrands[category.name] || []
           const duplicatedCategoryBrands = [...categoryBrandsData, ...categoryBrandsData, ...categoryBrandsData]
@@ -562,6 +629,7 @@ function HomeContent() {
                   ) : (
                     <div className="text-center py-12">
                       <p className="text-gray-500 text-lg">No products available in this category yet.</p>
+                      <p className="text-gray-400 text-sm mt-2">Be the first to list a product!</p>
                     </div>
                   )}
 
@@ -595,6 +663,9 @@ function HomeContent() {
                                     maxWidth: "100%",
                                     maxHeight: "100%",
                                     objectFit: "contain",
+                                  }}
+                                  onError={(e) => {
+                                    e.target.src = '/placeholder-image.jpg';
                                   }}
                                 />
                               </div>
