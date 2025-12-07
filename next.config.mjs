@@ -9,7 +9,8 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  reactCompiler: true,
+  // REMOVE reactCompiler from here completely
+  // Let Babel handle it instead
 }
 
-export default nextConfig
+export default nextConfig;

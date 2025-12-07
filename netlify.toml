@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NEXT_VERSION = "15.1.6"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
