@@ -117,19 +117,19 @@ function HomeContent() {
     {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
-      image: "/products/bag.jpg",
+      image: "/categories/toys-collectibles.jpg",
       href: "/collections/watches"
     },
     {
       title: "DESIGNER HANDBAGS",
       description: "Carry timeless elegance",
-      image: "/products/bag.jpg",
+      image: "/categories/toys-collectibles.jpg",
       href: "/collections/bags"
     },
     {
       title: "SMART TECHNOLOGY",
       description: "Innovation meets luxury",
-      image: "/products/bag.jpg",
+      image: "/categories/toys-collectibles.jpg",
       href: "/collections/electronics"
     }
   ], [])
