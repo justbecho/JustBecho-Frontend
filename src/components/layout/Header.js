@@ -7,6 +7,8 @@ import { FiUser, FiHeart, FiShoppingBag, FiLogOut, FiSettings, FiPackage, FiShop
 import { usePathname, useRouter } from 'next/navigation'
 import AuthModal from '@/components/ui/AuthModal'
 
+// ... baki ka code same rahega
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -108,86 +110,32 @@ export default function Header() {
     };
   }, [ensureJustbechoFormat])
 
-  // ✅ FIXED: Fetch categories from backend with fallback
+  // ✅ FIXED: Fetch categories from backend ONLY
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true)
         console.log('📡 Fetching categories from backend API...')
         
-        const response = await fetch('https://just-becho-backend.vercel.app/api/categories', {
-          cache: 'no-store',
-          headers: {
-            'Accept': 'application/json',
-          }
-        })
-        
-        console.log('📡 Response status:', response.status)
+        const response = await fetch('https://just-becho-backend.vercel.app/api/categories')
         
         if (!response.ok) {
-          console.warn('⚠️ API responded with status:', response.status)
-          // Use fallback categories
-          setCategories([
-            "Men's Fashion",
-            "Women's Fashion", 
-            "Footwear",
-            "Accessories",
-            "Watches",
-            "Perfumes",
-            "Toys & Collectibles",
-            "Kids Fashion"
-          ])
-          return
+          throw new Error(`API responded with status: ${response.status}`)
         }
         
         const data = await response.json()
         console.log('📦 Backend API response:', data)
         
-        if (data.success && data.categories) {
-          if (Array.isArray(data.categories)) {
-            console.log(`✅ Received ${data.categories.length} categories from ${data.source || 'backend'}`)
-            
-            // Handle both string[] and object[] formats
-            const processedCategories = data.categories.map(cat => {
-              if (typeof cat === 'string') {
-                return cat
-              } else if (cat && typeof cat === 'object') {
-                return cat.name || cat
-              }
-              return cat
-            })
-            
-            setCategories(processedCategories.filter(Boolean))
-          } else {
-            console.error('❌ Categories is not an array:', data.categories)
-            setCategories([])
-          }
+        if (data.success && data.categories && Array.isArray(data.categories)) {
+          console.log(`✅ Backend categories found: ${data.categories.length}`)
+          setCategories(data.categories)
         } else {
-          console.warn('⚠️ API returned success: false, using fallback')
-          setCategories([
-            "Men's Fashion",
-            "Women's Fashion",
-            "Footwear",
-            "Accessories", 
-            "Watches",
-            "Perfumes",
-            "Toys & Collectibles",
-            "Kids Fashion"
-          ])
+          console.error('❌ Backend API response structure incorrect')
+          setCategories([]) // Empty array if no categories from backend
         }
       } catch (error) {
         console.error('💥 Error fetching categories from backend:', error)
-        // Always have fallback categories
-        setCategories([
-          "Men's Fashion",
-          "Women's Fashion",
-          "Footwear",
-          "Accessories",
-          "Watches",
-          "Perfumes",
-          "Toys & Collectibles",
-          "Kids Fashion"
-        ])
+        setCategories([]) // Empty array on error
       } finally {
         setLoading(false)
       }
@@ -222,7 +170,7 @@ export default function Header() {
       const data = await response.json()
       
       if (data.success) {
-        setCartCount(data.cart?.totalItems || data.cart?.items?.length || 0);
+        setCartCount(data.cart.totalItems || 0);
         setCartApiAvailable(true);
       } else {
         setCartApiAvailable(false);
@@ -312,56 +260,49 @@ export default function Header() {
     }
   }, [router, ensureJustbechoFormat])
 
-  // ✅ FIXED: Transform categories with useMemo
+  // ✅ FIXED: Transform categories - ONLY BACKEND DATA
   const transformedCategories = useMemo(() => {
-    console.log('🔄 Transforming categories:', categories)
+    console.log('🔄 Transforming backend categories:', categories)
     
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
-      console.log('📝 No categories available')
-      return [] // Return empty array
+      console.log('⚠️ No categories from backend')
+      return []; // Empty array - will show "No categories available"
     }
     
+    // Transform backend categories based on their structure
     const transformed = categories.map((category, index) => {
-      // If category is a string
+      // If category is a string (like ["Mobile Phones", "Laptops"])
       if (typeof category === 'string') {
-        const name = category
         return {
-          name: name,
-          href: `/categories/${name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`,
+          name: category,
+          href: `/categories/${category.toLowerCase().replace(/\s+/g, '-')}`,
           dropdown: {
             sections: [{
               title: "ITEMS",
               items: ["View All Products", "New Arrivals", "Best Sellers"]
             }]
           }
-        }
+        };
       }
       
-      // If category is an object
-      if (category && typeof category === 'object') {
-        const name = category.name || `Category ${index + 1}`
-        const href = category.href || `/categories/${name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`
-        
-        return {
-          name: name,
-          href: href,
-          dropdown: {
-            sections: category.subCategories || category.dropdown?.sections || [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
+      // If category is an object (with name, href, subCategories)
+      return {
+        name: category?.name || `Category ${index + 1}`,
+        href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
+        dropdown: {
+          sections: category?.subCategories || [{
+            title: "ITEMS",
+            items: ["View All Products", "New Arrivals", "Best Sellers"]
+          }]
         }
-      }
-      
-      return null
-    }).filter(Boolean) // Remove null entries
+      };
+    });
     
     console.log('✅ Transformed categories:', transformed)
-    return transformed
-  }, [categories])
+    return transformed;
+  }, [categories]);
 
-  // ✅ FIXED: Handle Sell Now click
+  // ✅ Rest of your handlers remain the same...
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
