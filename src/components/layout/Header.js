@@ -17,6 +17,7 @@ export default function Header() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
+  const [cartApiAvailable, setCartApiAvailable] = useState(true) // ✅ NEW: Track if cart API is available
   const pathname = usePathname()
   const router = useRouter()
 
@@ -157,7 +158,7 @@ export default function Header() {
     fetchCategories()
   }, [])
 
-  // ✅ FIXED: Fetch cart count with useCallback
+  // ✅ FIXED: Fetch cart count with useCallback - WITH ERROR HANDLING
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -166,26 +167,43 @@ export default function Header() {
         return
       }
 
+      console.log('🛒 Attempting to fetch cart from API...');
       const response = await fetch('https://just-becho-backend.vercel.app/api/cart', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        // Timeout after 3 seconds
+        signal: AbortSignal.timeout(3000)
       })
 
       if (!response.ok) {
-        setCartCount(0)
-        return
+        console.log(`🛒 Cart API response not OK: ${response.status}`);
+        setCartApiAvailable(false);
+        setCartCount(0);
+        return;
       }
 
       const data = await response.json()
       
       if (data.success) {
-        setCartCount(data.cart.totalItems || 0)
+        console.log('🛒 Cart data received:', data);
+        setCartCount(data.cart.totalItems || 0);
+        setCartApiAvailable(true);
+      } else {
+        console.log('🛒 Cart API success false');
+        setCartApiAvailable(false);
+        setCartCount(0);
       }
     } catch (error) {
-      console.error('Error fetching cart count:', error)
-      setCartCount(0)
+      console.log('🛒 Cart fetch error:', error.name === 'TimeoutError' ? 'Request timed out' : error.message);
+      setCartApiAvailable(false);
+      setCartCount(0);
+      
+      // Check if it's a timeout or network error
+      if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+        console.log('🛒 Cart API is not responding - using mock data');
+      }
     }
   }, [])
 
@@ -284,13 +302,15 @@ export default function Header() {
 
   // ✅ FIXED: Transform categories with useCallback
   const transformCategories = useCallback((backendCategories) => {
+    if (!backendCategories || !Array.isArray(backendCategories)) return [];
+    
     return backendCategories.map(category => ({
-      name: category.name,
-      href: category.href || `/categories/${category.name.toLowerCase().replace(/\s+/g, '-')}`,
+      name: category.name || 'Category',
+      href: category.href || `/categories/${(category.name || 'category').toLowerCase().replace(/\s+/g, '-')}`,
       dropdown: {
         sections: category.subCategories?.map(subCategory => ({
-          title: subCategory.title,
-          items: subCategory.items
+          title: subCategory.title || 'Section',
+          items: subCategory.items || []
         })) || [
           {
             title: "ITEMS",
@@ -432,23 +452,32 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router])
 
+  // ✅ FIXED: Handle cart click with cart API availability check
   const handleCartClick = useCallback((e) => {
     e.preventDefault()
     if (user) {
-      router.push('/cart')
+      if (cartApiAvailable) {
+        router.push('/cart')
+      } else {
+        alert('Cart functionality is currently unavailable. Please try again later.');
+      }
     } else {
       setIsAuthModalOpen(true)
     }
-  }, [user, router])
+  }, [user, router, cartApiAvailable])
 
   const handleMobileCartClick = useCallback(() => {
     if (user) {
-      router.push('/cart')
+      if (cartApiAvailable) {
+        router.push('/cart')
+      } else {
+        alert('Cart functionality is currently unavailable. Please try again later.');
+      }
     } else {
       setIsAuthModalOpen(true)
     }
     setIsMenuOpen(false)
-  }, [user, router])
+  }, [user, router, cartApiAvailable])
 
   // ✅ FIXED: Handle logout properly for Google signup users
   const handleLogout = useCallback(() => {
@@ -759,22 +788,24 @@ export default function Header() {
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
-                {/* Cart Icon */}
-                <button 
-                  onClick={handleCartClick}
-                  className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                    isDashboardPage ? 'text-gray-900' :
-                    isProductPage || isSellNowPage ? 'text-gray-900' : 
-                    isScrolled ? 'text-gray-900' : 'text-white'
-                  }`}
-                >
-                  <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
-                      {cartCount > 99 ? '99+' : cartCount}
-                    </span>
-                  )}
-                </button>
+                {/* Cart Icon - Only show if cart API is available */}
+                {cartApiAvailable && (
+                  <button 
+                    onClick={handleCartClick}
+                    className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                      isDashboardPage ? 'text-gray-900' :
+                      isProductPage || isSellNowPage ? 'text-gray-900' : 
+                      isScrolled ? 'text-gray-900' : 'text-white'
+                    }`}
+                  >
+                    <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -890,14 +921,16 @@ export default function Header() {
                 WISHLIST
               </button>
               
-              {/* Mobile Cart */}
-              <button 
-                onClick={handleMobileCartClick}
-                className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300 text-left"
-              >
-                <FiShoppingBag className="w-4 h-4 mr-3" />
-                CART {cartCount > 0 && `(${cartCount})`}
-              </button>
+              {/* Mobile Cart - Only show if cart API is available */}
+              {cartApiAvailable && (
+                <button 
+                  onClick={handleMobileCartClick}
+                  className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300 text-left"
+                >
+                  <FiShoppingBag className="w-4 h-4 mr-3" />
+                  CART {cartCount > 0 && `(${cartCount})`}
+                </button>
+              )}
             </nav>
           </div>
         )}
@@ -957,7 +990,7 @@ export default function Header() {
                                 {section.items.map((item, itemIndex) => (
                                   <li key={itemIndex}>
                                     <Link
-                                      href={`${category.href}?subcategory=${item.toLowerCase().replace(' ', '-')}`}
+                                      href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(' ', '-')}`}
                                       className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-0.5"
                                     >
                                       {item}

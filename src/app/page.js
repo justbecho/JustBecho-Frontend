@@ -311,6 +311,7 @@ function HomeContent() {
     // ✅ FIXED: toLowerCase() error se bachne ke liye
     const productName = product.productName || 'Product';
     const safeProductName = typeof productName === 'string' ? productName : 'Product';
+    const safeCondition = product.condition && typeof product.condition === 'string' ? product.condition : '';
     
     return (
       <Link 
@@ -329,10 +330,10 @@ function HomeContent() {
             }}
           />
           {/* Condition Badge */}
-          {product.condition && (
+          {safeCondition && (
             <div className="absolute top-2 left-2">
               <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
-                {product.condition.toUpperCase()}
+                {safeCondition.toUpperCase()}
               </span>
             </div>
           )}
@@ -394,6 +395,14 @@ function HomeContent() {
         </div>
       </div>
     )
+  }
+
+  // ✅ FIXED: Helper function to safely convert strings to uppercase
+  const safeToUpperCase = (str) => {
+    if (typeof str === 'string') {
+      return str.toUpperCase();
+    }
+    return '';
   }
 
   return (
@@ -497,7 +506,7 @@ function HomeContent() {
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
                   </div>
                   <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-4 sm:mt-6 leading-tight">
-                    {cat.name.toUpperCase()}
+                    {safeToUpperCase(cat.name)}
                   </h3>
                 </Link>
               ))}
@@ -601,15 +610,15 @@ function HomeContent() {
           const products = categoryProducts[category.name] || []
 
           return (
-            <div key={category.name}>
+            <div key={category.name || index}>
               <section className="py-16 bg-white border-t border-gray-100">
                 <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
                   <div className="text-center mb-12">
                     <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
-                      {category.name.toUpperCase()}
+                      {safeToUpperCase(category.name)}
                     </h2>
                     <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-3">
-                      EXPLORE OUR CURATED {category.name.toUpperCase()} COLLECTION
+                      EXPLORE OUR CURATED {safeToUpperCase(category.name)} COLLECTION
                     </p>
                   </div>
 
@@ -640,7 +649,7 @@ function HomeContent() {
                     <div className="mt-16">
                       <div className="text-center mb-8">
                         <h3 className="text-gray-900 text-xl sm:text-3xl font-light tracking-widest uppercase">
-                          POPULAR BRANDS IN {category.name.toUpperCase()}
+                          POPULAR BRANDS IN {safeToUpperCase(category.name)}
                         </h3>
                         <p className="text-gray-900 text-base font-light tracking-widest uppercase mt-2">
                           AUTHENTIC LUXURY BRANDS YOU CAN TRUST
@@ -668,7 +677,7 @@ function HomeContent() {
                       className="text-gray-900 text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative"
                     >
                       <span className="relative">
-                        → {category.name.toUpperCase()}
+                        → {safeToUpperCase(category.name)}
                         <span className="absolute bottom-0 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-700 group-hover:delay-100"></span>
                       </span>
                     </Link>
@@ -681,7 +690,7 @@ function HomeContent() {
                 <section className="py-16 bg-gradient-to-r from-gray-900 to-black">
                   <div className="max-w-[1700px] mx-auto px-4 sm:px-6 text-center">
                     <h2 className="text-white text-2xl sm:text-3xl font-light tracking-widest uppercase mb-4">
-                      READY TO SELL YOUR {category.name.toUpperCase()}?
+                      READY TO SELL YOUR {safeToUpperCase(category.name)}?
                     </h2>
                     <p className="text-gray-300 text-base font-light tracking-widest uppercase mb-6 max-w-2xl mx-auto">
                       Get the best value for your luxury items
@@ -763,14 +772,14 @@ function HomeContent() {
 
                         <div className="flex items-center pt-3 border-t border-gray-200/50">
                           <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center text-white font-light text-base mr-3 shadow-md">
-                            {testimonial.name.charAt(0)}
+                            {testimonial.name?.charAt(0) || 'U'}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-gray-900 text-sm font-light tracking-wide mb-0.5">{testimonial.name}</h4>
-                            <p className="text-gray-600 text-xs font-light">{testimonial.location}</p>
+                            <h4 className="text-gray-900 text-sm font-light tracking-wide mb-0.5">{testimonial.name || 'User'}</h4>
+                            <p className="text-gray-600 text-xs font-light">{testimonial.location || 'India'}</p>
                             <div className="mt-1">
                               <span className="inline-block bg-gray-200/70 text-gray-700 text-[9px] font-light tracking-wider px-2 py-0.5 rounded-full">
-                                {testimonial.role}
+                                {testimonial.role || 'Customer'}
                               </span>
                             </div>
                           </div>
