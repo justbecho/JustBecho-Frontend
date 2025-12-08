@@ -108,49 +108,32 @@ export default function Header() {
     };
   }, [ensureJustbechoFormat])
 
-  // ✅ FIXED: Fetch categories with better error handling
+  // ✅ FIXED: Fetch categories from backend ONLY
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true)
-        console.log('📡 Fetching categories from API...')
-        const response = await fetch('https://just-becho-backend.vercel.app/api/categories')
-        const data = await response.json()
+        console.log('📡 Fetching categories from backend API...')
         
-        console.log('📦 Categories API response:', data)
+        const response = await fetch('https://just-becho-backend.vercel.app/api/categories')
+        
+        if (!response.ok) {
+          throw new Error(`API responded with status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        console.log('📦 Backend API response:', data)
         
         if (data.success && data.categories && Array.isArray(data.categories)) {
-          console.log(`✅ Categories found: ${data.categories.length}`)
+          console.log(`✅ Backend categories found: ${data.categories.length}`)
           setCategories(data.categories)
         } else {
-          console.error('❌ Failed to fetch categories or empty response')
-          
-          // ✅ FALLBACK: Use default categories if API fails
-          const defaultCategories = [
-            { name: "Men's Fashion", href: "/categories/men" },
-            { name: "Women's Fashion", href: "/categories/women" },
-            { name: "Footwear", href: "/categories/footwear" },
-            { name: "Accessories", href: "/categories/accessories" },
-            { name: "Watches", href: "/categories/watches" },
-            { name: "Perfumes", href: "/categories/perfumes" },
-            { name: "Toys & Collectibles", href: "/categories/toys" }
-          ]
-          setCategories(defaultCategories)
+          console.error('❌ Backend API response structure incorrect')
+          setCategories([]) // Empty array if no categories from backend
         }
       } catch (error) {
-        console.error('💥 Error fetching categories:', error)
-        
-        // ✅ FALLBACK: Use default categories on error
-        const defaultCategories = [
-          { name: "Men's Fashion", href: "/categories/men" },
-          { name: "Women's Fashion", href: "/categories/women" },
-          { name: "Footwear", href: "/categories/footwear" },
-          { name: "Accessories", href: "/categories/accessories" },
-          { name: "Watches", href: "/categories/watches" },
-          { name: "Perfumes", href: "/categories/perfumes" },
-          { name: "Toys & Collectibles", href: "/categories/toys" }
-        ]
-        setCategories(defaultCategories)
+        console.error('💥 Error fetching categories from backend:', error)
+        setCategories([]) // Empty array on error
       } finally {
         setLoading(false)
       }
@@ -159,7 +142,7 @@ export default function Header() {
     fetchCategories()
   }, [])
 
-  // ✅ FIXED: Fetch cart count with useCallback
+  // ✅ FIXED: Fetch cart count
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -209,7 +192,7 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // ✅ FIXED: Convert to Seller Function
+  // ✅ Convert to Seller Function
   const convertToSeller = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -257,7 +240,7 @@ export default function Header() {
           localStorage.setItem('token', data.token);
         }
         
-        alert('✅ You are now registered as a seller! Please complete your seller profile details including bank information.');
+        alert('✅ You are now registered as a seller!');
         
         localStorage.setItem('changingRoleToSeller', 'true');
         
@@ -270,111 +253,54 @@ export default function Header() {
       }
       
     } catch (error) {
-      console.error('Error in convertToSeller from header:', error);
+      console.error('Error in convertToSeller:', error);
       alert(`Error: ${error.message}`);
     }
   }, [router, ensureJustbechoFormat])
 
-  // ✅ FIXED: Transform categories - SIMPLIFIED VERSION
+  // ✅ FIXED: Transform categories - ONLY BACKEND DATA
   const transformedCategories = useMemo(() => {
-    if (!categories || !Array.isArray(categories)) {
-      // Return default categories if API fails
-      return [
-        {
-          name: "Men's Fashion",
-          href: '/categories/men',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        },
-        {
-          name: "Women's Fashion",
-          href: '/categories/women',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        },
-        {
-          name: "Footwear",
-          href: '/categories/footwear',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        },
-        {
-          name: "Accessories",
-          href: '/categories/accessories',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        },
-        {
-          name: "Watches",
-          href: '/categories/watches',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        },
-        {
-          name: "Perfumes",
-          href: '/categories/perfumes',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        },
-        {
-          name: "Toys & Collectibles",
-          href: '/categories/toys',
-          dropdown: {
-            sections: [{
-              title: "ITEMS",
-              items: ["View All Products", "New Arrivals", "Best Sellers"]
-            }]
-          }
-        }
-      ];
+    console.log('🔄 Transforming backend categories:', categories)
+    
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
+      console.log('⚠️ No categories from backend')
+      return []; // Empty array - will show "No categories available"
     }
     
-    // Transform backend categories to frontend format
-    return categories.map(category => {
-      // Ensure category has required properties
-      const safeCategory = {
-        name: category?.name || 'Category',
-        href: category?.href || `/categories/${(category?.name || 'category').toLowerCase().replace(/\s+/g, '-')}`,
+    // Transform backend categories based on their structure
+    const transformed = categories.map((category, index) => {
+      // If category is a string (like ["Mobile Phones", "Laptops"])
+      if (typeof category === 'string') {
+        return {
+          name: category,
+          href: `/categories/${category.toLowerCase().replace(/\s+/g, '-')}`,
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        };
+      }
+      
+      // If category is an object (with name, href, subCategories)
+      return {
+        name: category?.name || `Category ${index + 1}`,
+        href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
         dropdown: {
-          sections: category?.subCategories?.map(subCat => ({
-            title: subCat?.title || 'Section',
-            items: subCat?.items || []
-          })) || [{
+          sections: category?.subCategories || [{
             title: "ITEMS",
             items: ["View All Products", "New Arrivals", "Best Sellers"]
           }]
         }
       };
-      
-      return safeCategory;
     });
+    
+    console.log('✅ Transformed categories:', transformed)
+    return transformed;
   }, [categories]);
 
-  // ✅ FIXED: Handle Sell Now Click
+  // ✅ Rest of your handlers remain the same...
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
@@ -389,7 +315,7 @@ export default function Header() {
           router.push('/sell-now')
         } else {
           if (latestUser.sellerVerificationStatus === 'pending') {
-            alert('Your seller account is pending approval. Please wait for admin verification.')
+            alert('Your seller account is pending approval.')
             router.push('/dashboard?section=listings')
           } else if (latestUser.sellerVerificationStatus === 'approved') {
             const updatedUser = {
@@ -416,7 +342,6 @@ export default function Header() {
     }
   }, [user, router, convertToSeller])
 
-  // ✅ FIXED: Handle Mobile Sell Now Click
   const handleMobileSellNowClick = useCallback(() => {
     if (user) {
       const currentUserData = localStorage.getItem('user');
@@ -429,7 +354,7 @@ export default function Header() {
           router.push('/sell-now')
         } else {
           if (latestUser.sellerVerificationStatus === 'pending') {
-            alert('Your seller account is pending approval. Please wait for admin verification.')
+            alert('Your seller account is pending approval.')
             router.push('/dashboard?section=listings')
           } else if (latestUser.sellerVerificationStatus === 'approved') {
             const updatedUser = {
@@ -457,7 +382,6 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router, convertToSeller])
 
-  // ✅ FIXED: Other handlers
   const handleProfileClick = useCallback((e) => {
     e.preventDefault()
     if (user) {
@@ -492,7 +416,7 @@ export default function Header() {
       if (cartApiAvailable) {
         router.push('/cart')
       } else {
-        alert('Cart functionality is currently unavailable. Please try again later.');
+        alert('Cart functionality is currently unavailable.');
       }
     } else {
       setIsAuthModalOpen(true)
@@ -504,7 +428,7 @@ export default function Header() {
       if (cartApiAvailable) {
         router.push('/cart')
       } else {
-        alert('Cart functionality is currently unavailable. Please try again later.');
+        alert('Cart functionality is currently unavailable.');
       }
     } else {
       setIsAuthModalOpen(true)
@@ -512,7 +436,6 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router, cartApiAvailable])
 
-  // ✅ FIXED: Handle logout
   const handleLogout = useCallback(() => {
     try {
       localStorage.removeItem('token')
@@ -547,7 +470,6 @@ export default function Header() {
     }
   }, [])
 
-  // ✅ FIXED: Mobile logout handler
   const handleMobileLogout = useCallback(() => {
     setIsMenuOpen(false)
     
