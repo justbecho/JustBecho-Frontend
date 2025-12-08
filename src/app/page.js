@@ -224,7 +224,7 @@ function HomeContent() {
     }
   ], [])
 
-  // ✅ FIXED: Use the CORRECT API endpoint
+  // ✅ FIXED: Use the correct API endpoint
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       try {
@@ -234,16 +234,8 @@ function HomeContent() {
         // Har category ke liye products fetch karo
         for (const category of categories) {
           try {
-            // ✅ CRITICAL FIX: Use the WORKING backend route
-            // Your backend has BOTH routes now:
-            // 1. /api/products?category=... (query parameter) - WORKING
-            // 2. /api/products/category/... (path parameter) - NOW ADDED
-            
-            // OPTION 1: Use query parameter (RECOMMENDED - already working)
+            // ✅ FIXED: Use correct endpoint (with query parameter)
             const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
-            
-            // OPTION 2: Use path parameter (if backend adds it)
-            // const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${encodeURIComponent(category.apiCategory)}?limit=4`
             
             console.log(`📡 Fetching ${category.name} from:`, apiUrl)
             
@@ -254,10 +246,8 @@ function HomeContent() {
               const data = await response.json()
               console.log(`📦 ${category.name} API response:`, data)
               
-              // ✅ FIXED: Check response structure
               if (data.success && data.products) {
                 console.log(`✅ ${category.name} products found:`, data.products.length)
-                // Sirf active products lo aur maximum 4 products
                 productsByCategory[category.name] = data.products.slice(0, 4)
               } else {
                 console.log(`❌ No products found for ${category.name}`)
