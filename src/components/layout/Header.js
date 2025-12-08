@@ -17,7 +17,7 @@ export default function Header() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
-  const [cartApiAvailable, setCartApiAvailable] = useState(true) // ✅ NEW: Track if cart API is available
+  const [cartApiAvailable, setCartApiAvailable] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -29,98 +29,74 @@ export default function Header() {
   const ensureJustbechoFormat = useCallback((username) => {
     if (!username) return null;
     
-    // Remove any leading @
     let clean = username.replace(/^@+/, '');
     
-    // If already ends with @justbecho, return as-is
     if (clean.endsWith('@justbecho')) {
       return clean;
     }
     
-    // If contains @justbecho elsewhere, fix it
     if (clean.includes('@justbecho')) {
       const namePart = clean.replace('@justbecho', '');
       return `${namePart}@justbecho`;
     }
     
-    // Add @justbecho suffix
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ NEW: Real-time user state synchronization
-  const updateUserState = useCallback(() => {
-    try {
-      const token = localStorage.getItem('token')
-      const userData = localStorage.getItem('user')
-      
-      if (token && userData) {
-        const user = JSON.parse(userData)
+  // ✅ FIXED: Listen for seller status updates
+  useEffect(() => {
+    const updateUserState = () => {
+      try {
+        const token = localStorage.getItem('token')
+        const userData = localStorage.getItem('user')
         
-        // ✅ FIXED: Ensure username is in "name@justbecho" format
-        if (user.username) {
-          user.username = ensureJustbechoFormat(user.username);
-        }
-        
-        setUser(user)
-        
-        // ✅ Check for seller verification updates
-        if (user.role === 'seller' && user.sellerVerificationStatus === 'approved') {
-          // Ensure sellerVerified is true if status is approved
-          if (!user.sellerVerified) {
-            const updatedUser = {
-              ...user,
-              sellerVerified: true
-            };
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-            setUser(updatedUser);
+        if (token && userData) {
+          const user = JSON.parse(userData)
+          
+          if (user.username) {
+            user.username = ensureJustbechoFormat(user.username);
           }
+          
+          setUser(user)
+          
+          if (user.role === 'seller' && user.sellerVerificationStatus === 'approved') {
+            if (!user.sellerVerified) {
+              const updatedUser = {
+                ...user,
+                sellerVerified: true
+              };
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+              setUser(updatedUser);
+            }
+          }
+          
+          fetchCartCount()
+        } else {
+          setUser(null)
+          setCartCount(0)
         }
-        
-        // Fetch cart count when user is logged in
-        fetchCartCount()
-      } else {
+      } catch (error) {
+        console.error('Error updating user state:', error)
         setUser(null)
         setCartCount(0)
       }
-    } catch (error) {
-      console.error('Error updating user state:', error)
-      setUser(null)
-      setCartCount(0)
     }
-  }, [ensureJustbechoFormat])
 
-  // ✅ FIXED: Listen for seller status updates
-  useEffect(() => {
-    // Check user state on mount
     updateUserState();
     
-    // Listen for storage changes (when user data updates in localStorage)
     const handleStorageChange = (e) => {
       if (e.key === 'user' || e.key === 'token') {
-        console.log('🔄 Storage changed, updating user state');
         updateUserState();
       }
     };
     
-    // Listen for custom events from other components
     const handleSellerStatusUpdate = () => {
-      console.log('📢 Received seller status update event');
       updateUserState();
-    };
-    
-    // Listen for Socket.IO events
-    const handleSocketSellerUpdate = (data) => {
-      if (data.type === 'seller-status-update') {
-        console.log('📢 Socket.IO seller update received');
-        updateUserState();
-      }
     };
     
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
-    window.addEventListener('socketSellerUpdate', handleSocketSellerUpdate);
     
-    // Poll for user updates every 5 seconds (fallback)
     const pollInterval = setInterval(() => {
       updateUserState();
     }, 5000);
@@ -128,28 +104,53 @@ export default function Header() {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
-      window.removeEventListener('socketSellerUpdate', handleSocketSellerUpdate);
       clearInterval(pollInterval);
     };
-  }, [updateUserState]);
+  }, [ensureJustbechoFormat])
 
-  // ✅ FIXED: Fetch categories with proper dependencies
+  // ✅ FIXED: Fetch categories with better error handling
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true)
+        console.log('📡 Fetching categories from API...')
         const response = await fetch('https://just-becho-backend.vercel.app/api/categories')
         const data = await response.json()
         
-        if (data.success) {
+        console.log('📦 Categories API response:', data)
+        
+        if (data.success && data.categories && Array.isArray(data.categories)) {
+          console.log(`✅ Categories found: ${data.categories.length}`)
           setCategories(data.categories)
         } else {
-          console.error('Failed to fetch categories:', data.message)
-          setCategories([])
+          console.error('❌ Failed to fetch categories or empty response')
+          
+          // ✅ FALLBACK: Use default categories if API fails
+          const defaultCategories = [
+            { name: "Men's Fashion", href: "/categories/men" },
+            { name: "Women's Fashion", href: "/categories/women" },
+            { name: "Footwear", href: "/categories/footwear" },
+            { name: "Accessories", href: "/categories/accessories" },
+            { name: "Watches", href: "/categories/watches" },
+            { name: "Perfumes", href: "/categories/perfumes" },
+            { name: "Toys & Collectibles", href: "/categories/toys" }
+          ]
+          setCategories(defaultCategories)
         }
       } catch (error) {
-        console.error('Error fetching categories:', error)
-        setCategories([])
+        console.error('💥 Error fetching categories:', error)
+        
+        // ✅ FALLBACK: Use default categories on error
+        const defaultCategories = [
+          { name: "Men's Fashion", href: "/categories/men" },
+          { name: "Women's Fashion", href: "/categories/women" },
+          { name: "Footwear", href: "/categories/footwear" },
+          { name: "Accessories", href: "/categories/accessories" },
+          { name: "Watches", href: "/categories/watches" },
+          { name: "Perfumes", href: "/categories/perfumes" },
+          { name: "Toys & Collectibles", href: "/categories/toys" }
+        ]
+        setCategories(defaultCategories)
       } finally {
         setLoading(false)
       }
@@ -158,7 +159,7 @@ export default function Header() {
     fetchCategories()
   }, [])
 
-  // ✅ FIXED: Fetch cart count with useCallback - WITH ERROR HANDLING
+  // ✅ FIXED: Fetch cart count with useCallback
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -167,18 +168,15 @@ export default function Header() {
         return
       }
 
-      console.log('🛒 Attempting to fetch cart from API...');
       const response = await fetch('https://just-becho-backend.vercel.app/api/cart', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        // Timeout after 3 seconds
         signal: AbortSignal.timeout(3000)
       })
 
       if (!response.ok) {
-        console.log(`🛒 Cart API response not OK: ${response.status}`);
         setCartApiAvailable(false);
         setCartCount(0);
         return;
@@ -187,27 +185,19 @@ export default function Header() {
       const data = await response.json()
       
       if (data.success) {
-        console.log('🛒 Cart data received:', data);
         setCartCount(data.cart.totalItems || 0);
         setCartApiAvailable(true);
       } else {
-        console.log('🛒 Cart API success false');
         setCartApiAvailable(false);
         setCartCount(0);
       }
     } catch (error) {
-      console.log('🛒 Cart fetch error:', error.name === 'TimeoutError' ? 'Request timed out' : error.message);
       setCartApiAvailable(false);
       setCartCount(0);
-      
-      // Check if it's a timeout or network error
-      if (error.name === 'AbortError' || error.name === 'TimeoutError') {
-        console.log('🛒 Cart API is not responding - using mock data');
-      }
     }
   }, [])
 
-  // ✅ FIXED: Scroll effect with cleanup
+  // ✅ FIXED: Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
@@ -228,9 +218,6 @@ export default function Header() {
         return;
       }
       
-      console.log('🔄 Converting buyer to seller from header...');
-      
-      // Call backend API to convert to seller
       const response = await fetch('https://just-becho-backend.vercel.app/api/auth/convert-to-seller', {
         method: 'PUT',
         headers: {
@@ -246,12 +233,8 @@ export default function Header() {
       }
       
       if (data.success) {
-        console.log('✅ Converted to seller from header:', data);
-        
-        // ✅ FIXED: Ensure username is in "name@justbecho" format
         const formattedUsername = ensureJustbechoFormat(data.user?.username);
         
-        // Update local user data IMMEDIATELY
         const userData = localStorage.getItem('user');
         const currentUser = userData ? JSON.parse(userData) : null;
         
@@ -261,31 +244,23 @@ export default function Header() {
           sellerVerified: data.user?.sellerVerified || false,
           sellerVerificationStatus: data.user?.sellerVerificationStatus || 'pending',
           verificationId: data.user?.verificationId || null,
-          username: formattedUsername // ✅ Store as "name@justbecho"
+          username: formattedUsername
         };
         
-        // Save to localStorage
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        
-        // Update state immediately
         setUser(updatedUser);
         
-        // Trigger auth change event
         window.dispatchEvent(new Event('authChange'));
         window.dispatchEvent(new Event('sellerStatusUpdated'));
         
-        // Save new token if provided
         if (data.token) {
           localStorage.setItem('token', data.token);
         }
         
-        // Show success message
         alert('✅ You are now registered as a seller! Please complete your seller profile details including bank information.');
         
-        // ✅ Set flag for seller conversion
         localStorage.setItem('changingRoleToSeller', 'true');
         
-        // Redirect to complete-profile page
         setTimeout(() => {
           router.push('/complete-profile?convertingToSeller=true');
         }, 1000);
@@ -300,53 +275,123 @@ export default function Header() {
     }
   }, [router, ensureJustbechoFormat])
 
-  // ✅ FIXED: Transform categories with useCallback
-  const transformCategories = useCallback((backendCategories) => {
-    if (!backendCategories || !Array.isArray(backendCategories)) return [];
+  // ✅ FIXED: Transform categories - SIMPLIFIED VERSION
+  const transformedCategories = useMemo(() => {
+    if (!categories || !Array.isArray(categories)) {
+      // Return default categories if API fails
+      return [
+        {
+          name: "Men's Fashion",
+          href: '/categories/men',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        },
+        {
+          name: "Women's Fashion",
+          href: '/categories/women',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        },
+        {
+          name: "Footwear",
+          href: '/categories/footwear',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        },
+        {
+          name: "Accessories",
+          href: '/categories/accessories',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        },
+        {
+          name: "Watches",
+          href: '/categories/watches',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        },
+        {
+          name: "Perfumes",
+          href: '/categories/perfumes',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        },
+        {
+          name: "Toys & Collectibles",
+          href: '/categories/toys',
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        }
+      ];
+    }
     
-    return backendCategories.map(category => ({
-      name: category.name || 'Category',
-      href: category.href || `/categories/${(category.name || 'category').toLowerCase().replace(/\s+/g, '-')}`,
-      dropdown: {
-        sections: category.subCategories?.map(subCategory => ({
-          title: subCategory.title || 'Section',
-          items: subCategory.items || []
-        })) || [
-          {
+    // Transform backend categories to frontend format
+    return categories.map(category => {
+      // Ensure category has required properties
+      const safeCategory = {
+        name: category?.name || 'Category',
+        href: category?.href || `/categories/${(category?.name || 'category').toLowerCase().replace(/\s+/g, '-')}`,
+        dropdown: {
+          sections: category?.subCategories?.map(subCat => ({
+            title: subCat?.title || 'Section',
+            items: subCat?.items || []
+          })) || [{
             title: "ITEMS",
             items: ["View All Products", "New Arrivals", "Best Sellers"]
-          }
-        ]
-      }
-    }))
-  }, [])
+          }]
+        }
+      };
+      
+      return safeCategory;
+    });
+  }, [categories]);
 
-  const transformedCategories = transformCategories(categories)
-
-  // ✅ FIXED: Handle Sell Now Click with useCallback
+  // ✅ FIXED: Handle Sell Now Click
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
     if (user) {
-      // ✅ Check user status again before proceeding
       const currentUserData = localStorage.getItem('user');
       const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
       
-      // Use latest user data from localStorage
       const latestUser = currentUser || user;
       
-      // Check if user is seller
       if (latestUser.role === 'seller') {
-        // Check if seller is verified
         if (latestUser.sellerVerified) {
           router.push('/sell-now')
         } else {
-          // Check seller verification status
           if (latestUser.sellerVerificationStatus === 'pending') {
             alert('Your seller account is pending approval. Please wait for admin verification.')
             router.push('/dashboard?section=listings')
           } else if (latestUser.sellerVerificationStatus === 'approved') {
-            // If approved but sellerVerified is false, update user data
             const updatedUser = {
               ...latestUser,
               sellerVerified: true
@@ -354,20 +399,15 @@ export default function Header() {
             localStorage.setItem('user', JSON.stringify(updatedUser));
             setUser(updatedUser);
             
-            // Dispatch event to update other components
             window.dispatchEvent(new Event('sellerStatusUpdated'));
-            
-            // Redirect to sell-now
             router.push('/sell-now')
           } else {
             router.push('/sell-now')
           }
         }
       } else {
-        // Not a seller, show confirmation to become seller
         const confirmBecomeSeller = confirm('You need to be a seller to list products. Would you like to become a seller?');
         if (confirmBecomeSeller) {
-          // Call the API to convert to seller
           convertToSeller();
         }
       }
@@ -376,26 +416,22 @@ export default function Header() {
     }
   }, [user, router, convertToSeller])
 
-  // ✅ FIXED: Handle Mobile Sell Now Click with useCallback
+  // ✅ FIXED: Handle Mobile Sell Now Click
   const handleMobileSellNowClick = useCallback(() => {
     if (user) {
-      // ✅ Check user status again before proceeding
       const currentUserData = localStorage.getItem('user');
       const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
       
-      // Use latest user data from localStorage
       const latestUser = currentUser || user;
       
       if (latestUser.role === 'seller') {
         if (latestUser.sellerVerified) {
           router.push('/sell-now')
         } else {
-          // Check seller verification status
           if (latestUser.sellerVerificationStatus === 'pending') {
             alert('Your seller account is pending approval. Please wait for admin verification.')
             router.push('/dashboard?section=listings')
           } else if (latestUser.sellerVerificationStatus === 'approved') {
-            // If approved but sellerVerified is false, update user data
             const updatedUser = {
               ...latestUser,
               sellerVerified: true
@@ -403,9 +439,7 @@ export default function Header() {
             localStorage.setItem('user', JSON.stringify(updatedUser));
             setUser(updatedUser);
             
-            // Dispatch event to update other components
             window.dispatchEvent(new Event('sellerStatusUpdated'));
-            
             router.push('/sell-now')
           } else {
             router.push('/sell-now')
@@ -423,7 +457,7 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router, convertToSeller])
 
-  // ✅ FIXED: Other handlers with useCallback
+  // ✅ FIXED: Other handlers
   const handleProfileClick = useCallback((e) => {
     e.preventDefault()
     if (user) {
@@ -452,7 +486,6 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router])
 
-  // ✅ FIXED: Handle cart click with cart API availability check
   const handleCartClick = useCallback((e) => {
     e.preventDefault()
     if (user) {
@@ -479,10 +512,9 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router, cartApiAvailable])
 
-  // ✅ FIXED: Handle logout properly for Google signup users
+  // ✅ FIXED: Handle logout
   const handleLogout = useCallback(() => {
     try {
-      // Clear all auth-related data
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       localStorage.removeItem('isGoogleSignup')
@@ -490,15 +522,12 @@ export default function Header() {
       localStorage.removeItem('changingRoleToSeller')
       localStorage.removeItem('isGoogleUser')
       
-      // Clear any other data
       sessionStorage.clear()
       
-      // Update state
       setUser(null)
       setCartCount(0)
       setShowUserDropdown(false)
       
-      // Clear cookies
       const cookies = document.cookie.split(";")
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i]
@@ -507,29 +536,23 @@ export default function Header() {
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
       }
       
-      // Dispatch events
       window.dispatchEvent(new Event('authChange'))
       window.dispatchEvent(new Event('storage'))
       
-      // Direct redirect to home page
       window.location.href = '/'
       
     } catch (error) {
       console.error('Logout error:', error)
-      // Fallback: Direct redirect
       window.location.href = '/'
     }
   }, [])
 
   // ✅ FIXED: Mobile logout handler
   const handleMobileLogout = useCallback(() => {
-    // Close mobile menu first
     setIsMenuOpen(false)
     
-    // Small delay to allow menu to close
     setTimeout(() => {
       try {
-        // Clear all auth-related data
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         localStorage.removeItem('isGoogleSignup')
@@ -537,14 +560,11 @@ export default function Header() {
         localStorage.removeItem('changingRoleToSeller')
         localStorage.removeItem('isGoogleUser')
         
-        // Clear any other data
         sessionStorage.clear()
         
-        // Update state
         setUser(null)
         setCartCount(0)
         
-        // Clear cookies
         const cookies = document.cookie.split(";")
         for (let i = 0; i < cookies.length; i++) {
           const cookie = cookies[i]
@@ -553,11 +573,9 @@ export default function Header() {
           document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
         }
         
-        // Dispatch events
         window.dispatchEvent(new Event('authChange'))
         window.dispatchEvent(new Event('storage'))
         
-        // Direct redirect to home page
         window.location.href = '/'
         
       } catch (error) {
@@ -877,7 +895,6 @@ export default function Header() {
                       </div>
                       {user.username && (
                         <p className="text-xs text-gray-600 mt-1">
-                          {/* ✅ FIXED: Display username as "name@justbecho" */}
                           Username: {ensureJustbechoFormat(user.username)}
                         </p>
                       )}
@@ -901,7 +918,6 @@ export default function Header() {
                     MY PURCHASES
                   </Link>
                   
-                  {/* ✅ FIXED: Mobile Logout Button */}
                   <button onClick={handleMobileLogout} className="flex items-center py-2 text-red-600 hover:text-red-700 transition-colors duration-300 text-left">
                     <FiLogOut className="w-4 h-4 mr-3" />
                     LOGOUT
@@ -950,9 +966,9 @@ export default function Header() {
             {loading ? (
               <div className="text-sm text-gray-500">Loading categories...</div>
             ) : transformedCategories.length > 0 ? (
-              transformedCategories.map((category) => (
+              transformedCategories.map((category, index) => (
                 <div
-                  key={category.name}
+                  key={category.name || index}
                   className="relative group"
                   onMouseEnter={() => setActiveCategory(category.name)}
                   onMouseLeave={() => setActiveCategory(null)}
@@ -966,7 +982,7 @@ export default function Header() {
                       isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
                     }`}
                   >
-                    {category.name}
+                    {category.name.toUpperCase()}
                   </Link>
 
                   {/* COMPACT DROPDOWN */}
@@ -990,7 +1006,7 @@ export default function Header() {
                                 {section.items.map((item, itemIndex) => (
                                   <li key={itemIndex}>
                                     <Link
-                                      href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(' ', '-')}`}
+                                      href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
                                       className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-0.5"
                                     >
                                       {item}
@@ -1031,9 +1047,9 @@ export default function Header() {
             {loading ? (
               <div className="text-xs text-gray-500">Loading...</div>
             ) : transformedCategories.length > 0 ? (
-              transformedCategories.map((category) => (
+              transformedCategories.map((category, index) => (
                 <Link
-                  key={category.name}
+                  key={category.name || index}
                   href={category.href}
                   className={`flex-shrink-0 text-xs font-light tracking-widest uppercase whitespace-nowrap ${
                     isDashboardPage ? 'text-gray-800 hover:text-gray-600' :
