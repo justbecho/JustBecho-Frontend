@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - SIMPLIFIED VERSION (SHOW ONLY SAME CATEGORY PRODUCTS)
+// app/products/[id]/page.js - COMPLETELY UPDATED VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -25,8 +25,8 @@ export default function ProductPage() {
       try {
         setLoading(true)
         
-        // 1. पहले current product fetch करें
-        const productResponse = await fetch(`http://localhost:8000/api/products/${productId}`)
+        // ✅ UPDATED: Production URL
+        const productResponse = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}`)
         
         if (productResponse.ok) {
           const productData = await productResponse.json()
@@ -36,13 +36,13 @@ export default function ProductPage() {
             setProduct(currentProduct)
             checkWishlistStatus(currentProduct._id)
             
-            // 2. फिर उसी category के products fetch करें
+            // ✅ UPDATED: Production URL
             if (currentProduct.category) {
               console.log('📦 Fetching products of category:', currentProduct.category)
               
               try {
                 const relatedResponse = await fetch(
-                  `http://localhost:8000/api/products/category/${encodeURIComponent(currentProduct.category)}?limit=13`
+                  `https://just-becho-backend.vercel.app/api/products/category/${encodeURIComponent(currentProduct.category)}?limit=13`
                 )
                 
                 if (relatedResponse.ok) {
@@ -85,7 +85,8 @@ export default function ProductPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch('http://localhost:8000/api/wishlist', {
+      // ✅ UPDATED: Production URL
+      const response = await fetch('https://just-becho-backend.vercel.app/api/wishlist', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -139,7 +140,8 @@ export default function ProductPage() {
 
       console.log('📦 Sending cart data to backend:', cartData)
 
-      const response = await fetch('http://localhost:8000/api/cart/add', {
+      // ✅ UPDATED: Production URL
+      const response = await fetch('https://just-becho-backend.vercel.app/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +209,8 @@ export default function ProductPage() {
         return
       }
 
-      const response = await fetch('http://localhost:8000/api/wishlist', {
+      // ✅ UPDATED: Production URL
+      const response = await fetch('https://just-becho-backend.vercel.app/api/wishlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -239,7 +242,8 @@ export default function ProductPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch(`http://localhost:8000/api/wishlist/${product._id}`, {
+      // ✅ UPDATED: Production URL
+      const response = await fetch(`https://just-becho-backend.vercel.app/api/wishlist/${product._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
