@@ -21,41 +21,48 @@ function HomeContent() {
   // ✅ FIXED: Home page should always show homepage content
   // Removed auth check that was causing redirect to /login
   
-  // Category-wise brands data - useMemo mein rakhein taaki har render par recreate na ho
+  // ✅ FIXED: Brand logos ke liye default images ka fallback rakho
+  const getBrandLogo = (brandName, category) => {
+    // Agar brand logo nahi hai to default image use karo
+    const logoPath = `/brandslogo/${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}/${brandName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+    return logoPath;
+  }
+
+  // ✅ FIXED: Updated categoryBrands with safer approach
   const categoryBrands = useMemo(() => ({
     "Men's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/balenciaga.png" },
-      { name: "Armani", logo: "/brandslogo/mens-fashion/armani.png" },
-      { name: "Prada", logo: "/brandslogo/mens-fashion/prada.png" },
-      { name: "Versace", logo: "/brandslogo/mens-fashion/versace.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png" },
-      { name: "Gucci", logo: "/brandslogo/mens-fashion/gucci.png" },
-      { name: "Burberry", logo: "/brandslogo/mens-fashion/burberry.png" },
-      { name: "Fendi", logo: "/brandslogo/mens-fashion/fendi.png" }
+      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Armani", logo: "/brandslogo/mens-fashion/armani.png", fallback: "/brands/armani.png" },
+      { name: "Prada", logo: "/brandslogo/mens-fashion/prada.png", fallback: "/brands/prada.png" },
+      { name: "Versace", logo: "/brandslogo/mens-fashion/versace.png", fallback: "/brands/versace.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/louis-vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/mens-fashion/gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Burberry", logo: "/brandslogo/mens-fashion/burberry.png", fallback: "/brands/burberry.png" },
+      { name: "Fendi", logo: "/brandslogo/mens-fashion/fendi.png", fallback: "/brands/fendi.png" }
     ],
     "Women's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png" },
-      { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png" },
-      { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png" },
-      { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png" },
-      { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png" },
-      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png" }
+      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Dior", logo: "/brandslogo/womens-fashion/dior.png", fallback: "/brands/dior.png" },
+      { name: "Chanel", logo: "/brandslogo/womens-fashion/chanel.png", fallback: "/brands/chanel.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/louis-vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/womens-fashion/gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Givenchy", logo: "/brandslogo/womens-fashion/givenchy.png", fallback: "/brands/givenchy.png" },
+      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/dolce-gabbana.png", fallback: "/brands/dolce-gabbana.png" }
     ],
     "Footwear": [
-      { name: "Balenciaga", logo: "/brandslogo/footwear/Balenciaga.png" },
-      { name: "Jimmy Choo", logo: "/brandslogo/footwear/Jimmy Choo.png" },
-      { name: "Prada", logo: "/brandslogo/footwear/Prada.png" },
-      { name: "Puma", logo: "/brandslogo/footwear/Puma.png" },
-      { name: "Gucci", logo: "/brandslogo/footwear/Gucci.png" },
-      { name: "Reebok", logo: "/brandslogo/footwear/Reebok.png" }
+      { name: "Balenciaga", logo: "/brandslogo/footwear/balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/jimmy-choo.png", fallback: "/brands/jimmy-choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/prada.png", fallback: "/brands/prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/puma.png", fallback: "/brands/puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/reebok.png", fallback: "/brands/reebok.png" }
     ],
     "Accessories": [
-      { name: "Woodland", logo: "/brandslogo/accessories/Woodland.png" },
-      { name: "Baggit", logo: "/brandslogo/accessories/Baggit.png" },
-      { name: "Ray-Ban", logo: "/brandslogo/accessories/Ray-Ban.png" },
-      { name: "Wildhorn", logo: "/brandslogo/accessories/Wildhorn.jpg" },
-      { name: "Nike", logo: "/brandslogo/accessories/Nike.png" }
+      { name: "Woodland", logo: "/brandslogo/accessories/woodland.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/accessories/baggit.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/accessories/ray-ban.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/accessories/wildhorn.jpg", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/accessories/nike.png", fallback: "/brands/nike.png" }
     ]
   }), [])
 
@@ -275,51 +282,6 @@ function HomeContent() {
     fetchCategoryProducts()
   }, [categories])
 
-  // ✅ OPTIONAL: Temporary test with mock data
-  useEffect(() => {
-    // If you want to test without API, use this mock data
-    const useMockData = false; // Set to true for testing
-    
-    if (useMockData) {
-      const mockProducts = {
-        "Men's Fashion": [
-          {
-            _id: "mock1",
-            productName: "Designer Shirt",
-            brand: "Armani",
-            finalPrice: 7999,
-            originalPrice: 12000,
-            images: [{ url: "/products/shirt.jpg" }],
-            condition: "New"
-          },
-          {
-            _id: "mock2",
-            productName: "Leather Jacket",
-            brand: "Gucci",
-            finalPrice: 24999,
-            originalPrice: 35000,
-            images: [{ url: "/products/jacket.jpg" }],
-            condition: "Like New"
-          }
-        ],
-        "Women's Fashion": [
-          {
-            _id: "mock3",
-            productName: "Evening Gown",
-            brand: "Dior",
-            finalPrice: 44999,
-            originalPrice: 60000,
-            images: [{ url: "/products/gown.jpg" }],
-            condition: "New"
-          }
-        ]
-      }
-      
-      setCategoryProducts(mockProducts);
-      setLoading(false);
-    }
-  }, [])
-
   const nextTestimonials = () => {
     if (isAnimating) return;
     setIsAnimating(true);
@@ -346,6 +308,10 @@ function HomeContent() {
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
     
+    // ✅ FIXED: toLowerCase() error se bachne ke liye
+    const productName = product.productName || 'Product';
+    const safeProductName = typeof productName === 'string' ? productName : 'Product';
+    
     return (
       <Link 
         href={`/products/${product._id}`}
@@ -354,11 +320,12 @@ function HomeContent() {
       >
         <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
           <img
-            src={product.images?.[0]?.url || '/placeholder-image.jpg'}
-            alt={product.productName || 'Product'}
+            src={product.images?.[0]?.url || '/images/placeholder.jpg'}
+            alt={safeProductName}
             className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
-              e.target.src = '/placeholder-image.jpg';
+              e.target.src = '/images/placeholder.jpg';
+              e.target.onerror = null; // Prevent infinite loop
             }}
           />
           {/* Condition Badge */}
@@ -372,7 +339,7 @@ function HomeContent() {
         </div>
         <div className="text-left px-1">
           <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
-            {product.productName?.toUpperCase() || 'PRODUCT'}
+            {safeProductName.toUpperCase()}
           </h3>
           <p className="text-gray-900 text-base font-light tracking-widest uppercase">
             ₹{product.finalPrice?.toLocaleString() || '0'}
@@ -384,6 +351,48 @@ function HomeContent() {
           )}
         </div>
       </Link>
+    )
+  }
+
+  // ✅ FIXED: Brand logo display component
+  const BrandLogo = ({ brand, index, categoryName }) => {
+    const [imgSrc, setImgSrc] = useState(brand.logo);
+    const [hasError, setHasError] = useState(false);
+    
+    // Agar brand name undefined hai to skip karo
+    if (!brand || !brand.name) return null;
+
+    return (
+      <div key={index} className="mx-8 sm:mx-12 flex-shrink-0">
+        <div
+          className="flex items-center justify-center"
+          style={{
+            width: "100px",
+            height: "50px",
+          }}
+        >
+          <img
+            src={imgSrc}
+            alt={brand.name}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain",
+            }}
+            onError={() => {
+              // Pehle fallback image try karo
+              if (!hasError && brand.fallback) {
+                setImgSrc(brand.fallback);
+                setHasError(true);
+              } else {
+                // Agar fallback bhi fail ho, to brand name dikhao
+                setImgSrc('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50" viewBox="0 0 100 50"><rect width="100" height="50" fill="%23f3f4f6" rx="4"/><text x="50%" y="50%" font-family="Arial" font-size="10" text-anchor="middle" dy=".3em" fill="%236b7280">' + encodeURIComponent(brand.name.substring(0, 10)) + '</text></svg>');
+              }
+            }}
+            loading="lazy"
+          />
+        </div>
+      </div>
     )
   }
 
@@ -401,6 +410,9 @@ function HomeContent() {
               fill
               className="object-cover object-center brightness-110 contrast-105 saturate-110"
               priority
+              onError={(e) => {
+                e.target.src = '/images/hero-placeholder.jpg';
+              }}
             />
             <div className="absolute inset-0 bg-black/30"></div>
           </div>
@@ -479,7 +491,7 @@ function HomeContent() {
                       fill
                       className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        e.target.src = '/placeholder-image.jpg';
+                        e.target.src = '/images/category-placeholder.jpg';
                       }}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
@@ -558,7 +570,7 @@ function HomeContent() {
                       fill
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        e.target.src = '/placeholder-image.jpg';
+                        e.target.src = '/images/collection-placeholder.jpg';
                       }}
                     />
                   </div>
@@ -637,29 +649,13 @@ function HomeContent() {
 
                       <div className="w-full overflow-hidden py-3">
                         <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap">
-                          {duplicatedCategoryBrands.map((brand, index) => (
-                            <div key={index} className="mx-8 sm:mx-12">
-                              <div
-                                className="flex items-center justify-center"
-                                style={{
-                                  width: "100px",
-                                  height: "50px",
-                                }}
-                              >
-                                <img
-                                  src={brand.logo}
-                                  alt={brand.name}
-                                  style={{
-                                    maxWidth: "100%",
-                                    maxHeight: "100%",
-                                    objectFit: "contain",
-                                  }}
-                                  onError={(e) => {
-                                    e.target.src = '/placeholder-image.jpg';
-                                  }}
-                                />
-                              </div>
-                            </div>
+                          {duplicatedCategoryBrands.map((brand, brandIndex) => (
+                            <BrandLogo 
+                              key={brandIndex} 
+                              brand={brand} 
+                              index={brandIndex} 
+                              categoryName={category.name}
+                            />
                           ))}
                         </div>
                       </div>
