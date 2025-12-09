@@ -2,13 +2,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
 export default function ProductPage() {
   const params = useParams()
+  const router = useRouter()
   const productId = params.id
   const [selectedImage, setSelectedImage] = useState(0)
   const [product, setProduct] = useState(null)
@@ -167,26 +168,59 @@ export default function ProductPage() {
     }
   }
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!product) return
     
-    if (isBechoProtectSelected) {
-      const bechoProtectPrice = product.finalPrice < 15000 ? 499 : 999
-      const totalPrice = product.finalPrice + bechoProtectPrice
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        alert('Please login to proceed with purchase')
+        return
+      }
+
+      // Pehle product ko cart mein add karein
+      setAddingToCart(true)
       
-      const orderData = {
+      const cartData = {
         productId: product._id,
         quantity: 1,
         price: product.finalPrice,
-        bechoProtectSelected: true,
-        bechoProtectPrice: bechoProtectPrice,
-        totalPrice: totalPrice
+        bechoProtectSelected: isBechoProtectSelected
       }
-      
-      console.log('🛒 Buy Now data:', orderData)
-      alert(`Proceeding to purchase ${product.productName}! Total: ₹${totalPrice} (including Becho Protect ₹${bechoProtectPrice})`)
-    } else {
-      alert(`Proceeding to purchase ${product.productName}! Total: ₹${product.finalPrice} (without Becho Protect)`)
+
+      if (isBechoProtectSelected) {
+        const bechoProtectPrice = product.finalPrice < 15000 ? 499 : 999
+        cartData.bechoProtectPrice = bechoProtectPrice
+      }
+
+      console.log('🛒 Adding to cart for Buy Now:', cartData)
+
+      // ✅ Production URL
+      const response = await fetch('https://just-becho-backend.vercel.app/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(cartData)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Cart update event trigger karein
+        window.dispatchEvent(new Event('cartUpdate'))
+        
+        // Next.js router se cart page par redirect karein
+        router.push('/cart')
+      } else {
+        alert(data.message || 'Failed to add to cart')
+      }
+    } catch (error) {
+      console.error('Error in Buy Now:', error)
+      alert('Error processing Buy Now')
+    } finally {
+      setAddingToCart(false)
     }
   }
 
@@ -439,8 +473,6 @@ export default function ProductPage() {
                             </span>
                           </div>
                         </label>
-                        
-                       
                       </div>
                       
                       {/* Right side: Price */}
@@ -596,9 +628,10 @@ export default function ProductPage() {
                   </div>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full bg-gradient-to-r from-gray-900 to-black text-white py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg"
+                    disabled={addingToCart}
+                    className="w-full bg-gradient-to-r from-gray-900 to-black text-white py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    BUY NOW
+                    {addingToCart ? 'PROCESSING...' : 'BUY NOW'}
                   </button>
                 </div>
               </div>
@@ -645,8 +678,6 @@ export default function ProductPage() {
                 {/* Category Info */}
                 <div className="mt-4">
                   <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
-                   
-                    
                     <span className="text-gray-600 text-sm">
                       Showing {relatedProducts.length} related products
                     </span>
@@ -699,8 +730,6 @@ export default function ProductPage() {
                         <p className="text-gray-900 text-sm font-light tracking-widest uppercase">
                           ₹{relatedProduct.finalPrice?.toLocaleString()}
                         </p>
-                        
-                        
                       </div>
                       
                       {relatedProduct.originalPrice && relatedProduct.originalPrice > relatedProduct.finalPrice && (
