@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiUser, FiHeart, FiShoppingBag, FiLogOut, FiSettings, FiPackage, FiShoppingCart, FiSearch, FiHome } from 'react-icons/fi'
+import { FiUser, FiHeart, FiShoppingBag, FiLogOut, FiSettings, FiPackage, FiShoppingCart, FiSearch, FiHome, FiMenu, FiX } from 'react-icons/fi'
 import { usePathname, useRouter } from 'next/navigation'
 import AuthModal from '@/components/ui/AuthModal'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuAnimating, setIsMenuAnimating] = useState(false)
   const [activeCategory, setActiveCategory] = useState(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [user, setUser] = useState(null)
@@ -264,6 +265,16 @@ export default function Header() {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  // ✅ BURGER MENU ANIMATION HANDLER
+  const handleBurgerClick = () => {
+    setIsMenuAnimating(true);
+    setIsMenuOpen(!isMenuOpen);
+    
+    setTimeout(() => {
+      setIsMenuAnimating(false);
+    }, 300);
+  };
 
   // ✅ Convert to Seller Function
   const convertToSeller = useCallback(async () => {
@@ -602,101 +613,37 @@ export default function Header() {
       >
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4 sm:py-5">
-            {/* LEFT: Search + Sell Now - Desktop Only */}
-            <div className="hidden md:flex flex-1 items-center space-x-4">
-              {/* ✅ FUNCTIONAL Search Bar */}
-              <div className="relative flex items-center max-w-[200px] lg:max-w-[220px] w-full border-b-2 border-gray-400 search-container">
-                <form onSubmit={handleSearchSubmit} className="w-full">
-                  <input
-                    type="text"
-                    placeholder="Search for products..."
-                    value={searchQuery}
-                    onChange={handleSearchInputChange}
-                    onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                    className={`flex-1 bg-transparent outline-none py-1.5 text-[14px] lg:text-[15px] w-full font-light tracking-wide text-gray-800 placeholder-gray-500`}
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-0 px-2 py-1.5 transition flex-shrink-0 text-gray-600"
-                  >
-                    <FiSearch className="w-4 h-4 lg:w-5 lg:h-5" />
-                  </button>
-                </form>
-                
-                {/* Search Results Dropdown */}
-                {showSearchResults && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-96 overflow-y-auto">
-                    {searchLoading ? (
-                      <div className="p-4 text-center text-gray-500">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                        <p className="mt-2 text-sm">Searching...</p>
-                      </div>
-                    ) : searchResults.length > 0 ? (
-                      <div className="py-2">
-                        {searchResults.map((product) => (
-                          <Link
-                            key={product._id}
-                            href={`/products/${product._id}`}
-                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                            onClick={() => setShowSearchResults(false)}
-                          >
-                            {product.images?.[0]?.url ? (
-                              <img
-                                src={product.images[0].url}
-                                alt={product.productName}
-                                className="w-10 h-10 object-cover rounded mr-3"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
-                                <FiShoppingBag className="w-5 h-5 text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">
-                                {product.productName}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                ₹{product.finalPrice?.toLocaleString() || '0'}
-                              </p>
-                            </div>
-                          </Link>
-                        ))}
-                        <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
-                          <button
-                            onClick={() => {
-                              setShowSearchResults(false);
-                              router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                            }}
-                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
-                          >
-                            View all results for "{searchQuery}"
-                          </button>
-                        </div>
-                      </div>
-                    ) : searchQuery.trim() && (
-                      <div className="p-4 text-center text-gray-500">
-                        <p className="text-sm">No products found for "{searchQuery}"</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Sell Now Button */}
+            {/* ✅ LEFT: Burger Menu - MOBILE ONLY (LEFT SIDE) */}
+            <div className="md:hidden flex items-center">
               <button
-                onClick={handleSellNowClick}
-                className={`text-[14px] lg:text-[15px] font-light tracking-widest uppercase transition-all duration-300 whitespace-nowrap px-4 lg:px-5 py-1.5 rounded-full ${
-                  isDashboardPage ? 'bg-black text-white hover:bg-gray-800' :
-                  isProductPage || isSellNowPage ? 'bg-black text-white hover:bg-gray-800' :
-                  isCartPage ? 'bg-black text-white hover:bg-gray-800' : // ✅ Cart page pe bhi black button
-                  isScrolled ? 'bg-black text-white hover:bg-gray-800' : 'bg-white text-black hover:bg-gray-100'
+                className={`focus:outline-none p-1 relative ${
+                  isMenuAnimating ? 'opacity-70' : ''
                 }`}
+                onClick={handleBurgerClick}
+                aria-label="Menu"
               >
-                SELL NOW
+                <div className="relative w-6 h-6">
+                  {/* Burger Icon with Animation */}
+                  <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
+                    isMenuOpen 
+                      ? 'rotate-45 translate-y-0 bg-gray-900' 
+                      : '-translate-y-2 bg-current'
+                  }`}></span>
+                  <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
+                    isMenuOpen 
+                      ? 'opacity-0 translate-x-4' 
+                      : 'opacity-100'
+                  } bg-current`}></span>
+                  <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
+                    isMenuOpen 
+                      ? '-rotate-45 translate-y-0 bg-gray-900' 
+                      : 'translate-y-2 bg-current'
+                  }`}></span>
+                </div>
               </button>
             </div>
 
-            {/* CENTER: Logo - Perfect Center */}
+            {/* ✅ CENTER: Logo - Perfect Center with Margin */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center justify-center">
                 <Image
@@ -704,7 +651,7 @@ export default function Header() {
                   alt="Just Becho"
                   width={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
                   height={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
-                  className={`transition-all duration-500 ${
+                  className={`transition-all duration-500 mt-1 ${
                     isDashboardPage ? 'h-14 w-auto' : 
                     isProductPage || isSellNowPage ? 'h-14 w-auto' : 
                     isCartPage ? 'h-14 w-auto' : // ✅ Cart page pe chhota logo
@@ -715,42 +662,8 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* RIGHT: Icons - ORDER: Profile -> Wishlist -> Cart */}
+            {/* ✅ RIGHT: Desktop Icons and Mobile Cart */}
             <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
-              {/* Mobile Menu Button */}
-              <button
-                className="md:hidden focus:outline-none p-1"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                <svg
-                  className={`w-6 h-6 sm:w-7 sm:h-7 ${
-                    isDashboardPage ? 'text-gray-900' :
-                    isProductPage || isSellNowPage ? 'text-gray-900' : 
-                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
-                    isScrolled ? 'text-gray-900' : 'text-white'
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  {isMenuOpen ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
-                </svg>
-              </button>
-
               {/* Desktop Options */}
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
                 {/* Profile Icon with Dropdown */}
@@ -866,6 +779,26 @@ export default function Header() {
                   </button>
                 )}
               </div>
+
+              {/* Mobile Cart Icon - RIGHT SIDE */}
+              {cartApiAvailable && (
+                <button 
+                  onClick={handleMobileCartClick}
+                  className={`md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center ${
+                    isDashboardPage ? 'text-gray-900' :
+                    isProductPage || isSellNowPage ? 'text-gray-900' : 
+                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                    isScrolled ? 'text-gray-900' : 'text-white'
+                  }`}
+                >
+                  <FiShoppingBag className="w-6 h-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
@@ -964,16 +897,48 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ FIXED: MOBILE MENU - ALWAYS WHITE BACKGROUND */}
-        {isMenuOpen && (
-          <div
-            className={`md:hidden transition-all duration-300 font-light tracking-widest uppercase bg-white text-gray-800 shadow-lg z-[60]`}
-          >
-            <nav className="flex flex-col">
-              {/* ✅ CATEGORIES SECTION IN MOBILE MENU */}
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-900 mb-3 uppercase tracking-wider">CATEGORIES</h3>
-                <div className="grid grid-cols-2 gap-2">
+        {/* ✅ FIXED: MOBILE MENU - SLIDE ANIMATION FROM LEFT */}
+        <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}>
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-black/50 transition-opacity duration-300"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          
+          {/* Menu Panel - Slides from left */}
+          <div className={`absolute top-0 left-0 h-full w-4/5 max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
+            isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}>
+            <nav className="flex flex-col h-full overflow-y-auto">
+              {/* Header with Close Button */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <div className="flex items-center">
+                  <Image
+                    src="/Just Becho Logo Golden.png"
+                    alt="Just Becho"
+                    width={40}
+                    height={40}
+                    className="h-10 w-auto"
+                  />
+                  <span className="ml-3 text-lg font-light tracking-widest uppercase text-gray-900">
+                    MENU
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Close menu"
+                >
+                  <FiX className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+
+              {/* ✅ CATEGORIES SECTION */}
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-4 uppercase tracking-wider">CATEGORIES</h3>
+                <div className="grid grid-cols-2 gap-3">
                   {loading ? (
                     <div className="col-span-2 text-xs text-gray-500">Loading categories...</div>
                   ) : transformedCategories.length > 0 ? (
@@ -981,7 +946,7 @@ export default function Header() {
                       <Link
                         key={category.name || index}
                         href={category.href}
-                        className="px-3 py-2 text-xs font-light bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-lg transition-all text-center"
+                        className="px-4 py-3 text-xs font-light bg-gray-50 text-gray-800 hover:bg-gray-100 rounded-lg transition-all text-center"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {category.name.toUpperCase()}
@@ -994,31 +959,31 @@ export default function Header() {
               </div>
 
               {/* ✅ Mobile Menu Items */}
-              <div className="px-6 py-4 space-y-1 text-base">
+              <div className="flex-1 p-6 space-y-1">
                 {/* Home Link */}
                 <Link 
                   href="/"
-                  className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300"
+                  className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiHome className="w-4 h-4 mr-3" />
-                  HOME
+                  <FiHome className="w-5 h-5 mr-4" />
+                  <span className="font-light tracking-widest uppercase">HOME</span>
                 </Link>
                 
                 {/* Mobile Sell Now Button */}
                 <button 
                   onClick={handleMobileSellNowClick}
-                  className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full"
+                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                 >
-                  <span className="w-4 mr-3 text-center text-gray-900">$</span>
-                  SELL NOW
+                  <span className="w-5 h-5 mr-4 text-center text-gray-900 font-bold">$</span>
+                  <span className="font-light tracking-widest uppercase">SELL NOW</span>
                 </button>
                 
                 {user ? (
                   <>
                     {/* Seller Status in Mobile Menu */}
                     {user.role === 'seller' && (
-                      <div className="px-2 py-2 mb-2">
+                      <div className="px-4 py-3 mb-2 bg-gray-50 rounded-lg">
                         <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                           user.sellerVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                         }`}>
@@ -1032,61 +997,70 @@ export default function Header() {
                       </div>
                     )}
                     
-                    <Link href="/dashboard" className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                      <FiUser className="w-4 h-4 mr-3" />
-                      DASHBOARD
+                    <Link href="/dashboard" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                      <FiUser className="w-5 h-5 mr-4" />
+                      <span className="font-light tracking-widest uppercase">DASHBOARD</span>
                     </Link>
                     
                     {user.role === 'seller' && (
-                      <Link href="/dashboard?section=listings" className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                        <FiPackage className="w-4 h-4 mr-3" />
-                        MY LISTINGS
+                      <Link href="/dashboard?section=listings" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                        <FiPackage className="w-5 h-5 mr-4" />
+                        <span className="font-light tracking-widest uppercase">MY LISTINGS</span>
                       </Link>
                     )}
                     
-                    <Link href="/dashboard?section=purchases" className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                      <FiShoppingCart className="w-4 h-4 mr-3" />
-                      MY PURCHASES
+                    <Link href="/dashboard?section=purchases" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                      <FiShoppingCart className="w-5 h-5 mr-4" />
+                      <span className="font-light tracking-widest uppercase">MY PURCHASES</span>
                     </Link>
                     
-                    <button onClick={handleMobileLogout} className="flex items-center py-3 text-red-600 hover:text-red-700 transition-colors duration-300 text-left w-full">
-                      <FiLogOut className="w-4 h-4 mr-3" />
-                      LOGOUT
+                    <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300 text-left">
+                      <FiLogOut className="w-5 h-5 mr-4" />
+                      <span className="font-light tracking-widest uppercase">LOGOUT</span>
                     </button>
                   </>
                 ) : (
-                  <button onClick={handleMobileProfileClick} className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full">
-                    <FiUser className="w-4 h-4 mr-3" />
-                    PROFILE
+                  <button onClick={handleMobileProfileClick} className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left">
+                    <FiUser className="w-5 h-5 mr-4" />
+                    <span className="font-light tracking-widest uppercase">PROFILE</span>
                   </button>
                 )}
                 
                 {/* Mobile Wishlist */}
                 <button 
                   onClick={handleMobileWishlistClick}
-                  className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full"
+                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                 >
-                  <FiHeart className="w-4 h-4 mr-3" />
-                  WISHLIST
+                  <FiHeart className="w-5 h-5 mr-4" />
+                  <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
                 {/* Mobile Cart - Only show if cart API is available */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleMobileCartClick}
-                    className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full"
+                    className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                   >
-                    <FiShoppingBag className="w-4 h-4 mr-3" />
-                    CART {cartCount > 0 && `(${cartCount})`}
+                    <FiShoppingBag className="w-5 h-5 mr-4" />
+                    <span className="font-light tracking-widest uppercase">
+                      CART {cartCount > 0 && `(${cartCount})`}
+                    </span>
                   </button>
                 )}
               </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-gray-200 mt-auto">
+                <p className="text-xs text-gray-500 text-center">
+                  © 2024 Just Becho. All rights reserved.
+                </p>
+              </div>
             </nav>
           </div>
-        )}
+        </div>
       </header>
 
-      {/* ✅ SUBHEADER WITH CATEGORIES - ONLY FOR DESKTOP (NO MOBILE CATEGORIES HERE) */}
+      {/* ✅ SUBHEADER WITH CATEGORIES - ONLY FOR DESKTOP */}
       <div
         className={`hidden md:block fixed top-20 left-0 right-0 z-40 transition-all duration-500 ${
           isDashboardPage ? 'bg-white shadow-md' :
