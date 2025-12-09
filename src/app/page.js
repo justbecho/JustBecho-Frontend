@@ -19,8 +19,6 @@ function HomeContent() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
 
-  // ✅ FIXED: Home page should always show homepage content
-  
   // ✅ FIXED: Brand logos ke liye optimized approach - Aapke original data use karo
   const categoryBrands = useMemo(() => ({
     "Men's Fashion": [
@@ -171,20 +169,17 @@ function HomeContent() {
   // ✅ Helper function to get category image
   const getCategoryImage = (categoryName) => {
     if (!categoryName) {
-      console.log('❌ No category name provided');
       return categoryImages["default"];
     }
     
     // Sabse pehle exact match check karo
     if (categoryImages[categoryName]) {
-      console.log(`✅ Exact match found for "${categoryName}": ${categoryImages[categoryName]}`);
       return categoryImages[categoryName];
     }
     
     // Agar exact match nahi mila, to capitalize karke dekho
     const capitalized = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
     if (categoryImages[capitalized]) {
-      console.log(`✅ Capitalized match found for "${categoryName}": ${categoryImages[capitalized]}`);
       return categoryImages[capitalized];
     }
     
@@ -192,32 +187,27 @@ function HomeContent() {
     const normalizedInput = categoryName.toLowerCase();
     for (const [key, value] of Object.entries(categoryImages)) {
       if (key.toLowerCase() === normalizedInput) {
-        console.log(`✅ Case-insensitive match found for "${categoryName}": ${value}`);
         return value;
       }
     }
     
-    console.log(`❌ No image found for "${categoryName}", using default`);
     return categoryImages["default"];
   }
 
   // ✅ Helper function to get category brands
   const getCategoryBrands = (categoryName) => {
     if (!categoryName) {
-      console.log('❌ No category name provided for brands');
       return [];
     }
     
     // Sabse pehle exact match check karo
     if (categoryBrands[categoryName]) {
-      console.log(`✅ Exact brand match found for "${categoryName}": ${categoryBrands[categoryName].length} brands`);
       return categoryBrands[categoryName];
     }
     
     // Agar exact match nahi mila, to capitalize karke dekho
     const capitalized = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
     if (categoryBrands[capitalized]) {
-      console.log(`✅ Capitalized brand match found for "${categoryName}": ${categoryBrands[capitalized].length} brands`);
       return categoryBrands[capitalized];
     }
     
@@ -225,12 +215,10 @@ function HomeContent() {
     const normalizedInput = categoryName.toLowerCase();
     for (const [key, value] of Object.entries(categoryBrands)) {
       if (key.toLowerCase() === normalizedInput) {
-        console.log(`✅ Case-insensitive brand match found for "${categoryName}": ${value.length} brands`);
         return value;
       }
     }
     
-    console.log(`❌ No brands found for "${categoryName}"`);
     return [];
   }
 
@@ -360,22 +348,12 @@ function HomeContent() {
         setLoading(true)
         
         // 1. First fetch categories from backend
-        console.log('📡 Fetching categories from backend...')
         const categoriesResponse = await fetch('https://just-becho-backend.vercel.app/api/categories')
         
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json()
-          console.log('📦 Categories API raw response:', categoriesData)
           
           if (categoriesData.success && categoriesData.categories) {
-            console.log(`✅ Categories found: ${categoriesData.categories.length}`)
-            
-            // Debug: Print all category names from backend
-            console.log('📋 Categories from backend:');
-            categoriesData.categories.forEach((cat, idx) => {
-              console.log(`  ${idx + 1}. "${cat.name}" (slug: ${cat.slug})`);
-            });
-            
             // Convert backend categories to our format
             const formattedCategories = categoriesData.categories.map(cat => {
               const categoryName = cat.name || '';
@@ -387,14 +365,6 @@ function HomeContent() {
               // Image aur brands fetch karo
               const imagePath = getCategoryImage(categoryName);
               const brandLogos = getCategoryBrands(categoryName);
-              
-              console.log(`🏷️ Processing category "${categoryName}":`);
-              console.log(`   Display name: ${displayName}`);
-              console.log(`   Image path: ${imagePath}`);
-              console.log(`   Brands found: ${brandLogos.length}`);
-              brandLogos.forEach((brand, idx) => {
-                console.log(`     ${idx + 1}. ${brand.name}: ${brand.logo}`);
-              });
               
               return {
                 name: displayName,
@@ -416,44 +386,33 @@ function HomeContent() {
                 if (category.apiCategory) {
                   const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
                   
-                  console.log(`📡 Fetching ${category.name} products from:`, apiUrl)
-                  
                   const response = await fetch(apiUrl)
-                  console.log(`📡 Response for ${category.name}:`, response.status)
                   
                   if (response.ok) {
                     const data = await response.json()
                     
                     if (data.success && data.products) {
-                      console.log(`✅ ${category.name} products found:`, data.products.length)
                       productsByCategory[category.name] = data.products.slice(0, 4)
                     } else {
-                      console.log(`❌ No products found for ${category.name}`)
                       productsByCategory[category.name] = []
                     }
                   } else {
-                    console.log(`❌ API call failed for ${category.name}:`, response.status)
                     productsByCategory[category.name] = []
                   }
                 }
               } catch (error) {
-                console.error(`💥 Error fetching ${category.name} products:`, error)
                 productsByCategory[category.name] = []
               }
             }
             
-            console.log('🎯 Final products by category:', Object.keys(productsByCategory))
             setCategoryProducts(productsByCategory)
           } else {
-            console.log('❌ No categories found in backend')
             setCategoriesFromBackend([])
           }
         } else {
-          console.log('❌ Categories API call failed')
           setCategoriesFromBackend([])
         }
       } catch (error) {
-        console.error('Error in fetchData:', error)
         setCategoriesFromBackend([])
       } finally {
         setLoading(false)
@@ -535,7 +494,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ FIXED: Brand logo display component with fallback
+  // ✅ FIXED: Clean Brand logo display component WITHOUT BACKGROUND BOX
   const BrandLogo = ({ brand, index }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
@@ -548,37 +507,43 @@ function HomeContent() {
         className="flex-shrink-0 px-4 sm:px-6 md:px-8"
         title={brand.name}
       >
-        <div className="relative w-24 h-16 sm:w-28 sm:h-20 md:w-32 md:h-24 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-200">
+        {/* ✅ NO BACKGROUND BOX - Just the logo */}
+        <div className="relative h-16 sm:h-20 md:h-24 flex items-center justify-center">
           <img
             src={imgSrc}
             alt={brand.name}
-            className="w-full h-full object-contain p-2"
+            className="w-auto h-full max-h-full object-contain"
+            style={{
+              filter: 'grayscale(10%)',
+              opacity: 0.85,
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.filter = 'grayscale(0%)';
+              e.target.style.opacity = '1';
+              e.target.style.transform = 'scale(1.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.filter = 'grayscale(10%)';
+              e.target.style.opacity = '0.85';
+              e.target.style.transform = 'scale(1)';
+            }}
             onError={(e) => {
-              console.error(`❌ Failed to load logo for ${brand.name}: ${brand.logo}`);
               if (!hasError && brand.fallback) {
-                // Pehle fallback try karo
                 setImgSrc(brand.fallback);
                 setHasError(true);
               } else {
-                // Phir bhi fail ho to placeholder
                 setImgSrc('/images/placeholder.jpg');
               }
             }}
-            onLoad={() => {
-              console.log(`✅ Successfully loaded logo for ${brand.name}`);
-            }}
             loading="lazy"
           />
-          {/* Brand Name Tooltip */}
-          <div className="absolute -bottom-6 left-0 right-0 bg-black/80 text-white text-xs py-1 text-center rounded opacity-0 hover:opacity-100 transition-opacity duration-300">
-            {brand.name}
-          </div>
         </div>
       </div>
     )
   }
 
-  // ✅ FIXED: Helper function to safely convert strings to uppercase
+  // ✅ Helper function to safely convert strings to uppercase
   const safeToUpperCase = (str) => {
     if (typeof str === 'string') {
       return str.toUpperCase();
@@ -691,11 +656,7 @@ function HomeContent() {
                         fill
                         className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
                         onError={(e) => {
-                          console.error(`❌ Failed to load category image for ${cat.name}: ${cat.image}`);
                           e.target.src = '/images/category-placeholder.jpg';
-                        }}
-                        onLoad={() => {
-                          console.log(`✅ Successfully loaded category image for ${cat.name}: ${cat.image}`);
                         }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
@@ -703,9 +664,6 @@ function HomeContent() {
                     <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-4 sm:mt-6 leading-tight">
                       {safeToUpperCase(cat.name)}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {cat.brands?.length || 0} brands
-                    </p>
                   </Link>
                 ))}
               </div>
@@ -765,11 +723,6 @@ function HomeContent() {
             : [];
           const products = categoryProducts[category.name] || [];
 
-          console.log(`🎬 Rendering category section for "${category.name}":`);
-          console.log(`   Brands available: ${categoryBrandsData.length}`);
-          console.log(`   Products available: ${products.length}`);
-          console.log(`   Image path: ${category.image}`);
-
           return (
             <div key={category.name || index}>
               <section className="py-16 bg-white border-t border-gray-100">
@@ -817,8 +770,9 @@ function HomeContent() {
                         </p>
                       </div>
 
-                      <div className="w-full overflow-hidden py-3">
-                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap">
+                      {/* ✅ UPDATED: Clean logos marquee without background boxes */}
+                      <div className="w-full overflow-hidden py-4">
+                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap items-center">
                           {duplicatedCategoryBrands.map((brand, brandIndex) => (
                             <BrandLogo 
                               key={brandIndex} 
