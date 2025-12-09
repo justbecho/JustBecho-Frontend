@@ -108,7 +108,7 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
+      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdated);
       clearInterval(pollInterval);
     };
   }, [ensureJustbechoFormat])
@@ -812,7 +812,7 @@ export default function Header() {
                         <Link 
                           href="/dashboard?section=orders" 
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          onClick={() => setShowUserDropdown(false)}
+                            onClick={() => setShowUserDropdown(false)}
                         >
                           <FiShoppingCart className="w-4 h-4 mr-3 text-gray-400" />
                           My Orders
@@ -964,22 +964,15 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ MOBILE MENU - CATEGORIES ADDED HERE */}
+        {/* ✅ FIXED: MOBILE MENU - ALWAYS WHITE BACKGROUND */}
         {isMenuOpen && (
           <div
-            className={`md:hidden transition-all duration-300 font-light tracking-widest uppercase ${
-              isDashboardPage ? 'bg-white text-gray-800 shadow-lg' :
-              isProductPage || isSellNowPage ? 'bg-white text-gray-800 shadow-lg' :
-              isCartPage ? 'bg-white text-gray-800 shadow-lg' : // ✅ Cart page pe white
-              isScrolled ? 'bg-white text-gray-800 shadow-lg' : 'bg-black/95 text-white'
-            }`}
+            className={`md:hidden transition-all duration-300 font-light tracking-widest uppercase bg-white text-gray-800 shadow-lg z-[60]`}
           >
-            <nav className="flex flex-col px-6 py-4 space-y-4 text-base">
+            <nav className="flex flex-col">
               {/* ✅ CATEGORIES SECTION IN MOBILE MENU */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-3 uppercase tracking-wider border-b pb-2">
-                  CATEGORIES
-                </h3>
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 uppercase tracking-wider">CATEGORIES</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {loading ? (
                     <div className="col-span-2 text-xs text-gray-500">Loading categories...</div>
@@ -988,104 +981,106 @@ export default function Header() {
                       <Link
                         key={category.name || index}
                         href={category.href}
-                        className={`text-xs font-light tracking-widest uppercase py-2 px-3 rounded-lg text-center ${
-                          isDashboardPage || isScrolled || isProductPage || isSellNowPage || isCartPage
-                            ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                            : 'bg-white/10 text-white hover:bg-white/20'
-                        }`}
+                        className="px-3 py-2 text-xs font-light bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-lg transition-all text-center"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        {category.name.split(' ')[0]}
+                        {category.name.toUpperCase()}
                       </Link>
                     ))
                   ) : (
-                    <div className="col-span-2 text-xs text-gray-500">No categories</div>
+                    <div className="col-span-2 text-xs text-gray-500">No categories available</div>
                   )}
                 </div>
               </div>
 
-              {/* Home Link */}
-              <Link 
-                href="/"
-                className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <FiHome className="w-4 h-4 mr-3" />
-                HOME
-              </Link>
-              
-              {/* Mobile Sell Now Button */}
-              <button 
-                onClick={handleMobileSellNowClick}
-                className="py-2 hover:text-gray-700 transition-colors duration-300 text-left"
-              >
-                SELL NOW
-              </button>
-              
-              {user ? (
-                <>
-                  {/* Seller Status in Mobile Menu */}
-                  {user.role === 'seller' && (
-                    <div className="px-2 py-1">
-                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        user.sellerVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {user.sellerVerified ? 'Seller Verified' : 'Seller Pending'}
-                      </div>
-                      {user.username && (
-                        <p className="text-xs text-gray-600 mt-1">
-                          Username: {ensureJustbechoFormat(user.username)}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  
-                  <Link href="/dashboard" className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                    <FiUser className="w-4 h-4 mr-3" />
-                    DASHBOARD
-                  </Link>
-                  
-                  {user.role === 'seller' && (
-                    <Link href="/dashboard?section=listings" className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                      <FiPackage className="w-4 h-4 mr-3" />
-                      MY LISTINGS
-                    </Link>
-                  )}
-                  
-                  <Link href="/dashboard?section=purchases" className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                    <FiShoppingCart className="w-4 h-4 mr-3" />
-                    MY PURCHASES
-                  </Link>
-                  
-                  <button onClick={handleMobileLogout} className="flex items-center py-2 text-red-600 hover:text-red-700 transition-colors duration-300 text-left">
-                    <FiLogOut className="w-4 h-4 mr-3" />
-                    LOGOUT
-                  </button>
-                </>
-              ) : (
-                <button onClick={handleMobileProfileClick} className="py-2 hover:text-gray-700 transition-colors duration-300 text-left">
-                  PROFILE
-                </button>
-              )}
-              
-              {/* Mobile Wishlist */}
-              <button 
-                onClick={handleMobileWishlistClick}
-                className="py-2 hover:text-gray-700 transition-colors duration-300 text-left"
-              >
-                WISHLIST
-              </button>
-              
-              {/* Mobile Cart - Only show if cart API is available */}
-              {cartApiAvailable && (
-                <button 
-                  onClick={handleMobileCartClick}
-                  className="flex items-center py-2 hover:text-gray-700 transition-colors duration-300 text-left"
+              {/* ✅ Mobile Menu Items */}
+              <div className="px-6 py-4 space-y-1 text-base">
+                {/* Home Link */}
+                <Link 
+                  href="/"
+                  className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300"
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiShoppingBag className="w-4 h-4 mr-3" />
-                  CART {cartCount > 0 && `(${cartCount})`}
+                  <FiHome className="w-4 h-4 mr-3" />
+                  HOME
+                </Link>
+                
+                {/* Mobile Sell Now Button */}
+                <button 
+                  onClick={handleMobileSellNowClick}
+                  className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full"
+                >
+                  <span className="w-4 mr-3 text-center text-gray-900">$</span>
+                  SELL NOW
                 </button>
-              )}
+                
+                {user ? (
+                  <>
+                    {/* Seller Status in Mobile Menu */}
+                    {user.role === 'seller' && (
+                      <div className="px-2 py-2 mb-2">
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          user.sellerVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {user.sellerVerified ? 'Seller Verified' : 'Seller Pending'}
+                        </div>
+                        {user.username && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            Username: {ensureJustbechoFormat(user.username)}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
+                    <Link href="/dashboard" className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                      <FiUser className="w-4 h-4 mr-3" />
+                      DASHBOARD
+                    </Link>
+                    
+                    {user.role === 'seller' && (
+                      <Link href="/dashboard?section=listings" className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                        <FiPackage className="w-4 h-4 mr-3" />
+                        MY LISTINGS
+                      </Link>
+                    )}
+                    
+                    <Link href="/dashboard?section=purchases" className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                      <FiShoppingCart className="w-4 h-4 mr-3" />
+                      MY PURCHASES
+                    </Link>
+                    
+                    <button onClick={handleMobileLogout} className="flex items-center py-3 text-red-600 hover:text-red-700 transition-colors duration-300 text-left w-full">
+                      <FiLogOut className="w-4 h-4 mr-3" />
+                      LOGOUT
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={handleMobileProfileClick} className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full">
+                    <FiUser className="w-4 h-4 mr-3" />
+                    PROFILE
+                  </button>
+                )}
+                
+                {/* Mobile Wishlist */}
+                <button 
+                  onClick={handleMobileWishlistClick}
+                  className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full"
+                >
+                  <FiHeart className="w-4 h-4 mr-3" />
+                  WISHLIST
+                </button>
+                
+                {/* Mobile Cart - Only show if cart API is available */}
+                {cartApiAvailable && (
+                  <button 
+                    onClick={handleMobileCartClick}
+                    className="flex items-center py-3 text-gray-900 hover:text-gray-700 transition-colors duration-300 text-left w-full"
+                  >
+                    <FiShoppingBag className="w-4 h-4 mr-3" />
+                    CART {cartCount > 0 && `(${cartCount})`}
+                  </button>
+                )}
+              </div>
             </nav>
           </div>
         )}
@@ -1181,8 +1176,6 @@ export default function Header() {
             )}
           </nav>
         </div>
-
-        {/* ❌ MOBILE CATEGORIES REMOVED FROM HERE - NOW IN BURGER MENU */}
       </div>
 
       {/* AUTH MODAL */}
