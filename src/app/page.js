@@ -20,95 +20,142 @@ function HomeContent() {
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
 
   // ✅ FIXED: Home page should always show homepage content
-  // Removed auth check that was causing redirect to /login
   
-  // ✅ FIXED: Brand logos ke liye optimized approach - Frontend se hi
+  // ✅ FIXED: Brand logos ke liye optimized approach - Aapke original data use karo
   const categoryBrands = useMemo(() => ({
     "Men's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png" },
-      { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png" },
-      { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png" },
-      { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png" },
-      { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png" },
-      { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png" },
-      { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png" }
+      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png" },
+      { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png" },
+      { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png", fallback: "/brands/burberry.png" },
+      { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png" }
     ],
     "Women's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png" },
-      { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png" },
-      { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png" },
-      { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png" },
-      { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png" },
-      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png" }
+      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png" },
+      { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png", fallback: "/brands/givenchy.png" },
+      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png" }
     ],
     "Footwear": [
-      { name: "Nike", logo: "/brandslogo/footwear/Nike.png" },
-      { name: "Adidas", logo: "/brandslogo/footwear/Adidas.png" },
-      { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg" },
-      { name: "Balenciaga", logo: "/brandslogo/footwear/Balenciaga.jpg" },
-      { name: "Gucci", logo: "/brandslogo/footwear/Alexander-McQueen.jpg" },
-      { name: "Prada", logo: "/brandslogo/footwear/Air-Jordan.png" },
-      { name: "Dior", logo: "/brandslogo/footwear/Dior.png" },
-      { name: "Converse", logo: "/brandslogo/footwear/Converse.jpg" },
-      { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png" },
-      { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png" },
-      { name: "On", logo: "/brandslogo/footwear/On.jpg" }
+      { name: "Balenciaga", logo: "/brandslogo/footwear/Acne-Studios.jpg", fallback: "/brands/balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/Adidas.png", fallback: "/brands/jimmy-choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/Air-Jordan.png", fallback: "/brands/prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/ALAIA.jpg", fallback: "/brands/puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/Alexander-McQueen.jpg", fallback: "/brands/gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/Alo-Yoga.png", fallback: "/brands/reebok.png" },
+      { name: "Balenciaga", logo: "/brandslogo/footwear/Acne-Studios.jpg", fallback: "/brands/balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/Adidias.png", fallback: "/brands/jimmy-choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/Air-Jordan.png", fallback: "/brands/prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/ALAIA.jpg", fallback: "/brands/puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/Alexander-McQueen.jpg", fallback: "/brands/gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/Alo-Yoga.png", fallback: "/brands/reebok.png" },
+      { name: "Balenciaga", logo: "/brandslogo/footwear/Altra Running.png", fallback: "/brands/balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/Amiri.jpg", fallback: "/brands/jimmy-choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/ANTA.jpg", fallback: "/brands/prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/Armani.png", fallback: "/brands/puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/Balenciaga.jpg", fallback: "/brands/gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/BALLY.png", fallback: "/brands/reebok.png" },
+      { name: "Balenciaga", logo: "/brandslogo/footwear/BALMAIN.png", fallback: "/brands/balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/BAPE.jpg", fallback: "/brands/jimmy-choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/Burberry.jpg", fallback: "/brands/prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/Calvin Klein.png", fallback: "/brands/puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/Chloe.png", fallback: "/brands/gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/Coach.jpg", fallback: "/brands/reebok.png" },
+      { name: "Balenciaga", logo: "/brandslogo/footwear/Converse.jpg", fallback: "/brands/balenciaga.png" },
+      { name: "Jimmy Choo", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png" },
+      { name: "Prada", logo: "/brandslogo/footwear/Dior.png", fallback: "/brands/prada.png" },
+      { name: "Puma", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png" },
+      { name: "Gucci", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png" },
+      { name: "Reebok", logo: "/brandslogo/footwear/On.jpg", fallback: "/brands/reebok.png" },
+      { name: "Balenciaga", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/balenciaga.png" }
     ],
     "Accessories": [
-      { name: "Ray-Ban", logo: "/brandslogo/accessories/Balenciaga.jpg" },
-      { name: "Gucci", logo: "/brandslogo/accessories/Gucci.png" },
-      { name: "Dior", logo: "/brandslogo/accessories/Dior.png" },
-      { name: "Prada", logo: "/brandslogo/accessories/Prada.jpg" },
-      { name: "Chanel", logo: "/brandslogo/accessories/Chanel.jpg" },
-      { name: "Cartier", logo: "/brandslogo/accessories/Cartier.jpg" },
-      { name: "Swarovski", logo: "/brandslogo/accessories/Swaroski.png" },
-      { name: "Fendi", logo: "/brandslogo/accessories/Fendi.png" }
+      { name: "Woodland", logo: "/brandslogo/Accessories/Alexander McQueen.jpg", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/Accessories/Apm Monaco.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/Accessories/Balenciaga.jpg", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/Accessories/Buccellati.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/Accessories/Cartier.jpg", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/Accessories/Chaumet.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/Accessories/Chloe.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/Accessories/Dior.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/Accessories/Fendi.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Woodland", logo: "/brandslogo/Accessories/FRED.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/Accessories/Gucci.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/Accessories/Harry Winston.jpg", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/Accessories/MCM.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/Accessories/Messika.png", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/Accessories/Miu Miu.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/Accessories/Prada.jpg", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/Accessories/Qeelin.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/Accessories/Swaroski.png", fallback: "/brands/wildhorn.jpg" }
     ],
     "Watches": [
-      { name: "Rolex", logo: "/brandslogo/watches/Rolex.png" },
-      { name: "Omega", logo: "/brandslogo/watches/OMEGA.png" },
-      { name: "Tag Heuer", logo: "/brandslogo/watches/TAG Heuer.png" },
-      { name: "Audemars Piguet", logo: "/brandslogo/watches/AUDEMARS PIGUET.png" },
-      { name: "Patek Philippe", logo: "/brandslogo/watches/Patek Philippe.png" },
-      { name: "Cartier", logo: "/brandslogo/watches/Cartier.png" },
-      { name: "Breitling", logo: "/brandslogo/watches/Breitling.jpg" },
-      { name: "IWC", logo: "/brandslogo/watches/IWC.png" }
+      { name: "Woodland", logo: "/brandslogo/watches/Armani.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/watches/AUDEMARS PIGUET.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/watches/BLANCPAIN.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/watches/BREGUET.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/watches/Hamilton.jpg", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/watches/Chanel.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/watches/CORUM.jpg", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/watches/Dior.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/watches/Fendi.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Woodland", logo: "/brandslogo/watches/Franck Muller.jpg", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/watches/Gucci.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/watches/Hermes.jpg", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/watches/HUBLOT.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/watches/LONGINES.jpg", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/watches/CHOPARD.png", fallback: "/brands/baggit.png" }
     ],
-    "Toys & Collectibles": [
-      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png" },
-      { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg" },
-      { name: "KAWS", logo: "/brandslogo/toys/KAWS.png" },
-      { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png" },
-      { name: "POP MART", logo: "/brandslogo/toys/POP MART.jpg" },
-      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg" },
-      { name: "Takashi Murakami", logo: "/brandslogo/toys/Takashi Murakami.png" },
-      { name: "WWF", logo: "/brandslogo/toys/WWF.png" }
+    "TOYS & COLLECTIBLES": [
+      { name: "Woodland", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/toys/POP MART.jpg", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/toys/Takashi Murakami.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/toys/WWF.png", fallback: "/brands/ray-ban.png" }
     ],
-    "Perfumes": [
-      { name: "Chanel", logo: "/brandslogo/perfumes/Chanel.png" },
-      { name: "Dior", logo: "/brandslogo/perfumes/Dior.png" },
-      { name: "Gucci", logo: "/brandslogo/perfumes/Gucci.jpg" },
-      { name: "Armani", logo: "/brandslogo/perfumes/Armani.png" },
-      { name: "Versace", logo: "/brandslogo/perfumes/Versace.png" },
-      { name: "Tom Ford", logo: "/brandslogo/perfumes/Tom Ford.png" },
-      { name: "Burberry", logo: "/brandslogo/perfumes/Burberry.jpg" },
-      { name: "Bvlgari", logo: "/brandslogo/perfumes/Bvlgari.png" }
+    "PERFUMES": [
+      { name: "Woodland", logo: "/brandslogo/perfumes/3CE.jpg", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/perfumes/Anessa.jpg", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/perfumes/Anna Sui.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/perfumes/Armani.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/perfumes/Bobbi Brown.png", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/perfumes/Bottega Veneta.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/perfumes/Burberry.jpg", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/perfumes/Bvlgari.png", fallback: "/brands/ray-ban.png" },
+      { name: "Baggit", logo: "/brandslogo/perfumes/Chanel.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/perfumes/Clarins.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/perfumes/Cle de Peau.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/perfumes/Clinique.png", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/perfumes/Cosmo Decorte.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/perfumes/Curel.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/perfumes/Davidoff.png", fallback: "/brands/ray-ban.png" },
+      { name: "Woodland", logo: "/brandslogo/perfumes/FANCL.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/perfumes/Filorga.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/perfumes/Guerlain.png", fallback: "/brands/ray-ban.png" }
     ],
-    "Kids": [
-      { name: "Nike Kids", logo: "/brandslogo/kids/Nike.png" },
-      { name: "Adidas Kids", logo: "/brandslogo/kids/Adidas.png" },
-      { name: "Puma Kids", logo: "/brandslogo/kids/Puma.jpg" },
-      { name: "Disney", logo: "/brandslogo/kids/Disney.png" },
-      { name: "Lego", logo: "/brandslogo/kids/Lego.png" },
-      { name: "Barbie", logo: "/brandslogo/kids/Barbie.png" },
-      { name: "Gap Kids", logo: "/brandslogo/kids/Gap.png" },
-      { name: "Zara Kids", logo: "/brandslogo/kids/Zara.png" }
+    "KIDS": [
+      { name: "Woodland", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
+      { name: "Wildhorn", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg" },
+      { name: "Nike", logo: "/brandslogo/toys/POP MART.jpg", fallback: "/brands/nike.png" },
+      { name: "Woodland", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/woodland.png" },
+      { name: "Baggit", logo: "/brandslogo/toys/Takashi Murakami.png", fallback: "/brands/baggit.png" },
+      { name: "Ray-Ban", logo: "/brandslogo/toys/WWF.png", fallback: "/brands/ray-ban.png" }
     ],
   }), [])
 
-  // ✅ Category images mapping - Frontend se hi
+  // ✅ FIXED: Category images mapping - Frontend se hi (UPPERCASE keys aapke data ke hisaab se)
   const categoryImages = useMemo(() => ({
     "Men's Fashion": "/categories/mens-fashion.jpg",
     "Women's Fashion": "/categories/womens-fashion.jpg", 
@@ -116,9 +163,76 @@ function HomeContent() {
     "Accessories": "/categories/accessories.jpg",
     "Watches": "/categories/watches.jpg", 
     "Perfumes": "/categories/perfumes.jpg",
-    "Toys & Collectibles": "/categories/toys-collectibles.jpg",
-    "Kids": "/categories/kids.jpg"
+    "TOYS & COLLECTIBLES": "/categories/toys-collectibles.jpg",
+    "KIDS": "/categories/kids.jpg",
+    "default": "/categories/default.jpg"
   }), [])
+
+  // ✅ Helper function to get category image
+  const getCategoryImage = (categoryName) => {
+    if (!categoryName) {
+      console.log('❌ No category name provided');
+      return categoryImages["default"];
+    }
+    
+    // Sabse pehle exact match check karo
+    if (categoryImages[categoryName]) {
+      console.log(`✅ Exact match found for "${categoryName}": ${categoryImages[categoryName]}`);
+      return categoryImages[categoryName];
+    }
+    
+    // Agar exact match nahi mila, to capitalize karke dekho
+    const capitalized = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+    if (categoryImages[capitalized]) {
+      console.log(`✅ Capitalized match found for "${categoryName}": ${categoryImages[capitalized]}`);
+      return categoryImages[capitalized];
+    }
+    
+    // Sab categories ke keys ko check karo (case-insensitive)
+    const normalizedInput = categoryName.toLowerCase();
+    for (const [key, value] of Object.entries(categoryImages)) {
+      if (key.toLowerCase() === normalizedInput) {
+        console.log(`✅ Case-insensitive match found for "${categoryName}": ${value}`);
+        return value;
+      }
+    }
+    
+    console.log(`❌ No image found for "${categoryName}", using default`);
+    return categoryImages["default"];
+  }
+
+  // ✅ Helper function to get category brands
+  const getCategoryBrands = (categoryName) => {
+    if (!categoryName) {
+      console.log('❌ No category name provided for brands');
+      return [];
+    }
+    
+    // Sabse pehle exact match check karo
+    if (categoryBrands[categoryName]) {
+      console.log(`✅ Exact brand match found for "${categoryName}": ${categoryBrands[categoryName].length} brands`);
+      return categoryBrands[categoryName];
+    }
+    
+    // Agar exact match nahi mila, to capitalize karke dekho
+    const capitalized = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+    if (categoryBrands[capitalized]) {
+      console.log(`✅ Capitalized brand match found for "${categoryName}": ${categoryBrands[capitalized].length} brands`);
+      return categoryBrands[capitalized];
+    }
+    
+    // Sab categories ke keys ko check karo (case-insensitive)
+    const normalizedInput = categoryName.toLowerCase();
+    for (const [key, value] of Object.entries(categoryBrands)) {
+      if (key.toLowerCase() === normalizedInput) {
+        console.log(`✅ Case-insensitive brand match found for "${categoryName}": ${value.length} brands`);
+        return value;
+      }
+    }
+    
+    console.log(`❌ No brands found for "${categoryName}"`);
+    return [];
+  }
 
   // Featured Collections - useMemo mein rakhein
   const featuredCollections = useMemo(() => [
@@ -251,18 +365,46 @@ function HomeContent() {
         
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json()
-          console.log('📦 Categories API response:', categoriesData)
+          console.log('📦 Categories API raw response:', categoriesData)
           
           if (categoriesData.success && categoriesData.categories) {
-            console.log(`✅ Categories found:`, categoriesData.categories.length)
+            console.log(`✅ Categories found: ${categoriesData.categories.length}`)
+            
+            // Debug: Print all category names from backend
+            console.log('📋 Categories from backend:');
+            categoriesData.categories.forEach((cat, idx) => {
+              console.log(`  ${idx + 1}. "${cat.name}" (slug: ${cat.slug})`);
+            });
             
             // Convert backend categories to our format
-            const formattedCategories = categoriesData.categories.map(cat => ({
-              name: cat.name || '',
-              href: `/categories/${cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-') || ''}`,
-              apiCategory: cat.name || '',
-              image: categoryImages[cat.name] || "/categories/default.jpg"
-            }))
+            const formattedCategories = categoriesData.categories.map(cat => {
+              const categoryName = cat.name || '';
+              // Display name ko capitalize karo
+              const displayName = categoryName.split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+              
+              // Image aur brands fetch karo
+              const imagePath = getCategoryImage(categoryName);
+              const brandLogos = getCategoryBrands(categoryName);
+              
+              console.log(`🏷️ Processing category "${categoryName}":`);
+              console.log(`   Display name: ${displayName}`);
+              console.log(`   Image path: ${imagePath}`);
+              console.log(`   Brands found: ${brandLogos.length}`);
+              brandLogos.forEach((brand, idx) => {
+                console.log(`     ${idx + 1}. ${brand.name}: ${brand.logo}`);
+              });
+              
+              return {
+                name: displayName,
+                originalName: categoryName,
+                href: `/categories/${cat.slug || categoryName.toLowerCase().replace(/\s+/g, '-')}`,
+                apiCategory: categoryName,
+                image: imagePath,
+                brands: brandLogos
+              }
+            })
             
             setCategoriesFromBackend(formattedCategories)
             
@@ -281,7 +423,6 @@ function HomeContent() {
                   
                   if (response.ok) {
                     const data = await response.json()
-                    console.log(`📦 ${category.name} products response:`, data)
                     
                     if (data.success && data.products) {
                       console.log(`✅ ${category.name} products found:`, data.products.length)
@@ -301,7 +442,7 @@ function HomeContent() {
               }
             }
             
-            console.log('🎯 Final products by category:', productsByCategory)
+            console.log('🎯 Final products by category:', Object.keys(productsByCategory))
             setCategoryProducts(productsByCategory)
           } else {
             console.log('❌ No categories found in backend')
@@ -320,7 +461,7 @@ function HomeContent() {
     }
 
     fetchData()
-  }, [categoryImages])
+  }, [])
 
   const nextTestimonials = () => {
     if (isAnimating) return;
@@ -344,11 +485,10 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ FIXED: Product card render function with better error handling
+  // ✅ FIXED: Product card render function
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
     
-    // ✅ FIXED: toLowerCase() error se bachne ke liye
     const productName = product.productName || 'Product';
     const safeProductName = typeof productName === 'string' ? productName : 'Product';
     const safeCondition = product.condition && typeof product.condition === 'string' ? product.condition : '';
@@ -366,7 +506,7 @@ function HomeContent() {
             className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               e.target.src = '/images/placeholder.jpg';
-              e.target.onerror = null; // Prevent infinite loop
+              e.target.onerror = null;
             }}
           />
           {/* Condition Badge */}
@@ -395,7 +535,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ FIXED: Brand logo display component with better error handling
+  // ✅ FIXED: Brand logo display component with fallback
   const BrandLogo = ({ brand, index }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
@@ -408,26 +548,29 @@ function HomeContent() {
         className="flex-shrink-0 px-4 sm:px-6 md:px-8"
         title={brand.name}
       >
-        <div className="relative w-24 h-16 sm:w-28 sm:h-20 md:w-32 md:h-24">
+        <div className="relative w-24 h-16 sm:w-28 sm:h-20 md:w-32 md:h-24 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-200">
           <img
             src={imgSrc}
             alt={brand.name}
-            className="w-full h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100"
-            onError={() => {
-              if (!hasError) {
-                // Try to load from general brands folder
-                const generalPath = `/brands/${brand.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
-                setImgSrc(generalPath);
+            className="w-full h-full object-contain p-2"
+            onError={(e) => {
+              console.error(`❌ Failed to load logo for ${brand.name}: ${brand.logo}`);
+              if (!hasError && brand.fallback) {
+                // Pehle fallback try karo
+                setImgSrc(brand.fallback);
                 setHasError(true);
               } else {
-                // Fallback to placeholder
-                setImgSrc('/brands/placeholder.png');
+                // Phir bhi fail ho to placeholder
+                setImgSrc('/images/placeholder.jpg');
               }
+            }}
+            onLoad={() => {
+              console.log(`✅ Successfully loaded logo for ${brand.name}`);
             }}
             loading="lazy"
           />
           {/* Brand Name Tooltip */}
-          <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs py-1 text-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute -bottom-6 left-0 right-0 bg-black/80 text-white text-xs py-1 text-center rounded opacity-0 hover:opacity-100 transition-opacity duration-300">
             {brand.name}
           </div>
         </div>
@@ -512,7 +655,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ FIXED: Categories Section - Now using backend categories */}
+        {/* Categories Section */}
         <section className="py-16 bg-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
@@ -548,7 +691,11 @@ function HomeContent() {
                         fill
                         className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
                         onError={(e) => {
+                          console.error(`❌ Failed to load category image for ${cat.name}: ${cat.image}`);
                           e.target.src = '/images/category-placeholder.jpg';
+                        }}
+                        onLoad={() => {
+                          console.log(`✅ Successfully loaded category image for ${cat.name}: ${cat.image}`);
                         }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
@@ -556,6 +703,9 @@ function HomeContent() {
                     <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-4 sm:mt-6 leading-tight">
                       {safeToUpperCase(cat.name)}
                     </h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {cat.brands?.length || 0} brands
+                    </p>
                   </Link>
                 ))}
               </div>
@@ -606,64 +756,19 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Featured Collections */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase mb-3">
-                CURATED COLLECTIONS
-              </h2>
-              <p className="text-gray-600 text-base font-light max-w-2xl mx-auto">
-                Handpicked luxury items curated by our experts for the discerning shopper
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {featuredCollections.map((collection, index) => (
-                <Link
-                  key={index}
-                  href={collection.href}
-                  className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 h-80"
-                >
-                  <div className="absolute inset-0 z-0">
-                    <Image
-                      src={collection.image}
-                      alt={collection.title}
-                      fill
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.src = '/images/collection-placeholder.jpg';
-                      }}
-                    />
-                  </div>
-
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900/70 to-gray-600/50 z-10" />
-
-                  <div className="absolute inset-0 flex items-end p-6 z-20">
-                    <div className="text-white">
-                      <h3 className="text-xl font-light tracking-widest uppercase mb-2">
-                        {collection.title}
-                      </h3>
-                      <p className="text-gray-200 font-light text-sm mb-3">
-                        {collection.description}
-                      </p>
-                      <div className="w-10 h-px bg-white transform group-hover:scale-x-150 transition-transform duration-500"></div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Category-wise Sections with Banners - Now using backend categories */}
+        {/* Category-wise Sections with Banners */}
         {categoriesFromBackend.map((category, index) => {
-          const categoryBrandsData = categoryBrands[category.name] || []
+          const categoryBrandsData = category.brands || [];
           // Marquee effect ke liye brands duplicate karo
           const duplicatedCategoryBrands = categoryBrandsData.length > 0 
             ? [...categoryBrandsData, ...categoryBrandsData, ...categoryBrandsData]
-            : []
-          const products = categoryProducts[category.name] || []
+            : [];
+          const products = categoryProducts[category.name] || [];
+
+          console.log(`🎬 Rendering category section for "${category.name}":`);
+          console.log(`   Brands available: ${categoryBrandsData.length}`);
+          console.log(`   Products available: ${products.length}`);
+          console.log(`   Image path: ${category.image}`);
 
           return (
             <div key={category.name || index}>
@@ -700,7 +805,7 @@ function HomeContent() {
                     </div>
                   )}
 
-                  {/* Popular Brands Carousel */}
+                  {/* Popular Brands Carousel - ONLY if brands exist */}
                   {categoryBrandsData.length > 0 && (
                     <div className="mt-16">
                       <div className="text-center mb-8">
@@ -802,9 +907,7 @@ function HomeContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   {visibleTestimonials.map((testimonial, index) => (
                     <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-80 flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer">
-
                       <div className="absolute top-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-700 group-hover:w-full transition-all duration-500"></div>
-
                       <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-gray-100 to-transparent rounded-full -translate-y-10 translatex-10 opacity-50"></div>
 
                       <div className="flex-1 flex flex-col justify-between relative z-10">
