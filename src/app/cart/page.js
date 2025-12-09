@@ -1,10 +1,10 @@
-// app/cart/page.js - UPDATED WITH IMPROVED DESIGN
+// app/cart/page.js - RIGHT SECTION REVERTED TO ORIGINAL DESIGN
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { FiShoppingBag, FiTrash2, FiPlus, FiMinus, FiArrowLeft, FiShoppingCart, FiShield, FiCheck, FiX, FiInfo, FiChevronRight } from 'react-icons/fi'
+import { FiShoppingBag, FiTrash2, FiPlus, FiMinus, FiArrowLeft, FiShoppingCart, FiShield, FiCheck, FiX, FiInfo } from 'react-icons/fi'
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 
@@ -244,14 +244,14 @@ export default function CartPage() {
       <Header />
       <div className="min-h-screen bg-gray-50 pt-32 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* ✅ IMPROVED HEADER SECTION */}
+          {/* ✅ IMPROVED HEADER SECTION ONLY */}
           <div className="mb-10">
             {/* Breadcrumb */}
             <div className="flex items-center text-sm text-gray-600 mb-3">
               <Link href="/" className="hover:text-gray-900 transition-colors">
                 Home
               </Link>
-              <FiChevronRight className="mx-2 w-4 h-4" />
+              <span className="mx-2">/</span>
               <span className="text-gray-900 font-medium">Shopping Cart</span>
             </div>
             
@@ -270,17 +270,17 @@ export default function CartPage() {
                 <div className="flex items-center gap-4 self-start sm:self-center">
                   <Link 
                     href="/" 
-                    className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm font-light tracking-widest uppercase group"
+                    className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm font-light tracking-widest uppercase"
                   >
-                    <FiArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+                    <FiArrowLeft className="w-4 h-4 mr-2" />
                     Continue Shopping
                   </Link>
                   
                   <button
                     onClick={clearCart}
-                    className="flex items-center text-red-600 hover:text-red-700 transition-colors text-sm font-light tracking-widest uppercase group"
+                    className="flex items-center text-red-600 hover:text-red-700 transition-colors text-sm font-light tracking-widest uppercase"
                   >
-                    <FiTrash2 className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
+                    <FiTrash2 className="w-4 h-4 mr-2" />
                     Clear Cart
                   </button>
                 </div>
@@ -290,7 +290,7 @@ export default function CartPage() {
 
           {cart && cart.items && cart.items.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Cart Items - ✅ IMPROVED LAYOUT */}
+              {/* ✅ LEFT SECTION - PRODUCTS */}
               <div className="lg:col-span-2">
                 {/* Items Header */}
                 <div className="bg-white rounded-t-lg border border-gray-200 px-6 py-4 mb-4">
@@ -307,18 +307,18 @@ export default function CartPage() {
                 {/* Items List */}
                 <div className="space-y-4">
                   {cart.items.map((item) => (
-                    <div key={item._id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow duration-300">
+                    <div key={item._id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
                       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                         {/* Product Image */}
                         <Link 
                           href={`/products/${item.product?._id}`}
-                          className="flex-shrink-0 w-full sm:w-24 h-64 sm:h-24 bg-gray-100 rounded-lg overflow-hidden group"
+                          className="flex-shrink-0 w-full sm:w-24 h-64 sm:h-24 bg-gray-100 rounded-lg overflow-hidden"
                         >
                           {item.product?.images?.[0]?.url ? (
                             <img
                               src={item.product.images[0].url}
                               alt={item.product.productName}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              className="w-full h-full object-cover"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-gray-200">
@@ -332,12 +332,12 @@ export default function CartPage() {
                           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                             <div className="flex-1">
                               <Link href={`/products/${item.product?._id}`}>
-                                <h3 className="text-lg font-light tracking-widest text-gray-900 hover:text-gray-700 uppercase mb-1">
+                                <h3 className="text-lg font-light text-gray-900 hover:text-gray-700">
                                   {item.product?.productName || 'Product'}
                                 </h3>
                               </Link>
                               
-                              <div className="space-y-1">
+                              <div className="space-y-1 mt-2">
                                 <p className="text-gray-600 text-sm">
                                   <span className="font-medium">Brand:</span> {item.product?.brand || 'Unknown'}
                                 </p>
@@ -362,95 +362,83 @@ export default function CartPage() {
 
                             {/* Price */}
                             <div className="text-right">
-                              <p className="text-lg font-light tracking-widest text-gray-900">
+                              <p className="text-lg font-light text-gray-900">
                                 ₹{item.price?.toLocaleString()}
                               </p>
-                              <p className="text-xs text-gray-500 font-light">
-                                PER ITEM
+                              <p className="text-xs text-gray-500">
+                                per item
                               </p>
                             </div>
                           </div>
 
                           {/* Becho Protect Toggle */}
-                          <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${item.bechoProtect?.selected ? 'bg-green-500' : 'bg-gray-300'}`}>
-                                  {item.bechoProtect?.selected && <FiCheck className="w-3 h-3 text-white" />}
-                                </div>
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-gray-900">
-                                      Becho Protect
-                                    </span>
-                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                                      ₹{item.bechoProtect?.price || 0}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-gray-500 mt-0.5">
-                                    Authenticity Guaranteed • Secure Delivery
-                                  </p>
-                                </div>
+                          <div className="mt-4 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${item.bechoProtect?.selected ? 'bg-green-500' : 'bg-gray-300'}`}>
+                                {item.bechoProtect?.selected && <FiCheck className="w-2 h-2 text-white" />}
                               </div>
-                              
-                              <button
-                                onClick={() => toggleBechoProtect(item._id, item.bechoProtect?.selected)}
-                                disabled={togglingBechoProtect === item._id}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium transition-all ${item.bechoProtect?.selected 
-                                  ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' 
-                                  : 'bg-gray-900 text-white hover:bg-gray-800 border border-gray-900'}`}
-                              >
-                                {togglingBechoProtect === item._id ? (
-                                  'Updating...'
-                                ) : item.bechoProtect?.selected ? (
-                                  <>
-                                    <FiX className="w-3 h-3" />
-                                    Remove
-                                  </>
-                                ) : (
-                                  <>
-                                    <FiShield className="w-3 h-3" />
-                                    Add Protection
-                                  </>
-                                )}
-                              </button>
+                              <span className="text-sm font-medium text-gray-700">
+                                Becho Protect - ₹{item.bechoProtect?.price || 0}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                (Authenticity Guaranteed)
+                              </span>
                             </div>
+                            
+                            <button
+                              onClick={() => toggleBechoProtect(item._id, item.bechoProtect?.selected)}
+                              disabled={togglingBechoProtect === item._id}
+                              className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium transition-all ${item.bechoProtect?.selected 
+                                ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' 
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'}`}
+                            >
+                              {togglingBechoProtect === item._id ? (
+                                'Updating...'
+                              ) : item.bechoProtect?.selected ? (
+                                <>
+                                  <FiX className="w-3 h-3" />
+                                  Remove Protection
+                                </>
+                              ) : (
+                                <>
+                                  <FiShield className="w-3 h-3" />
+                                  Add Protection
+                                </>
+                              )}
+                            </button>
                           </div>
 
                           {/* Quantity Controls & Item Total */}
                           <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                            <div className="flex items-center space-x-1">
-                              <p className="text-sm text-gray-600 mr-4 font-light">QUANTITY:</p>
-                              <div className="flex items-center border border-gray-300 rounded-lg">
-                                <button
-                                  onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                                  disabled={updating === item._id || item.quantity <= 1}
-                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-lg"
-                                >
-                                  <FiMinus className="w-3 h-3" />
-                                </button>
-                                
-                                <span className="w-8 text-center font-light border-x border-gray-300 py-1">
-                                  {updating === item._id ? '...' : item.quantity}
-                                </span>
-                                
-                                <button
-                                  onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                                  disabled={updating === item._id || item.quantity >= (item.product?.stock || 1)}
-                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-lg"
-                                >
-                                  <FiPlus className="w-3 h-3" />
-                                </button>
-                              </div>
+                            <div className="flex items-center space-x-3">
+                              <button
+                                onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                                disabled={updating === item._id || item.quantity <= 1}
+                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <FiMinus className="w-3 h-3" />
+                              </button>
+                              
+                              <span className="w-8 text-center font-medium">
+                                {updating === item._id ? '...' : item.quantity}
+                              </span>
+                              
+                              <button
+                                onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                                disabled={updating === item._id || item.quantity >= (item.product?.stock || 1)}
+                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <FiPlus className="w-3 h-3" />
+                              </button>
                             </div>
 
                             {/* Item Total */}
                             <div className="text-right">
-                              <p className="text-lg font-light tracking-widest text-gray-900">
+                              <p className="text-lg font-bold text-gray-900">
                                 ₹{item.totalPrice?.toLocaleString()}
                               </p>
-                              <p className="text-xs text-gray-500 font-light">
-                                ITEM TOTAL
+                              <p className="text-xs text-gray-500">
+                                Item total
                               </p>
                             </div>
                           </div>
@@ -459,8 +447,7 @@ export default function CartPage() {
                         {/* Remove Button */}
                         <button
                           onClick={() => removeItem(item._id)}
-                          className="flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors p-2 self-start hover:bg-red-50 rounded-full"
-                          title="Remove item"
+                          className="flex-shrink-0 text-red-600 hover:text-red-700 transition-colors p-2 self-start"
                         >
                           <FiTrash2 className="w-5 h-5" />
                         </button>
@@ -470,185 +457,135 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* ✅ IMPROVED Order Summary Section */}
+              {/* ✅ RIGHT SECTION - ORIGINAL DESIGN */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-32">
-                  <div className="mb-6">
-                    <h2 className="text-xl font-light tracking-widest uppercase text-gray-900 mb-1">
-                      Order Summary
-                    </h2>
-                    <p className="text-sm text-gray-500 font-light">
-                      Review your items and proceed to checkout
-                    </p>
-                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
                   
-                  <div className="space-y-4 mb-6">
+                  <div className="space-y-3 mb-6">
                     {/* Subtotal */}
-                    <div className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="text-gray-600 text-sm font-light">Subtotal</span>
-                      <span className="text-gray-900 font-light">₹{(cart.subtotal || 0).toLocaleString()}</span>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal ({cart.totalItems || 0} items)</span>
+                      <span className="text-gray-900">₹{(cart.subtotal || 0).toLocaleString()}</span>
                     </div>
                     
                     {/* Becho Protect Total */}
                     {cart.bechoProtectTotal > 0 && (
-                      <div className="flex justify-between py-2 border-b border-gray-100">
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-600 text-sm font-light">Becho Protect</span>
+                      <div className="flex justify-between text-sm">
+                        <div className="flex items-center gap-1">
+                          <span className="text-gray-600">Becho Protect</span>
                           <FiShield className="w-3 h-3 text-green-600" />
                         </div>
-                        <span className="text-green-600 font-light">+₹{(cart.bechoProtectTotal || 0).toLocaleString()}</span>
+                        <span className="text-green-600">₹{(cart.bechoProtectTotal || 0).toLocaleString()}</span>
                       </div>
                     )}
                     
                     {/* Shipping */}
-                    <div className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="text-gray-600 text-sm font-light">Shipping</span>
-                      <span className="text-gray-900 font-light">+₹{SHIPPING_CHARGE.toLocaleString()}</span>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="text-gray-900">₹{SHIPPING_CHARGE.toLocaleString()}</span>
                     </div>
                     
-                    {/* ✅ GST (18% on Platform Fee) */}
-                    <div className="flex justify-between py-2 border-b border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-600 text-sm font-light">GST (18%)</span>
+                    {/* ✅ GST (18% on Platform Fee) - HIDE CALCULATION */}
+                    <div className="flex justify-between text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-600">GST (18%)</span>
+                       
                       </div>
-                      <span className="text-gray-900 font-light">+₹{totals.tax.toLocaleString()}</span>
+                      <span className="text-gray-900">₹{totals.tax.toLocaleString()}</span>
                     </div>
                     
-                    {/* Total Amount */}
-                    <div className="flex justify-between py-4 border-t border-gray-300">
-                      <div>
-                        <span className="text-gray-900 text-lg font-light tracking-widest uppercase">Total Amount</span>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Inclusive of all charges
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-2xl font-light text-gray-900">
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 pt-3">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span className="text-gray-900">Total Amount</span>
+                        <span className="text-gray-900">
                           ₹{totals.grandTotal.toLocaleString()}
                         </span>
                       </div>
-                    </div>
-                    
-                    {/* Summary Details */}
-                    <div className="mt-4">
-                      <details className="group">
-                        <summary className="cursor-pointer hover:text-gray-700 flex items-center justify-between text-sm text-gray-600 pb-2 border-b border-gray-200">
-                          <div className="flex items-center gap-2">
-                            <FiInfo className="w-4 h-4" />
-                            <span>View detailed summary</span>
-                          </div>
-                          <span className="transform transition-transform group-open:rotate-180">
-                            <FiChevronRight className="w-4 h-4" />
-                          </span>
-                        </summary>
-                        <div className="mt-3 p-4 bg-gray-50 rounded-lg space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Items total:</span>
-                            <span className="font-light">₹{totals.subtotal.toLocaleString()}</span>
-                          </div>
-                          {totals.bechoProtectTotal > 0 && (
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-600">Becho Protect:</span>
-                              <span className="font-light">₹{totals.bechoProtectTotal.toLocaleString()}</span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Inclusive of GST 
+                      </p>
+                      
+                      {/* Simplified Breakdown Tooltip */}
+                      <div className="mt-2 text-xs text-gray-500">
+                        <details>
+                          <summary className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
+                            <FiInfo className="w-3 h-3" />
+                            View summary
+                          </summary>
+                          <div className="mt-2 p-3 bg-gray-50 rounded border border-gray-200">
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Items total:</span>
+                                <span className="font-medium">₹{totals.subtotal.toLocaleString()}</span>
+                              </div>
+                              {totals.bechoProtectTotal > 0 && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Becho Protect:</span>
+                                  <span className="font-medium">₹{totals.bechoProtectTotal.toLocaleString()}</span>
+                                </div>
+                              )}
+                              
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">GST (18%):</span>
+                                <span className="font-medium">₹{totals.tax.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Shipping:</span>
+                                <span className="font-medium">₹{SHIPPING_CHARGE.toLocaleString()}</span>
+                              </div>
+                              <div className="border-t border-gray-300 pt-2 mt-2">
+                                <div className="flex justify-between font-bold">
+                                  <span>Total Payable:</span>
+                                  <span>₹{totals.grandTotal.toLocaleString()}</span>
+                                </div>
+                              </div>
                             </div>
-                          )}
-                          
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">GST (18%):</span>
-                            <span className="font-light">₹{totals.tax.toLocaleString()}</span>
                           </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Shipping:</span>
-                            <span className="font-light">₹{SHIPPING_CHARGE.toLocaleString()}</span>
-                          </div>
-                          <div className="pt-2 border-t border-gray-300 mt-2">
-                            <div className="flex justify-between font-medium">
-                              <span className="text-gray-900">Total Payable:</span>
-                              <span className="text-gray-900">₹{totals.grandTotal.toLocaleString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </details>
+                        </details>
+                      </div>
                     </div>
                   </div>
 
                   {/* Checkout Button */}
                   <button
                     onClick={() => router.push('/checkout')}
-                    className="w-full bg-gradient-to-r from-gray-900 to-black text-white py-4 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-300 font-light tracking-widest uppercase shadow-lg hover:shadow-xl mb-6 group"
+                    className="w-full bg-gradient-to-r from-gray-900 to-black text-white py-4 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-300 font-medium shadow-lg hover:shadow-xl mb-4"
                   >
-                    <div className="flex items-center justify-center gap-2">
-                      Proceed to Checkout
-                      <FiChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                    </div>
+                    Proceed to Checkout
                   </button>
 
                   {/* Security Badge */}
-                  <div className="flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <FiShield className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-light text-gray-900">Secure checkout</p>
-                      <p className="text-xs text-gray-500">100% Authenticity Guaranteed</p>
-                    </div>
+                  <div className="flex items-center justify-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <FiShield className="w-4 h-4 text-green-600" />
+                    <span className="text-xs text-gray-600">
+                      Secure checkout • 100% Authenticity Guaranteed
+                    </span>
                   </div>
 
-                  {/* Support Info */}
-                  <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-                    <p className="text-xs text-gray-500 font-light tracking-widest uppercase">
-                      24/7 CUSTOMER SUPPORT
-                    </p>
-                  </div>
-                </div>
-
-                {/* Continue Shopping Card */}
-                <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      <FiShoppingBag className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-light text-gray-900">Continue Shopping</h3>
-                      <p className="text-xs text-gray-500">Discover more luxury items</p>
-                    </div>
-                  </div>
-                  <Link
-                    href="/"
-                    className="block w-full text-center border border-gray-300 text-gray-900 py-3 rounded-lg hover:bg-gray-50 transition-colors text-sm font-light"
-                  >
-                    Browse Collections
-                  </Link>
+                  <p className="text-xs text-gray-500 text-center mt-4">
+                    24/7 Customer Support
+                  </p>
                 </div>
               </div>
             </div>
           ) : (
             // Empty Cart State
-            <div className="text-center py-20">
-              <div className="w-32 h-32 mx-auto mb-8 bg-gray-100 rounded-full flex items-center justify-center">
-                <FiShoppingCart className="w-16 h-16 text-gray-400" />
+            <div className="text-center py-16">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                <FiShoppingCart className="w-12 h-12 text-gray-400" />
               </div>
-              <h2 className="text-3xl font-light tracking-widest uppercase text-gray-900 mb-4">
-                Your Cart is Empty
-              </h2>
-              <p className="text-gray-600 mb-10 max-w-md mx-auto font-light">
+              <h2 className="text-2xl font-light text-gray-900 mb-4">Your cart is empty</h2>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 Looks like you haven't added any items to your cart yet. Start shopping to discover amazing luxury products!
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/"
-                  className="inline-flex items-center justify-center bg-gradient-to-r from-gray-900 to-black text-white px-8 py-3 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-300 font-light tracking-widest uppercase group"
-                >
-                  Start Shopping
-                  <FiArrowLeft className="w-4 h-4 ml-2 transform rotate-180 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/collections"
-                  className="inline-flex items-center justify-center border border-gray-300 text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 font-light tracking-widest uppercase"
-                >
-                  View Collections
-                </Link>
-              </div>
+              <Link
+                href="/"
+                className="inline-flex items-center bg-gradient-to-r from-gray-900 to-black text-white px-8 py-3 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-300 font-medium"
+              >
+                Start Shopping
+              </Link>
             </div>
           )}
         </div>
