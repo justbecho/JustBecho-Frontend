@@ -7,8 +7,6 @@ import { FiUser, FiHeart, FiShoppingBag, FiLogOut, FiSettings, FiPackage, FiShop
 import { usePathname, useRouter } from 'next/navigation'
 import AuthModal from '@/components/ui/AuthModal'
 
-// ... baki ka code same rahega
-
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -26,6 +24,7 @@ export default function Header() {
   const isProductPage = pathname?.includes('/products/')
   const isSellNowPage = pathname === '/sell-now'
   const isDashboardPage = pathname?.includes('/dashboard')
+  const isCartPage = pathname === '/cart' // ✅ CART PAGE DETECTION
 
   // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
@@ -520,9 +519,11 @@ export default function Header() {
 
   return (
     <>
-      {/* MAIN HEADER */}
+      {/* ✅ FIXED: MAIN HEADER - Increased z-index for cart page */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${
+        className={`fixed top-0 left-0 right-0 transition-all duration-500 font-sans ${
+          isCartPage ? 'z-[100]' : 'z-50' // ✅ Cart page pe high z-index
+        } ${
           isDashboardPage ? 'bg-white text-gray-900 shadow-sm' :
           isProductPage || isSellNowPage ? 'bg-white text-gray-900 shadow-sm' : 
           isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
@@ -752,13 +753,13 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Mobile Search Bar - Below Header */}
-          <div className="md:hidden border-t border-gray-200/50 mt-2 pt-2 pb-1">
+          {/* ✅ FIXED: Mobile Search Bar - Improved spacing */}
+          <div className="md:hidden mt-2 pb-1">
             <div className="relative flex items-center">
               <input
                 type="text"
                 placeholder="Search for products..."
-                className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
+                className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2.5 text-sm outline-none w-full font-light tracking-wide ${
                   isDashboardPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
                   isProductPage || isSellNowPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
                   isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
@@ -789,10 +790,12 @@ export default function Header() {
           </div>
         </div>
 
-        {/* MOBILE MENU */}
+        {/* ✅ FIXED: MOBILE MENU - Better z-index */}
         {isMenuOpen && (
           <div
             className={`md:hidden transition-all duration-300 font-light tracking-widest uppercase ${
+              isCartPage ? 'z-[101]' : 'z-50'
+            } ${
               isDashboardPage ? 'bg-white text-gray-800 shadow-lg' :
               isProductPage || isSellNowPage ? 'bg-white text-gray-800 shadow-lg' :
               isScrolled ? 'bg-white text-gray-800 shadow-lg' : 'bg-black/95 text-white'
@@ -876,13 +879,18 @@ export default function Header() {
         )}
       </header>
 
-      {/* SUBHEADER WITH CATEGORIES */}
+      {/* ✅ FIXED: SUBHEADER WITH CATEGORIES - Better mobile spacing */}
       <div
-        className={`fixed top-20 left-0 right-0 z-40 transition-all duration-500 ${
+        className={`fixed left-0 right-0 transition-all duration-500 ${
+          isCartPage ? 'z-[99]' : 'z-40' // ✅ Cart page mein subheader ko thoda niche
+        } ${
           isDashboardPage ? 'bg-white shadow-md' :
           isProductPage || isSellNowPage ? 'bg-white shadow-md' :
           isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
         }`}
+        style={{
+          top: '80px' // ✅ Mobile search bar ke neeche categories
+        }}
       >
         {/* Main Categories Bar */}
         <div className="w-[95%] sm:w-[90%] mx-auto">
@@ -965,27 +973,28 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Mobile Categories - Horizontal Scroll */}
-        <div className="md:hidden border-t border-gray-200/50">
-          <div className="flex overflow-x-auto space-x-6 py-3 px-4 hide-scrollbar">
+        {/* ✅ FIXED: Mobile Categories - Better spacing, no overlap */}
+        <div className="md:hidden">
+          <div className="flex overflow-x-auto space-x-4 py-2.5 px-3 hide-scrollbar">
             {loading ? (
-              <div className="text-xs text-gray-500">Loading...</div>
+              <div className="text-xs text-gray-500 px-2">Loading...</div>
             ) : transformedCategories.length > 0 ? (
               transformedCategories.map((category, index) => (
                 <Link
                   key={category.name || index}
                   href={category.href}
-                  className={`flex-shrink-0 text-xs font-light tracking-widest uppercase whitespace-nowrap ${
-                    isDashboardPage ? 'text-gray-800 hover:text-gray-600' :
-                    isProductPage || isSellNowPage ? 'text-gray-800 hover:text-gray-600' :
-                    isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
+                  className={`flex-shrink-0 text-xs font-light tracking-widest uppercase whitespace-nowrap px-3 py-1.5 rounded-full border ${
+                    isDashboardPage ? 'text-gray-800 hover:text-gray-600 border-gray-300' :
+                    isProductPage || isSellNowPage ? 'text-gray-800 hover:text-gray-600 border-gray-300' :
+                    isScrolled ? 'text-gray-800 hover:text-gray-600 border-gray-300' : 'text-white hover:text-gray-200 border-white/30'
                   }`}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   {category.name.split(' ')[0]}
                 </Link>
               ))
             ) : (
-              <div className="text-xs text-gray-500">No categories</div>
+              <div className="text-xs text-gray-500 px-2">No categories</div>
             )}
           </div>
         </div>
