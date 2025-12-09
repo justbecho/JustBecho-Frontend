@@ -31,23 +31,23 @@ function HomeContent() {
   // ✅ FIXED: Updated categoryBrands with safer approach
   const categoryBrands = useMemo(() => ({
     "Men's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/balenciaga.png", fallback: "/brands/balenciaga.png" },
-      { name: "Armani", logo: "/brandslogo/mens-fashion/armani.png", fallback: "/brands/armani.png" },
-      { name: "Prada", logo: "/brandslogo/mens-fashion/prada.png", fallback: "/brands/prada.png" },
-      { name: "Versace", logo: "/brandslogo/mens-fashion/versace.png", fallback: "/brands/versace.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/louis-vuitton.png", fallback: "/brands/louis-vuitton.png" },
-      { name: "Gucci", logo: "/brandslogo/mens-fashion/gucci.png", fallback: "/brands/gucci.png" },
-      { name: "Burberry", logo: "/brandslogo/mens-fashion/burberry.png", fallback: "/brands/burberry.png" },
-      { name: "Fendi", logo: "/brandslogo/mens-fashion/fendi.png", fallback: "/brands/fendi.png" }
+      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png" },
+      { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png" },
+      { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png", fallback: "/brands/burberry.png" },
+      { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png" }
     ],
     "Women's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/balenciaga.png", fallback: "/brands/balenciaga.png" },
-      { name: "Dior", logo: "/brandslogo/womens-fashion/dior.png", fallback: "/brands/dior.png" },
-      { name: "Chanel", logo: "/brandslogo/womens-fashion/chanel.png", fallback: "/brands/chanel.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/louis-vuitton.png", fallback: "/brands/louis-vuitton.png" },
-      { name: "Gucci", logo: "/brandslogo/womens-fashion/gucci.png", fallback: "/brands/gucci.png" },
-      { name: "Givenchy", logo: "/brandslogo/womens-fashion/givenchy.png", fallback: "/brands/givenchy.png" },
-      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/dolce-gabbana.png", fallback: "/brands/dolce-gabbana.png" }
+      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png" },
+      { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
+      { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png", fallback: "/brands/givenchy.png" },
+      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png" }
     ],
     "Footwear": [
       { name: "Balenciaga", logo: "/brandslogo/footwear/Acne-Studios.jpg", fallback: "/brands/balenciaga.png" },
