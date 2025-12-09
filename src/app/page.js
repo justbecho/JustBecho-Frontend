@@ -476,7 +476,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: Brand logo component - ALL LOGOS SAME SIZE AND SMALLER
+  // ✅ UPDATED: PERFECT Brand logo component - ALL LOGOS EXACT SAME SIZE AND PROPER SPACING
   const BrandLogo = ({ brand, index }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
@@ -486,18 +486,23 @@ function HomeContent() {
     return (
       <div 
         key={index} 
-        className="flex-shrink-0 px-2 sm:px-4 md:px-6"
+        className="flex-shrink-0 px-1 sm:px-2 md:px-3"
         title={brand.name}
       >
-        {/* ✅ ALL LOGOS SAME HEIGHT - SMALLER SIZE */}
-        <div className="relative h-12 sm:h-14 md:h-16 flex items-center justify-center">
+        {/* ✅ FIXED: ALL LOGOS EXACT SAME CONTAINER SIZE */}
+        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
           <img
             src={imgSrc}
             alt={brand.name}
-            className="w-auto h-full max-h-full object-contain transition-all duration-300"
+            className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300"
             style={{
               filter: 'grayscale(10%)',
               opacity: 0.85,
+              objectFit: 'contain',
+              width: 'auto',
+              height: 'auto',
+              maxWidth: '80%',
+              maxHeight: '80%'
             }}
             onMouseEnter={(e) => {
               e.target.style.filter = 'grayscale(0%)';
@@ -608,7 +613,6 @@ function HomeContent() {
               <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
                 EXPLORE CATEGORIES
               </h2>
-              {/* ✅ "DISCOVER LUXURY ITEMS" text rakha hai, "Number of brands" wala text hata diya */}
               <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-3">
                 DISCOVER LUXURY ITEMS
               </p>
@@ -751,9 +755,9 @@ function HomeContent() {
                         </p>
                       </div>
 
-                      {/* ✅ UPDATED: ALL LOGOS SAME SIZE AND SMALLER */}
+                      {/* ✅ UPDATED: PERFECT LOGO MARQUEE - ALL SAME SIZE, PROPER SPACING */}
                       <div className="w-full overflow-hidden py-4">
-                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap items-center">
+                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap items-center space-x-1 sm:space-x-2 md:space-x-3">
                           {duplicatedCategoryBrands.map((brand, brandIndex) => (
                             <BrandLogo 
                               key={brandIndex} 
