@@ -29,7 +29,9 @@ export default function Header() {
   const isProductPage = pathname?.includes('/products/')
   const isSellNowPage = pathname === '/sell-now'
   const isDashboardPage = pathname?.includes('/dashboard')
-  const isCartPage = pathname === '/cart' // ✅ CART PAGE DETECTION
+  const isCartPage = pathname === '/cart'
+  const isCategoryPage = pathname?.includes('/categories') || pathname?.includes('/category')
+  const isHomePage = pathname === '/'
 
   // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
@@ -186,14 +188,15 @@ export default function Header() {
     }
   }, [])
 
-  // ✅ FIXED: Scroll effect - CART PAGE PE BINA SCROLL KARE WHITE
+  // ✅ FIXED: Scroll effect - Only transparent on homepage and category pages
   useEffect(() => {
     const handleScroll = () => {
-      // ✅ Cart page pe bina scroll kare hi white
-      if (isCartPage) {
-        setIsScrolled(true);
-      } else {
+      // ✅ Homepage aur category pages pe hi transparency ka logic
+      if (isHomePage || isCategoryPage) {
         setIsScrolled(window.scrollY > 50);
+      } else {
+        // ✅ Baaki sab pages pe hamesha white background
+        setIsScrolled(true);
       }
     }
     
@@ -201,7 +204,7 @@ export default function Header() {
     
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isCartPage]) // ✅ isCartPage dependency add kiya
+  }, [isHomePage, isCategoryPage, isCartPage]) // ✅ isCartPage dependency add kiya
 
   // ✅ SEARCH FUNCTIONALITY
   const handleSearch = useCallback(async (query) => {
@@ -600,16 +603,51 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router])
 
+  // ✅ Function to determine if header should be transparent
+  const getHeaderBackground = () => {
+    // ✅ Homepage aur category pages pe hi transparent ho sakta hai
+    if (isHomePage || isCategoryPage) {
+      return isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
+    }
+    // ✅ Baaki sab pages pe hamesha white background
+    return 'bg-white text-gray-900 shadow-sm'
+  }
+
+  // ✅ Function to determine if categories should be transparent
+  const getCategoriesBackground = () => {
+    // ✅ Homepage aur category pages pe hi transparent ho sakta hai
+    if (isHomePage || isCategoryPage) {
+      return isScrolled ? 'bg-white' : 'bg-transparent'
+    }
+    // ✅ Baaki sab pages pe hamesha white background
+    return 'bg-white'
+  }
+
+  // ✅ Function to determine text color for category links
+  const getCategoryTextColor = () => {
+    // ✅ Homepage aur category pages pe hi white text ho sakta hai
+    if (isHomePage || isCategoryPage) {
+      return isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
+    }
+    // ✅ Baaki sab pages pe hamesha dark text
+    return 'text-gray-800 hover:text-gray-600'
+  }
+
+  // ✅ Function to determine icon colors
+  const getIconColor = () => {
+    // ✅ Homepage aur category pages pe hi white icons ho sakte hain
+    if (isHomePage || isCategoryPage) {
+      return isScrolled ? 'text-gray-900' : 'text-white'
+    }
+    // ✅ Baaki sab pages pe hamesha dark icons
+    return 'text-gray-900'
+  }
+
   return (
     <>
-      {/* ✅ COMPLETE HEADER WITH CATEGORIES - NO GAP VERSION */}
+      {/* ✅ COMPLETE HEADER WITH CATEGORIES */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${
-          isDashboardPage ? 'bg-white text-gray-900 shadow-sm' :
-          isProductPage || isSellNowPage ? 'bg-white text-gray-900 shadow-sm' : 
-          isCartPage ? 'bg-white text-gray-900 shadow-sm' : // ✅ Cart page pe bina scroll kare white
-          isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${getHeaderBackground()}`}
       >
         {/* Top Section with Logo and Icons */}
         <div className="w-[95%] sm:w-[90%] mx-auto">
@@ -652,10 +690,10 @@ export default function Header() {
                   width={80}
                   height={80}
                   className={`transition-all duration-500 ${
-                    isDashboardPage ? 'h-14 w-auto' : 
-                    isProductPage || isSellNowPage ? 'h-14 w-auto' : 
-                    isCartPage ? 'h-14 w-auto' : 
-                    isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
+                    // Logo size: homepage/category pages pe bada, baaki pages pe chhota
+                    isHomePage || isCategoryPage 
+                      ? isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
+                      : 'h-14 w-auto'
                   }`}
                   priority
                 />
@@ -669,12 +707,7 @@ export default function Header() {
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
-                    className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                      isDashboardPage ? 'text-gray-900' :
-                      isProductPage || isSellNowPage ? 'text-gray-900' : 
-                      isCartPage ? 'text-gray-900' : 
-                      isScrolled ? 'text-gray-900' : 'text-white'
-                    }`}
+                    className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${getIconColor()}`}
                   >
                     <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
@@ -742,12 +775,7 @@ export default function Header() {
                 {/* Wishlist Icon */}
                 <button 
                   onClick={handleWishlistClick}
-                  className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                    isDashboardPage ? 'text-gray-900' :
-                    isProductPage || isSellNowPage ? 'text-gray-900' : 
-                    isCartPage ? 'text-gray-900' : 
-                    isScrolled ? 'text-gray-900' : 'text-white'
-                  }`}
+                  className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${getIconColor()}`}
                 >
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
@@ -756,12 +784,7 @@ export default function Header() {
                 {cartApiAvailable && (
                   <button 
                     onClick={handleCartClick}
-                    className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                      isDashboardPage ? 'text-gray-900' :
-                      isProductPage || isSellNowPage ? 'text-gray-900' : 
-                      isCartPage ? 'text-gray-900' : 
-                      isScrolled ? 'text-gray-900' : 'text-white'
-                    }`}
+                    className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${getIconColor()}`}
                   >
                     <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
                     {cartCount > 0 && (
@@ -777,12 +800,7 @@ export default function Header() {
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
-                  className={`md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center ${
-                    isDashboardPage ? 'text-gray-900' :
-                    isProductPage || isSellNowPage ? 'text-gray-900' : 
-                    isCartPage ? 'text-gray-900' : 
-                    isScrolled ? 'text-gray-900' : 'text-white'
-                  }`}
+                  className={`md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center ${getIconColor()}`}
                 >
                   <FiShoppingBag className="w-6 h-6" />
                   {cartCount > 0 && (
@@ -806,19 +824,19 @@ export default function Header() {
                   onChange={handleSearchInputChange}
                   onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
                   className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
-                    isDashboardPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
-                    isProductPage || isSellNowPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
-                    isCartPage ? 'text-gray-800 placeholder-gray-500 bg-white' : 
-                    isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
+                    // Search input background
+                    (isHomePage || isCategoryPage) && !isScrolled
+                      ? 'text-white placeholder-white/80 bg-white/10'
+                      : 'text-gray-800 placeholder-gray-500 bg-white'
                   }`}
                 />
                 <button
                   type="submit"
                   className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                    isDashboardPage ? 'text-gray-600' :
-                    isProductPage || isSellNowPage ? 'text-gray-600' :
-                    isCartPage ? 'text-gray-600' : 
-                    isScrolled ? 'text-gray-600' : 'text-white'
+                    // Search icon color
+                    (isHomePage || isCategoryPage) && !isScrolled
+                      ? 'text-white'
+                      : 'text-gray-600'
                   }`}
                 >
                   <FiSearch className="w-4 h-4" />
@@ -889,8 +907,8 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ DESKTOP CATEGORIES - DIRECTLY BELOW MAIN HEADER (NO GAP) */}
-        <div className="hidden md:block border-t border-gray-100">
+        {/* ✅ DESKTOP CATEGORIES - WITHOUT WHITE LINE */}
+        <div className={`hidden md:block ${getCategoriesBackground()} transition-all duration-500`}>
           <div className="w-[95%] sm:w-[90%] mx-auto">
             <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-3">
               {loading ? (
@@ -906,37 +924,35 @@ export default function Header() {
                     {/* Category Link */}
                     <Link
                       href={category.href}
-                      className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${
-                        isDashboardPage ? 'text-gray-800 hover:text-gray-600' :
-                        isProductPage || isSellNowPage ? 'text-gray-800 hover:text-gray-600' :
-                        isCartPage ? 'text-gray-800 hover:text-gray-600' : 
-                        isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
-                      }`}
+                      className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${getCategoryTextColor()}`}
                     >
                       {category.name.toUpperCase()}
                     </Link>
 
-                    {/* DROPDOWN - DIRECTLY BELOW CATEGORIES BAR */}
+                    {/* ✅ FULL WIDTH DROPDOWN - LIKE BEFORE */}
                     {activeCategory === category.name && (
                       <div 
-                        className="absolute left-0 right-0 top-full bg-white shadow-2xl border-t border-gray-100 py-6 z-[60] mt-0"
+                        className="fixed left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
+                        style={{ top: 'calc(100% - 1px)' }} 
                         onMouseEnter={() => setActiveCategory(category.name)}
                         onMouseLeave={() => setActiveCategory(null)}
                       >
                         <div className="w-[95%] sm:w-[90%] mx-auto max-w-5xl">
-                          <div className="grid grid-cols-5 gap-6">
+                          <div className="grid grid-cols-5 gap-8">
                             {category.dropdown.sections.map((section, sectionIndex) => (
-                              <div key={sectionIndex} className="space-y-2">
-                                <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-1">
+                              <div key={sectionIndex} className="space-y-3">
+                                {/* Section Title - Centered */}
+                                <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-2 text-center">
                                   {section.title}
                                 </h3>
                                 
-                                <ul className="space-y-1">
+                                {/* Section Items - Centered */}
+                                <ul className="space-y-2">
                                   {section.items.map((item, itemIndex) => (
-                                    <li key={itemIndex}>
+                                    <li key={itemIndex} className="text-center">
                                       <Link
                                         href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
-                                        className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-0.5"
+                                        className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-1"
                                       >
                                         {item}
                                       </Link>
@@ -947,10 +963,11 @@ export default function Header() {
                             ))}
                           </div>
                           
-                          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+                          {/* View All Button - Centered */}
+                          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
                             <Link
                               href={category.href}
-                              className="inline-flex items-center text-gray-900 text-[13px] font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group"
+                              className="inline-flex items-center text-gray-900 text-[13px] font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group mx-auto"
                             >
                               View All {category.name} 
                               <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
