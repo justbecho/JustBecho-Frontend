@@ -185,7 +185,7 @@ function HomeContent() {
     "Watches": "/banners/Watches.png", 
     "Perfumes": "/banners/perfumes.png",
     "TOYS & COLLECTIBLES": "/banners/toys and Figurines.png",
-    "KIDS": "/banners/Footwear.png",
+    "KIDS": "/banners/Kids Fashion.png",
     "default": "/banners/default.jpg"
   }), [])
 
