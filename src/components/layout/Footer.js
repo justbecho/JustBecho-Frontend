@@ -33,10 +33,10 @@ export default function Footer() {
           <div>
             <h4 className="font-medium text-black mb-4">Support</h4>
             <div className="space-y-2 text-sm">
-              <Link href="/help" className="block text-gray-600 hover:text-black">Help Center</Link>
-              <Link href="/contact" className="block text-gray-600 hover:text-black">Contact Us</Link>
-              <Link href="/shipping" className="block text-gray-600 hover:text-black">Shipping</Link>
-              <Link href="/returns" className="block text-gray-600 hover:text-black">Returns</Link>
+              <Link href="/help" prefetch={false} className="block text-gray-600 hover:text-black">Help Center</Link>
+              <Link href="/contact"  prefetch={false} className="block text-gray-600 hover:text-black">Contact Us</Link>
+              <Link href="/shipping" prefetch={false} className="block text-gray-600 hover:text-black">Shipping</Link>
+              <Link href="/returns" prefetch={false} className="block text-gray-600 hover:text-black">Returns</Link>
             </div>
           </div>
 
@@ -47,7 +47,7 @@ export default function Footer() {
               <Link href="/terms/seller-terms" className="block text-gray-600 hover:text-black">Seller Terms & Condition</Link>
               <Link href="/terms/buyer-terms" className="block text-gray-600 hover:text-black">Buyer Terms & Condition</Link>
               <Link href="/privacy-policy" className="block text-gray-600 hover:text-black">Privacy Policy</Link>
-              <Link href="/authenticity" className="block text-gray-600 hover:text-black">Authenticity Guarantee</Link>
+              <Link href="/authenticity" prefetch={false} className="block text-gray-600 hover:text-black">Authenticity Guarantee</Link>
             </div>
           </div>
         </div>
