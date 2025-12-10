@@ -5,13 +5,13 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useState, useEffect, useMemo, Suspense, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 // ✅ Dynamic export add karo (Netlify ke liye important)
 export const dynamic = 'force-dynamic'
 
-// ✅ UPDATED: Custom CSS for faster marquee animation
+// ✅ UPDATED: Custom CSS for faster marquee animation and carousel
 const customStyles = `
   @keyframes faster-marquee-mobile {
     0% { transform: translateX(0); }
@@ -35,6 +35,44 @@ const customStyles = `
   .animate-faster-marquee:hover {
     animation-play-state: paused;
   }
+  
+  /* Carousel animations */
+  @keyframes slideInFromRight {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOutToLeft {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(-100%); opacity: 0; }
+  }
+  
+  .carousel-slide-in {
+    animation: slideInFromRight 1s ease-out forwards;
+  }
+  
+  .carousel-slide-out {
+    animation: slideOutToLeft 1s ease-out forwards;
+  }
+  
+  /* Fade transition for carousel */
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  .carousel-fade-in {
+    animation: fadeIn 1.5s ease-out forwards;
+  }
+  
+  .carousel-fade-out {
+    animation: fadeOut 1s ease-out forwards;
+  }
 `
 
 // Main content ko alag component mein rakho
@@ -46,6 +84,11 @@ function HomeContent() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
   const [brandsFromBackend, setBrandsFromBackend] = useState([])
+  
+  // ✅ Carousel states
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const carouselIntervalRef = useRef(null)
 
   // ✅ UPDATED: Brand logos - sabka size same rakhein
   const categoryBrands = useMemo(() => ({
@@ -176,7 +219,7 @@ function HomeContent() {
     ],
   }), [])
 
-  // ✅ Category images mapping
+  // ✅ Category images mapping for carousel
   const categoryImages = useMemo(() => ({
     "Men's Fashion": "/banners/Men_s Fashion.png",
     "Women's Fashion": "/banners/Women_s Fashion.png", 
@@ -188,6 +231,59 @@ function HomeContent() {
     "KIDS": "/banners/Kids Fashion.png",
     "default": "/banners/default.jpg"
   }), [])
+
+  // ✅ Default carousel slides (agar backend se categories nahi milte)
+  const defaultCarouselSlides = useMemo(() => [
+    {
+      image: "/banners/Men_s Fashion.png",
+      title: "Men's Fashion",
+      description: "Discover premium men's fashion",
+      href: "/categories/mens-fashion"
+    },
+    {
+      image: "/banners/Women_s Fashion.png",
+      title: "Women's Fashion",
+      description: "Explore luxury women's collections",
+      href: "/categories/womens-fashion"
+    },
+    {
+      image: "/banners/Footwear.png",
+      title: "Footwear",
+      description: "Step into luxury footwear",
+      href: "/categories/footwear"
+    },
+    {
+      image: "/banners/Fashion Accessories.png",
+      title: "Accessories",
+      description: "Complete your look with accessories",
+      href: "/categories/accessories"
+    },
+    {
+      image: "/banners/Watches.png",
+      title: "Watches",
+      description: "Timeless luxury timepieces",
+      href: "/categories/watches"
+    },
+    {
+      image: "/banners/perfumes.png",
+      title: "Perfumes",
+      description: "Signature scents and fragrances",
+      href: "/categories/perfumes"
+    }
+  ], [])
+
+  // ✅ Carousel slides from categories
+  const carouselSlides = useMemo(() => {
+    if (categoriesFromBackend.length > 0) {
+      return categoriesFromBackend.slice(0, 6).map(cat => ({
+        image: cat.image,
+        title: cat.name,
+        description: `Explore luxury ${cat.name.toLowerCase()}`,
+        href: cat.href
+      }))
+    }
+    return defaultCarouselSlides
+  }, [categoriesFromBackend, defaultCarouselSlides])
 
   // ✅ Featured Collections
   const featuredCollections = useMemo(() => [
@@ -204,7 +300,7 @@ function HomeContent() {
       href: "/collections/bags"
     },
     {
-      title: "Popular Footwear",
+      title: "POPULAR FOOTWEAR",
       description: "Innovation meets luxury",
       image: "/banners/Footwear.png",
       href: "/collections/footwear"
@@ -300,7 +396,7 @@ function HomeContent() {
     {
       icon: "🛡️",
       title: "AUTHENTICITY GUARANTEED",
-      description: "Every product verified by luxury experts"
+      description: "Every product verified by luxury experts (Only with BECHO PROTECT)"
     },
     {
       icon: "💎",
@@ -357,6 +453,67 @@ function HomeContent() {
       rating: 5
     }
   ], [])
+
+  // ✅ Carousel functions
+  const nextSlide = () => {
+    if (isTransitioning || carouselSlides.length === 0) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+      setIsTransitioning(false);
+    }, 500);
+  }
+
+  const prevSlide = () => {
+    if (isTransitioning || carouselSlides.length === 0) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+      setIsTransitioning(false);
+    }, 500);
+  }
+
+  const goToSlide = (index) => {
+    if (isTransitioning || index === currentSlide || carouselSlides.length === 0) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide(index);
+      setIsTransitioning(false);
+    }, 300);
+  }
+
+  // ✅ Start carousel auto-play
+  useEffect(() => {
+    if (carouselSlides.length > 1) {
+      carouselIntervalRef.current = setInterval(() => {
+        nextSlide();
+      }, 5000); // Change slide every 5 seconds
+    }
+    
+    return () => {
+      if (carouselIntervalRef.current) {
+        clearInterval(carouselIntervalRef.current);
+      }
+    };
+  }, [carouselSlides.length, currentSlide]);
+
+  // ✅ Pause carousel on hover
+  const handleMouseEnter = () => {
+    if (carouselIntervalRef.current) {
+      clearInterval(carouselIntervalRef.current);
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (carouselSlides.length > 1) {
+      carouselIntervalRef.current = setInterval(() => {
+        nextSlide();
+      }, 5000);
+    }
+  }
 
   // ✅ Fetch categories and brands from backend
   useEffect(() => {
@@ -613,40 +770,114 @@ function HomeContent() {
       <style jsx global>{customStyles}</style>
       
       <main className="min-h-screen bg-white">
-        {/* Hero Section */}
+        {/* ✅ UPDATED: Carousel Hero Section */}
         <section className="relative h-[60vh] sm:h-[75vh] md:h-[85vh] overflow-hidden">
           <Header />
           
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/banners/Men_s Fashion.png"
-              alt="Just Becho - Buy and Sell luxury Items"
-              fill
-              className="object-cover object-center brightness-110 contrast-105 saturate-110"
-              priority
-              onError={(e) => {
-                e.target.src = '/images/hero-placeholder.jpg';
-              }}
-            />
-            <div className="absolute inset-0 bg-black/30"></div>
+          <div 
+            className="absolute inset-0 z-0"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {carouselSlides.length > 0 ? (
+              <>
+                {/* Current Slide */}
+                <div className={`absolute inset-0 ${isTransitioning ? 'carousel-fade-out' : 'carousel-fade-in'}`}>
+                  <Image
+                    src={carouselSlides[currentSlide]?.image || "/banners/Men_s Fashion.png"}
+                    alt={carouselSlides[currentSlide]?.title || "Just Becho"}
+                    fill
+                    className="object-cover object-center brightness-110 contrast-105 saturate-110"
+                    priority
+                    onError={(e) => {
+                      e.target.src = '/images/hero-placeholder.jpg';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/40"></div>
+                  
+                  {/* Carousel Content */}
+                  <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
+                    <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
+                      <h1 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-widest uppercase mb-4">
+                        {carouselSlides[currentSlide]?.title || "JUST BECHO"}
+                      </h1>
+                      <p className="text-sm sm:text-lg md:text-xl font-light tracking-widest uppercase mb-6 max-w-2xl mx-auto">
+                        {carouselSlides[currentSlide]?.description || "Luxury Reborn • Trust Redefined"}
+                      </p>
+                      <Link
+                        href={carouselSlides[currentSlide]?.href || "/products"}
+                        className="inline-block bg-white text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-sm sm:text-base"
+                      >
+                        EXPLORE NOW
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Carousel Navigation Buttons */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group"
+                  aria-label="Previous slide"
+                >
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group"
+                  aria-label="Next slide"
+                >
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                {/* Carousel Indicators */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+                  {carouselSlides.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Slide Counter */}
+                <div className="absolute bottom-4 right-4 z-20 bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+                  <span className="font-light">{currentSlide + 1} / {carouselSlides.length}</span>
+                </div>
+              </>
+            ) : (
+              /* Fallback when no carousel slides */
+              <div className="absolute inset-0">
+                <Image
+                  src="/banners/Men_s Fashion.png"
+                  alt="Just Becho - Buy and Sell luxury Items"
+                  fill
+                  className="object-cover object-center brightness-110 contrast-105 saturate-110"
+                  priority
+                />
+                <div className="absolute inset-0 bg-black/30"></div>
+                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center text-white z-10">
+                  <h1 className="text-2xl sm:text-4xl font-light tracking-widest uppercase mb-4 opacity-0 animate-fade-in-up" 
+                      style={{animationDelay: '0.3s', animationFillMode: 'forwards'}}>
+                    JUST BECHO
+                  </h1>
+                  <p className="text-sm sm:text-lg font-light tracking-widest uppercase opacity-0 animate-fade-in-up"
+                     style={{animationDelay: '0.6s', animationFillMode: 'forwards'}}>
+                    Luxury Reborn • Trust Redefined
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center text-white z-10">
-            <h1 className="text-2xl sm:text-4xl font-light tracking-widest uppercase mb-4 opacity-0 animate-fade-in-up" 
-                style={{animationDelay: '0.3s', animationFillMode: 'forwards'}}>
-              JUST BECHO
-            </h1>
-            <p className="text-sm sm:text-lg font-light tracking-widest uppercase opacity-0 animate-fade-in-up"
-               style={{animationDelay: '0.6s', animationFillMode: 'forwards'}}>
-              Luxury Reborn • Trust Redefined
-            </p>
-          </div>
-
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-            <div className="w-5 h-8 border-2 border-white rounded-full flex justify-center">
-              <div className="w-1 h-2 bg-white rounded-full mt-1"></div>
-            </div>
-          </div>
+        
         </section>
 
         {/* Why Choose Us */}
@@ -657,7 +888,7 @@ function HomeContent() {
                 WHY CHOOSE JUST BECHO
               </h2>
               <p className="text-gray-600 text-base font-light max-w-2xl mx-auto">
-                Experience luxury redefined with our curated collection of authenticated luxury items
+                Experience luxury redefined with our curated collection of luxury items
               </p>
             </div>
 

@@ -23,9 +23,9 @@ export default function Footer() {
               <Link href="/categories/kids" className="block text-gray-600 hover:text-black">Kids</Link>
               <Link href="/categories/accessories" className="block text-gray-600 hover:text-black">Accessories</Link>
               <Link href="/categories/footwear" className="block text-gray-600 hover:text-black">Footwear</Link>
-              <Link href="/categories/toys" className="block text-gray-600 hover:text-black">Footwear</Link>
-              <Link href="/categories/watches" className="block text-gray-600 hover:text-black">Footwear</Link>
-              <Link href="/categories/perfumes" className="block text-gray-600 hover:text-black">Footwear</Link>
+              <Link href="/categories/toys" className="block text-gray-600 hover:text-black">Toys</Link>
+              <Link href="/categories/watches" className="block text-gray-600 hover:text-black">Watches</Link>
+              <Link href="/categories/perfumes" className="block text-gray-600 hover:text-black">Perfumes</Link>
             </div>
           </div>
 

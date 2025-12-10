@@ -158,7 +158,7 @@ export default function BrandPage() {
               {category ? (
                 <div className="flex flex-col items-center gap-4">
                   <p className="text-gray-600 text-lg font-light max-w-2xl">
-                    Explore authentic {brandName} products in {category}
+                    Explore  {brandName} products in {category}
                   </p>
                   <div className="flex items-center gap-4">
                     <span className="text-gray-400">•</span>
@@ -173,7 +173,7 @@ export default function BrandPage() {
                 </div>
               ) : (
                 <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto">
-                  Discover authenticated {brandName} luxury items
+                  Discover  {brandName} luxury items
                 </p>
               )}
               
@@ -204,7 +204,7 @@ export default function BrandPage() {
               <h3 className="text-gray-900 text-xl font-light tracking-widest uppercase mb-3">
                 LOADING {safeToUpperCase(brandName)}
               </h3>
-              <p className="text-gray-600">Fetching authenticated luxury items...</p>
+              <p className="text-gray-600">Fetching luxury items...</p>
             </section>
           )}
 
@@ -243,10 +243,7 @@ export default function BrandPage() {
                   <h2 className="text-gray-900 text-2xl sm:text-3xl font-light tracking-widest uppercase mb-2">
                     CURATED COLLECTION
                   </h2>
-                  <p className="text-gray-600 text-base font-light">
-                    {products.length} authenticated {brandName} product{products.length !== 1 ? 's' : ''}
-                    {category && ` in ${category}`}
-                  </p>
+               
                 </div>
                 
                 <div className="flex items-center gap-4">
@@ -309,7 +306,7 @@ export default function BrandPage() {
                   <div className="bg-gray-50 p-5 rounded-xl">
                     <div className="text-gray-900 text-2xl mb-2">🔍</div>
                     <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2 text-sm">GET VERIFIED</h3>
-                    <p className="text-gray-600 text-xs">Our experts authenticate every {brandName} product</p>
+                    <p className="text-gray-600 text-xs">Our experts authenticate every {brandName} product (Only with BECHO PROTECT)</p>
                   </div>
                   <div className="bg-gray-50 p-5 rounded-xl">
                     <div className="text-gray-900 text-2xl mb-2">💎</div>
