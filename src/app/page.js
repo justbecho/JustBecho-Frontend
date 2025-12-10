@@ -19,6 +19,7 @@ function HomeContent() {
   const [loading, setLoading] = useState(true)
   const [isAnimating, setIsAnimating] = useState(false)
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
+  const [brandsFromBackend, setBrandsFromBackend] = useState([])
 
   // ✅ UPDATED: Brand logos - sabka size same rakhein
   const categoryBrands = useMemo(() => ({
@@ -330,12 +331,13 @@ function HomeContent() {
     }
   ], [])
 
-  // ✅ Fetch categories from backend
+  // ✅ Fetch categories and brands from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
         
+        // ✅ Fetch categories
         const categoriesResponse = await fetch('https://just-becho-backend.vercel.app/api/categories')
         
         if (categoriesResponse.ok) {
@@ -363,6 +365,21 @@ function HomeContent() {
             
             setCategoriesFromBackend(formattedCategories)
             
+            // ✅ Fetch brands from backend (optional - for future use)
+            try {
+              const brandsResponse = await fetch('https://just-becho-backend.vercel.app/api/products/brands/all')
+              if (brandsResponse.ok) {
+                const brandsData = await brandsResponse.json()
+                if (brandsData.success && brandsData.brands) {
+                  setBrandsFromBackend(brandsData.brands)
+                  console.log('Brands from backend:', brandsData.brands.length)
+                }
+              }
+            } catch (brandsError) {
+              console.log('Could not fetch brands from backend:', brandsError.message)
+            }
+            
+            // ✅ Fetch products for each category
             const productsByCategory = {}
             
             for (const category of formattedCategories) {
@@ -385,6 +402,7 @@ function HomeContent() {
                   }
                 }
               } catch (error) {
+                console.error(`Error fetching products for ${category.name}:`, error)
                 productsByCategory[category.name] = []
               }
             }
@@ -397,6 +415,7 @@ function HomeContent() {
           setCategoriesFromBackend([])
         }
       } catch (error) {
+        console.error('Error fetching homepage data:', error)
         setCategoriesFromBackend([])
       } finally {
         setLoading(false)
@@ -435,6 +454,7 @@ function HomeContent() {
     const productName = product.productName || 'Product';
     const safeProductName = typeof productName === 'string' ? productName : 'Product';
     const safeCondition = product.condition && typeof product.condition === 'string' ? product.condition : '';
+    const primaryImage = product.images?.[0]?.url || '/images/placeholder.jpg';
     
     return (
       <Link 
@@ -443,17 +463,19 @@ function HomeContent() {
         className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300 block"
       >
         <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-          <img
-            src={product.images?.[0]?.url || '/images/placeholder.jpg'}
+          <Image
+            src={primaryImage}
             alt={safeProductName}
-            className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+            fill
+            className="object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             onError={(e) => {
               e.target.src = '/images/placeholder.jpg';
               e.target.onerror = null;
             }}
           />
           {safeCondition && (
-            <div className="absolute top-2 left-2">
+            <div className="absolute top-2 left-2 z-10">
               <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
                 {safeCondition.toUpperCase()}
               </span>
@@ -464,9 +486,16 @@ function HomeContent() {
           <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
             {safeProductName.toUpperCase()}
           </h3>
-          <p className="text-gray-900 text-base font-light tracking-widest uppercase">
-            ₹{product.finalPrice?.toLocaleString() || '0'}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-gray-900 text-base font-light tracking-widest uppercase">
+              ₹{product.finalPrice?.toLocaleString() || '0'}
+            </p>
+            {product.views > 0 && (
+              <span className="text-gray-500 text-xs">
+                👁️ {product.views}
+              </span>
+            )}
+          </div>
           {product.originalPrice && product.originalPrice > product.finalPrice && (
             <p className="text-gray-500 text-sm line-through">
               ₹{product.originalPrice.toLocaleString()}
@@ -496,48 +525,47 @@ function HomeContent() {
     return (
       <div 
         key={index} 
-        className="flex-shrink-0 px-1 sm:px-2 md:px-3 cursor-pointer"
-        title={brand.name}
+        className="flex-shrink-0 px-1 sm:px-2 md:px-3 cursor-pointer group"
+        title={`Browse ${brand.name} products in ${categoryName}`}
         onClick={handleBrandClick}
       >
-        {/* ✅ FIXED: ALL LOGOS EXACT SAME CONTAINER SIZE */}
-        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center group">
-          <img
-            src={imgSrc}
-            alt={brand.name}
-            className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300"
-            style={{
-              filter: 'grayscale(10%)',
-              opacity: 0.85,
-              objectFit: 'contain',
-              width: 'auto',
-              height: 'auto',
-              maxWidth: '80%',
-              maxHeight: '80%'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.filter = 'grayscale(0%)';
-              e.target.style.opacity = '1';
-              e.target.style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.filter = 'grayscale(10%)';
-              e.target.style.opacity = '0.85';
-              e.target.style.transform = 'scale(1)';
-            }}
-            onError={(e) => {
-              if (!hasError && brand.fallback) {
-                setImgSrc(brand.fallback);
-                setHasError(true);
-              } else {
-                setImgSrc('/images/placeholder.jpg');
-              }
-            }}
-            loading="lazy"
-          />
+        <div className="relative h-12 w-28 sm:h-14 sm:w-32 md:h-16 md:w-36 flex items-center justify-center">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              src={imgSrc}
+              alt={brand.name}
+              className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300"
+              style={{
+                filter: 'grayscale(30%)',
+                opacity: 0.9,
+                objectFit: 'contain'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.filter = 'grayscale(0%)';
+                e.target.style.opacity = '1';
+                e.target.style.transform = 'scale(1.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.filter = 'grayscale(30%)';
+                e.target.style.opacity = '0.9';
+                e.target.style.transform = 'scale(1)';
+              }}
+              onError={(e) => {
+                if (!hasError && brand.fallback) {
+                  setImgSrc(brand.fallback);
+                  setHasError(true);
+                } else {
+                  setImgSrc('/images/placeholder.jpg');
+                }
+              }}
+              loading="lazy"
+            />
+          </div>
+          
           {/* Brand name tooltip on hover */}
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
-            {brand.name}
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20 shadow-lg pointer-events-none">
+            <span className="font-medium">{brand.name}</span>
+            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
           </div>
         </div>
       </div>
@@ -550,6 +578,11 @@ function HomeContent() {
       return str.toUpperCase();
     }
     return '';
+  }
+
+  // ✅ Function to handle category click
+  const handleCategoryClick = (category) => {
+    router.push(category.href);
   }
 
   return (
@@ -621,7 +654,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Categories Section - ✅ REMOVED "Number of brands" text */}
+        {/* Categories Section */}
         <section className="py-16 bg-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
@@ -645,10 +678,10 @@ function HomeContent() {
             ) : categoriesFromBackend.length > 0 ? (
               <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6 sm:gap-8 lg:gap-10">
                 {categoriesFromBackend.slice(0, 7).map((cat, index) => (
-                  <Link
-                    href={cat.href}
+                  <div
                     key={index}
-                    className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2"
+                    className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
+                    onClick={() => handleCategoryClick(cat)}
                   >
                     <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full overflow-hidden shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500">
                       <Image
@@ -665,7 +698,7 @@ function HomeContent() {
                     <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-4 sm:mt-6 leading-tight">
                       {safeToUpperCase(cat.name)}
                     </h3>
-                  </Link>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -770,32 +803,38 @@ function HomeContent() {
                         </p>
                       </div>
 
-                      {/* ✅ UPDATED: PERFECT LOGO MARQUEE - ALL SAME SIZE, PROPER SPACING */}
-                      <div className="w-full overflow-hidden py-4">
-                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap items-center space-x-1 sm:space-x-2 md:space-x-3">
+                      {/* ✅ UPDATED: BRAND LOGO MARQUEE WITH CLICK FUNCTIONALITY */}
+                      <div className="w-full overflow-hidden py-6">
+                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap items-center space-x-4 sm:space-x-6 md:space-x-8">
                           {duplicatedCategoryBrands.map((brand, brandIndex) => (
                             <BrandLogo 
                               key={brandIndex} 
                               brand={brand} 
                               index={brandIndex}
-                              categoryName={category.name} // ✅ Add this
+                              categoryName={category.name}
                             />
                           ))}
                         </div>
+                      </div>
+                      
+                      <div className="text-center mt-6">
+                        <p className="text-gray-500 text-sm">
+                          Click on any brand to view all {category.name} products from that brand
+                        </p>
                       </div>
                     </div>
                   )}
 
                   <div className="text-center mt-12">
-                    <Link
-                      href={category.href}
+                    <button
+                      onClick={() => handleCategoryClick(category)}
                       className="text-gray-900 text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative"
                     >
                       <span className="relative">
-                        → {safeToUpperCase(category.name)}
+                        → VIEW ALL {safeToUpperCase(category.name)}
                         <span className="absolute bottom-0 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-700 group-hover:delay-100"></span>
                       </span>
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </section>

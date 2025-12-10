@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function BrandPage() {
   const params = useParams()
@@ -14,6 +15,7 @@ export default function BrandPage() {
   const [loading, setLoading] = useState(true)
   const [brandName, setBrandName] = useState('')
   const [category, setCategory] = useState('')
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (params.brandName) {
@@ -35,29 +37,35 @@ export default function BrandPage() {
   const fetchProducts = async (brand, category) => {
     try {
       setLoading(true)
+      setError(null)
       
-      // API endpoint - आपके backend के according adjust करें
-      let apiUrl = `https://just-becho-backend.vercel.app/api/products?brand=${encodeURIComponent(brand)}`
+      // Build API URL
+      let apiUrl = `https://just-becho-backend.vercel.app/api/products/brand/${encodeURIComponent(brand)}`
       
-      // अगर category है तो उसे भी filter में add करें
+      // Add category parameter if available
       if (category) {
-        apiUrl += `&category=${encodeURIComponent(category)}`
+        apiUrl += `?category=${encodeURIComponent(category)}`
       }
+      
+      console.log('Fetching products from:', apiUrl)
       
       const response = await fetch(apiUrl)
       
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success && data.products) {
-          setProducts(data.products)
-        } else {
-          setProducts([])
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        setProducts(data.products || [])
       } else {
         setProducts([])
+        setError(data.message || 'Failed to fetch products')
       }
     } catch (error) {
       console.error('Error fetching products:', error)
+      setError(error.message || 'Network error occurred')
       setProducts([])
     } finally {
       setLoading(false)
@@ -70,6 +78,7 @@ export default function BrandPage() {
     const productName = product.productName || 'Product';
     const safeProductName = typeof productName === 'string' ? productName : 'Product';
     const safeCondition = product.condition && typeof product.condition === 'string' ? product.condition : '';
+    const primaryImage = product.images?.[0]?.url || '/images/placeholder.jpg';
     
     return (
       <Link 
@@ -78,10 +87,12 @@ export default function BrandPage() {
         className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300 block"
       >
         <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-          <img
-            src={product.images?.[0]?.url || '/images/placeholder.jpg'}
+          <Image
+            src={primaryImage}
             alt={safeProductName}
-            className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+            fill
+            className="object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             onError={(e) => {
               e.target.src = '/images/placeholder.jpg';
               e.target.onerror = null;
@@ -131,55 +142,82 @@ export default function BrandPage() {
             <div className="w-24 h-0.5 bg-gray-900 mx-auto mt-4"></div>
           </div>
 
-          {/* Products Grid */}
-          {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {[...Array(10)].map((_, index) => (
-                <div key={index} className="animate-pulse">
-                  <div className="w-full aspect-square bg-gray-200 rounded-lg mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                </div>
-              ))}
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading {brandName} products...</p>
             </div>
-          ) : products.length > 0 ? (
-            <>
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-gray-600">
-                  Showing {products.length} product{products.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {products.map(renderProductCard)}
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-20">
-              <div className="text-gray-400 text-6xl mb-6">👜</div>
-              <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-4">
-                NO PRODUCTS AVAILABLE
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-12">
+              <div className="text-red-500 text-4xl mb-4">⚠️</div>
+              <h2 className="text-gray-900 text-xl font-light tracking-widest uppercase mb-2">
+                ERROR LOADING PRODUCTS
               </h2>
-              <p className="text-gray-600 max-w-md mx-auto mb-8">
-                Currently there are no {brandName} products listed in this category.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/products"
-                  className="bg-gray-900 text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-800 transition-all duration-300 rounded-full text-sm"
-                >
-                  BROWSE ALL PRODUCTS
-                </Link>
-                {category && (
-                  <Link
-                    href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="border border-gray-900 text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-50 transition-all duration-300 rounded-full text-sm"
-                  >
-                    VIEW CATEGORY
-                  </Link>
-                )}
-              </div>
+              <p className="text-gray-600 mb-6">{error}</p>
+              <button
+                onClick={() => fetchProducts(brandName, category)}
+                className="bg-gray-900 text-white px-6 py-2 font-light tracking-widest uppercase hover:bg-gray-800 transition-all duration-300 rounded-full text-sm"
+              >
+                TRY AGAIN
+              </button>
             </div>
+          )}
+
+          {/* Products Grid */}
+          {!loading && !error && (
+            <>
+              {products.length > 0 ? (
+                <>
+                  <div className="flex justify-between items-center mb-6">
+                    <p className="text-gray-600">
+                      Showing {products.length} {products.length === 1 ? 'product' : 'products'} for {brandName}
+                      {category && ` in ${category}`}
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    {products.map(renderProductCard)}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-20">
+                  <div className="text-gray-400 text-6xl mb-6">👜</div>
+                  <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-4">
+                    NO PRODUCTS AVAILABLE
+                  </h2>
+                  <p className="text-gray-600 max-w-md mx-auto mb-8">
+                    Currently there are no {brandName} products listed
+                    {category && ` in the ${category} category`}.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link
+                      href="/products"
+                      className="bg-gray-900 text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-800 transition-all duration-300 rounded-full text-sm"
+                    >
+                      BROWSE ALL PRODUCTS
+                    </Link>
+                    {category && (
+                      <Link
+                        href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="border border-gray-900 text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-50 transition-all duration-300 rounded-full text-sm"
+                      >
+                        VIEW {category.toUpperCase()} CATEGORY
+                      </Link>
+                    )}
+                    <Link
+                      href="/sell-now"
+                      className="border border-gray-900 text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-50 transition-all duration-300 rounded-full text-sm"
+                    >
+                      SELL {brandName.toUpperCase()}
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
