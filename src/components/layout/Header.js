@@ -1200,7 +1200,7 @@ export default function Header() {
                   {/* COMPACT DROPDOWN */}
                   {activeCategory === category.name && (
                     <div 
-                      className="fixed left-0 right-0 top-[120px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
+                      className="fixed left-0 right-0 top-[130px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
                       onMouseEnter={() => setActiveCategory(category.name)}
                       onMouseLeave={() => setActiveCategory(null)}
                     >
