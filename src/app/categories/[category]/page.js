@@ -242,7 +242,7 @@ export default async function CategoryPage({ params }) {
       'perfumes': {
         title: 'PERFUMES',
         subtitle: 'Signature scents and luxury fragrances',
-        banner: '/banners/Perfumes.png',
+        banner: '/banners/perfumes.png',
         whyTitle: 'WHY SHOP PERFUMES AT JUST BECHO',
         features: [
           {
