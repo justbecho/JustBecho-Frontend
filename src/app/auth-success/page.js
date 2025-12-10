@@ -3,8 +3,8 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// ❌ YEH LINE DELETE KARDO - 'use client' ke sath 'force-dynamic' nahi chalta
-// export const dynamic = 'force-dynamic';
+// ✅ Client component ke liye dynamic declaration
+export const dynamic = 'force-dynamic';
 
 function AuthSuccessContent() {
   const router = useRouter();
