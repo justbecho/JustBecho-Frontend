@@ -189,6 +189,28 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
+  // ✅ Featured Collections
+  const featuredCollections = useMemo(() => [
+    {
+      title: "LUXURY TIMEPIECES",
+      description: "Elevate your style with iconic watches",
+      image: "/banners/Watches.png",
+      href: "/collections/watches"
+    },
+    {
+      title: "DESIGNER HANDBAGS",
+      description: "Carry timeless elegance",
+      image: "/banners/Fashion Accessories.png",
+      href: "/collections/bags"
+    },
+    {
+      title: "Popular Footwear",
+      description: "Innovation meets luxury",
+      image: "/banners/Footwear.png",
+      href: "/collections/footwear"
+    }
+  ], [])
+
   // ✅ Helper function to get category image
   const getCategoryImage = (categoryName) => {
     if (!categoryName) {
@@ -238,28 +260,6 @@ function HomeContent() {
     
     return [];
   }
-
-  // Featured Collections
-  const featuredCollections = useMemo(() => [
-    {
-      title: "LUXURY TIMEPIECES",
-      description: "Elevate your style with iconic watches",
-      image: "/banners/Watches.png",
-      href: "/collections/watches"
-    },
-    {
-      title: "DESIGNER HANDBAGS",
-      description: "Carry timeless elegance",
-      image: "/banners/Fashion Accessories.png",
-      href: "/collections/bags"
-    },
-    {
-      title: "Popular Footwear",
-      description: "Innovation meets luxury",
-      image: "/banners/Footwear.png",
-      href: "/collections/electronics"
-    }
-  ], [])
 
   // How It Works Steps
   const howItWorks = useMemo(() => [
@@ -731,6 +731,59 @@ function HomeContent() {
                 <p className="text-gray-500 text-lg">No categories available yet.</p>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Featured Collections */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
+                FEATURED COLLECTIONS
+              </h2>
+              <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-3">
+                CURATED LUXURY SELECTIONS
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+              {featuredCollections.map((collection, index) => (
+                <Link
+                  href={collection.href}
+                  key={index}
+                  className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
+                >
+                  <div className="relative h-64 sm:h-72 md:h-80 w-full">
+                    <Image
+                      src={collection.image}
+                      alt={collection.title}
+                      fill
+                      className="object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onError={(e) => {
+                        e.target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="text-xl sm:text-2xl font-light tracking-widest uppercase mb-2">
+                        {collection.title}
+                      </h3>
+                      <p className="text-sm font-light opacity-90">
+                        {collection.description}
+                      </p>
+                      <div className="mt-4 flex items-center text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span>Explore Collection</span>
+                        <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 
