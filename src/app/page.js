@@ -289,7 +289,7 @@ function HomeContent() {
     {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
-      image: "/banners/Watches.png",
+      image: "/banners/Rolex.png",
       href: "/categories/watches"
     },
     {
