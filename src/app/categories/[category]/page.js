@@ -219,7 +219,7 @@ export default async function CategoryPage({ params }) {
             'watches': {
                 title: 'WATCHES',
                 subtitle: 'Timeless luxury timepieces',
-                banner: '/banners/Rolex.png',
+                banner: '/banners/rolex.jpg',
                 whyTitle: 'WHY SHOP WATCHES AT JUST BECHO',
                 features: [
                     {

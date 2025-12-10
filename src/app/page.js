@@ -258,7 +258,7 @@ function HomeContent() {
       href: "/categories/accessories"
     },
     {
-      image: "/banners/Watches.png",
+      image: "/banners/rolex.jpg",
       title: "Watches",
       description: "Timeless luxury timepieces",
       href: "/categories/watches"
@@ -289,7 +289,7 @@ function HomeContent() {
     {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
-      image: "/banners/Rolex.png",
+      image: "/banners/rolex.jpg",
       href: "/categories/watches"
     },
     {
