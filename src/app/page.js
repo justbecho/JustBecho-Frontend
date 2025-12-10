@@ -11,6 +11,32 @@ import { useRouter } from 'next/navigation'
 // ✅ Dynamic export add karo (Netlify ke liye important)
 export const dynamic = 'force-dynamic'
 
+// ✅ UPDATED: Custom CSS for faster marquee animation
+const customStyles = `
+  @keyframes faster-marquee-mobile {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  @keyframes faster-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  .animate-faster-marquee-mobile {
+    animation: faster-marquee-mobile 30s linear infinite;
+  }
+  
+  .animate-faster-marquee {
+    animation: faster-marquee 60s linear infinite;
+  }
+  
+  .animate-faster-marquee-mobile:hover,
+  .animate-faster-marquee:hover {
+    animation-play-state: paused;
+  }
+`
+
 // Main content ko alag component mein rakho
 function HomeContent() {
   const router = useRouter()
@@ -448,7 +474,7 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ Product card render function
+  // ✅ UPDATED: Product card render function - VIEWS REMOVED
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
     
@@ -491,11 +517,6 @@ function HomeContent() {
             <p className="text-gray-900 text-base font-light tracking-widest uppercase">
               ₹{product.finalPrice?.toLocaleString() || '0'}
             </p>
-            {product.views > 0 && (
-              <span className="text-gray-500 text-xs">
-                👁️ {product.views}
-              </span>
-            )}
           </div>
           {product.originalPrice && product.originalPrice > product.finalPrice && (
             <p className="text-gray-500 text-sm line-through">
@@ -530,7 +551,7 @@ function HomeContent() {
         title={`Browse ${brand.name} products in ${categoryName}`}
         onClick={handleBrandClick}
       >
-        <div className="relative h-12 w-28 sm:h-14 sm:w-32 md:h-16 md:w-36 flex items-center justify-center">
+        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
           <div className="relative w-full h-full flex items-center justify-center">
             <img
               src={imgSrc}
@@ -564,7 +585,7 @@ function HomeContent() {
           </div>
           
           {/* Brand name tooltip on hover */}
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20 shadow-lg pointer-events-none">
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20 shadow-lg pointer-events-none">
             <span className="font-medium">{brand.name}</span>
             <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
           </div>
@@ -588,6 +609,9 @@ function HomeContent() {
 
   return (
     <>
+      {/* ✅ Add custom styles for faster animation */}
+      <style jsx global>{customStyles}</style>
+      
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative h-[60vh] sm:h-[75vh] md:h-[85vh] overflow-hidden">
@@ -792,7 +816,7 @@ function HomeContent() {
                     </div>
                   )}
 
-                  {/* Popular Brands Carousel */}
+                  {/* Popular Brands Carousel - ✅ UPDATED WITH FASTER ANIMATION */}
                   {categoryBrandsData.length > 0 && (
                     <div className="mt-16">
                       <div className="text-center mb-8">
@@ -804,9 +828,9 @@ function HomeContent() {
                         </p>
                       </div>
 
-                      {/* ✅ UPDATED: BRAND LOGO MARQUEE WITH CLICK FUNCTIONALITY */}
-                      <div className="w-full overflow-hidden py-6">
-                        <div className="flex animate-marquee-mobile sm:animate-marquee whitespace-nowrap items-center space-x-4 sm:space-x-6 md:space-x-8">
+                      {/* ✅ UPDATED: FASTER BRAND LOGO MARQUEE */}
+                      <div className="w-full overflow-hidden py-4">
+                        <div className="flex animate-faster-marquee-mobile sm:animate-faster-marquee whitespace-nowrap items-center space-x-4 sm:space-x-6 md:space-x-8">
                           {duplicatedCategoryBrands.map((brand, brandIndex) => (
                             <BrandLogo 
                               key={brandIndex} 

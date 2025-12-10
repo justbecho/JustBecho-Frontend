@@ -103,7 +103,7 @@ export default function Header() {
     };
     
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
+    window.addEventListener('sellerStatusUpdated', handleSellerStatusUpdated);
     
     const pollInterval = setInterval(() => {
       updateUserState();
@@ -929,11 +929,11 @@ export default function Header() {
                       {category.name.toUpperCase()}
                     </Link>
 
-                    {/* ✅ FULL WIDTH DROPDOWN - LIKE BEFORE */}
+                    {/* ✅ FIXED: FULL WIDTH DROPDOWN - ABSOLUTE POSITIONING */}
                     {activeCategory === category.name && (
                       <div 
-                        className="fixed left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
-                        style={{ top: 'calc(100% - 1px)' }} 
+                        className="absolute left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
+                        style={{ top: '100%' }}
                         onMouseEnter={() => setActiveCategory(category.name)}
                         onMouseLeave={() => setActiveCategory(null)}
                       >

@@ -108,13 +108,6 @@ export default function BrandPage() {
               </span>
             </div>
           )}
-          {product.views > 0 && (
-            <div className="absolute top-2 right-2 z-20">
-              <span className="text-white text-xs font-light bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1">
-                👁️ {product.views}
-              </span>
-            </div>
-          )}
         </div>
         <div className="text-left px-1 pt-2">
           <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-2 line-clamp-2 leading-tight">
@@ -155,9 +148,9 @@ export default function BrandPage() {
       
       <main className="min-h-screen bg-white pt-24">
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-          {/* Brand Header Section - Similar to Homepage */}
-          <section className="py-12 text-center">
-            <div className="mb-8">
+          {/* Brand Header Section */}
+          <section className="py-10 text-center">
+            <div className="mb-6">
               <h1 className="text-gray-900 text-3xl sm:text-5xl font-light tracking-widest uppercase mb-4 animate-fade-in-up">
                 {safeToUpperCase(brandName)}
               </h1>
@@ -184,12 +177,12 @@ export default function BrandPage() {
                 </p>
               )}
               
-              <div className="w-32 h-0.5 bg-gradient-to-r from-gray-300 via-gray-900 to-gray-300 mx-auto mt-8"></div>
+              <div className="w-32 h-0.5 bg-gradient-to-r from-gray-300 via-gray-900 to-gray-300 mx-auto mt-6"></div>
             </div>
 
-            {/* Stats */}
+            {/* Stats - Views removed */}
             {!loading && !error && products.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-lg mx-auto mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-md mx-auto mb-8">
                 <div className="text-center">
                   <div className="text-gray-900 text-3xl font-light mb-1">{products.length}</div>
                   <div className="text-gray-600 text-sm font-light tracking-widest uppercase">PRODUCTS</div>
@@ -200,19 +193,13 @@ export default function BrandPage() {
                   </div>
                   <div className="text-gray-600 text-sm font-light tracking-widest uppercase">STARTING FROM</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-gray-900 text-3xl font-light mb-1">
-                    {Math.round(products.reduce((sum, p) => sum + (p.views || 0), 0) / products.length) || '0'}
-                  </div>
-                  <div className="text-gray-600 text-sm font-light tracking-widest uppercase">AVG VIEWS</div>
-                </div>
               </div>
             )}
           </section>
 
           {/* Loading State */}
           {loading && (
-            <section className="py-16 text-center">
+            <section className="py-12 text-center">
               <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900 mx-auto mb-6"></div>
               <h3 className="text-gray-900 text-xl font-light tracking-widest uppercase mb-3">
                 LOADING {safeToUpperCase(brandName)}
@@ -223,7 +210,7 @@ export default function BrandPage() {
 
           {/* Error State */}
           {error && !loading && (
-            <section className="py-20 text-center">
+            <section className="py-16 text-center">
               <div className="text-gray-400 text-7xl mb-8">🔍</div>
               <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-4">
                 UNABLE TO LOAD PRODUCTS
@@ -251,7 +238,7 @@ export default function BrandPage() {
           {/* Products Grid Section */}
           {!loading && !error && products.length > 0 && (
             <section className="py-8">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
                   <h2 className="text-gray-900 text-2xl sm:text-3xl font-light tracking-widest uppercase mb-2">
                     CURATED COLLECTION
@@ -285,7 +272,7 @@ export default function BrandPage() {
               </div>
 
               {/* View More Button */}
-              <div className="text-center mt-16">
+              <div className="text-center mt-12">
                 <Link
                   href="/products"
                   className="inline-flex items-center gap-3 text-gray-900 text-lg font-light tracking-widest uppercase hover:text-gray-700 transition-all duration-500 group"
@@ -301,46 +288,46 @@ export default function BrandPage() {
 
           {/* No Products State */}
           {!loading && !error && products.length === 0 && (
-            <section className="py-24 text-center">
+            <section className="py-16 text-center">
               <div className="max-w-2xl mx-auto">
-                <div className="text-gray-300 text-8xl mb-8">👜</div>
-                <h2 className="text-gray-900 text-3xl font-light tracking-widest uppercase mb-6">
+                <div className="text-gray-300 text-8xl mb-6">👜</div>
+                <h2 className="text-gray-900 text-3xl font-light tracking-widest uppercase mb-4">
                   NO {safeToUpperCase(brandName)} PRODUCTS YET
                 </h2>
-                <p className="text-gray-600 text-lg mb-10 leading-relaxed">
+                <p className="text-gray-600 text-lg mb-8 leading-relaxed">
                   We currently don't have any {brandName} products listed
                   {category && ` in the ${category} category`}.
                   Be the first to list a {brandName} product!
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                  <div className="bg-gray-50 p-6 rounded-xl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                  <div className="bg-gray-50 p-5 rounded-xl">
                     <div className="text-gray-900 text-2xl mb-2">📱</div>
-                    <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2">LIST YOUR ITEM</h3>
-                    <p className="text-gray-600 text-sm">List your {brandName} product with detailed photos</p>
+                    <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2 text-sm">LIST YOUR ITEM</h3>
+                    <p className="text-gray-600 text-xs">List your {brandName} product with detailed photos</p>
                   </div>
-                  <div className="bg-gray-50 p-6 rounded-xl">
+                  <div className="bg-gray-50 p-5 rounded-xl">
                     <div className="text-gray-900 text-2xl mb-2">🔍</div>
-                    <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2">GET VERIFIED</h3>
-                    <p className="text-gray-600 text-sm">Our experts authenticate every {brandName} product</p>
+                    <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2 text-sm">GET VERIFIED</h3>
+                    <p className="text-gray-600 text-xs">Our experts authenticate every {brandName} product</p>
                   </div>
-                  <div className="bg-gray-50 p-6 rounded-xl">
+                  <div className="bg-gray-50 p-5 rounded-xl">
                     <div className="text-gray-900 text-2xl mb-2">💎</div>
-                    <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2">SELL WITH TRUST</h3>
-                    <p className="text-gray-600 text-sm">Reach thousands of luxury buyers</p>
+                    <h3 className="text-gray-900 font-light tracking-widest uppercase mb-2 text-sm">SELL WITH TRUST</h3>
+                    <p className="text-gray-600 text-xs">Reach thousands of luxury buyers</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
                     href="/sell-now"
-                    className="bg-gray-900 text-white px-8 py-4 font-light tracking-widest uppercase hover:bg-gray-800 transition-all duration-300 rounded-full text-base"
+                    className="bg-gray-900 text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-800 transition-all duration-300 rounded-full text-sm"
                   >
                     SELL {safeToUpperCase(brandName)}
                   </Link>
                   <Link
                     href="/products"
-                    className="border border-gray-900 text-gray-900 px-8 py-4 font-light tracking-widest uppercase hover:bg-gray-50 transition-all duration-300 rounded-full text-base"
+                    className="border border-gray-900 text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-50 transition-all duration-300 rounded-full text-sm"
                   >
                     BROWSE ALL BRANDS
                   </Link>
@@ -351,8 +338,8 @@ export default function BrandPage() {
 
           {/* Related Categories Section */}
           {!loading && !error && products.length > 0 && category && (
-            <section className="py-16 border-t border-gray-100">
-              <div className="text-center mb-12">
+            <section className="py-12 border-t border-gray-100">
+              <div className="text-center mb-10">
                 <h2 className="text-gray-900 text-2xl sm:text-3xl font-light tracking-widest uppercase mb-4">
                   EXPLORE MORE IN {safeToUpperCase(category)}
                 </h2>
@@ -382,33 +369,33 @@ export default function BrandPage() {
               </div>
             </section>
           )}
-
-          {/* CTA Section */}
-          <section className="py-16 bg-gradient-to-r from-gray-900 to-black rounded-3xl my-16">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-              <h2 className="text-white text-2xl sm:text-4xl font-light tracking-widest uppercase mb-6">
-                READY TO SELL YOUR {safeToUpperCase(brandName)}?
-              </h2>
-              <p className="text-gray-300 text-lg font-light tracking-widest uppercase mb-8 max-w-2xl mx-auto">
-                Get the best value for your authentic {brandName} items
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/sell-now"
-                  className="bg-white text-gray-900 px-8 py-4 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-base"
-                >
-                  SELL {safeToUpperCase(brandName)}
-                </Link>
-                <Link
-                  href="/products"
-                  className="border border-white text-white px-8 py-4 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-base"
-                >
-                  BROWSE ALL LUXURY
-                </Link>
-              </div>
-            </div>
-          </section>
         </div>
+
+        {/* ✅ UPDATED: Full Width CTA Section with Reduced Height */}
+        <section className="py-12 bg-gradient-to-r from-gray-900 to-black mt-12">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 text-center">
+            <h2 className="text-white text-2xl sm:text-3xl font-light tracking-widest uppercase mb-4">
+              READY TO SELL YOUR {safeToUpperCase(brandName)}?
+            </h2>
+            <p className="text-gray-300 text-base font-light tracking-widest uppercase mb-6 max-w-2xl mx-auto">
+              Get the best value for your authentic {brandName} items
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/sell-now"
+                className="bg-white text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-base"
+              >
+                SELL {safeToUpperCase(brandName)}
+              </Link>
+              <Link
+                href="/products"
+                className="border border-white text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-base"
+              >
+                BROWSE ALL LUXURY
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />
