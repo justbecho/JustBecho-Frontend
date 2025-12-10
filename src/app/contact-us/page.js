@@ -2,8 +2,8 @@
 'use client'
 
 import { useState } from 'react'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 import { FiMail, FiPhone, FiMapPin, FiMessageSquare, FiSend, FiCheckCircle, FiUser, FiMail as FiEmailIcon, FiBriefcase, FiGlobe } from 'react-icons/fi'
 
 export default function ContactUs() {
