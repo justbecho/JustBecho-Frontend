@@ -614,34 +614,37 @@ export default function Header() {
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4 sm:py-5">
             
-            {/* ✅ LEFT SECTION: DESKTOP Search + Sell Now - CLEAN DESIGN */}
-            <div className="hidden md:flex items-center space-x-4 flex-1">
+            {/* ✅ LEFT SECTION: Desktop Search + Sell Now */}
+            <div className="hidden md:flex items-center space-x-4">
               
-              {/* DESKTOP SEARCH BAR - PROFESSIONAL DESIGN */}
-              <div className="relative w-72 lg:w-80 search-container">
-                <form onSubmit={handleSearchSubmit} className="relative">
-                  <div className="relative">
-                    <FiSearch className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                        ? 'text-gray-400' 
-                        : 'text-white/70'
-                    }`} />
-                    <input
-                      type="text"
-                      placeholder="Search products, brands, categories..."
-                      value={searchQuery}
-                      onChange={handleSearchInputChange}
-                      onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                      className={`pl-11 pr-4 py-3 w-full rounded-lg text-sm outline-none transition-all duration-200 font-light ${
-                        isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                          ? 'bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-500 hover:border-gray-300 focus:border-gray-400 focus:bg-white focus:shadow-sm'
-                          : 'bg-white/10 border border-white/20 text-white placeholder-white/60 backdrop-blur-sm hover:bg-white/15 hover:border-white/30 focus:bg-white/20 focus:border-white/40 focus:shadow-md'
-                      }`}
-                    />
-                  </div>
+              {/* DESKTOP SEARCH BAR - SIMPLE DESIGN */}
+              <div className="relative w-60 lg:w-72 search-container">
+                <form onSubmit={handleSearchSubmit}>
+                  <input
+                    type="text"
+                    placeholder="Search for products..."
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+                    className={`border rounded-full px-4 py-2.5 text-sm outline-none w-full ${
+                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
+                        ? 'border-gray-300 text-gray-800 bg-gray-50 placeholder-gray-500'
+                        : 'border-white/30 text-white bg-white/10 placeholder-white/70'
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
+                        ? 'text-gray-500'
+                        : 'text-white'
+                    }`}
+                  >
+                    <FiSearch className="w-4 h-4" />
+                  </button>
                 </form>
                 
-                {/* DESKTOP SEARCH RESULTS */}
+                {/* SEARCH RESULTS */}
                 {showSearchResults && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
                     {searchLoading ? (
@@ -655,19 +658,17 @@ export default function Header() {
                           <Link
                             key={product._id}
                             href={`/products/${product._id}`}
-                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 group"
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                             onClick={() => setShowSearchResults(false)}
                           >
                             {product.images?.[0]?.url ? (
-                              <div className="w-12 h-12 rounded-md overflow-hidden bg-gray-100 mr-3 flex-shrink-0">
-                                <img
-                                  src={product.images[0].url}
-                                  alt={product.productName}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                />
-                              </div>
+                              <img
+                                src={product.images[0].url}
+                                alt={product.productName}
+                                className="w-10 h-10 object-cover rounded mr-3"
+                              />
                             ) : (
-                              <div className="w-12 h-12 bg-gray-100 rounded-md mr-3 flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
                                 <FiShoppingBag className="w-5 h-5 text-gray-400" />
                               </div>
                             )}
@@ -675,7 +676,7 @@ export default function Header() {
                               <p className="text-sm font-medium text-gray-900 truncate">
                                 {product.productName}
                               </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="text-xs text-gray-500">
                                 ₹{product.finalPrice?.toLocaleString() || '0'}
                               </p>
                             </div>
@@ -687,133 +688,115 @@ export default function Header() {
                               setShowSearchResults(false);
                               router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
                             }}
-                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium hover:underline"
+                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
                           >
                             View all results
                           </button>
                         </div>
                       </div>
                     ) : searchQuery.trim() && (
-                      <div className="p-6 text-center text-gray-500">
-                        <FiSearch className="w-8 h-8 mx-auto text-gray-300 mb-2" />
+                      <div className="p-4 text-center text-gray-500">
                         <p className="text-sm">No products found</p>
-                        <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
                       </div>
                     )}
                   </div>
                 )}
               </div>
               
-              {/* DESKTOP SELL NOW BUTTON - CLEAN DESIGN */}
+              {/* DESKTOP SELL NOW BUTTON - SIMPLE DESIGN */}
               <button
                 onClick={handleSellNowClick}
-                className={`hidden md:inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 hover:shadow-md active:scale-95 whitespace-nowrap ${
-                  isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-sm'
-                    : 'bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white/20 hover:border-white/40 shadow-md'
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                  isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
+                    ? 'bg-black text-white hover:bg-gray-800'
+                    : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
                 }`}
               >
                 Sell Now
               </button>
             </div>
 
-            {/* ✅ MOBILE Burger Menu - LEFT SIDE (MOBILE ONLY) */}
+            {/* ✅ MOBILE Burger Menu */}
             <div className="md:hidden flex items-center">
               <button
-                className={`focus:outline-none p-2 rounded-lg transition-colors ${
-                  isMenuAnimating ? 'opacity-70' : 
-                  isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                    ? 'hover:bg-gray-100' 
-                    : 'hover:bg-white/10'
+                className={`focus:outline-none p-1 ${
+                  isMenuAnimating ? 'opacity-70' : ''
                 }`}
                 onClick={handleBurgerClick}
                 aria-label="Menu"
               >
-                <div className="relative w-5 h-5">
-                  {/* Burger Icon with Animation */}
-                  <span className={`absolute top-0.5 left-0 w-5 h-0.5 transform transition-all duration-300 rounded-full ${
+                <div className="relative w-6 h-6">
+                  <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
-                      ? 'rotate-45 translate-y-2 bg-gray-900' 
-                      : (isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                          ? 'bg-gray-900' 
-                          : 'bg-white')
+                      ? 'rotate-45 translate-y-0 bg-gray-900' 
+                      : '-translate-y-2 bg-current'
                   }`}></span>
-                  <span className={`absolute top-2 left-0 w-5 h-0.5 transform transition-all duration-300 rounded-full ${
+                  <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? 'opacity-0 translate-x-4' 
-                      : (isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                          ? 'bg-gray-900' 
-                          : 'bg-white')
-                  }`}></span>
-                  <span className={`absolute top-3.5 left-0 w-5 h-0.5 transform transition-all duration-300 rounded-full ${
+                      : 'opacity-100'
+                  } bg-current`}></span>
+                  <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
-                      ? '-rotate-45 -translate-y-2 bg-gray-900' 
-                      : (isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                          ? 'bg-gray-900' 
-                          : 'bg-white')
+                      ? '-rotate-45 translate-y-0 bg-gray-900' 
+                      : 'translate-y-2 bg-current'
                   }`}></span>
                 </div>
               </button>
             </div>
 
-            {/* ✅ CENTER: Logo - Perfectly Centered */}
+            {/* ✅ CENTER: Logo */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <Link href="/" className="flex items-center justify-center transition-opacity hover:opacity-90">
-                <div className="relative">
-                  <Image
-                    src="/Just Becho Logo Golden.png"
-                    alt="Just Becho"
-                    width={isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled ? 56 : 64}
-                    height={isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled ? 56 : 64}
-                    className={`transition-all duration-300 ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                        ? 'h-12 w-auto' 
-                        : 'h-14 w-auto'
-                    }`}
-                    priority
-                  />
-                  {/* Subtle shine effect on hover */}
-                  <div className="absolute inset-0 opacity-0 hover:opacity-20 bg-gradient-to-r from-transparent via-white to-transparent transition-opacity duration-300 rounded-full"></div>
-                </div>
+              <Link href="/" className="flex items-center justify-center">
+                <Image
+                  src="/Just Becho Logo Golden.png"
+                  alt="Just Becho"
+                  width={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
+                  height={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
+                  className={`transition-all duration-500 mt-1 ${
+                    isDashboardPage ? 'h-14 w-auto' : 
+                    isProductPage || isSellNowPage ? 'h-14 w-auto' : 
+                    isCartPage ? 'h-14 w-auto' : // ✅ Cart page pe chhota logo
+                    isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
+                  }`}
+                  priority
+                />
               </Link>
             </div>
 
-            {/* ✅ RIGHT SECTION: Desktop Icons + Mobile Cart */}
-            <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
-              {/* Desktop Icons */}
-              <div className="hidden md:flex items-center space-x-6">
-                {/* Profile Icon with Dropdown */}
+            {/* ✅ RIGHT SECTION: ORIGINAL ICONS WAPAS */}
+            <div className="flex items-center space-x-4 sm:space-x-5">
+              {/* Desktop Icons - ORIGINAL SIZE AND SPACING */}
+              <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+                {/* Profile Icon with Dropdown - ORIGINAL */}
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
-                    className={`p-2 rounded-full transition-all duration-200 hover:scale-110 ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                        ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                        : 'text-white hover:text-white hover:bg-white/10'
+                    className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                      isDashboardPage ? 'text-gray-900' :
+                      isProductPage || isSellNowPage ? 'text-gray-900' : 
+                      isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                      isScrolled ? 'text-gray-900' : 'text-white'
                     }`}
                   >
-                    <FiUser className="w-5 h-5" />
+                    <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
 
-                  {/* User Dropdown */}
+                  {/* User Dropdown - ORIGINAL */}
                   {showUserDropdown && user && (
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50">
+                    <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                       {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{user.name || 'User'}</p>
-                        <p className="text-xs text-gray-500 mt-0.5 truncate">
-                          {user.email || user.username || ''}
-                        </p>
+                        <p className="text-sm font-medium text-gray-900 truncate">{user.name || 'User'}</p>
+                      
                         
                         {/* Seller Status Badge */}
                         {user.role === 'seller' && (
                           <div className="mt-2">
-                            <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                              user.sellerVerified 
-                                ? 'bg-green-50 text-green-700 border border-green-100' 
-                                : 'bg-amber-50 text-amber-700 border border-amber-100'
+                            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              user.sellerVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                             }`}>
-                              {user.sellerVerified ? '✓ Verified Seller' : '⏳ Pending'}
+                              {user.sellerVerified ? 'Seller Verified' : 'Seller Pending'}
                             </div>
                           </div>
                         )}
@@ -823,17 +806,17 @@ export default function Header() {
                       <div className="py-1">
                         <Link 
                           href="/dashboard" 
-                          className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-2"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={() => setShowUserDropdown(false)}
                         >
                           <FiUser className="w-4 h-4 mr-3 text-gray-400" />
-                          Dashboard
+                          My Dashboard
                         </Link>
                         
                         {user.role === 'seller' && (
                           <Link 
                             href="/dashboard?section=listings" 
-                            className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-2"
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                             onClick={() => setShowUserDropdown(false)}
                           >
                             <FiPackage className="w-4 h-4 mr-3 text-gray-400" />
@@ -843,7 +826,7 @@ export default function Header() {
                         
                         <Link 
                           href="/dashboard?section=orders" 
-                          className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-2"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={() => setShowUserDropdown(false)}
                         >
                           <FiShoppingCart className="w-4 h-4 mr-3 text-gray-400" />
@@ -852,10 +835,10 @@ export default function Header() {
                       </div>
                       
                       {/* Logout */}
-                      <div className="border-t border-gray-100 pt-1 mt-1">
+                      <div className="border-t border-gray-100 pt-1">
                         <button 
                           onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-2"
+                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <FiLogOut className="w-4 h-4 mr-3" />
                           Logout
@@ -865,103 +848,99 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Wishlist Icon */}
+                {/* Wishlist Icon - ORIGINAL */}
                 <button 
                   onClick={handleWishlistClick}
-                  className={`p-2 rounded-full transition-all duration-200 hover:scale-110 ${
-                    isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                      ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                      : 'text-white hover:text-white hover:bg-white/10'
+                  className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                    isDashboardPage ? 'text-gray-900' :
+                    isProductPage || isSellNowPage ? 'text-gray-900' : 
+                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                    isScrolled ? 'text-gray-900' : 'text-white'
                   }`}
                 >
-                  <FiHeart className="w-5 h-5" />
+                  <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
-                {/* Cart Icon - Only show if cart API is available */}
+                {/* Cart Icon - Only show if cart API is available - ORIGINAL */}
                 {cartApiAvailable && (
-                  <div className="relative">
-                    <button 
-                      onClick={handleCartClick}
-                      className={`p-2 rounded-full transition-all duration-200 hover:scale-110 ${
-                        isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                          ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                          : 'text-white hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <FiShoppingBag className="w-5 h-5" />
-                      {cartCount > 0 && (
-                        <span className={`absolute -top-1 -right-1 text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center shadow-sm ${
-                          isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                            ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
-                            : 'bg-gradient-to-r from-red-400 to-pink-400 text-white'
-                        }`}>
-                          {cartCount > 99 ? '99+' : cartCount}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile Cart Icon - RIGHT SIDE */}
-              {cartApiAvailable && (
-                <div className="md:hidden relative">
                   <button 
-                    onClick={handleMobileCartClick}
-                    className={`p-2 rounded-full transition-colors ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                        ? 'text-gray-900 hover:bg-gray-100'
-                        : 'text-white hover:bg-white/10'
+                    onClick={handleCartClick}
+                    className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                      isDashboardPage ? 'text-gray-900' :
+                      isProductPage || isSellNowPage ? 'text-gray-900' : 
+                      isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                      isScrolled ? 'text-gray-900' : 'text-white'
                     }`}
                   >
-                    <FiShoppingBag className="w-5 h-5" />
+                    <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
                     {cartCount > 0 && (
-                      <span className={`absolute -top-1 -right-1 text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center shadow-sm ${
-                        isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                          ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
-                          : 'bg-gradient-to-r from-red-400 to-pink-400 text-white'
-                      }`}>
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
                         {cartCount > 99 ? '99+' : cartCount}
                       </span>
                     )}
                   </button>
-                </div>
+                )}
+              </div>
+
+              {/* Mobile Cart Icon - ORIGINAL */}
+              {cartApiAvailable && (
+                <button 
+                  onClick={handleMobileCartClick}
+                  className={`md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center ${
+                    isDashboardPage ? 'text-gray-900' :
+                    isProductPage || isSellNowPage ? 'text-gray-900' : 
+                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                    isScrolled ? 'text-gray-900' : 'text-white'
+                  }`}
+                >
+                  <FiShoppingBag className="w-6 h-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  )}
+                </button>
               )}
             </div>
           </div>
 
-          {/* ✅ MOBILE SEARCH BAR (Mobile pe neeche) - CLEAN DESIGN */}
-          <div className="md:hidden border-t border-gray-200/30 mt-3 pt-3 pb-2 search-container">
+          {/* ✅ MOBILE SEARCH BAR */}
+          <div className="md:hidden border-t border-gray-200/50 mt-2 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
-                <div className="relative">
-                  <FiSearch className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                    isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                      ? 'text-gray-400'
-                      : 'text-white/70'
-                  }`} />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={handleSearchInputChange}
-                    onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                    className={`pl-11 pr-4 py-3 w-full rounded-xl text-sm outline-none transition-all duration-200 font-light ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                        ? 'bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-500 hover:border-gray-300 focus:border-gray-400 focus:bg-white'
-                        : 'bg-white/10 border border-white/20 text-white placeholder-white/60 backdrop-blur-sm hover:bg-white/15 hover:border-white/30 focus:bg-white/20 focus:border-white/40'
-                    }`}
-                  />
-                </div>
+                <input
+                  type="text"
+                  placeholder="Search for products..."
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+                  className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
+                    isDashboardPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
+                    isProductPage || isSellNowPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
+                    isCartPage ? 'text-gray-800 placeholder-gray-500 bg-white' : // ✅ Cart page pe white
+                    isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
+                  }`}
+                />
+                <button
+                  type="submit"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                    isDashboardPage ? 'text-gray-600' :
+                    isProductPage || isSellNowPage ? 'text-gray-600' :
+                    isCartPage ? 'text-gray-600' : // ✅ Cart page pe gray
+                    isScrolled ? 'text-gray-600' : 'text-white'
+                  }`}
+                >
+                  <FiSearch className="w-4 h-4" />
+                </button>
               </form>
               
               {/* Mobile Search Results */}
               {showSearchResults && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white shadow-2xl rounded-xl border border-gray-200 z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
                   {searchLoading ? (
-                    <div className="p-6 text-center text-gray-500">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
-                      <p className="text-sm">Searching products...</p>
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                      <p className="mt-2 text-sm">Searching...</p>
                     </div>
                   ) : searchResults.length > 0 ? (
                     <div className="py-2">
@@ -969,53 +948,49 @@ export default function Header() {
                         <Link
                           key={product._id}
                           href={`/products/${product._id}`}
-                          className="flex items-center px-4 py-3 hover:bg-gray-50 active:bg-gray-100 border-b border-gray-100 last:border-b-0"
+                          className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                           onClick={() => {
                             setShowSearchResults(false);
                             setIsMenuOpen(false);
                           }}
                         >
                           {product.images?.[0]?.url ? (
-                            <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 mr-3 flex-shrink-0">
-                              <img
-                                src={product.images[0].url}
-                                alt={product.productName}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
+                            <img
+                              src={product.images[0].url}
+                              alt={product.productName}
+                              className="w-10 h-10 object-cover rounded mr-3"
+                            />
                           ) : (
-                            <div className="w-14 h-14 bg-gray-100 rounded-lg mr-3 flex items-center justify-center flex-shrink-0">
-                              <FiShoppingBag className="w-6 h-6 text-gray-400" />
+                            <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                              <FiShoppingBag className="w-5 h-5 text-gray-400" />
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">
                               {product.productName}
                             </p>
-                            <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            <p className="text-xs text-gray-500">
                               ₹{product.finalPrice?.toLocaleString() || '0'}
                             </p>
                           </div>
                         </Link>
                       ))}
-                      <div className="border-t border-gray-200 mt-2 pt-3 px-4 pb-3">
+                      <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
                         <button
                           onClick={() => {
                             setShowSearchResults(false);
                             setIsMenuOpen(false);
                             router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
                           }}
-                          className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-2 font-medium rounded-lg bg-gray-50 hover:bg-gray-100"
+                          className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
                         >
                           View all results
                         </button>
                       </div>
                     </div>
                   ) : searchQuery.trim() && (
-                    <div className="p-6 text-center text-gray-500">
-                      <FiSearch className="w-10 h-10 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-medium text-gray-700">No products found</p>
-                      <p className="text-xs text-gray-500 mt-1">Try different search terms</p>
+                    <div className="p-4 text-center text-gray-500">
+                      <p className="text-sm">No products found</p>
                     </div>
                   )}
                 </div>
@@ -1024,33 +999,33 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ MOBILE MENU - MODERN DESIGN */}
+        {/* ✅ MOBILE MENU */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
           {/* Overlay */}
           <div 
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
+            className="absolute inset-0 bg-black/50 transition-opacity duration-300"
             onClick={() => setIsMenuOpen(false)}
           />
           
-          {/* Menu Panel - Slides from left */}
-          <div className={`absolute top-0 left-0 h-full w-4/5 max-w-xs bg-white shadow-2xl transform transition-transform duration-300 ease-out ${
+          {/* Menu Panel */}
+          <div className={`absolute top-0 left-0 h-full w-4/5 max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}>
             <nav className="flex flex-col h-full overflow-y-auto">
               {/* Header with Close Button */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div className="flex items-center">
                   <Image
                     src="/Just Becho Logo Golden.png"
                     alt="Just Becho"
-                    width={36}
-                    height={36}
-                    className="h-9 w-auto"
+                    width={40}
+                    height={40}
+                    className="h-10 w-auto"
                   />
-                  <span className="ml-3 text-base font-medium tracking-wide text-gray-900">
-                    Menu
+                  <span className="ml-3 text-lg font-light tracking-widest uppercase text-gray-900">
+                    MENU
                   </span>
                 </div>
                 <button
@@ -1063,136 +1038,121 @@ export default function Header() {
               </div>
 
               {/* CATEGORIES SECTION */}
-              <div className="p-5 border-b border-gray-100">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Browse Categories</h3>
-                <div className="grid grid-cols-2 gap-2">
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-4 uppercase tracking-wider">CATEGORIES</h3>
+                <div className="grid grid-cols-2 gap-3">
                   {loading ? (
-                    <div className="col-span-2 flex items-center justify-center py-6">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
-                    </div>
+                    <div className="col-span-2 text-xs text-gray-500">Loading categories...</div>
                   ) : transformedCategories.length > 0 ? (
-                    transformedCategories.slice(0, 6).map((category, index) => (
+                    transformedCategories.map((category, index) => (
                       <Link
                         key={category.name || index}
                         href={category.href}
-                        className="px-3 py-2.5 text-xs font-medium bg-gray-50 text-gray-800 hover:bg-gray-100 rounded-lg transition-all text-center hover:shadow-sm active:scale-95"
+                        className="px-4 py-3 text-xs font-light bg-gray-50 text-gray-800 hover:bg-gray-100 rounded-lg transition-all text-center"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        {category.name}
+                        {category.name.toUpperCase()}
                       </Link>
                     ))
                   ) : (
-                    <div className="col-span-2 text-xs text-gray-500 text-center py-4">
-                      No categories available
-                    </div>
+                    <div className="col-span-2 text-xs text-gray-500">No categories available</div>
                   )}
                 </div>
-                {transformedCategories.length > 6 && (
-                  <Link 
-                    href="/categories" 
-                    className="block text-center text-xs font-medium text-gray-700 mt-4 py-2 hover:text-gray-900"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    View All Categories →
-                  </Link>
-                )}
               </div>
 
               {/* Mobile Menu Items */}
-              <div className="flex-1 p-5 space-y-1">
+              <div className="flex-1 p-6 space-y-1">
                 {/* Home Link */}
                 <Link 
                   href="/"
-                  className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200"
+                  className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiHome className="w-5 h-5 mr-3 text-gray-500" />
-                  <span className="font-medium">Home</span>
+                  <FiHome className="w-5 h-5 mr-4" />
+                  <span className="font-light tracking-widest uppercase">HOME</span>
                 </Link>
                 
                 {/* Mobile Sell Now Button */}
                 <button 
                   onClick={handleMobileSellNowClick}
-                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200 text-left"
+                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                 >
-                  <span className="w-5 h-5 mr-3 text-center text-gray-900 font-bold text-lg">$</span>
-                  <span className="font-medium">Sell Now</span>
+                  <span className="w-5 h-5 mr-4 text-center text-gray-900 font-bold">$</span>
+                  <span className="font-light tracking-widest uppercase">SELL NOW</span>
                 </button>
                 
                 {user ? (
                   <>
                     {/* Seller Status in Mobile Menu */}
                     {user.role === 'seller' && (
-                      <div className="px-4 py-3 mb-2 bg-gray-50 rounded-xl mx-1">
-                        <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${
-                          user.sellerVerified 
-                            ? 'bg-green-50 text-green-700 border border-green-100' 
-                            : 'bg-amber-50 text-amber-700 border border-amber-100'
+                      <div className="px-4 py-3 mb-2 bg-gray-50 rounded-lg">
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          user.sellerVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {user.sellerVerified ? '✓ Verified Seller' : '⏳ Seller Pending'}
+                          {user.sellerVerified ? 'Seller Verified' : 'Seller Pending'}
                         </div>
                         {user.username && (
-                          <p className="text-xs text-gray-600 mt-2">
-                            {ensureJustbechoFormat(user.username)}
+                          <p className="text-xs text-gray-600 mt-1">
+                            Username: {ensureJustbechoFormat(user.username)}
                           </p>
                         )}
                       </div>
                     )}
                     
-                    <Link href="/dashboard" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200" onClick={() => setIsMenuOpen(false)}>
-                      <FiUser className="w-5 h-5 mr-3 text-gray-500" />
-                      <span className="font-medium">Dashboard</span>
+                    <Link href="/dashboard" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                      <FiUser className="w-5 h-5 mr-4" />
+                      <span className="font-light tracking-widest uppercase">DASHBOARD</span>
                     </Link>
                     
                     {user.role === 'seller' && (
-                      <Link href="/dashboard?section=listings" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200" onClick={() => setIsMenuOpen(false)}>
-                        <FiPackage className="w-5 h-5 mr-3 text-gray-500" />
-                        <span className="font-medium">My Listings</span>
+                      <Link href="/dashboard?section=listings" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                        <FiPackage className="w-5 h-5 mr-4" />
+                        <span className="font-light tracking-widest uppercase">MY LISTINGS</span>
                       </Link>
                     )}
                     
-                    <Link href="/dashboard?section=purchases" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200" onClick={() => setIsMenuOpen(false)}>
-                      <FiShoppingCart className="w-5 h-5 mr-3 text-gray-500" />
-                      <span className="font-medium">My Purchases</span>
+                    <Link href="/dashboard?section=purchases" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
+                      <FiShoppingCart className="w-5 h-5 mr-4" />
+                      <span className="font-light tracking-widest uppercase">MY PURCHASES</span>
                     </Link>
                     
-                    <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors duration-200 text-left">
-                      <FiLogOut className="w-5 h-5 mr-3" />
-                      <span className="font-medium">Logout</span>
+                    <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300 text-left">
+                      <FiLogOut className="w-5 h-5 mr-4" />
+                      <span className="font-light tracking-widest uppercase">LOGOUT</span>
                     </button>
                   </>
                 ) : (
-                  <button onClick={handleMobileProfileClick} className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200 text-left">
-                    <FiUser className="w-5 h-5 mr-3 text-gray-500" />
-                    <span className="font-medium">Sign In</span>
+                  <button onClick={handleMobileProfileClick} className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left">
+                    <FiUser className="w-5 h-5 mr-4" />
+                    <span className="font-light tracking-widest uppercase">PROFILE</span>
                   </button>
                 )}
                 
                 {/* Mobile Wishlist */}
                 <button 
                   onClick={handleMobileWishlistClick}
-                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200 text-left"
+                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                 >
-                  <FiHeart className="w-5 h-5 mr-3 text-gray-500" />
-                  <span className="font-medium">Wishlist</span>
+                  <FiHeart className="w-5 h-5 mr-4" />
+                  <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
                 {/* Mobile Cart - Only show if cart API is available */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleMobileCartClick}
-                    className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-colors duration-200 text-left"
+                    className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                   >
-                    <FiShoppingBag className="w-5 h-5 mr-3 text-gray-500" />
-                    <span className="font-medium">
-                      Cart {cartCount > 0 && <span className="ml-1 text-xs font-semibold bg-red-500 text-white px-2 py-0.5 rounded-full">{cartCount}</span>}
+                    <FiShoppingBag className="w-5 h-5 mr-4" />
+                    <span className="font-light tracking-widest uppercase">
+                      CART {cartCount > 0 && `(${cartCount})`}
                     </span>
                   </button>
                 )}
               </div>
 
               {/* Footer */}
-              <div className="p-5 border-t border-gray-100 mt-auto">
+              <div className="p-6 border-t border-gray-200 mt-auto">
                 <p className="text-xs text-gray-500 text-center">
                   © 2024 Just Becho. All rights reserved.
                 </p>
@@ -1215,11 +1175,7 @@ export default function Header() {
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-4">
             {loading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-20 h-4 bg-gray-200 animate-pulse rounded"></div>
-                <div className="w-16 h-4 bg-gray-200 animate-pulse rounded"></div>
-                <div className="w-24 h-4 bg-gray-200 animate-pulse rounded"></div>
-              </div>
+              <div className="text-sm text-gray-500">Loading categories...</div>
             ) : transformedCategories.length > 0 ? (
               transformedCategories.map((category, index) => (
                 <div
@@ -1231,43 +1187,39 @@ export default function Header() {
                   {/* Category Link */}
                   <Link
                     href={category.href}
-                    className={`text-sm font-medium tracking-wide transition-all duration-300 ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                        ? 'text-gray-700 hover:text-gray-900' 
-                        : 'text-white/90 hover:text-white'
+                    className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${
+                      isDashboardPage ? 'text-gray-800 hover:text-gray-600' :
+                      isProductPage || isSellNowPage ? 'text-gray-800 hover:text-gray-600' :
+                      isCartPage ? 'text-gray-800 hover:text-gray-600' : // ✅ Cart page pe black
+                      isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
                     }`}
                   >
-                    {category.name}
-                    <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-current transition-all duration-300 group-hover:w-full ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled 
-                        ? 'bg-gray-900' 
-                        : 'bg-white'
-                    }`}></span>
+                    {category.name.toUpperCase()}
                   </Link>
 
-                  {/* DROPDOWN */}
+                  {/* COMPACT DROPDOWN */}
                   {activeCategory === category.name && (
                     <div 
-                      className="fixed left-0 right-0 top-[140px] bg-white shadow-2xl border-t border-gray-100 py-6 z-[60] animate-fadeIn"
+                      className="fixed left-0 right-0 top-[140px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
                       onMouseEnter={() => setActiveCategory(category.name)}
                       onMouseLeave={() => setActiveCategory(null)}
                     >
-                      <div className="w-[95%] sm:w-[90%] mx-auto max-w-4xl">
-                        <div className="flex justify-between">
+                      <div className="w-[95%] sm:w-[90%] mx-auto max-w-5xl">
+                        <div className="grid grid-cols-5 gap-6">
                           {category.dropdown.sections.map((section, sectionIndex) => (
-                            <div key={sectionIndex} className="w-48">
-                              {/* Section Title */}
-                              <h3 className="text-gray-900 text-sm font-semibold uppercase mb-4 tracking-wider">
+                            <div key={sectionIndex} className="space-y-2">
+                              {/* Section Title - Compact */}
+                              <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-1">
                                 {section.title}
                               </h3>
                               
-                              {/* Section Items */}
-                              <ul className="space-y-2">
+                              {/* Section Items - Compact */}
+                              <ul className="space-y-1">
                                 {section.items.map((item, itemIndex) => (
                                   <li key={itemIndex}>
                                     <Link
                                       href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
-                                      className="text-gray-600 text-sm font-normal hover:text-gray-900 transition-colors duration-200 block py-1"
+                                      className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-0.5"
                                     >
                                       {item}
                                     </Link>
@@ -1278,14 +1230,14 @@ export default function Header() {
                           ))}
                         </div>
                         
-                        {/* View All Button */}
-                        <div className="mt-6 pt-5 border-t border-gray-200 text-center">
+                        {/* View All Button - Compact */}
+                        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
                           <Link
                             href={category.href}
-                            className="inline-flex items-center text-gray-900 text-sm font-semibold hover:text-gray-700 transition-colors duration-200 group"
+                            className="inline-flex items-center text-gray-900 text-[13px] font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group"
                           >
-                            View All in {category.name} 
-                            <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            View All {category.name} 
+                            <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                           </Link>

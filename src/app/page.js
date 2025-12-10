@@ -179,13 +179,13 @@ function HomeContent() {
   // ✅ Category images mapping
   const categoryImages = useMemo(() => ({
     "Men's Fashion": "/banners/Men_s Fashion.png",
-    "Women's Fashion": "/banners/Women_s Fashion.jpg", 
-    "Footwear": "/banners/Footwear.jpg",
-    "Accessories": "/banners/Fashion Accessories.jpg",
-    "Watches": "/banners/Watches.jpg", 
-    "Perfumes": "/banners/perfumes.jpg",
-    "TOYS & COLLECTIBLES": "/banners/toys and Figurines.jpg",
-    "KIDS": "/banners/Footwear.jpg",
+    "Women's Fashion": "/banners/Women_s Fashion.png", 
+    "Footwear": "/banners/Footwear.png",
+    "Accessories": "/banners/Fashion Accessories.png",
+    "Watches": "/banners/Watches.png", 
+    "Perfumes": "/banners/perfumes.png",
+    "TOYS & COLLECTIBLES": "/banners/toys and Figurines.png",
+    "KIDS": "/banners/Footwear.png",
     "default": "/banners/default.jpg"
   }), [])
 
@@ -619,7 +619,7 @@ function HomeContent() {
           
           <div className="absolute inset-0 z-0">
             <Image
-              src="/2_5.webp.jpeg"
+              src="/banners/Men_s Fashion.png"
               alt="Just Becho - Buy and Sell luxury Items"
               fill
               className="object-cover object-center brightness-110 contrast-105 saturate-110"
