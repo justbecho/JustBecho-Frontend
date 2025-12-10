@@ -50,7 +50,6 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ FIXED: Corrected the useEffect with proper event listener
   useEffect(() => {
     const updateUserState = () => {
       try {
@@ -97,7 +96,6 @@ export default function Header() {
       }
     };
     
-    // ✅ FIXED: Using the same function name
     const handleSellerStatusUpdate = () => {
       updateUserState();
     };
@@ -374,7 +372,6 @@ export default function Header() {
     return transformed;
   }, [categories]);
 
-  // ✅ FIXED: Added missing userData variable declaration in handleSellNowClick
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
@@ -670,7 +667,109 @@ export default function Header() {
               </Link>
             </div>
 
+            {/* ✅ DESKTOP SEARCH BAR */}
+            <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
+              <div className="relative w-full search-container">
+                <form onSubmit={handleSearchSubmit} className="w-full">
+                  <input
+                    type="text"
+                    placeholder="Search for products..."
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+                    className={`w-full border border-gray-300/50 rounded-full px-6 py-2 text-sm outline-none font-light tracking-wide ${
+                      (isHomePage || isCategoryPage) && !isScrolled
+                        ? 'text-white placeholder-white/80 bg-white/10'
+                        : 'text-gray-800 placeholder-gray-500 bg-white'
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                      (isHomePage || isCategoryPage) && !isScrolled
+                        ? 'text-white'
+                        : 'text-gray-600'
+                    }`}
+                  >
+                    <FiSearch className="w-4 h-4" />
+                  </button>
+                </form>
+                
+                {/* ✅ DESKTOP SEARCH RESULTS */}
+                {showSearchResults && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
+                    {searchLoading ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                        <p className="mt-2 text-sm">Searching...</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="py-2">
+                        {searchResults.map((product) => (
+                          <Link
+                            key={product._id}
+                            href={`/products/${product._id}`}
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              setShowSearchResults(false);
+                            }}
+                          >
+                            {product.images?.[0]?.url ? (
+                              <img
+                                src={product.images[0].url}
+                                alt={product.productName}
+                                className="w-10 h-10 object-cover rounded mr-3"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                                <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {product.productName}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                ₹{product.finalPrice?.toLocaleString() || '0'}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                        <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
+                          <button
+                            onClick={() => {
+                              setShowSearchResults(false);
+                              router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                            }}
+                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
+                          >
+                            View all results
+                          </button>
+                        </div>
+                      </div>
+                    ) : searchQuery.trim() && (
+                      <div className="p-4 text-center text-gray-500">
+                        <p className="text-sm">No products found</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
+              {/* ✅ DESKTOP SELL NOW BUTTON */}
+              <button
+                onClick={handleSellNowClick}
+                className={`hidden md:inline-block px-6 py-2 rounded-full font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${
+                  (isHomePage || isCategoryPage) && !isScrolled
+                    ? 'bg-white text-gray-900 hover:bg-gray-100'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+                }`}
+              >
+                Sell Now
+              </button>
+
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
                 <div className="relative">
                   <button 
@@ -761,6 +860,18 @@ export default function Header() {
                 )}
               </div>
 
+              {/* ✅ MOBILE SELL NOW BUTTON */}
+              <button
+                onClick={handleMobileSellNowClick}
+                className={`md:hidden px-4 py-2 rounded-full font-light tracking-widest uppercase text-sm ${
+                  (isHomePage || isCategoryPage) && !isScrolled
+                    ? 'bg-white text-gray-900'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                }`}
+              >
+                Sell
+              </button>
+
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
@@ -777,6 +888,7 @@ export default function Header() {
             </div>
           </div>
 
+          {/* MOBILE SEARCH BAR */}
           <div className="md:hidden border-t border-gray-200/50 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
@@ -868,6 +980,7 @@ export default function Header() {
           </div>
         </div>
 
+        {/* ✅ DESKTOP CATEGORIES - FULL WIDTH DROPDOWN LIKE NIKE */}
         <div className={`hidden md:block ${getCategoriesBackground()} transition-all duration-500`}>
           <div className="w-[95%] sm:w-[90%] mx-auto">
             <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-3">
@@ -888,27 +1001,28 @@ export default function Header() {
                       {category.name.toUpperCase()}
                     </Link>
 
+                    {/* ✅ FULL WIDTH DROPDOWN - NIKE STYLE */}
                     {activeCategory === category.name && (
                       <div 
-                        className="absolute left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
+                        className="fixed left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-10 z-[60]"
                         style={{ top: '100%' }}
                         onMouseEnter={() => setActiveCategory(category.name)}
                         onMouseLeave={() => setActiveCategory(null)}
                       >
-                        <div className="w-[95%] sm:w-[90%] mx-auto max-w-5xl">
-                          <div className="grid grid-cols-5 gap-8">
+                        <div className="w-[95%] sm:w-[90%] mx-auto max-w-7xl">
+                          <div className="grid grid-cols-6 gap-12">
                             {category.dropdown.sections.map((section, sectionIndex) => (
-                              <div key={sectionIndex} className="space-y-3">
-                                <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-2 text-center">
+                              <div key={sectionIndex} className="space-y-4">
+                                <h3 className="text-gray-900 text-sm font-semibold tracking-wide uppercase mb-3">
                                   {section.title}
                                 </h3>
                                 
-                                <ul className="space-y-2">
+                                <ul className="space-y-3">
                                   {section.items.map((item, itemIndex) => (
-                                    <li key={itemIndex} className="text-center">
+                                    <li key={itemIndex}>
                                       <Link
                                         href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
-                                        className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-1"
+                                        className="text-gray-600 text-sm font-normal hover:text-gray-900 transition-colors duration-200 block py-1"
                                       >
                                         {item}
                                       </Link>
@@ -919,13 +1033,13 @@ export default function Header() {
                             ))}
                           </div>
                           
-                          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                          <div className="mt-12 pt-8 border-t border-gray-200 text-center">
                             <Link
                               href={category.href}
-                              className="inline-flex items-center text-gray-900 text-[13px] font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group mx-auto"
+                              className="inline-flex items-center text-gray-900 text-sm font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group"
                             >
                               View All {category.name} 
-                              <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                             </Link>
@@ -942,6 +1056,7 @@ export default function Header() {
           </div>
         </div>
 
+        {/* MOBILE MENU */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
