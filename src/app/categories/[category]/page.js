@@ -127,7 +127,7 @@ export default async function CategoryPage({ params }) {
       "men's fashion": {
         title: "MEN'S FASHION",
         subtitle: 'Discover luxury fashion for men',
-        banner: '/categories/men-fashion.jpg',
+        banner: '/banners/Men_s Fashion.png',
         whyTitle: "WHY SHOP MEN'S FASHION AT JUST BECHO",
         features: [
           {
@@ -150,7 +150,7 @@ export default async function CategoryPage({ params }) {
       "women's fashion": {
         title: "WOMEN'S FASHION",
         subtitle: 'Explore curated luxury for women',
-        banner: '/categories/women-fashion.jpg',
+        banner: '/banners/Women_s Fashion.png',
         whyTitle: "WHY SHOP WOMEN'S FASHION AT JUST BECHO",
         features: [
           {
@@ -173,7 +173,7 @@ export default async function CategoryPage({ params }) {
       'footwear': {
         title: 'FOOTWEAR',
         subtitle: 'Step into style with luxury footwear',
-        banner: '/categories/footwear.jpg',
+        banner: '/banners/Footwear.png',
         whyTitle: 'WHY SHOP FOOTWEAR AT JUST BECHO',
         features: [
           {
@@ -196,7 +196,7 @@ export default async function CategoryPage({ params }) {
       'accessories': {
         title: 'ACCESSORIES',
         subtitle: 'Complete your look with luxury accessories',
-        banner: '/categories/accessories.jpg',
+        banner: '/banners/Fashion Accessories.png',
         whyTitle: 'WHY SHOP ACCESSORIES AT JUST BECHO',
         features: [
           {
@@ -219,7 +219,7 @@ export default async function CategoryPage({ params }) {
       'watches': {
         title: 'WATCHES',
         subtitle: 'Timeless luxury timepieces',
-        banner: '/categories/watches.jpg',
+        banner: '/banners/Watches.png',
         whyTitle: 'WHY SHOP WATCHES AT JUST BECHO',
         features: [
           {
@@ -242,7 +242,7 @@ export default async function CategoryPage({ params }) {
       'perfumes': {
         title: 'PERFUMES',
         subtitle: 'Signature scents and luxury fragrances',
-        banner: '/categories/perfumes.jpg',
+        banner: '/banners/Perfumes.png',
         whyTitle: 'WHY SHOP PERFUMES AT JUST BECHO',
         features: [
           {
@@ -265,7 +265,7 @@ export default async function CategoryPage({ params }) {
       'toys & collectibles': {
         title: 'TOYS & COLLECTIBLES',
         subtitle: 'Luxury toys and collectible treasures',
-        banner: '/categories/toys-collectibles.jpg',
+        banner: '/banners/Toys and Figurines.png',
         whyTitle: 'WHY SHOP TOYS AT JUST BECHO',
         features: [
           {
@@ -288,7 +288,7 @@ export default async function CategoryPage({ params }) {
       'kids fashion': {
         title: 'KIDS FASHION',
         subtitle: 'Adorable luxury fashion for kids',
-        banner: '/categories/kids-fashion.jpg',
+        banner: '/banners/Kids Fashion.png',
         whyTitle: 'WHY SHOP KIDS FASHION AT JUST BECHO',
         features: [
           {
