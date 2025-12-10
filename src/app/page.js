@@ -178,15 +178,15 @@ function HomeContent() {
 
   // ✅ Category images mapping
   const categoryImages = useMemo(() => ({
-    "Men's Fashion": "/categories/mens-fashion.jpg",
-    "Women's Fashion": "/categories/womens-fashion.jpg", 
-    "Footwear": "/categories/footwear.jpg",
-    "Accessories": "/categories/accessories.jpg",
-    "Watches": "/categories/watches.jpg", 
-    "Perfumes": "/categories/perfumes.jpg",
-    "TOYS & COLLECTIBLES": "/categories/toys-collectibles.jpg",
-    "KIDS": "/categories/kids.jpg",
-    "default": "/categories/default.jpg"
+    "Men's Fashion": "/banners/Men_s Fashion.png",
+    "Women's Fashion": "/banners/Women_s Fashion.jpg", 
+    "Footwear": "/banners/Footwear.jpg",
+    "Accessories": "/banners/Fashion Accessories.jpg",
+    "Watches": "/banners/Watches.jpg", 
+    "Perfumes": "/banners/perfumes.jpg",
+    "TOYS & COLLECTIBLES": "/banners/toys and Figurines.jpg",
+    "KIDS": "/banners/Footwear.jpg",
+    "default": "/banners/default.jpg"
   }), [])
 
   // ✅ Helper function to get category image
