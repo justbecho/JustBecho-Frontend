@@ -19,10 +19,10 @@ export default function Header() {
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
   const [cartApiAvailable, setCartApiAvailable] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('') // ✅ Search query state
-  const [showSearchResults, setShowSearchResults] = useState(false) // ✅ Search results visibility
-  const [searchResults, setSearchResults] = useState([]) // ✅ Search results
-  const [searchLoading, setSearchLoading] = useState(false) // ✅ Search loading
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -33,7 +33,6 @@ export default function Header() {
   const isCategoryPage = pathname?.includes('/categories') || pathname?.includes('/category')
   const isHomePage = pathname === '/'
 
-  // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
     if (!username) return null;
     
@@ -51,7 +50,7 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ FIXED: Listen for seller status updates
+  // ✅ FIXED: Corrected the useEffect with proper event listener
   useEffect(() => {
     const updateUserState = () => {
       try {
@@ -98,12 +97,13 @@ export default function Header() {
       }
     };
     
+    // ✅ FIXED: Using the same function name
     const handleSellerStatusUpdate = () => {
       updateUserState();
     };
     
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('sellerStatusUpdated', handleSellerStatusUpdated);
+    window.addEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
     
     const pollInterval = setInterval(() => {
       updateUserState();
@@ -111,12 +111,11 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdated);
+      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
       clearInterval(pollInterval);
     };
   }, [ensureJustbechoFormat])
 
-  // ✅ FIXED: Fetch categories from backend ONLY
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -137,11 +136,11 @@ export default function Header() {
           setCategories(data.categories)
         } else {
           console.error('❌ Backend API response structure incorrect')
-          setCategories([]) // Empty array if no categories from backend
+          setCategories([])
         }
       } catch (error) {
         console.error('💥 Error fetching categories from backend:', error)
-        setCategories([]) // Empty array on error
+        setCategories([])
       } finally {
         setLoading(false)
       }
@@ -150,7 +149,6 @@ export default function Header() {
     fetchCategories()
   }, [])
 
-  // ✅ FIXED: Fetch cart count
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -188,14 +186,11 @@ export default function Header() {
     }
   }, [])
 
-  // ✅ FIXED: Scroll effect - Only transparent on homepage and category pages
   useEffect(() => {
     const handleScroll = () => {
-      // ✅ Homepage aur category pages pe hi transparency ka logic
       if (isHomePage || isCategoryPage) {
         setIsScrolled(window.scrollY > 50);
       } else {
-        // ✅ Baaki sab pages pe hamesha white background
         setIsScrolled(true);
       }
     }
@@ -204,9 +199,8 @@ export default function Header() {
     
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isHomePage, isCategoryPage, isCartPage]) // ✅ isCartPage dependency add kiya
+  }, [isHomePage, isCategoryPage, isCartPage])
 
-  // ✅ SEARCH FUNCTIONALITY
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -258,7 +252,6 @@ export default function Header() {
     }
   };
 
-  // ✅ Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target.closest('.search-container')) return;
@@ -269,7 +262,6 @@ export default function Header() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // ✅ BURGER MENU ANIMATION HANDLER
   const handleBurgerClick = () => {
     setIsMenuAnimating(true);
     setIsMenuOpen(!isMenuOpen);
@@ -279,7 +271,6 @@ export default function Header() {
     }, 300);
   };
 
-  // ✅ Convert to Seller Function
   const convertToSeller = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -345,18 +336,15 @@ export default function Header() {
     }
   }, [router, ensureJustbechoFormat])
 
-  // ✅ FIXED: Transform categories - ONLY BACKEND DATA
   const transformedCategories = useMemo(() => {
     console.log('🔄 Transforming backend categories:', categories)
     
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
       console.log('⚠️ No categories from backend')
-      return []; // Empty array - will show "No categories available"
+      return [];
     }
     
-    // Transform backend categories based on their structure
     const transformed = categories.map((category, index) => {
-      // If category is a string (like ["Mobile Phones", "Laptops"])
       if (typeof category === 'string') {
         return {
           name: category,
@@ -370,7 +358,6 @@ export default function Header() {
         };
       }
       
-      // If category is an object (with name, href, subCategories)
       return {
         name: category?.name || `Category ${index + 1}`,
         href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
@@ -387,13 +374,13 @@ export default function Header() {
     return transformed;
   }, [categories]);
 
-  // ✅ Rest of your handlers remain the same...
+  // ✅ FIXED: Added missing userData variable declaration in handleSellNowClick
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
     if (user) {
       const currentUserData = localStorage.getItem('user');
-      const currentUser = currentUserData ? JSON.parse(userData) : null;
+      const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
       
       const latestUser = currentUser || user;
       
@@ -432,7 +419,7 @@ export default function Header() {
   const handleMobileSellNowClick = useCallback(() => {
     if (user) {
       const currentUserData = localStorage.getItem('user');
-      const currentUser = currentUserData ? JSON.parse(userData) : null;
+      const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
       
       const latestUser = currentUser || user;
       
@@ -603,56 +590,41 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router])
 
-  // ✅ Function to determine if header should be transparent
   const getHeaderBackground = () => {
-    // ✅ Homepage aur category pages pe hi transparent ho sakta hai
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
     }
-    // ✅ Baaki sab pages pe hamesha white background
     return 'bg-white text-gray-900 shadow-sm'
   }
 
-  // ✅ Function to determine if categories should be transparent
   const getCategoriesBackground = () => {
-    // ✅ Homepage aur category pages pe hi transparent ho sakta hai
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'bg-white' : 'bg-transparent'
     }
-    // ✅ Baaki sab pages pe hamesha white background
     return 'bg-white'
   }
 
-  // ✅ Function to determine text color for category links
   const getCategoryTextColor = () => {
-    // ✅ Homepage aur category pages pe hi white text ho sakta hai
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
     }
-    // ✅ Baaki sab pages pe hamesha dark text
     return 'text-gray-800 hover:text-gray-600'
   }
 
-  // ✅ Function to determine icon colors
   const getIconColor = () => {
-    // ✅ Homepage aur category pages pe hi white icons ho sakte hain
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'text-gray-900' : 'text-white'
     }
-    // ✅ Baaki sab pages pe hamesha dark icons
     return 'text-gray-900'
   }
 
   return (
     <>
-      {/* ✅ COMPLETE HEADER WITH CATEGORIES */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${getHeaderBackground()}`}
       >
-        {/* Top Section with Logo and Icons */}
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4">
-            {/* LEFT: Burger Menu - MOBILE ONLY */}
             <div className="md:hidden flex items-center">
               <button
                 className={`focus:outline-none p-1 relative ${
@@ -681,7 +653,6 @@ export default function Header() {
               </button>
             </div>
 
-            {/* CENTER: Logo */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center justify-center">
                 <Image
@@ -690,7 +661,6 @@ export default function Header() {
                   width={80}
                   height={80}
                   className={`transition-all duration-500 ${
-                    // Logo size: homepage/category pages pe bada, baaki pages pe chhota
                     isHomePage || isCategoryPage 
                       ? isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
                       : 'h-14 w-auto'
@@ -700,10 +670,8 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* RIGHT: Desktop Icons and Mobile Cart */}
             <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                {/* Profile Icon */}
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
@@ -712,7 +680,6 @@ export default function Header() {
                     <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
 
-                  {/* User Dropdown */}
                   {showUserDropdown && user && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                       <div className="px-4 py-3 border-b border-gray-100">
@@ -772,7 +739,6 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Wishlist Icon */}
                 <button 
                   onClick={handleWishlistClick}
                   className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${getIconColor()}`}
@@ -780,7 +746,6 @@ export default function Header() {
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
-                {/* Cart Icon */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleCartClick}
@@ -796,7 +761,6 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Mobile Cart Icon */}
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
@@ -813,7 +777,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Mobile Search Bar */}
           <div className="md:hidden border-t border-gray-200/50 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
@@ -824,7 +787,6 @@ export default function Header() {
                   onChange={handleSearchInputChange}
                   onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
                   className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
-                    // Search input background
                     (isHomePage || isCategoryPage) && !isScrolled
                       ? 'text-white placeholder-white/80 bg-white/10'
                       : 'text-gray-800 placeholder-gray-500 bg-white'
@@ -833,7 +795,6 @@ export default function Header() {
                 <button
                   type="submit"
                   className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                    // Search icon color
                     (isHomePage || isCategoryPage) && !isScrolled
                       ? 'text-white'
                       : 'text-gray-600'
@@ -907,7 +868,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ DESKTOP CATEGORIES - WITHOUT WHITE LINE */}
         <div className={`hidden md:block ${getCategoriesBackground()} transition-all duration-500`}>
           <div className="w-[95%] sm:w-[90%] mx-auto">
             <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-3">
@@ -921,7 +881,6 @@ export default function Header() {
                     onMouseEnter={() => setActiveCategory(category.name)}
                     onMouseLeave={() => setActiveCategory(null)}
                   >
-                    {/* Category Link */}
                     <Link
                       href={category.href}
                       className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${getCategoryTextColor()}`}
@@ -929,7 +888,6 @@ export default function Header() {
                       {category.name.toUpperCase()}
                     </Link>
 
-                    {/* ✅ FIXED: FULL WIDTH DROPDOWN - ABSOLUTE POSITIONING */}
                     {activeCategory === category.name && (
                       <div 
                         className="absolute left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
@@ -941,12 +899,10 @@ export default function Header() {
                           <div className="grid grid-cols-5 gap-8">
                             {category.dropdown.sections.map((section, sectionIndex) => (
                               <div key={sectionIndex} className="space-y-3">
-                                {/* Section Title - Centered */}
                                 <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-2 text-center">
                                   {section.title}
                                 </h3>
                                 
-                                {/* Section Items - Centered */}
                                 <ul className="space-y-2">
                                   {section.items.map((item, itemIndex) => (
                                     <li key={itemIndex} className="text-center">
@@ -963,7 +919,6 @@ export default function Header() {
                             ))}
                           </div>
                           
-                          {/* View All Button - Centered */}
                           <div className="mt-8 pt-6 border-t border-gray-200 text-center">
                             <Link
                               href={category.href}
@@ -987,7 +942,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
@@ -1139,7 +1093,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* AUTH MODAL */}
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
