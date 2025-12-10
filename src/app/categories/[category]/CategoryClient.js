@@ -292,7 +292,7 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
                   SHOP NOW
                 </Link>
                 <Link
-                  href="/sell"
+                  href="/sell-now"
                   className="border-2 border-white text-white px-8 py-4 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-lg"
                 >
                   SELL ITEMS
@@ -443,7 +443,7 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
                       <option value="price-high">Price: High to Low</option>
                     </select>
                     
-                    <Link href="/sell">
+                    <Link href="/sell-now">
                       <button className="bg-black text-white px-6 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors">
                         SELL ITEM
                       </button>
@@ -469,7 +469,7 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
                   <div className="text-center py-12">
                     <p className="text-gray-500 text-lg">No products found in {categoryName}.</p>
                     <Link 
-                      href="/sell" 
+                      href="/sell-now" 
                       className="inline-block mt-4 border-2 border-black text-black px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all"
                     >
                       Sell Items

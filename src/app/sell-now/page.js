@@ -53,6 +53,146 @@ export default function SellNowPage() {
     }
   }
 
+  // ✅ Brand input handler - Capitalize first letter
+  const handleBrandInput = (e) => {
+    const { name, value } = e.target;
+    
+    // Process the brand name
+    let processedValue = value;
+    
+    if (value.trim()) {
+      // Capitalize first letter of each word
+      processedValue = value
+        .toLowerCase() // First convert all to lowercase
+        .split(' ') // Split by spaces
+        .map(word => {
+          // Handle special cases like '&' and abbreviations
+          if (word.includes('&')) {
+            return word.toUpperCase();
+          }
+          
+          // Handle abbreviations (2-3 letters)
+          if (word.length <= 3 && !['the', 'and', 'for', 'but', 'nor', 'yet', 'so'].includes(word)) {
+            return word.toUpperCase();
+          }
+          
+          // Capitalize first letter of other words
+          return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(' ');
+        
+      // Special handling for known brand formats
+      const specialBrands = {
+        'mcqueen': 'McQueen',
+        'mcm': 'MCM',
+        'lv': 'Louis Vuitton',
+        'gucci': 'Gucci',
+        'nike': 'Nike',
+        'adidas': 'Adidas',
+        'puma': 'Puma',
+        'armani': 'Armani',
+        'dior': 'Dior',
+        'chanel': 'Chanel',
+        'versace': 'Versace',
+        'prada': 'Prada',
+        'burberry': 'Burberry',
+        'balenciaga': 'Balenciaga',
+        'hermes': 'Hermes',
+        'cartier': 'Cartier',
+        'rolex': 'Rolex',
+        'omega': 'Omega',
+        'ray-ban': 'Ray-Ban',
+        'louis vuitton': 'Louis Vuitton',
+        'dolce & gabbana': 'Dolce & Gabbana',
+        'alexander mcqueen': 'Alexander McQueen',
+        'alexander mc queen': 'Alexander McQueen',
+        'yves saint laurent': 'Yves Saint Laurent',
+        'ysl': 'YSL',
+        'tom ford': 'Tom Ford',
+        'calvin klein': 'Calvin Klein',
+        'ck': 'Calvin Klein',
+        'hugo boss': 'Hugo Boss',
+        'ralph lauren': 'Ralph Lauren',
+        'tiffany & co': 'Tiffany & Co.',
+        'tiffany': 'Tiffany & Co.',
+        'bvlgari': 'Bvlgari',
+        'bottega veneta': 'Bottega Veneta',
+        'ferragamo': 'Ferragamo',
+        'givenchy': 'Givenchy',
+        'jimmy choo': 'Jimmy Choo',
+        'tod\'s': 'Tod\'s',
+        'valentino': 'Valentino',
+        'versace': 'Versace',
+        'zara': 'Zara',
+        'h&m': 'H&M',
+        'uniqlo': 'Uniqlo',
+        'levi\'s': 'Levi\'s',
+        'wrangler': 'Wrangler',
+        'reebok': 'Reebok',
+        'converse': 'Converse',
+        'vans': 'Vans',
+        'new balance': 'New Balance',
+        'under armour': 'Under Armour',
+        'lululemon': 'Lululemon',
+        'fila': 'Fila',
+        'skechers': 'Skechers',
+        'woodland': 'Woodland'
+      };
+      
+      // Check for special brand formatting
+      const lowerValue = value.toLowerCase().trim();
+      if (specialBrands[lowerValue]) {
+        processedValue = specialBrands[lowerValue];
+      }
+      
+      // Handle common brand patterns
+      if (processedValue.includes('Mc') && processedValue.length > 2) {
+        // Keep 'Mc' uppercase and capitalize next letter
+        processedValue = processedValue.replace(/Mc([a-z])/g, (match, p1) => `Mc${p1.toUpperCase()}`);
+      }
+      
+      // Handle apostrophe cases
+      if (processedValue.includes('\'s')) {
+        processedValue = processedValue.replace(/'s/gi, '\'s');
+      }
+      
+      // Remove extra spaces
+      processedValue = processedValue.replace(/\s+/g, ' ').trim();
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: processedValue
+    }));
+  };
+
+  // ✅ General input handler for other fields
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Special handling for product name - capitalize first letter
+    if (name === 'productName') {
+      let processedValue = value;
+      if (value.trim()) {
+        processedValue = value
+          .toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: processedValue
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
   // ✅ FETCH CATEGORIES FROM BACKEND
   const fetchCategories = useCallback(async () => {
     try {
@@ -320,14 +460,6 @@ export default function SellNowPage() {
     fetchCategories()
     checkUserAuth()
   }, [router, fetchCategories])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -624,6 +756,7 @@ export default function SellNowPage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Product Name *
+                          <span className="text-xs text-gray-500 ml-1">(Auto-capitalized)</span>
                         </label>
                         <input
                           type="text"
@@ -689,16 +822,27 @@ export default function SellNowPage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Brand *
+                          <span className="text-xs text-gray-500 ml-1">(Auto-formatted)</span>
                         </label>
                         <input
                           type="text"
                           name="brand"
                           value={formData.brand}
-                          onChange={handleInputChange}
+                          onChange={handleBrandInput}
+                          onBlur={(e) => {
+                            // Additional formatting on blur
+                            if (e.target.value.trim()) {
+                              handleBrandInput(e);
+                            }
+                          }}
                           required
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                          placeholder="e.g., Nike, Adidas, Zara"
+                          placeholder="e.g., Nike, Adidas, Louis Vuitton"
+                          autoComplete="off"
                         />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Type brand name (e.g., "nike" becomes "Nike", "louis vuitton" becomes "Louis Vuitton")
+                        </p>
                       </div>
 
                       {formData.category && productTypes.length > 0 && (
