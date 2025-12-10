@@ -224,7 +224,7 @@ function HomeContent() {
     "Women's Fashion": "/banners/Women_s Fashion.png", 
     "Footwear": "/banners/DIOR LOAFERS.png",
     "Accessories": "/banners/Fashion Accessories.png",
-    "Watches": "/banners/Rolex.png", 
+    "Watches": "/banners/rolex.jpg", 
     "Perfumes": "/banners/perfumes.png",
     "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
     "KIDS": "/banners/Kids Fashion.png",
