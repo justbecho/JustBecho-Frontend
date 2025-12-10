@@ -49,7 +49,7 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ FIXED: Listen for seller status updates
+  // ✅ FIXED: Listen for seller status updates - ERROR FIXED HERE
   useEffect(() => {
     const updateUserState = () => {
       try {
@@ -96,6 +96,7 @@ export default function Header() {
       }
     };
     
+    // ✅ CORRECT FUNCTION NAME - match karega cleanup mein
     const handleSellerStatusUpdate = () => {
       updateUserState();
     };
@@ -109,7 +110,8 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdated);
+      // ✅ FIXED: Ab sahi function name use karein
+      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
       clearInterval(pollInterval);
     };
   }, [ensureJustbechoFormat])
