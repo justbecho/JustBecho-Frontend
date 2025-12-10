@@ -1,3 +1,4 @@
+// app/page.js
 "use client"
 
 import Header from '@/components/layout/Header'
@@ -476,21 +477,31 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: PERFECT Brand logo component - ALL LOGOS EXACT SAME SIZE AND PROPER SPACING
-  const BrandLogo = ({ brand, index }) => {
+  // ✅ UPDATED: Brand logo component with click handler
+  const BrandLogo = ({ brand, index, categoryName }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
     
     if (!brand || !brand.name) return null;
 
+    const handleBrandClick = () => {
+      // Brand name और category के based पर URL create करें
+      const brandSlug = encodeURIComponent(brand.name.toLowerCase().replace(/\s+/g, '-'));
+      const categorySlug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'));
+      
+      // Brand page पर redirect करें
+      router.push(`/brand/${brandSlug}?category=${categorySlug}`);
+    };
+
     return (
       <div 
         key={index} 
-        className="flex-shrink-0 px-1 sm:px-2 md:px-3"
+        className="flex-shrink-0 px-1 sm:px-2 md:px-3 cursor-pointer"
         title={brand.name}
+        onClick={handleBrandClick}
       >
         {/* ✅ FIXED: ALL LOGOS EXACT SAME CONTAINER SIZE */}
-        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
+        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center group">
           <img
             src={imgSrc}
             alt={brand.name}
@@ -524,6 +535,10 @@ function HomeContent() {
             }}
             loading="lazy"
           />
+          {/* Brand name tooltip on hover */}
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+            {brand.name}
+          </div>
         </div>
       </div>
     )
@@ -762,7 +777,8 @@ function HomeContent() {
                             <BrandLogo 
                               key={brandIndex} 
                               brand={brand} 
-                              index={brandIndex} 
+                              index={brandIndex}
+                              categoryName={category.name} // ✅ Add this
                             />
                           ))}
                         </div>
