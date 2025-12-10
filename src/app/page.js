@@ -48,6 +48,7 @@ function HomeContent() {
       { name: "Air Jordan", logo: "/brandslogo/footwear/Air-Jordan.png", fallback: "/brands/prada.png" },
       { name: "ALAIA", logo: "/brandslogo/footwear/ALAIA.jpg", fallback: "/brands/puma.png" },
       { name: "Alexander McQueen", logo: "/brandslogo/footwear/Alexander-McQueen.jpg", fallback: "/brands/gucci.png" },
+      { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png" },
       { name: "Alo Yoga", logo: "/brandslogo/footwear/Alo-Yoga.png", fallback: "/brands/reebok.png" },
       { name: "Altra Running", logo: "/brandslogo/footwear/Altra Running.png", fallback: "/brands/balenciaga.png" },
       { name: "Amiri", logo: "/brandslogo/footwear/Amiri.jpg", fallback: "/brands/jimmy-choo.png" },
@@ -65,7 +66,7 @@ function HomeContent() {
       { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png" },
       { name: "Dior", logo: "/brandslogo/footwear/Dior.png", fallback: "/brands/prada.png" },
       { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png" },
-      { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png" },
+      
       { name: "On", logo: "/brandslogo/footwear/On.jpg", fallback: "/brands/reebok.png" },
       { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/balenciaga.png" }
     ],
