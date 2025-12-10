@@ -19,10 +19,10 @@ export default function Header() {
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
   const [cartApiAvailable, setCartApiAvailable] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showSearchResults, setShowSearchResults] = useState(false)
-  const [searchResults, setSearchResults] = useState([])
-  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('') // ✅ Search query state
+  const [showSearchResults, setShowSearchResults] = useState(false) // ✅ Search results visibility
+  const [searchResults, setSearchResults] = useState([]) // ✅ Search results
+  const [searchLoading, setSearchLoading] = useState(false) // ✅ Search loading
   const pathname = usePathname()
   const router = useRouter()
 
@@ -33,6 +33,7 @@ export default function Header() {
   const isCategoryPage = pathname?.includes('/categories') || pathname?.includes('/category')
   const isHomePage = pathname === '/'
 
+  // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
     if (!username) return null;
     
@@ -50,6 +51,7 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
+  // ✅ FIXED: Listen for seller status updates
   useEffect(() => {
     const updateUserState = () => {
       try {
@@ -114,6 +116,7 @@ export default function Header() {
     };
   }, [ensureJustbechoFormat])
 
+  // ✅ FIXED: Fetch categories from backend ONLY
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -134,11 +137,11 @@ export default function Header() {
           setCategories(data.categories)
         } else {
           console.error('❌ Backend API response structure incorrect')
-          setCategories([])
+          setCategories([]) // Empty array if no categories from backend
         }
       } catch (error) {
         console.error('💥 Error fetching categories from backend:', error)
-        setCategories([])
+        setCategories([]) // Empty array on error
       } finally {
         setLoading(false)
       }
@@ -147,6 +150,7 @@ export default function Header() {
     fetchCategories()
   }, [])
 
+  // ✅ FIXED: Fetch cart count
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -184,11 +188,14 @@ export default function Header() {
     }
   }, [])
 
+  // ✅ FIXED: Scroll effect - Only transparent on homepage and category pages
   useEffect(() => {
     const handleScroll = () => {
+      // ✅ Homepage aur category pages pe hi transparency ka logic
       if (isHomePage || isCategoryPage) {
         setIsScrolled(window.scrollY > 50);
       } else {
+        // ✅ Baaki sab pages pe hamesha white background
         setIsScrolled(true);
       }
     }
@@ -197,8 +204,9 @@ export default function Header() {
     
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isHomePage, isCategoryPage, isCartPage])
+  }, [isHomePage, isCategoryPage]) // ✅ isCartPage dependency remove kiya
 
+  // ✅ SEARCH FUNCTIONALITY
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -250,6 +258,7 @@ export default function Header() {
     }
   };
 
+  // ✅ Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target.closest('.search-container')) return;
@@ -260,6 +269,7 @@ export default function Header() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // ✅ BURGER MENU ANIMATION HANDLER
   const handleBurgerClick = () => {
     setIsMenuAnimating(true);
     setIsMenuOpen(!isMenuOpen);
@@ -269,6 +279,7 @@ export default function Header() {
     }, 300);
   };
 
+  // ✅ Convert to Seller Function
   const convertToSeller = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -334,15 +345,18 @@ export default function Header() {
     }
   }, [router, ensureJustbechoFormat])
 
+  // ✅ FIXED: Transform categories - ONLY BACKEND DATA
   const transformedCategories = useMemo(() => {
     console.log('🔄 Transforming backend categories:', categories)
     
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
       console.log('⚠️ No categories from backend')
-      return [];
+      return []; // Empty array - will show "No categories available"
     }
     
+    // Transform backend categories based on their structure
     const transformed = categories.map((category, index) => {
+      // If category is a string (like ["Mobile Phones", "Laptops"])
       if (typeof category === 'string') {
         return {
           name: category,
@@ -356,6 +370,7 @@ export default function Header() {
         };
       }
       
+      // If category is an object (with name, href, subCategories)
       return {
         name: category?.name || `Category ${index + 1}`,
         href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
@@ -372,6 +387,7 @@ export default function Header() {
     return transformed;
   }, [categories]);
 
+  // ✅ Rest of your handlers remain the same...
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
@@ -587,41 +603,63 @@ export default function Header() {
     setIsMenuOpen(false)
   }, [user, router])
 
+  // ✅ Function to determine if header should be transparent
   const getHeaderBackground = () => {
+    // ✅ Homepage aur category pages pe hi transparent ho sakta hai
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
     }
+    // ✅ Baaki sab pages pe hamesha white background
     return 'bg-white text-gray-900 shadow-sm'
   }
 
+  // ✅ Function to determine if categories should be transparent
   const getCategoriesBackground = () => {
+    // ✅ Homepage aur category pages pe hi transparent ho sakta hai
     if (isHomePage || isCategoryPage) {
-      return isScrolled ? 'bg-white' : 'bg-transparent'
+      return isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
     }
-    return 'bg-white'
+    // ✅ Baaki sab pages pe hamesha white background
+    return 'bg-white shadow-md'
   }
 
+  // ✅ Function to determine text color for category links
   const getCategoryTextColor = () => {
+    // ✅ Homepage aur category pages pe hi white text ho sakta hai
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
     }
+    // ✅ Baaki sab pages pe hamesha dark text
     return 'text-gray-800 hover:text-gray-600'
   }
 
+  // ✅ Function to determine icon colors
   const getIconColor = () => {
+    // ✅ Homepage aur category pages pe hi white icons ho sakte hain
     if (isHomePage || isCategoryPage) {
       return isScrolled ? 'text-gray-900' : 'text-white'
     }
+    // ✅ Baaki sab pages pe hamesha dark icons
     return 'text-gray-900'
+  }
+
+  // ✅ Function to get search bar background
+  const getSearchBarBackground = () => {
+    if (isHomePage || isCategoryPage) {
+      return isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
+    }
+    return 'text-gray-800 placeholder-gray-500 bg-white'
   }
 
   return (
     <>
+      {/* ✅ MAIN HEADER - CART PAGE PE BINA SCROLL KARE WHITE */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${getHeaderBackground()}`}
       >
         <div className="w-[95%] sm:w-[90%] mx-auto">
-          <div className="flex items-center justify-between py-4">
+          <div className="flex items-center justify-between py-4 sm:py-5">
+            {/* ✅ LEFT: Burger Menu - MOBILE ONLY (LEFT SIDE) */}
             <div className="md:hidden flex items-center">
               <button
                 className={`focus:outline-none p-1 relative ${
@@ -631,6 +669,7 @@ export default function Header() {
                 aria-label="Menu"
               >
                 <div className="relative w-6 h-6">
+                  {/* Burger Icon with Animation */}
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? 'rotate-45 translate-y-0 bg-gray-900' 
@@ -650,6 +689,7 @@ export default function Header() {
               </button>
             </div>
 
+            {/* ✅ CENTER: Logo - Perfect Center with Margin */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center justify-center">
                 <Image
@@ -657,108 +697,20 @@ export default function Header() {
                   alt="Just Becho"
                   width={80}
                   height={80}
-                  className={`transition-all duration-500 ${
-                    isHomePage || isCategoryPage 
-                      ? isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
-                      : 'h-14 w-auto'
+                  className={`transition-all duration-500 mt-1 ${
+                    isDashboardPage ? 'h-14 w-auto' : 
+                    isProductPage || isSellNowPage ? 'h-14 w-auto' : 
+                    isCartPage ? 'h-14 w-auto' : // ✅ Cart page pe chhota logo
+                    isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
                   }`}
                   priority
                 />
               </Link>
             </div>
 
-            {/* ✅ DESKTOP SEARCH BAR */}
-            <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
-              <div className="relative w-full search-container">
-                <form onSubmit={handleSearchSubmit} className="w-full">
-                  <input
-                    type="text"
-                    placeholder="Search for products..."
-                    value={searchQuery}
-                    onChange={handleSearchInputChange}
-                    onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                    className={`w-full border border-gray-300/50 rounded-full px-6 py-2 text-sm outline-none font-light tracking-wide ${
-                      (isHomePage || isCategoryPage) && !isScrolled
-                        ? 'text-white placeholder-white/80 bg-white/10'
-                        : 'text-gray-800 placeholder-gray-500 bg-white'
-                    }`}
-                  />
-                  <button
-                    type="submit"
-                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
-                      (isHomePage || isCategoryPage) && !isScrolled
-                        ? 'text-white'
-                        : 'text-gray-600'
-                    }`}
-                  >
-                    <FiSearch className="w-4 h-4" />
-                  </button>
-                </form>
-                
-                {/* ✅ DESKTOP SEARCH RESULTS */}
-                {showSearchResults && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
-                    {searchLoading ? (
-                      <div className="p-4 text-center text-gray-500">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                        <p className="mt-2 text-sm">Searching...</p>
-                      </div>
-                    ) : searchResults.length > 0 ? (
-                      <div className="py-2">
-                        {searchResults.map((product) => (
-                          <Link
-                            key={product._id}
-                            href={`/products/${product._id}`}
-                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                            onClick={() => {
-                              setShowSearchResults(false);
-                            }}
-                          >
-                            {product.images?.[0]?.url ? (
-                              <img
-                                src={product.images[0].url}
-                                alt={product.productName}
-                                className="w-10 h-10 object-cover rounded mr-3"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
-                                <FiShoppingBag className="w-5 h-5 text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">
-                                {product.productName}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                ₹{product.finalPrice?.toLocaleString() || '0'}
-                              </p>
-                            </div>
-                          </Link>
-                        ))}
-                        <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
-                          <button
-                            onClick={() => {
-                              setShowSearchResults(false);
-                              router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                            }}
-                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
-                          >
-                            View all results
-                          </button>
-                        </div>
-                      </div>
-                    ) : searchQuery.trim() && (
-                      <div className="p-4 text-center text-gray-500">
-                        <p className="text-sm">No products found</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
+            {/* ✅ RIGHT: Desktop Icons and Mobile Cart */}
             <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
-              {/* ✅ DESKTOP SELL NOW BUTTON */}
+              {/* ✅ DESKTOP SELL NOW BUTTON - RIGHT SIDE */}
               <button
                 onClick={handleSellNowClick}
                 className={`hidden md:inline-block px-6 py-2 rounded-full font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${
@@ -771,6 +723,7 @@ export default function Header() {
               </button>
 
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+                {/* Profile Icon with Dropdown */}
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
@@ -779,10 +732,15 @@ export default function Header() {
                     <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
 
+                  {/* User Dropdown */}
                   {showUserDropdown && user && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                      {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-sm font-medium text-gray-900 truncate">{user.name || 'User'}</p>
+                      
+                        
+                        {/* Seller Status Badge */}
                         {user.role === 'seller' && (
                           <div className="mt-2">
                             <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -794,6 +752,7 @@ export default function Header() {
                         )}
                       </div>
                       
+                      {/* Dashboard Links */}
                       <div className="py-1">
                         <Link 
                           href="/dashboard" 
@@ -825,6 +784,7 @@ export default function Header() {
                         </Link>
                       </div>
                       
+                      {/* Logout */}
                       <div className="border-t border-gray-100 pt-1">
                         <button 
                           onClick={handleLogout}
@@ -838,6 +798,7 @@ export default function Header() {
                   )}
                 </div>
 
+                {/* Wishlist Icon */}
                 <button 
                   onClick={handleWishlistClick}
                   className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${getIconColor()}`}
@@ -845,6 +806,7 @@ export default function Header() {
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
+                {/* Cart Icon - Only show if cart API is available */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleCartClick}
@@ -872,6 +834,7 @@ export default function Header() {
                 Sell
               </button>
 
+              {/* Mobile Cart Icon - RIGHT SIDE */}
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
@@ -888,8 +851,94 @@ export default function Header() {
             </div>
           </div>
 
-          {/* MOBILE SEARCH BAR */}
-          <div className="md:hidden border-t border-gray-200/50 pt-2 pb-1 search-container">
+          {/* ✅ DESKTOP SEARCH BAR - CENTER POSITION */}
+          <div className="hidden md:flex items-center justify-center mt-2 mb-4">
+            <div className="relative w-full max-w-2xl search-container">
+              <form onSubmit={handleSearchSubmit} className="w-full">
+                <input
+                  type="text"
+                  placeholder="Search for products..."
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+                  className={`w-full border border-gray-300/50 rounded-full px-6 py-3 text-sm outline-none font-light tracking-wide ${getSearchBarBackground()}`}
+                />
+                <button
+                  type="submit"
+                  className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                    (isHomePage || isCategoryPage) && !isScrolled
+                      ? 'text-white'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  <FiSearch className="w-4 h-4" />
+                </button>
+              </form>
+              
+              {/* ✅ DESKTOP SEARCH RESULTS */}
+              {showSearchResults && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
+                  {searchLoading ? (
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                      <p className="mt-2 text-sm">Searching...</p>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className="py-2">
+                      {searchResults.map((product) => (
+                        <Link
+                          key={product._id}
+                          href={`/products/${product._id}`}
+                          className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          onClick={() => {
+                            setShowSearchResults(false);
+                          }}
+                        >
+                          {product.images?.[0]?.url ? (
+                            <img
+                              src={product.images[0].url}
+                              alt={product.productName}
+                              className="w-10 h-10 object-cover rounded mr-3"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                              <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {product.productName}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              ₹{product.finalPrice?.toLocaleString() || '0'}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                      <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
+                        <button
+                          onClick={() => {
+                            setShowSearchResults(false);
+                            router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                          }}
+                          className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
+                        >
+                          View all results
+                        </button>
+                      </div>
+                    </div>
+                  ) : searchQuery.trim() && (
+                    <div className="p-4 text-center text-gray-500">
+                      <p className="text-sm">No products found</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ✅ FUNCTIONAL Mobile Search Bar */}
+          <div className="md:hidden border-t border-gray-200/50 mt-2 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
                 <input
@@ -898,11 +947,7 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                  className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
-                    (isHomePage || isCategoryPage) && !isScrolled
-                      ? 'text-white placeholder-white/80 bg-white/10'
-                      : 'text-gray-800 placeholder-gray-500 bg-white'
-                  }`}
+                  className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${getSearchBarBackground()}`}
                 />
                 <button
                   type="submit"
@@ -916,6 +961,7 @@ export default function Header() {
                 </button>
               </form>
               
+              {/* Mobile Search Results */}
               {showSearchResults && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
                   {searchLoading ? (
@@ -980,95 +1026,22 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ DESKTOP CATEGORIES - FULL WIDTH DROPDOWN LIKE NIKE */}
-        <div className={`hidden md:block ${getCategoriesBackground()} transition-all duration-500`}>
-          <div className="w-[95%] sm:w-[90%] mx-auto">
-            <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-3">
-              {loading ? (
-                <div className="text-sm text-gray-500">Loading categories...</div>
-              ) : transformedCategories.length > 0 ? (
-                transformedCategories.map((category, index) => (
-                  <div
-                    key={category.name || index}
-                    className="relative group"
-                    onMouseEnter={() => setActiveCategory(category.name)}
-                    onMouseLeave={() => setActiveCategory(null)}
-                  >
-                    <Link
-                      href={category.href}
-                      className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${getCategoryTextColor()}`}
-                    >
-                      {category.name.toUpperCase()}
-                    </Link>
-
-                    {/* ✅ FULL WIDTH DROPDOWN - NIKE STYLE */}
-                    {activeCategory === category.name && (
-                      <div 
-                        className="fixed left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-10 z-[60]"
-                        style={{ top: '100%' }}
-                        onMouseEnter={() => setActiveCategory(category.name)}
-                        onMouseLeave={() => setActiveCategory(null)}
-                      >
-                        <div className="w-[95%] sm:w-[90%] mx-auto max-w-7xl">
-                          <div className="grid grid-cols-6 gap-12">
-                            {category.dropdown.sections.map((section, sectionIndex) => (
-                              <div key={sectionIndex} className="space-y-4">
-                                <h3 className="text-gray-900 text-sm font-semibold tracking-wide uppercase mb-3">
-                                  {section.title}
-                                </h3>
-                                
-                                <ul className="space-y-3">
-                                  {section.items.map((item, itemIndex) => (
-                                    <li key={itemIndex}>
-                                      <Link
-                                        href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
-                                        className="text-gray-600 text-sm font-normal hover:text-gray-900 transition-colors duration-200 block py-1"
-                                      >
-                                        {item}
-                                      </Link>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                          
-                          <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-                            <Link
-                              href={category.href}
-                              className="inline-flex items-center text-gray-900 text-sm font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group"
-                            >
-                              View All {category.name} 
-                              <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">No categories available</div>
-              )}
-            </nav>
-          </div>
-        </div>
-
-        {/* MOBILE MENU */}
+        {/* ✅ FIXED: MOBILE MENU - SLIDE ANIMATION FROM LEFT */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
+          {/* Overlay */}
           <div 
             className="absolute inset-0 bg-black/50 transition-opacity duration-300"
             onClick={() => setIsMenuOpen(false)}
           />
           
+          {/* Menu Panel - Slides from left */}
           <div className={`absolute top-0 left-0 h-full w-4/5 max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}>
             <nav className="flex flex-col h-full overflow-y-auto">
+              {/* Header with Close Button */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div className="flex items-center">
                   <Image
@@ -1091,6 +1064,7 @@ export default function Header() {
                 </button>
               </div>
 
+              {/* ✅ CATEGORIES SECTION */}
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-900 mb-4 uppercase tracking-wider">CATEGORIES</h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -1113,7 +1087,9 @@ export default function Header() {
                 </div>
               </div>
 
+              {/* ✅ Mobile Menu Items */}
               <div className="flex-1 p-6 space-y-1">
+                {/* Home Link */}
                 <Link 
                   href="/"
                   className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300"
@@ -1123,6 +1099,7 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">HOME</span>
                 </Link>
                 
+                {/* Mobile Sell Now Button */}
                 <button 
                   onClick={handleMobileSellNowClick}
                   className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
@@ -1133,6 +1110,7 @@ export default function Header() {
                 
                 {user ? (
                   <>
+                    {/* Seller Status in Mobile Menu */}
                     {user.role === 'seller' && (
                       <div className="px-4 py-3 mb-2 bg-gray-50 rounded-lg">
                         <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -1177,6 +1155,7 @@ export default function Header() {
                   </button>
                 )}
                 
+                {/* Mobile Wishlist */}
                 <button 
                   onClick={handleMobileWishlistClick}
                   className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
@@ -1185,6 +1164,7 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
+                {/* Mobile Cart - Only show if cart API is available */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleMobileCartClick}
@@ -1198,6 +1178,7 @@ export default function Header() {
                 )}
               </div>
 
+              {/* Footer */}
               <div className="p-6 border-t border-gray-200 mt-auto">
                 <p className="text-xs text-gray-500 text-center">
                   © 2024 Just Becho. All rights reserved.
@@ -1208,6 +1189,91 @@ export default function Header() {
         </div>
       </header>
 
+      {/* ✅ SUBHEADER WITH CATEGORIES - ONLY FOR DESKTOP - NO GAP VERSION */}
+      <div
+        className={`hidden md:block fixed top-[5rem] left-0 right-0 z-40 transition-all duration-500 ${getCategoriesBackground()}`}
+        style={{ top: '5.5rem' }} 
+      >
+        {/* Main Categories Bar - Desktop Only */}
+        <div className="w-[95%] sm:w-[90%] mx-auto">
+          <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-3"> {/* ✅ py-3 reduced */}
+            {loading ? (
+              <div className="text-sm text-gray-500">Loading categories...</div>
+            ) : transformedCategories.length > 0 ? (
+              transformedCategories.map((category, index) => (
+                <div
+                  key={category.name || index}
+                  className="relative group"
+                  onMouseEnter={() => setActiveCategory(category.name)}
+                  onMouseLeave={() => setActiveCategory(null)}
+                >
+                  {/* Category Link */}
+                  <Link
+                    href={category.href}
+                    className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${getCategoryTextColor()}`}
+                  >
+                    {category.name.toUpperCase()}
+                  </Link>
+
+                  {/* ✅ FIXED: FULL WIDTH DROPDOWN - PROPERLY POSITIONED */}
+                  {activeCategory === category.name && (
+                    <div 
+                      className="fixed left-0 right-0 bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
+                      style={{ top: '8.5rem' }} 
+                      onMouseEnter={() => setActiveCategory(category.name)}
+                      onMouseLeave={() => setActiveCategory(null)}
+                    >
+                      <div className="w-[95%] sm:w-[90%] mx-auto max-w-5xl">
+                        <div className="grid grid-cols-5 gap-6">
+                          {category.dropdown.sections.map((section, sectionIndex) => (
+                            <div key={sectionIndex} className="space-y-2">
+                              {/* Section Title - Compact */}
+                              <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-1">
+                                {section.title}
+                              </h3>
+                              
+                              {/* Section Items - Compact */}
+                              <ul className="space-y-1">
+                                {section.items.map((item, itemIndex) => (
+                                  <li key={itemIndex}>
+                                    <Link
+                                      href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
+                                      className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-0.5"
+                                    >
+                                      {item}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* View All Button - Compact */}
+                        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                          <Link
+                            href={category.href}
+                            className="inline-flex items-center text-gray-900 text-[13px] font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group"
+                          >
+                            View All {category.name} 
+                            <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500">No categories available</div>
+            )}
+          </nav>
+        </div>
+      </div>
+
+      {/* AUTH MODAL */}
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
