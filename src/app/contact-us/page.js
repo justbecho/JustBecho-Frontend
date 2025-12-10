@@ -4,12 +4,31 @@
 import { useState } from 'react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { FiMail, FiPhone, FiMapPin, FiMessageSquare, FiSend, FiCheckCircle, FiUser, FiMail as FiEmailIcon, FiBriefcase, FiGlobe } from 'react-icons/fi'
+import { 
+  FiMail, 
+  FiPhone, 
+  FiMapPin, 
+  FiMessageSquare, 
+  FiSend, 
+  FiCheckCircle, 
+  FiUser, 
+  FiBriefcase, 
+  FiGlobe,
+  FiClock,
+  FiChevronRight,
+  FiInstagram,
+  FiLinkedin,
+  FiTwitter,
+  FiPhoneCall,
+  FiMessageCircle
+} from 'react-icons/fi'
+import { AiOutlineWhatsApp } from 'react-icons/ai'
 
 export default function ContactUs() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: '',
     category: 'general'
@@ -18,31 +37,60 @@ export default function ContactUs() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
+  const [activeFAQ, setActiveFAQ] = useState(null)
 
   const contactInfo = [
     {
-      icon: <FiMail className="w-6 h-6" />,
+      icon: <FiMail className="w-7 h-7" />,
       title: "Customer Support",
       description: "For queries, complaints, or assistance with orders",
       email: "support@justbecho.com",
-      phone: "+91-XXXXXXXXXX",
-      color: "bg-blue-50 border-blue-200 text-blue-700"
+      phone: "+91 98765 43210",
+      responseTime: "Within 24 hours",
+      gradient: "from-blue-500 to-cyan-500",
+      bgColor: "bg-gradient-to-br from-blue-50 to-cyan-50",
+      borderColor: "border-blue-100"
     },
     {
-      icon: <FiBriefcase className="w-6 h-6" />,
-      title: "Business & Partnerships",
+      icon: <FiBriefcase className="w-7 h-7" />,
+      title: "Business Partnerships",
       description: "To connect or become a bulk seller with us",
       email: "connect@justbecho.com",
-      phone: "+91-XXXXXXXXXX",
-      color: "bg-green-50 border-green-200 text-green-700"
+      phone: "+91 98765 43211",
+      responseTime: "Within 48 hours",
+      gradient: "from-emerald-500 to-teal-500",
+      bgColor: "bg-gradient-to-br from-emerald-50 to-teal-50",
+      borderColor: "border-emerald-100"
     },
     {
-      icon: <FiGlobe className="w-6 h-6" />,
+      icon: <FiGlobe className="w-7 h-7" />,
       title: "General Inquiries",
       description: "For all other business-related communications",
       email: "info@justbecho.com",
-      phone: "+91-XXXXXXXXXX",
-      color: "bg-purple-50 border-purple-200 text-purple-700"
+      phone: "+91 98765 43212",
+      responseTime: "Within 24 hours",
+      gradient: "from-purple-500 to-indigo-500",
+      bgColor: "bg-gradient-to-br from-purple-50 to-indigo-50",
+      borderColor: "border-purple-100"
+    }
+  ]
+
+  const faqs = [
+    {
+      question: "How long does it take to get a response?",
+      answer: "We typically respond within 24 hours on business days. For urgent matters, please call our support number or use the WhatsApp button below."
+    },
+    {
+      question: "What information should I include in my message?",
+      answer: "Please include your order ID (if applicable), a clear description of your query, and any relevant screenshots or documents to help us assist you better."
+    },
+    {
+      question: "How do I become a bulk seller on Just Becho?",
+      answer: "Email us at connect@justbecho.com with your business details, product catalog, and expected volume. Our partnership team will contact you within 2 business days."
+    },
+    {
+      question: "What are your business hours?",
+      answer: "Our customer support is available Monday to Saturday from 9 AM to 8 PM. For urgent issues, we have 24/7 emergency support."
     }
   ]
 
@@ -52,7 +100,6 @@ export default function ContactUs() {
       ...prev,
       [name]: value
     }))
-    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -74,14 +121,20 @@ export default function ContactUs() {
       newErrors.email = 'Please enter a valid email'
     }
     
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required'
+    } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+      newErrors.phone = 'Please enter a valid 10-digit phone number'
+    }
+    
     if (!formData.subject.trim()) {
       newErrors.subject = 'Subject is required'
     }
     
     if (!formData.message.trim()) {
       newErrors.message = 'Message is required'
-    } else if (formData.message.length < 10) {
-      newErrors.message = 'Message should be at least 10 characters'
+    } else if (formData.message.length < 20) {
+      newErrors.message = 'Message should be at least 20 characters'
     }
     
     setErrors(newErrors)
@@ -101,8 +154,8 @@ export default function ContactUs() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500))
       
-      // In real implementation, you would call your backend API here
-      // const response = await fetch('/api/contact', {
+      // In production, call your API here
+      // await fetch('/api/contact', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(formData)
@@ -112,12 +165,12 @@ export default function ContactUs() {
       setFormData({
         name: '',
         email: '',
+        phone: '',
         subject: '',
         message: '',
         category: 'general'
       })
       
-      // Reset success message after 5 seconds
       setTimeout(() => {
         setIsSubmitted(false)
       }, 5000)
@@ -130,374 +183,511 @@ export default function ContactUs() {
     }
   }
 
-  const handleCopyEmail = (email) => {
-    navigator.clipboard.writeText(email)
-      .then(() => {
-        alert('Email copied to clipboard!')
-      })
-      .catch(err => {
-        console.error('Failed to copy:', err)
-      })
+  const toggleFAQ = (index) => {
+    setActiveFAQ(activeFAQ === index ? null : index)
   }
 
   return (
     <>
       <Header />
       
-      <main className="min-h-screen pt-24 pb-16 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Get in <span className="text-gold">Touch</span>
-            </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              We're here to help! Whether you have questions about our platform, need support, 
-              or want to explore partnership opportunities, reach out to us.
-            </p>
-          </div>
+      {/* Hero Section with Gradient Background */}
+      <div className="relative overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-cyan-50" />
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-r from-blue-200 to-transparent rounded-full filter blur-3xl opacity-30" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-l from-cyan-200 to-transparent rounded-full filter blur-3xl opacity-30" />
+        
+        <main className="relative min-h-screen pt-24 pb-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            {/* Hero Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 border border-blue-200 mb-6">
+                <span className="text-sm font-medium text-blue-700 uppercase tracking-wider">
+                  Contact Us
+                </span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Let's <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Connect</span>
+              </h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Get in touch with our team. We're here to help you with any questions, 
+                support needs, or partnership opportunities.
+              </p>
+            </div>
 
-          {/* Success Message */}
-          {isSubmitted && (
-            <div className="max-w-2xl mx-auto mb-8">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
-                <FiCheckCircle className="w-6 h-6 text-green-500 mr-3" />
-                <div>
-                  <p className="text-green-800 font-medium">Message Sent Successfully!</p>
-                  <p className="text-green-600 text-sm">We'll get back to you within 24 hours.</p>
+            {/* Success Message */}
+            {isSubmitted && (
+              <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 flex items-start shadow-lg">
+                  <FiCheckCircle className="w-7 h-7 text-green-500 mr-4 flex-shrink-0" />
+                  <div>
+                    <p className="text-green-800 font-semibold text-lg">Message Sent Successfully!</p>
+                    <p className="text-green-600 mt-1">Our team will get back to you within 24 hours. We've sent a confirmation email to {formData.email}.</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            {/* Contact Info Cards */}
-            {contactInfo.map((info, index) => (
-              <div 
-                key={index}
-                className={`border-2 rounded-xl p-6 ${info.color} transition-transform duration-300 hover:scale-[1.02]`}
-              >
-                <div className="flex items-center mb-4">
-                  <div className="p-3 rounded-lg bg-white shadow-sm mr-4">
-                    {info.icon}
+            {/* Contact Cards Grid */}
+            <div className="grid lg:grid-cols-3 gap-6 mb-16">
+              {contactInfo.map((info, index) => (
+                <div 
+                  key={index}
+                  className={`${info.bgColor} border ${info.borderColor} rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group relative overflow-hidden`}
+                >
+                  {/* Gradient Accent */}
+                  <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${info.gradient}`} />
+                  
+                  <div className="relative">
+                    {/* Icon with Gradient Background */}
+                    <div className={`inline-flex p-4 rounded-xl bg-gradient-to-r ${info.gradient} text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                      {info.icon}
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">{info.title}</h3>
+                    <p className="text-gray-600 mb-6 leading-relaxed">{info.description}</p>
+                    
+                    <div className="space-y-4">
+                      {/* Email */}
+                      <div className="flex items-start group/email cursor-pointer" 
+                           onClick={() => navigator.clipboard.writeText(info.email)}>
+                        <div className="p-2 bg-white rounded-lg shadow-sm mr-4">
+                          <FiMail className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-500 mb-1">Email</p>
+                          <p className="text-gray-900 font-semibold group-hover/email:text-blue-600 transition-colors">
+                            {info.email}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Phone */}
+                      <div className="flex items-start">
+                        <div className="p-2 bg-white rounded-lg shadow-sm mr-4">
+                          <FiPhone className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-500 mb-1">Phone</p>
+                          <p className="text-gray-900 font-semibold">{info.phone}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Response Time */}
+                      <div className="flex items-start">
+                        <div className="p-2 bg-white rounded-lg shadow-sm mr-4">
+                          <FiClock className="w-5 h-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-500 mb-1">Response Time</p>
+                          <p className="text-gray-900 font-semibold">{info.responseTime}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold">{info.title}</h3>
-                    <p className="text-sm opacity-75">{info.description}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid lg:grid-cols-2 gap-12">
+              {/* Contact Form */}
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div className="p-8 border-b border-gray-100">
+                  <div className="flex items-center">
+                    <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white mr-4">
+                      <FiMessageSquare className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Send a Message</h2>
+                      <p className="text-gray-600 mt-1">Fill out the form below and we'll get back to you soon</p>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <div className="flex items-center group cursor-pointer" onClick={() => handleCopyEmail(info.email)}>
-                    <FiEmailIcon className="w-5 h-5 mr-3" />
-                    <div>
-                      <p className="text-sm opacity-75">Email</p>
-                      <p className="font-medium group-hover:text-blue-600 transition-colors">{info.email}</p>
+                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Name Field */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        <span className="flex items-center">
+                          <FiUser className="w-4 h-4 mr-2" />
+                          Full Name *
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 ${
+                          errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
+                        }`}
+                        placeholder="John Doe"
+                      />
+                      {errors.name && (
+                        <p className="text-sm text-red-600 animate-shake">{errors.name}</p>
+                      )}
+                    </div>
+                    
+                    {/* Email Field */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        <span className="flex items-center">
+                          <FiMail className="w-4 h-4 mr-2" />
+                          Email Address *
+                        </span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 ${
+                          errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
+                        }`}
+                        placeholder="john@example.com"
+                      />
+                      {errors.email && (
+                        <p className="text-sm text-red-600 animate-shake">{errors.email}</p>
+                      )}
                     </div>
                   </div>
                   
-                  <div className="flex items-center">
-                    <FiPhone className="w-5 h-5 mr-3" />
-                    <div>
-                      <p className="text-sm opacity-75">Phone</p>
-                      <p className="font-medium">{info.phone}</p>
+                  {/* Phone Field */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      <span className="flex items-center">
+                        <FiPhone className="w-4 h-4 mr-2" />
+                        Phone Number *
+                      </span>
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 ${
+                        errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
+                      }`}
+                      placeholder="+91 98765 43210"
+                    />
+                    {errors.phone && (
+                      <p className="text-sm text-red-600 animate-shake">{errors.phone}</p>
+                    )}
+                  </div>
+                  
+                  {/* Category Field */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Category *
+                    </label>
+                    <div className="relative">
+                      <select
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 appearance-none hover:border-blue-400 bg-white"
+                      >
+                        <option value="general">General Inquiry</option>
+                        <option value="support">Customer Support</option>
+                        <option value="seller">Seller Inquiry</option>
+                        <option value="business">Business Partnership</option>
+                        <option value="technical">Technical Issue</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <FiChevronRight className="absolute right-4 top-1/2 transform -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="flex items-center mb-6">
-                <div className="p-2 rounded-lg bg-blue-100 mr-4">
-                  <FiMessageSquare className="w-6 h-6 text-blue-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">Send us a Message</h2>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiUser className="inline w-4 h-4 mr-1" />
-                      Your Name *
+                  
+                  {/* Subject Field */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Subject *
                     </label>
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
+                      name="subject"
+                      value={formData.subject}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
-                        errors.name ? 'border-red-300' : 'border-gray-300'
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 ${
+                        errors.subject ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
                       }`}
-                      placeholder="Enter your full name"
+                      placeholder="What is this regarding?"
                     />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                    {errors.subject && (
+                      <p className="text-sm text-red-600 animate-shake">{errors.subject}</p>
                     )}
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiEmailIcon className="inline w-4 h-4 mr-1" />
-                      Email Address *
+                  {/* Message Field */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Message *
                     </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
+                    <textarea
+                      name="message"
+                      value={formData.message}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
-                        errors.email ? 'border-red-300' : 'border-gray-300'
+                      rows={6}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 resize-none ${
+                        errors.message ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
                       }`}
-                      placeholder="Enter your email"
+                      placeholder="Please describe your query in detail..."
                     />
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                    {errors.message && (
+                      <p className="text-sm text-red-600 animate-shake">{errors.message}</p>
                     )}
                   </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category *
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full py-4 px-6 rounded-xl font-semibold text-white flex items-center justify-center transition-all duration-300 transform hover:scale-[1.02] ${
+                      isSubmitting 
+                        ? 'bg-gradient-to-r from-blue-400 to-cyan-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 hover:shadow-xl active:scale-[0.98]'
+                    }`}
                   >
-                    <option value="general">General Inquiry</option>
-                    <option value="support">Customer Support</option>
-                    <option value="seller">Seller Inquiry</option>
-                    <option value="business">Business Partnership</option>
-                    <option value="technical">Technical Issue</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject *
-                  </label>
-                  <input
-                    type="text"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
-                      errors.subject ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="What is this regarding?"
-                  />
-                  {errors.subject && (
-                    <p className="mt-1 text-sm text-red-600">{errors.subject}</p>
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
+                        Sending Message...
+                      </>
+                    ) : (
+                      <>
+                        <FiSend className="w-5 h-5 mr-3" />
+                        Send Message
+                      </>
+                    )}
+                  </button>
+                  
+                  {errors.submit && (
+                    <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl">
+                      <p className="text-red-600 text-center">{errors.submit}</p>
+                    </div>
                   )}
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Message *
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={5}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none ${
-                      errors.message ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="Please describe your query in detail..."
-                  />
-                  {errors.message && (
-                    <p className="mt-1 text-sm text-red-600">{errors.message}</p>
-                  )}
-                </div>
-                
-                {errors.submit && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-600">{errors.submit}</p>
-                  </div>
-                )}
-                
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full py-3 px-6 rounded-lg font-semibold text-white flex items-center justify-center transition-all duration-300 ${
-                    isSubmitting 
-                      ? 'bg-blue-400 cursor-not-allowed' 
-                      : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg'
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <FiSend className="w-5 h-5 mr-2" />
-                      Send Message
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
+                </form>
+              </div>
 
-            {/* Additional Information */}
-            <div className="space-y-8">
-              {/* Office Address */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center mb-6">
-                  <div className="p-2 rounded-lg bg-green-100 mr-4">
-                    <FiMapPin className="w-6 h-6 text-green-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Our Office</h2>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <FiMapPin className="w-5 h-5 text-gray-400 mt-1 mr-3" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Registered Office</h3>
-                      <p className="text-gray-600">
-                        123 Business District, Sector 45<br />
-                        Gurugram, Haryana - 122001<br />
-                        India
-                      </p>
+              {/* Right Column */}
+              <div className="space-y-8">
+                {/* Office Info */}
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                  <div className="p-8 border-b border-gray-100">
+                    <div className="flex items-center">
+                      <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white mr-4">
+                        <FiMapPin className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Our Office</h2>
+                        <p className="text-gray-600 mt-1">Visit us or send mail</p>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="border-t pt-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">Business Hours</h3>
-                    <div className="space-y-2 text-gray-600">
-                      <div className="flex justify-between">
-                        <span>Monday - Friday</span>
-                        <span className="font-medium">9:00 AM - 6:00 PM</span>
+                  <div className="p-8">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Registered Office</h3>
+                        <div className="flex items-start">
+                          <FiMapPin className="w-5 h-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                          <div>
+                            <p className="text-gray-700 leading-relaxed">
+                              123 Business District, Sector 45<br />
+                              Gurugram, Haryana - 122001<br />
+                              India
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Saturday</span>
-                        <span className="font-medium">10:00 AM - 4:00 PM</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Sunday</span>
-                        <span className="font-medium">Closed</span>
+                      
+                      <div className="border-t border-gray-100 pt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Business Hours</h3>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span className="text-gray-700">Monday - Friday</span>
+                            <span className="font-semibold text-gray-900">9:00 AM - 6:00 PM</span>
+                          </div>
+                          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span className="text-gray-700">Saturday</span>
+                            <span className="font-semibold text-gray-900">10:00 AM - 4:00 PM</span>
+                          </div>
+                          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span className="text-gray-700">Sunday</span>
+                            <span className="font-semibold text-gray-900 text-red-500">Closed</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* FAQ Section */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-                
-                <div className="space-y-4">
-                  <details className="group border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
-                      <span>How long does it take to get a response?</span>
-                      <span className="transition group-open:rotate-180">▼</span>
-                    </summary>
-                    <p className="mt-3 text-gray-600">
-                      We typically respond within 24 hours on business days. For urgent matters, please call our support number.
-                    </p>
-                  </details>
+                {/* Quick Support */}
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border border-blue-100 p-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Support</h2>
                   
-                  <details className="group border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
-                      <span>What information should I include in my message?</span>
-                      <span className="transition group-open:rotate-180">▼</span>
-                    </summary>
-                    <p className="mt-3 text-gray-600">
-                      Please include your order ID (if applicable), a clear description of your query, and any relevant screenshots or documents.
-                    </p>
-                  </details>
-                  
-                  <details className="group border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
-                      <span>How do I become a bulk seller on Just Becho?</span>
-                      <span className="transition group-open:rotate-180">▼</span>
-                    </summary>
-                    <p className="mt-3 text-gray-600">
-                      Email us at connect@justbecho.com with your business details, product catalog, and expected volume. Our partnership team will contact you within 2 business days.
-                    </p>
-                  </details>
-                </div>
-              </div>
-
-              {/* Social Media Links */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Connect With Us</h2>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[
-                    { name: 'Facebook', icon: '📘', color: 'bg-blue-100 hover:bg-blue-200' },
-                    { name: 'Instagram', icon: '📷', color: 'bg-pink-100 hover:bg-pink-200' },
-                    { name: 'Twitter', icon: '🐦', color: 'bg-sky-100 hover:bg-sky-200' },
-                    { name: 'LinkedIn', icon: '💼', color: 'bg-blue-100 hover:bg-blue-200' }
-                  ].map((social, index) => (
-                    <a
-                      key={index}
-                      href="#"
-                      className={`${social.color} border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-md hover:-translate-y-1`}
+                  <div className="grid grid-cols-2 gap-4">
+                    <a 
+                      href="https://wa.me/919876543210"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white rounded-xl p-6 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-gray-200 group"
                     >
-                      <span className="text-2xl mb-2">{social.icon}</span>
-                      <span className="text-sm font-medium text-gray-700">{social.name}</span>
+                      <div className="p-3 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 mb-4 group-hover:scale-110 transition-transform">
+                        <AiOutlineWhatsApp className="w-8 h-8 text-green-600" />
+                      </div>
+                      <span className="font-semibold text-gray-900">WhatsApp</span>
+                      <span className="text-sm text-gray-500 mt-1">Instant Chat</span>
                     </a>
-                  ))}
+                    
+                    <a 
+                      href="tel:+919876543210"
+                      className="bg-white rounded-xl p-6 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-gray-200 group"
+                    >
+                      <div className="p-3 rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 mb-4 group-hover:scale-110 transition-transform">
+                        <FiPhoneCall className="w-8 h-8 text-blue-600" />
+                      </div>
+                      <span className="font-semibold text-gray-900">Call Now</span>
+                      <span className="text-sm text-gray-500 mt-1">24/7 Support</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* FAQ Section */}
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                  <div className="p-8 border-b border-gray-100">
+                    <h2 className="text-2xl font-bold text-gray-900">Frequently Asked Questions</h2>
+                  </div>
+                  
+                  <div className="divide-y divide-gray-100">
+                    {faqs.map((faq, index) => (
+                      <div 
+                        key={index}
+                        className={`p-6 transition-all duration-300 cursor-pointer hover:bg-gray-50 ${
+                          activeFAQ === index ? 'bg-blue-50' : ''
+                        }`}
+                        onClick={() => toggleFAQ(index)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-gray-900 pr-8">{faq.question}</h3>
+                          <FiChevronRight className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
+                            activeFAQ === index ? 'transform rotate-90' : ''
+                          }`} />
+                        </div>
+                        <div className={`mt-3 overflow-hidden transition-all duration-300 ${
+                          activeFAQ === index ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+                        }`}>
+                          <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Social Media */}
+                <div className="bg-gradient-to-r from-gray-900 to-black rounded-2xl p-8">
+                  <h2 className="text-2xl font-bold text-white mb-6">Connect With Us</h2>
+                  
+                  <div className="flex space-x-4">
+                    {[
+                      { icon: <FiInstagram className="w-6 h-6" />, color: 'from-pink-500 to-rose-500', label: 'Instagram' },
+                      { icon: <FiTwitter className="w-6 h-6" />, color: 'from-sky-500 to-blue-500', label: 'Twitter' },
+                      { icon: <FiLinkedin className="w-6 h-6" />, color: 'from-blue-600 to-blue-700', label: 'LinkedIn' },
+                    ].map((social, index) => (
+                      <a
+                        key={index}
+                        href="#"
+                        className={`flex-1 bg-gradient-to-r ${social.color} text-white rounded-xl p-4 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:opacity-90`}
+                      >
+                        {social.icon}
+                        <span className="text-sm font-medium mt-2">{social.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Emergency Banner */}
+            <div className="mt-16 bg-gradient-to-r from-red-50 via-orange-50 to-amber-50 rounded-2xl border border-red-200 p-8 md:p-10">
+              <div className="flex flex-col md:flex-row items-center justify-between">
+                <div className="flex-1 mb-6 md:mb-0 md:mr-8">
+                  <div className="flex items-center mb-4">
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-red-500 to-orange-500 text-white mr-4">
+                      <FiMessageCircle className="w-6 h-6" />
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                      Urgent Support Needed?
+                    </h2>
+                  </div>
+                  <p className="text-gray-600 text-lg max-w-2xl">
+                    For immediate assistance with critical issues, use our emergency contact channels.
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a 
+                    href="tel:+911122334455" 
+                    className="bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold py-3 px-8 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-[1.02] flex items-center justify-center"
+                  >
+                    <FiPhone className="w-5 h-5 mr-3" />
+                    Emergency Call
+                  </a>
+                  <a 
+                    href="mailto:emergency@justbecho.com" 
+                    className="bg-white text-gray-900 border-2 border-red-200 font-semibold py-3 px-8 rounded-xl hover:bg-red-50 transition-all duration-300 flex items-center justify-center"
+                  >
+                    <FiMail className="w-5 h-5 mr-3" />
+                    Emergency Email
+                  </a>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Call to Action */}
-          <div className="mt-16 text-center">
-            <div className="bg-gradient-to-r from-gold to-yellow-500 rounded-2xl p-8 md:p-12 max-w-4xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Need Immediate Assistance?
-              </h2>
-              <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-                Call our dedicated support team for urgent queries. We're available 24/7 for critical issues.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a 
-                  href="tel:+911234567890" 
-                  className="bg-white text-gray-900 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors flex items-center"
-                >
-                  <FiPhone className="w-5 h-5 mr-2" />
-                  Call Now: +91-123-456-7890
-                </a>
-                <a 
-                  href="mailto:emergency@justbecho.com" 
-                  className="bg-transparent border-2 border-white text-white font-semibold py-3 px-8 rounded-lg hover:bg-white/10 transition-colors flex items-center"
-                >
-                  <FiMail className="w-5 h-5 mr-2" />
-                  Emergency Email
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       <Footer />
-      
-      {/* Add this CSS in your global.css or in a style tag */}
+
+      {/* WhatsApp Floating Button */}
+      <a
+        href="https://wa.me/919876543210"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 z-40 group"
+      >
+        <AiOutlineWhatsApp className="w-7 h-7" />
+        <span className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm font-medium px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          Chat on WhatsApp
+        </span>
+      </a>
+
+      {/* Add to global.css or tailwind.config.js */}
       <style jsx>{`
-        .text-gold {
-          color: #D4AF37;
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         
-        details summary::-webkit-details-marker {
-          display: none;
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
         
-        details[open] summary {
-          margin-bottom: 0.5rem;
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+        
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
         }
       `}</style>
     </>
