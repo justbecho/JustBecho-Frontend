@@ -240,7 +240,7 @@ function HomeContent() {
       href: "/categories/mens-fashion"
     },
     {
-      image: "/banners/Women_s Fashion.png",
+      image: "/banners/bagu.jpeg",
       title: "Women's Fashion",
       description: "Explore luxury women's collections",
       href: "/categories/womens-fashion"
@@ -295,7 +295,7 @@ function HomeContent() {
     {
       title: "DESIGNER HANDBAGS",
       description: "Carry timeless elegance",
-      image: "/banners/Fashion Accessories.png",
+      image: "/banners/HERMES MINI KELLY.jpg",
       href: "/categories/bags"
     },
     {
