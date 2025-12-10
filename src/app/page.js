@@ -184,7 +184,7 @@ function HomeContent() {
     "Accessories": "/banners/Fashion Accessories.png",
     "Watches": "/banners/Watches.png", 
     "Perfumes": "/banners/perfumes.png",
-    "TOYS & COLLECTIBLES": "/banners/toys and Figurines.png",
+    "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
     "KIDS": "/banners/Kids Fashion.png",
     "default": "/banners/default.jpg"
   }), [])
@@ -244,19 +244,19 @@ function HomeContent() {
     {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
-      image: "/collections/watches.jpg",
+      image: "/banners/Watches.png",
       href: "/collections/watches"
     },
     {
       title: "DESIGNER HANDBAGS",
       description: "Carry timeless elegance",
-      image: "/collections/bags.jpg",
+      image: "/banners/Fashion Accessories.png",
       href: "/collections/bags"
     },
     {
-      title: "SMART TECHNOLOGY",
+      title: "Popular Footwear",
       description: "Innovation meets luxury",
-      image: "/collections/electronics.jpg",
+      image: "/banners/Footwear.png",
       href: "/collections/electronics"
     }
   ], [])
