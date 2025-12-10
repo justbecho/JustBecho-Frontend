@@ -613,7 +613,114 @@ export default function Header() {
       >
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4 sm:py-5">
-            {/* ✅ LEFT: Burger Menu - MOBILE ONLY (LEFT SIDE) */}
+            
+            {/* ✅ LEFT SECTION: DESKTOP Search + Sell Now */}
+            <div className="hidden md:flex items-center space-x-4 flex-1">
+              
+              {/* DESKTOP SEARCH BAR - TOP LEFT */}
+              <div className="relative w-64 xl:w-80 search-container">
+                <form onSubmit={handleSearchSubmit}>
+                  <input
+                    type="text"
+                    placeholder="Search for products..."
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+                    className={`border border-gray-300/50 rounded-full px-6 py-3 text-sm outline-none w-full font-light tracking-wide ${
+                      isDashboardPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
+                      isProductPage || isSellNowPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
+                      isCartPage ? 'text-gray-800 placeholder-gray-500 bg-white' : // ✅ Cart page pe white
+                      isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                      isDashboardPage ? 'text-gray-600' :
+                      isProductPage || isSellNowPage ? 'text-gray-600' :
+                      isCartPage ? 'text-gray-600' : // ✅ Cart page pe gray
+                      isScrolled ? 'text-gray-600' : 'text-white'
+                    }`}
+                  >
+                    <FiSearch className="w-4 h-4" />
+                  </button>
+                </form>
+                
+                {/* DESKTOP SEARCH RESULTS */}
+                {showSearchResults && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
+                    {searchLoading ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                        <p className="mt-2 text-sm">Searching...</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="py-2">
+                        {searchResults.map((product) => (
+                          <Link
+                            key={product._id}
+                            href={`/products/${product._id}`}
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => setShowSearchResults(false)}
+                          >
+                            {product.images?.[0]?.url ? (
+                              <img
+                                src={product.images[0].url}
+                                alt={product.productName}
+                                className="w-10 h-10 object-cover rounded mr-3"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                                <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {product.productName}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                ₹{product.finalPrice?.toLocaleString() || '0'}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                        <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
+                          <button
+                            onClick={() => {
+                              setShowSearchResults(false);
+                              router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                            }}
+                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
+                          >
+                            View all results
+                          </button>
+                        </div>
+                      </div>
+                    ) : searchQuery.trim() && (
+                      <div className="p-4 text-center text-gray-500">
+                        <p className="text-sm">No products found</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              {/* DESKTOP SELL NOW BUTTON - Search bar ke baad */}
+              <button
+                onClick={handleSellNowClick}
+                className={`hidden md:inline-flex items-center justify-center px-6 py-3 rounded-full font-medium text-sm tracking-wide transition-all duration-300 hover:scale-105 ${
+                  isDashboardPage ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:shadow-lg' :
+                  isProductPage || isSellNowPage ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:shadow-lg' :
+                  isCartPage ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:shadow-lg' : // ✅ Cart page pe same
+                  isScrolled ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:shadow-lg' : 
+                  'bg-gradient-to-r from-white/10 to-white/5 text-white backdrop-blur-sm hover:bg-white/20 border border-white/30'
+                }`}
+              >
+                SELL NOW
+              </button>
+            </div>
+
+            {/* ✅ MOBILE Burger Menu - LEFT SIDE (MOBILE ONLY) */}
             <div className="md:hidden flex items-center">
               <button
                 className={`focus:outline-none p-1 relative ${
@@ -643,7 +750,7 @@ export default function Header() {
               </button>
             </div>
 
-            {/* ✅ CENTER: Logo - Perfect Center with Margin */}
+            {/* ✅ CENTER: Logo - Perfect Center */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center justify-center">
                 <Image
@@ -662,9 +769,9 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* ✅ RIGHT: Desktop Icons and Mobile Cart */}
+            {/* ✅ RIGHT SECTION: Desktop Icons + Mobile Cart */}
             <div className="flex items-center space-x-4 sm:space-x-5 flex-1 justify-end">
-              {/* Desktop Options */}
+              {/* Desktop Icons */}
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
                 {/* Profile Icon with Dropdown */}
                 <div className="relative">
@@ -802,7 +909,7 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ✅ FUNCTIONAL Mobile Search Bar */}
+          {/* ✅ MOBILE SEARCH BAR (Mobile pe neeche) */}
           <div className="md:hidden border-t border-gray-200/50 mt-2 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
