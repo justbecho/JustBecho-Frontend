@@ -221,7 +221,7 @@ function HomeContent() {
   // ✅ Category images mapping for carousel
   const categoryImages = useMemo(() => ({
     "Men's Fashion": "/banners/Men_s Fashion.png",
-    "Women's Fashion": "/banners/Women_s Fashion.png", 
+    "Women's Fashion": "/banners/bagu.jpeg", 
     "Footwear": "/banners/DIOR LOAFERS.png",
     "Accessories": "/banners/Fashion Accessories.png",
     "Watches": "/banners/rolex.jpg", 
