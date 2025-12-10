@@ -92,7 +92,7 @@ function HomeContent() {
   // ✅ UPDATED: Brand logos - sabka size same rakhein
   const categoryBrands = useMemo(() => ({
     "Men's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png" },
       { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png" },
       { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png" },
       { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png" },
@@ -102,7 +102,7 @@ function HomeContent() {
       { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png" }
     ],
     "Women's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/balenciaga.png" },
+      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png" },
       { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png" },
       { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png" },
       { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
@@ -111,108 +111,108 @@ function HomeContent() {
       { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png" }
     ],
     "Footwear": [
-      { name: "Acne Studios", logo: "/brandslogo/footwear/Acne-Studios.jpg", fallback: "/brands/balenciaga.png" },
+      { name: "Acne Studios", logo: "/brandslogo/footwear/Acne-Studios.jpg", fallback: "/brands/Balenciaga.png" },
       { name: "Adidas", logo: "/brandslogo/footwear/Adidas.png", fallback: "/brands/jimmy-choo.png" },
       { name: "Air Jordan", logo: "/brandslogo/footwear/Air-Jordan.png", fallback: "/brands/prada.png" },
       { name: "ALAIA", logo: "/brandslogo/footwear/ALAIA.jpg", fallback: "/brands/puma.png" },
       { name: "Alexander McQueen", logo: "/brandslogo/footwear/Alexander-McQueen.jpg", fallback: "/brands/gucci.png" },
       { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png" },
       { name: "Alo Yoga", logo: "/brandslogo/footwear/Alo-Yoga.png", fallback: "/brands/reebok.png" },
-      { name: "Altra Running", logo: "/brandslogo/footwear/Altra Running.png", fallback: "/brands/balenciaga.png" },
+      { name: "Altra Running", logo: "/brandslogo/footwear/Altra Running.png", fallback: "/brands/Balenciaga.png" },
       { name: "Amiri", logo: "/brandslogo/footwear/Amiri.jpg", fallback: "/brands/jimmy-choo.png" },
       { name: "ANTA", logo: "/brandslogo/footwear/ANTA.jpg", fallback: "/brands/prada.png" },
       { name: "Armani", logo: "/brandslogo/footwear/Armani.png", fallback: "/brands/puma.png" },
       { name: "Balenciaga", logo: "/brandslogo/footwear/Balenciaga.jpg", fallback: "/brands/gucci.png" },
       { name: "BALLY", logo: "/brandslogo/footwear/BALLY.png", fallback: "/brands/reebok.png" },
-      { name: "BALMAIN", logo: "/brandslogo/footwear/BALMAIN.png", fallback: "/brands/balenciaga.png" },
+      { name: "BALMAIN", logo: "/brandslogo/footwear/BALMAIN.png", fallback: "/brands/Balenciaga.png" },
       { name: "BAPE", logo: "/brandslogo/footwear/BAPE.jpg", fallback: "/brands/jimmy-choo.png" },
       { name: "Burberry", logo: "/brandslogo/footwear/Burberry.jpg", fallback: "/brands/prada.png" },
       { name: "Calvin Klein", logo: "/brandslogo/footwear/Calvin Klein.png", fallback: "/brands/puma.png" },
       { name: "Chloe", logo: "/brandslogo/footwear/Chloe.png", fallback: "/brands/gucci.png" },
       { name: "Coach", logo: "/brandslogo/footwear/Coach.jpg", fallback: "/brands/reebok.png" },
-      { name: "Converse", logo: "/brandslogo/footwear/Converse.jpg", fallback: "/brands/balenciaga.png" },
+      { name: "Converse", logo: "/brandslogo/footwear/Converse.png", fallback: "/brands/Balenciaga.png" },
       { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png" },
       { name: "Dior", logo: "/brandslogo/footwear/Dior.png", fallback: "/brands/prada.png" },
       { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png" },
       
       { name: "On", logo: "/brandslogo/footwear/On.jpg", fallback: "/brands/reebok.png" },
-      { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/balenciaga.png" }
+      { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/Balenciaga.png" }
     ],
     "Accessories": [
-      { name: "Alexander McQueen", logo: "/brandslogo/Accessories/Alexander McQueen.jpg", fallback: "/brands/woodland.png" },
+      { name: "Alexander McQueen", logo: "/brandslogo/Accessories/Alenxander McQueen.jpg", fallback: "/brands/Alexander McQueen.jpg" },
       { name: "Apm Monaco", logo: "/brandslogo/Accessories/Apm Monaco.png", fallback: "/brands/baggit.png" },
       { name: "Balenciaga", logo: "/brandslogo/Accessories/Balenciaga.jpg", fallback: "/brands/ray-ban.png" },
       { name: "Buccellati", logo: "/brandslogo/Accessories/Buccellati.png", fallback: "/brands/wildhorn.jpg" },
       { name: "Cartier", logo: "/brandslogo/Accessories/Cartier.jpg", fallback: "/brands/nike.png" },
-      { name: "Chaumet", logo: "/brandslogo/Accessories/Chaumet.png", fallback: "/brands/woodland.png" },
+      { name: "Chaumet", logo: "/brandslogo/Accessories/Chaumet.png", fallback: "/brands/Chaumet.png" },
       { name: "Chloe", logo: "/brandslogo/Accessories/Chloe.png", fallback: "/brands/baggit.png" },
       { name: "Dior", logo: "/brandslogo/Accessories/Dior.png", fallback: "/brands/ray-ban.png" },
       { name: "Fendi", logo: "/brandslogo/Accessories/Fendi.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "FRED", logo: "/brandslogo/Accessories/FRED.png", fallback: "/brands/woodland.png" },
+      { name: "FRED", logo: "/brandslogo/Accessories/FRED.png", fallback: "/brands/FRED.png" },
       { name: "Gucci", logo: "/brandslogo/Accessories/Gucci.png", fallback: "/brands/baggit.png" },
       { name: "Harry Winston", logo: "/brandslogo/Accessories/Harry Winston.jpg", fallback: "/brands/ray-ban.png" },
       { name: "MCM", logo: "/brandslogo/Accessories/MCM.png", fallback: "/brands/wildhorn.jpg" },
       { name: "Messika", logo: "/brandslogo/Accessories/Messika.png", fallback: "/brands/nike.png" },
-      { name: "Miu Miu", logo: "/brandslogo/Accessories/Miu Miu.png", fallback: "/brands/woodland.png" },
+      { name: "Miu Miu", logo: "/brandslogo/Accessories/Miu Miu.png", fallback: "/brands/Miu Miu.png" },
       { name: "Prada", logo: "/brandslogo/Accessories/Prada.jpg", fallback: "/brands/baggit.png" },
       { name: "Qeelin", logo: "/brandslogo/Accessories/Qeelin.png", fallback: "/brands/ray-ban.png" },
       { name: "Swaroski", logo: "/brandslogo/Accessories/Swaroski.png", fallback: "/brands/wildhorn.jpg" }
     ],
     "Watches": [
-      { name: "Armani", logo: "/brandslogo/watches/Armani.png", fallback: "/brands/woodland.png" },
+      { name: "Armani", logo: "/brandslogo/watches/Armani.png", fallback: "/brands/Armani.png" },
       { name: "AUDEMARS PIGUET", logo: "/brandslogo/watches/AUDEMARS PIGUET.png", fallback: "/brands/baggit.png" },
       { name: "BLANCPAIN", logo: "/brandslogo/watches/BLANCPAIN.png", fallback: "/brands/ray-ban.png" },
       { name: "BREGUET", logo: "/brandslogo/watches/BREGUET.png", fallback: "/brands/wildhorn.jpg" },
       { name: "Hamilton", logo: "/brandslogo/watches/Hamilton.jpg", fallback: "/brands/nike.png" },
-      { name: "Chanel", logo: "/brandslogo/watches/Chanel.png", fallback: "/brands/woodland.png" },
+      { name: "Chanel", logo: "/brandslogo/watches/Chanel.png", fallback: "/brands/Chanel.png" },
       { name: "CORUM", logo: "/brandslogo/watches/CORUM.jpg", fallback: "/brands/baggit.png" },
       { name: "Dior", logo: "/brandslogo/watches/Dior.png", fallback: "/brands/ray-ban.png" },
       { name: "Fendi", logo: "/brandslogo/watches/Fendi.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Franck Muller", logo: "/brandslogo/watches/Franck Muller.jpg", fallback: "/brands/woodland.png" },
+      { name: "Franck Muller", logo: "/brandslogo/watches/Franck Muller.jpg", fallback: "/brands/Franck Muller.jpg" },
       { name: "Gucci", logo: "/brandslogo/watches/Gucci.png", fallback: "/brands/baggit.png" },
       { name: "Hermes", logo: "/brandslogo/watches/Hermes.jpg", fallback: "/brands/ray-ban.png" },
       { name: "HUBLOT", logo: "/brandslogo/watches/HUBLOT.png", fallback: "/brands/wildhorn.jpg" },
       { name: "LONGINES", logo: "/brandslogo/watches/LONGINES.jpg", fallback: "/brands/nike.png" },
-      { name: "OMEGA", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/woodland.png" },
+      { name: "OMEGA", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/OMEGA.png" },
       { name: "CHOPARD", logo: "/brandslogo/watches/CHOPARD.png", fallback: "/brands/baggit.png" }
     ],
     "TOYS & COLLECTIBLES": [
-      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/woodland.png" },
+      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },
       { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
       { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
       { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg" },
       { name: "POP MART", logo: "/brandslogo/toys/POP MART.jpg", fallback: "/brands/nike.png" },
-      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/woodland.png" },
+      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/Sport Cards.jpg" },
       { name: "Takashi Murakami", logo: "/brandslogo/toys/Takashi Murakami.png", fallback: "/brands/baggit.png" },
       { name: "WWF", logo: "/brandslogo/toys/WWF.png", fallback: "/brands/ray-ban.png" }
     ],
     "PERFUMES": [
-      { name: "3CE", logo: "/brandslogo/perfumes/3CE.jpg", fallback: "/brands/woodland.png" },
+      { name: "3CE", logo: "/brandslogo/perfumes/3CE.jpg", fallback: "/brands/3CE.jpg" },
       { name: "Anessa", logo: "/brandslogo/perfumes/Anessa.jpg", fallback: "/brands/baggit.png" },
       { name: "Anna Sui", logo: "/brandslogo/perfumes/Anna Sui.png", fallback: "/brands/ray-ban.png" },
       { name: "Armani", logo: "/brandslogo/perfumes/Armani.png", fallback: "/brands/wildhorn.jpg" },
       { name: "Bobbi Brown", logo: "/brandslogo/perfumes/Bobbi Brown.png", fallback: "/brands/nike.png" },
-      { name: "Bottega Veneta", logo: "/brandslogo/perfumes/Bottega Veneta.png", fallback: "/brands/woodland.png" },
+      { name: "Bottega Veneta", logo: "/brandslogo/perfumes/Bottega Veneta.png", fallback: "/brands/Bottega Veneta.png" },
       { name: "Burberry", logo: "/brandslogo/perfumes/Burberry.jpg", fallback: "/brands/baggit.png" },
       { name: "Bvlgari", logo: "/brandslogo/perfumes/Bvlgari.png", fallback: "/brands/ray-ban.png" },
       { name: "Chanel", logo: "/brandslogo/perfumes/Chanel.png", fallback: "/brands/baggit.png" },
       { name: "Clarins", logo: "/brandslogo/perfumes/Clarins.png", fallback: "/brands/ray-ban.png" },
       { name: "Cle de Peau", logo: "/brandslogo/perfumes/Cle de Peau.png", fallback: "/brands/wildhorn.jpg" },
       { name: "Clinique", logo: "/brandslogo/perfumes/Clinique.png", fallback: "/brands/nike.png" },
-      { name: "Cosmo Decorte", logo: "/brandslogo/perfumes/Cosmo Decorte.png", fallback: "/brands/woodland.png" },
+      { name: "Cosmo Decorte", logo: "/brandslogo/perfumes/Cosmo Decorte.png", fallback: "/brands/Cosmo Decorte.png" },
       { name: "Curel", logo: "/brandslogo/perfumes/Curel.png", fallback: "/brands/baggit.png" },
       { name: "Davidoff", logo: "/brandslogo/perfumes/Davidoff.png", fallback: "/brands/ray-ban.png" },
-      { name: "FANCL", logo: "/brandslogo/perfumes/FANCL.png", fallback: "/brands/woodland.png" },
+      { name: "FANCL", logo: "/brandslogo/perfumes/FANCL.png", fallback: "/brands/FANCL.png" },
       { name: "Filorga", logo: "/brandslogo/perfumes/Filorga.png", fallback: "/brands/baggit.png" },
       { name: "Guerlain", logo: "/brandslogo/perfumes/Guerlain.png", fallback: "/brands/ray-ban.png" }
     ],
     "KIDS": [
-      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/woodland.png" },
+      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },
       { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
       { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
       { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg" },
       { name: "POP MART", logo: "/brandslogo/toys/POP MART.jpg", fallback: "/brands/nike.png" },
-      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/woodland.png" },
+      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/Sport Cards.jpg" },
       { name: "Takashi Murakami", logo: "/brandslogo/toys/Takashi Murakami.png", fallback: "/brands/baggit.png" },
       { name: "WWF", logo: "/brandslogo/toys/WWF.png", fallback: "/brands/ray-ban.png" }
     ],
@@ -290,19 +290,19 @@ function HomeContent() {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
       image: "/banners/Watches.png",
-      href: "/collections/watches"
+      href: "/categories/watches"
     },
     {
       title: "DESIGNER HANDBAGS",
       description: "Carry timeless elegance",
       image: "/banners/Fashion Accessories.png",
-      href: "/collections/bags"
+      href: "/categories/bags"
     },
     {
       title: "POPULAR FOOTWEAR",
       description: "Innovation meets luxury",
       image: "/banners/Footwear.png",
-      href: "/collections/footwear"
+      href: "/categories/footwear"
     }
   ], [])
 
