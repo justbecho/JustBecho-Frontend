@@ -1,4 +1,4 @@
-// app/page.js
+// app/page.js - CLIENT COMPONENT
 "use client"
 
 import Header from '@/components/layout/Header'
@@ -8,10 +8,9 @@ import Image from 'next/image'
 import { useState, useEffect, useMemo, Suspense, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
-// ✅ Dynamic export add karo (Netlify ke liye important)
-export const dynamic = 'force-dynamic'
+// ✅ DELETE: export const dynamic = 'force-dynamic' - Server component nahi hai ye
 
-// ✅ UPDATED: Custom CSS for faster marquee animation and carousel
+// ✅ Custom CSS for faster marquee animation and carousel
 const customStyles = `
   @keyframes faster-marquee-mobile {
     0% { transform: translateX(0); }
