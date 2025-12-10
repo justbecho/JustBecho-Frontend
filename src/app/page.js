@@ -222,9 +222,9 @@ function HomeContent() {
   const categoryImages = useMemo(() => ({
     "Men's Fashion": "/banners/Men_s Fashion.png",
     "Women's Fashion": "/banners/Women_s Fashion.png", 
-    "Footwear": "/banners/Footwear.png",
+    "Footwear": "/banners/DIOR LOAFERS.png",
     "Accessories": "/banners/Fashion Accessories.png",
-    "Watches": "/banners/Watches.png", 
+    "Watches": "/banners/Rolex.png", 
     "Perfumes": "/banners/perfumes.png",
     "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
     "KIDS": "/banners/Kids Fashion.png",
