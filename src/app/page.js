@@ -684,7 +684,14 @@ function HomeContent() {
 
   return (
     <>
-      <main className="min-h-screen bg-white prevent-horizontal-scroll pt-24">
+      {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
+      <Header />
+      
+      {/* ✅ FIXED: MAIN CONTENT WITH PROPER SPACING */}
+      <div className="bg-white">
+        {/* ✅ HEADER KE BAAAD SPACING - IMPORTANT */}
+        <div className="pt-24"></div>
+        
         {/* ✅ FIXED: Carousel Hero Section - HEADER KE NICHE */}
         <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
           <div 
@@ -1161,8 +1168,8 @@ function HomeContent() {
             </div>
           </div>
         </section>
-      </main>
-
+      </div>
+      
       <Footer />
     </>
   )
