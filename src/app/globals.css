@@ -13,6 +13,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
 /* Smooth scrolling */
@@ -20,7 +21,256 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom animations */
+/* ✅ UPDATED: Banner Content Positioning for Mobile & Desktop */
+.carousel-content {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  z-index: 20;
+}
+
+/* Mobile: Content bottom mein */
+@media (max-width: 768px) {
+  .carousel-content {
+    bottom: 80px;
+    top: auto;
+    transform: none;
+    padding: 0 1rem;
+  }
+  
+  .carousel-title {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .carousel-description {
+    font-size: 0.875rem !important;
+    margin-bottom: 1rem !important;
+    line-height: 1.4;
+  }
+  
+  .carousel-button {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Desktop: Content center mein */
+@media (min-width: 769px) {
+  .carousel-content {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ✅ UPDATED: FASTER Marquee Animations for Brands */
+@keyframes faster-marquee-mobile {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes faster-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-faster-marquee-mobile {
+  animation: faster-marquee-mobile 20s linear infinite !important;
+}
+
+.animate-faster-marquee {
+  animation: faster-marquee 35s linear infinite !important;
+}
+
+/* ✅ UPDATED: INFINITE Marquee without gaps */
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.marquee-track {
+  display: flex;
+  animation: faster-marquee 35s linear infinite;
+}
+
+.marquee-track-mobile {
+  display: flex;
+  animation: faster-marquee-mobile 20s linear infinite;
+}
+
+/* Pause animation on hover */
+.marquee-track:hover,
+.marquee-track-mobile:hover {
+  animation-play-state: paused;
+}
+
+/* ✅ UPDATED: Carousel Animations */
+@keyframes slideInFromRight {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutToLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-100%); opacity: 0; }
+}
+
+.carousel-slide-in {
+  animation: slideInFromRight 1s ease-out forwards;
+}
+
+.carousel-slide-out {
+  animation: slideOutToLeft 1s ease-out forwards;
+}
+
+/* Fade transition for carousel */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.carousel-fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+.carousel-fade-out {
+  animation: fadeOut 0.8s ease-out forwards;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .carousel-content {
+    bottom: 70px;
+  }
+  
+  .carousel-title {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .carousel-description {
+    font-size: 0.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .category-grid {
+    gap: 0.5rem !important;
+  }
+  
+  .category-image {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  
+  .testimonial-card {
+    height: auto !important;
+    min-height: 280px !important;
+    padding: 1rem !important;
+  }
+  
+  .product-card {
+    padding: 0.5rem !important;
+  }
+  
+  .section-padding {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .section-py {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .mobile-block {
+    display: block !important;
+  }
+  
+  .mobile-flex {
+    display: flex !important;
+  }
+  
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+  
+  .mobile-text-xs {
+    font-size: 0.75rem !important;
+  }
+  
+  .mobile-space-y-2 > * + * {
+    margin-top: 0.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .featured-collections-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .how-it-works-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  
+  .testimonials-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .brands-container {
+    padding: 0.5rem 0 !important;
+  }
+  
+  .mobile-full-width {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    width: calc(100% + 2rem) !important;
+  }
+  
+  .mobile-text-center {
+    text-align: center !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .tablet-responsive {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .carousel-content {
+    padding: 2rem !important;
+  }
+  
+  .tablet-text-lg {
+    font-size: 1.125rem !important;
+  }
+}
+
+/* Base animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -185,12 +435,6 @@ html {
   animation: slideInRight 0.5s ease-in-out forwards;
 }
 
-/* Pause animation on hover */
-.animate-marquee:hover,
-.animate-marquee-mobile:hover {
-  animation-play-state: paused;
-}
-
 /* Line clamp utilities */
 .line-clamp-1 {
   display: -webkit-box;
@@ -251,7 +495,8 @@ html {
 
 /* Focus styles for accessibility */
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+input:focus-visible {
   outline: 2px solid #000;
   outline-offset: 2px;
 }
@@ -312,8 +557,7 @@ a:focus-visible {
   image-rendering: crisp-edges;
 }
 
-
-/* Extra sparkle effects - Agar aur jazba chahiye toh */
+/* Extra sparkle effects */
 .hover-lift {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -358,6 +602,111 @@ a:focus-visible {
   from, to { border-color: transparent }
   50% { border-color: #000 }
 }
+
+/* ✅ NEW: Touch-friendly buttons for mobile */
+.touch-button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.touch-button-small {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ NEW: Safe area padding for iOS */
+.safe-area-padding {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-area-padding-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ✅ NEW: Prevent horizontal scroll on mobile */
+.prevent-horizontal-scroll {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ✅ NEW: Better image loading */
+.lazy-image {
+  background-color: #f5f5f5;
+  background-image: linear-gradient(90deg, #f5f5f5 0%, #e8e8e8 50%, #f5f5f5 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ✅ NEW: Responsive typography */
+.responsive-heading {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+
+.responsive-subheading {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  line-height: 1.4;
+}
+
+.responsive-text {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  line-height: 1.5;
+}
+
+.responsive-text-sm {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  line-height: 1.4;
+}
+
+/* ✅ NEW: Aspect ratio utilities */
+.aspect-square-mobile {
+  aspect-ratio: 1 / 1;
+}
+
+/* ✅ NEW: Grid utilities */
+.mobile-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.mobile-grid-1 {
+  grid-template-columns: 1fr;
+}
+
+/* ✅ NEW: Carousel speed adjustments */
+.carousel-speed-slow {
+  animation-duration: 60s;
+}
+
+.carousel-speed-medium {
+  animation-duration: 40s;
+}
+
+.carousel-speed-fast {
+  animation-duration: 20s;
+}
+
+/* ✅ NEW: Brand logo hover effects */
+.brand-logo-hover {
+  transition: all 0.3s ease;
+  filter: grayscale(100%);
+  opacity: 0.8;
+}
+
+.brand-logo-hover:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
 /* Print styles */
 @media print {
   .no-print {
@@ -375,9 +724,16 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  
+  .animate-faster-marquee,
+  .animate-faster-marquee-mobile,
+  .animate-marquee,
+  .animate-marquee-mobile {
+    animation: none !important;
+  }
 }
 
-/* Dark mode support (if needed later) */
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .dark-mode-auto {
     /* Add dark mode styles here when needed */
@@ -389,4 +745,117 @@ a:focus-visible {
   .high-contrast {
     border: 1px solid currentColor;
   }
+  
+  .brand-logo-hover {
+    filter: contrast(200%) !important;
+  }
+}
+
+/* ✅ NEW: Mobile tap highlights */
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.tap-highlight-none {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ✅ NEW: Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* ✅ NEW: Loading states */
+.loading-overlay {
+  position: relative;
+}
+
+.loading-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ NEW: Container queries support */
+@container (max-width: 400px) {
+  .container-responsive {
+    padding: 1rem;
+  }
+}
+
+/* ✅ NEW: Viewport height adjustments */
+.mobile-vh-50 {
+  height: 50vh;
+}
+
+.mobile-vh-60 {
+  height: 60vh;
+}
+
+.mobile-vh-70 {
+  height: 70vh;
+}
+
+/* ✅ NEW: Text balance for better readability */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ✅ NEW: Smooth font rendering */
+.antialiased {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ✅ NEW: Prevent text overflow */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ✅ NEW: Grid auto-fit responsive */
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* ✅ NEW: Flex gap fallback for older browsers */
+.flex-gap {
+  gap: 1rem;
+}
+
+.flex-gap > * {
+  margin: 0.5rem;
+}
+
+/* ✅ NEW: Sticky positioning utilities */
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ✅ NEW: Gradient backgrounds */
+.bg-gradient-luxury {
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+}
+
+.bg-gradient-light {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
 }
