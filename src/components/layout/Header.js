@@ -25,7 +25,573 @@ export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
 
-  // ... (rest of your states and useEffect hooks remain the same)
+  const isProductPage = pathname?.includes('/products/')
+  const isSellNowPage = pathname === '/sell-now'
+  const isDashboardPage = pathname?.includes('/dashboard')
+  const isCartPage = pathname === '/cart'
+
+  // ✅ FIXED: Search functions - Defined at the top
+  const handleSearch = useCallback(async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const response = await fetch(
+        `https://just-becho-backend.vercel.app/api/products/search?query=${encodeURIComponent(query)}&limit=10`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.products) {
+          setSearchResults(data.products);
+          setShowSearchResults(true);
+        } else {
+          setSearchResults([]);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);
+
+  const handleSearchSubmit = useCallback((e) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      setShowSearchResults(false);
+      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+    }
+  }, [searchQuery, router]);
+
+  const handleSearchInputChange = useCallback((e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (value.trim()) {
+      handleSearch(value);
+    } else {
+      setShowSearchResults(false);
+      setSearchResults([]);
+    }
+  }, [handleSearch]);
+
+  // ✅ FIXED: Form submit handler
+  const handleFormSubmit = useCallback((e) => {
+    handleSearchSubmit(e);
+  }, [handleSearchSubmit]);
+
+  // ✅ FIXED: Username format function
+  const ensureJustbechoFormat = useCallback((username) => {
+    if (!username) return null;
+    
+    let clean = username.replace(/^@+/, '');
+    
+    if (clean.endsWith('@justbecho')) {
+      return clean;
+    }
+    
+    if (clean.includes('@justbecho')) {
+      const namePart = clean.replace('@justbecho', '');
+      return `${namePart}@justbecho`;
+    }
+    
+    return `${clean}@justbecho`;
+  }, [])
+
+  // ✅ FIXED: User state update
+  useEffect(() => {
+    const updateUserState = () => {
+      try {
+        const token = localStorage.getItem('token')
+        const userData = localStorage.getItem('user')
+        
+        if (token && userData) {
+          const user = JSON.parse(userData)
+          
+          if (user.username) {
+            user.username = ensureJustbechoFormat(user.username);
+          }
+          
+          setUser(user)
+          
+          if (user.role === 'seller' && user.sellerVerificationStatus === 'approved') {
+            if (!user.sellerVerified) {
+              const updatedUser = {
+                ...user,
+                sellerVerified: true
+              };
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+              setUser(updatedUser);
+            }
+          }
+          
+          fetchCartCount()
+        } else {
+          setUser(null)
+          setCartCount(0)
+        }
+      } catch (error) {
+        console.error('Error updating user state:', error)
+        setUser(null)
+        setCartCount(0)
+      }
+    }
+
+    updateUserState();
+    
+    const handleStorageChange = (e) => {
+      if (e.key === 'user' || e.key === 'token') {
+        updateUserState();
+      }
+    };
+    
+    const handleSellerStatusUpdate = () => {
+      updateUserState();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
+    
+    const pollInterval = setInterval(() => {
+      updateUserState();
+    }, 5000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
+      clearInterval(pollInterval);
+    };
+  }, [ensureJustbechoFormat])
+
+  // ✅ FIXED: Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true)
+        console.log('📡 Fetching categories from backend API...')
+        
+        const response = await fetch('https://just-becho-backend.vercel.app/api/categories')
+        
+        if (!response.ok) {
+          throw new Error(`API responded with status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        console.log('📦 Backend API response:', data)
+        
+        if (data.success && data.categories && Array.isArray(data.categories)) {
+          console.log(`✅ Backend categories found: ${data.categories.length}`)
+          setCategories(data.categories)
+        } else {
+          console.error('❌ Backend API response structure incorrect')
+          setCategories([])
+        }
+      } catch (error) {
+        console.error('💥 Error fetching categories from backend:', error)
+        setCategories([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  // ✅ FIXED: Fetch cart count
+  const fetchCartCount = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setCartCount(0)
+        return
+      }
+
+      const response = await fetch('https://just-becho-backend.vercel.app/api/cart', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(3000)
+      })
+
+      if (!response.ok) {
+        setCartApiAvailable(false);
+        setCartCount(0);
+        return;
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setCartCount(data.cart.totalItems || 0);
+        setCartApiAvailable(true);
+      } else {
+        setCartApiAvailable(false);
+        setCartCount(0);
+      }
+    } catch (error) {
+      setCartApiAvailable(false);
+      setCartCount(0);
+    }
+  }, [])
+
+  // ✅ FIXED: Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (e.target.closest('.search-container')) return;
+      setShowSearchResults(false);
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // ✅ FIXED: Burger menu animation
+  const handleBurgerClick = () => {
+    setIsMenuAnimating(true);
+    setIsMenuOpen(!isMenuOpen);
+    
+    setTimeout(() => {
+      setIsMenuAnimating(false);
+    }, 300);
+  };
+
+  // ✅ FIXED: Convert to Seller Function
+  const convertToSeller = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+      
+      const response = await fetch('https://just-becho-backend.vercel.app/api/auth/convert-to-seller', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to convert to seller');
+      }
+      
+      if (data.success) {
+        const formattedUsername = ensureJustbechoFormat(data.user?.username);
+        
+        const userData = localStorage.getItem('user');
+        const currentUser = userData ? JSON.parse(userData) : null;
+        
+        const updatedUser = {
+          ...currentUser,
+          role: 'seller',
+          sellerVerified: data.user?.sellerVerified || false,
+          sellerVerificationStatus: data.user?.sellerVerificationStatus || 'pending',
+          verificationId: data.user?.verificationId || null,
+          username: formattedUsername
+        };
+        
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        
+        window.dispatchEvent(new Event('authChange'));
+        window.dispatchEvent(new Event('sellerStatusUpdated'));
+        
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        
+        alert('✅ You are now registered as a seller!');
+        
+        localStorage.setItem('changingRoleToSeller', 'true');
+        
+        setTimeout(() => {
+          router.push('/complete-profile?convertingToSeller=true');
+        }, 1000);
+        
+      } else {
+        throw new Error(data.message || 'Conversion failed');
+      }
+      
+    } catch (error) {
+      console.error('Error in convertToSeller:', error);
+      alert(`Error: ${error.message}`);
+    }
+  }, [router, ensureJustbechoFormat])
+
+  // ✅ FIXED: Transform categories
+  const transformedCategories = useMemo(() => {
+    console.log('🔄 Transforming backend categories:', categories)
+    
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
+      console.log('⚠️ No categories from backend')
+      return [];
+    }
+    
+    const transformed = categories.map((category, index) => {
+      if (typeof category === 'string') {
+        return {
+          name: category,
+          href: `/categories/${category.toLowerCase().replace(/\s+/g, '-')}`,
+          dropdown: {
+            sections: [{
+              title: "ITEMS",
+              items: ["View All Products", "New Arrivals", "Best Sellers"]
+            }]
+          }
+        };
+      }
+      
+      return {
+        name: category?.name || `Category ${index + 1}`,
+        href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
+        dropdown: {
+          sections: category?.subCategories || [{
+            title: "ITEMS",
+            items: ["View All Products", "New Arrivals", "Best Sellers"]
+          }]
+        }
+      };
+    });
+    
+    console.log('✅ Transformed categories:', transformed)
+    return transformed;
+  }, [categories])
+
+  // ✅ FIXED: Sell Now Click Handler
+  const handleSellNowClick = useCallback((e) => {
+    e.preventDefault()
+    
+    if (user) {
+      const currentUserData = localStorage.getItem('user');
+      const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+      
+      const latestUser = currentUser || user;
+      
+      if (latestUser.role === 'seller') {
+        if (latestUser.sellerVerified) {
+          router.push('/sell-now')
+        } else {
+          if (latestUser.sellerVerificationStatus === 'pending') {
+            alert('Your seller account is pending approval.')
+            router.push('/dashboard?section=listings')
+          } else if (latestUser.sellerVerificationStatus === 'approved') {
+            const updatedUser = {
+              ...latestUser,
+              sellerVerified: true
+            };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            
+            window.dispatchEvent(new Event('sellerStatusUpdated'));
+            router.push('/sell-now')
+          } else {
+            router.push('/sell-now')
+          }
+        }
+      } else {
+        const confirmBecomeSeller = confirm('You need to be a seller to list products. Would you like to become a seller?');
+        if (confirmBecomeSeller) {
+          convertToSeller();
+        }
+      }
+    } else {
+      setIsAuthModalOpen(true)
+    }
+  }, [user, router, convertToSeller])
+
+  // ✅ FIXED: Mobile Sell Now Click Handler
+  const handleMobileSellNowClick = useCallback(() => {
+    if (user) {
+      const currentUserData = localStorage.getItem('user');
+      const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+      
+      const latestUser = currentUser || user;
+      
+      if (latestUser.role === 'seller') {
+        if (latestUser.sellerVerified) {
+          router.push('/sell-now')
+        } else {
+          if (latestUser.sellerVerificationStatus === 'pending') {
+            alert('Your seller account is pending approval.')
+            router.push('/dashboard?section=listings')
+          } else if (latestUser.sellerVerificationStatus === 'approved') {
+            const updatedUser = {
+              ...latestUser,
+              sellerVerified: true
+            };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            
+            window.dispatchEvent(new Event('sellerStatusUpdated'));
+            router.push('/sell-now')
+          } else {
+            router.push('/sell-now')
+          }
+        }
+      } else {
+        const confirmBecomeSeller = confirm('You need to be a seller to list products. Would you like to become a seller?');
+        if (confirmBecomeSeller) {
+          convertToSeller();
+        }
+      }
+    } else {
+      setIsAuthModalOpen(true)
+    }
+    setIsMenuOpen(false)
+  }, [user, router, convertToSeller])
+
+  // ✅ FIXED: Profile Click Handler
+  const handleProfileClick = useCallback((e) => {
+    e.preventDefault()
+    if (user) {
+      setShowUserDropdown(!showUserDropdown)
+    } else {
+      setIsAuthModalOpen(true)
+      setShowUserDropdown(false)
+    }
+  }, [user, showUserDropdown])
+
+  // ✅ FIXED: Wishlist Click Handler
+  const handleWishlistClick = useCallback(() => {
+    if (user) {
+      router.push('/dashboard?section=wishlist')
+      setShowUserDropdown(false)
+    } else {
+      setIsAuthModalOpen(true)
+    }
+  }, [user, router])
+
+  // ✅ FIXED: Mobile Wishlist Click Handler
+  const handleMobileWishlistClick = useCallback(() => {
+    if (user) {
+      router.push('/dashboard?section=wishlist')
+    } else {
+      setIsAuthModalOpen(true)
+    }
+    setIsMenuOpen(false)
+  }, [user, router])
+
+  // ✅ FIXED: Cart Click Handler
+  const handleCartClick = useCallback((e) => {
+    e.preventDefault()
+    if (user) {
+      if (cartApiAvailable) {
+        router.push('/cart')
+      } else {
+        alert('Cart functionality is currently unavailable.');
+      }
+    } else {
+      setIsAuthModalOpen(true)
+    }
+  }, [user, router, cartApiAvailable])
+
+  // ✅ FIXED: Mobile Cart Click Handler
+  const handleMobileCartClick = useCallback(() => {
+    if (user) {
+      if (cartApiAvailable) {
+        router.push('/cart')
+      } else {
+        alert('Cart functionality is currently unavailable.');
+      }
+    } else {
+      setIsAuthModalOpen(true)
+    }
+    setIsMenuOpen(false)
+  }, [user, router, cartApiAvailable])
+
+  // ✅ FIXED: Logout Handler
+  const handleLogout = useCallback(() => {
+    try {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('isGoogleSignup')
+      localStorage.removeItem('verificationId')
+      localStorage.removeItem('changingRoleToSeller')
+      localStorage.removeItem('isGoogleUser')
+      
+      sessionStorage.clear()
+      
+      setUser(null)
+      setCartCount(0)
+      setShowUserDropdown(false)
+      
+      const cookies = document.cookie.split(";")
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i]
+        const eqPos = cookie.indexOf("=")
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
+      }
+      
+      window.dispatchEvent(new Event('authChange'))
+      window.dispatchEvent(new Event('storage'))
+      
+      window.location.href = '/'
+      
+    } catch (error) {
+      console.error('Logout error:', error)
+      window.location.href = '/'
+    }
+  }, [])
+
+  // ✅ FIXED: Mobile Logout Handler
+  const handleMobileLogout = useCallback(() => {
+    setIsMenuOpen(false)
+    
+    setTimeout(() => {
+      try {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('isGoogleSignup')
+        localStorage.removeItem('verificationId')
+        localStorage.removeItem('changingRoleToSeller')
+        localStorage.removeItem('isGoogleUser')
+        
+        sessionStorage.clear()
+        
+        setUser(null)
+        setCartCount(0)
+        
+        const cookies = document.cookie.split(";")
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i]
+          const eqPos = cookie.indexOf("=")
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
+          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
+        }
+        
+        window.dispatchEvent(new Event('authChange'))
+        window.dispatchEvent(new Event('storage'))
+        
+        window.location.href = '/'
+        
+      } catch (error) {
+        console.error('Mobile logout error:', error)
+        window.location.href = '/'
+      }
+    }, 300)
+  }, [])
+
+  // ✅ FIXED: Mobile Profile Click Handler
+  const handleMobileProfileClick = useCallback(() => {
+    if (user) {
+      router.push('/dashboard')
+    } else {
+      setIsAuthModalOpen(true)
+    }
+    setIsMenuOpen(false)
+  }, [user, router])
 
   return (
     <>
@@ -59,7 +625,58 @@ export default function Header() {
                 {/* SEARCH RESULTS */}
                 {showSearchResults && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
-                    {/* Search results content */}
+                    {searchLoading ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                        <p className="mt-2 text-sm">Searching...</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="py-2">
+                        {searchResults.map((product) => (
+                          <Link
+                            key={product._id}
+                            href={`/products/${product._id}`}
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => setShowSearchResults(false)}
+                          >
+                            {product.images?.[0]?.url ? (
+                              <img
+                                src={product.images[0].url}
+                                alt={product.productName}
+                                className="w-10 h-10 object-cover rounded mr-3"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                                <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {product.productName}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                ₹{product.finalPrice?.toLocaleString() || '0'}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                        <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
+                          <button
+                            onClick={() => {
+                              setShowSearchResults(false);
+                              router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                            }}
+                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
+                          >
+                            View all results
+                          </button>
+                        </div>
+                      </div>
+                    ) : searchQuery.trim() && (
+                      <div className="p-4 text-center text-gray-500">
+                        <p className="text-sm">No products found</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -258,7 +875,62 @@ export default function Header() {
               {/* Mobile Search Results */}
               {showSearchResults && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
-                  {/* Search results content */}
+                  {searchLoading ? (
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                      <p className="mt-2 text-sm">Searching...</p>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className="py-2">
+                      {searchResults.map((product) => (
+                        <Link
+                          key={product._id}
+                          href={`/products/${product._id}`}
+                          className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          onClick={() => {
+                            setShowSearchResults(false);
+                            setIsMenuOpen(false);
+                          }}
+                        >
+                          {product.images?.[0]?.url ? (
+                            <img
+                              src={product.images[0].url}
+                              alt={product.productName}
+                              className="w-10 h-10 object-cover rounded mr-3"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                              <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {product.productName}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              ₹{product.finalPrice?.toLocaleString() || '0'}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                      <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
+                        <button
+                          onClick={() => {
+                            setShowSearchResults(false);
+                            setIsMenuOpen(false);
+                            router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                          }}
+                          className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
+                        >
+                          View all results
+                        </button>
+                      </div>
+                    </div>
+                  ) : searchQuery.trim() && (
+                    <div className="p-4 text-center text-gray-500">
+                      <p className="text-sm">No products found</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
