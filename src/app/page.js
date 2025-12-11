@@ -8,9 +8,7 @@ import Image from 'next/image'
 import { useState, useEffect, useMemo, Suspense, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
-// ✅ DELETE: export const dynamic = 'force-dynamic' - Server component nahi hai ye
-
-// ✅ Custom CSS for faster marquee animation and carousel
+// ✅ Custom CSS for mobile responsive design
 const customStyles = `
   @keyframes faster-marquee-mobile {
     0% { transform: translateX(0); }
@@ -71,6 +69,64 @@ const customStyles = `
   
   .carousel-fade-out {
     animation: fadeOut 1s ease-out forwards;
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .carousel-content {
+      padding: 1rem;
+    }
+    
+    .carousel-title {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .carousel-description {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    
+    .carousel-button {
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+    }
+    
+    .category-grid {
+      gap: 0.75rem;
+    }
+    
+    .category-image {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .testimonial-card {
+      height: auto;
+      min-height: 300px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .featured-collections-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    .how-it-works-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .testimonials-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    .brand-logo {
+      width: 100px;
+      height: 40px;
+    }
   }
 `
 
@@ -134,7 +190,6 @@ function HomeContent() {
       { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png" },
       { name: "Dior", logo: "/brandslogo/footwear/Dior.png", fallback: "/brands/prada.png" },
       { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png" },
-      
       { name: "On", logo: "/brandslogo/footwear/On.jpg", fallback: "/brands/reebok.png" },
       { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/Balenciaga.png" }
     ],
@@ -555,7 +610,6 @@ function HomeContent() {
                 const brandsData = await brandsResponse.json()
                 if (brandsData.success && brandsData.brands) {
                   setBrandsFromBackend(brandsData.brands)
-                  console.log('Brands from backend:', brandsData.brands.length)
                 }
               }
             } catch (brandsError) {
@@ -630,7 +684,7 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ UPDATED: Product card render function - VIEWS REMOVED
+  // ✅ UPDATED: Product card render function - MOBILE OPTIMIZED
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
     
@@ -651,7 +705,7 @@ function HomeContent() {
             alt={safeProductName}
             fill
             className="object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
             onError={(e) => {
               e.target.src = '/images/placeholder.jpg';
               e.target.onerror = null;
@@ -684,7 +738,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: Brand logo component with click handler
+  // ✅ UPDATED: Brand logo component with mobile optimization
   const BrandLogo = ({ brand, index, categoryName }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
@@ -692,11 +746,9 @@ function HomeContent() {
     if (!brand || !brand.name) return null;
 
     const handleBrandClick = () => {
-      // Brand name और category के based पर URL create करें
       const brandSlug = encodeURIComponent(brand.name.toLowerCase().replace(/\s+/g, '-'));
       const categorySlug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'));
       
-      // Brand page पर redirect करें
       router.push(`/brand/${brandSlug}?category=${categorySlug}`);
     };
 
@@ -707,7 +759,7 @@ function HomeContent() {
         title={`Browse ${brand.name} products in ${categoryName}`}
         onClick={handleBrandClick}
       >
-        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
+        <div className="relative h-8 w-20 sm:h-10 sm:w-24 md:h-12 md:w-28 lg:h-14 lg:w-32 flex items-center justify-center">
           <div className="relative w-full h-full flex items-center justify-center">
             <img
               src={imgSrc}
@@ -741,7 +793,7 @@ function HomeContent() {
           </div>
           
           {/* Brand name tooltip on hover */}
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20 shadow-lg pointer-events-none">
+          <div className="hidden sm:block absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20 shadow-lg pointer-events-none">
             <span className="font-medium">{brand.name}</span>
             <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
           </div>
@@ -765,12 +817,12 @@ function HomeContent() {
 
   return (
     <>
-      {/* ✅ Add custom styles for faster animation */}
+      {/* ✅ Add custom styles for mobile responsive design */}
       <style jsx global>{customStyles}</style>
       
       <main className="min-h-screen bg-white">
-        {/* ✅ UPDATED: Carousel Hero Section */}
-        <section className="relative h-[60vh] sm:h-[75vh] md:h-[85vh] overflow-hidden">
+        {/* ✅ MOBILE RESPONSIVE: Carousel Hero Section */}
+        <section className="relative h-[50vh] sm:h-[60vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
           <Header />
           
           <div 
@@ -788,24 +840,25 @@ function HomeContent() {
                     fill
                     className="object-cover object-center brightness-110 contrast-105 saturate-110"
                     priority
+                    sizes="100vw"
                     onError={(e) => {
                       e.target.src = '/images/hero-placeholder.jpg';
                     }}
                   />
                   <div className="absolute inset-0 bg-black/40"></div>
                   
-                  {/* Carousel Content */}
-                  <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
+                  {/* Carousel Content - MOBILE OPTIMIZED */}
+                  <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 md:px-8 carousel-content">
                     <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
-                      <h1 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-widest uppercase mb-4">
+                      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-widest uppercase mb-3 sm:mb-4 carousel-title">
                         {carouselSlides[currentSlide]?.title || "JUST BECHO"}
                       </h1>
-                      <p className="text-sm sm:text-lg md:text-xl font-light tracking-widest uppercase mb-6 max-w-2xl mx-auto">
+                      <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto carousel-description">
                         {carouselSlides[currentSlide]?.description || "Luxury Reborn • Trust Redefined"}
                       </p>
                       <Link
                         href={carouselSlides[currentSlide]?.href || "/products"}
-                        className="inline-block bg-white text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-sm sm:text-base"
+                        className="inline-block bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-xs sm:text-sm md:text-base carousel-button"
                       >
                         EXPLORE NOW
                       </Link>
@@ -813,41 +866,41 @@ function HomeContent() {
                   </div>
                 </div>
 
-                {/* Carousel Navigation Buttons */}
+                {/* Carousel Navigation Buttons - MOBILE OPTIMIZED */}
                 <button
                   onClick={prevSlide}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group"
+                  className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group"
                   aria-label="Previous slide"
                 >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
                 
                 <button
                   onClick={nextSlide}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group"
+                  className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group"
                   aria-label="Next slide"
                 >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
 
-                {/* Carousel Indicators */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+                {/* Carousel Indicators - MOBILE OPTIMIZED */}
+                <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-1 sm:space-x-2">
                   {carouselSlides.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => goToSlide(index)}
-                      className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
+                      className={`w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
                 </div>
 
-                {/* Slide Counter */}
-                <div className="absolute bottom-4 right-4 z-20 bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+                {/* Slide Counter - HIDDEN ON MOBILE */}
+                <div className="absolute bottom-4 right-4 z-20 bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full hidden sm:block">
                   <span className="font-light">{currentSlide + 1} / {carouselSlides.length}</span>
                 </div>
               </>
@@ -860,14 +913,15 @@ function HomeContent() {
                   fill
                   className="object-cover object-center brightness-110 contrast-105 saturate-110"
                   priority
+                  sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-black/30"></div>
-                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center text-white z-10">
-                  <h1 className="text-2xl sm:text-4xl font-light tracking-widest uppercase mb-4 opacity-0 animate-fade-in-up" 
+                <div className="absolute bottom-16 sm:bottom-20 left-1/2 transform -translate-x-1/2 text-center text-white z-10 w-full px-4">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-3 sm:mb-4 opacity-0 animate-fade-in-up" 
                       style={{animationDelay: '0.3s', animationFillMode: 'forwards'}}>
                     JUST BECHO
                   </h1>
-                  <p className="text-sm sm:text-lg font-light tracking-widest uppercase opacity-0 animate-fade-in-up"
+                  <p className="text-xs sm:text-sm md:text-base lg:text-lg font-light tracking-widest uppercase opacity-0 animate-fade-in-up"
                      style={{animationDelay: '0.6s', animationFillMode: 'forwards'}}>
                     Luxury Reborn • Trust Redefined
                   </p>
@@ -875,32 +929,30 @@ function HomeContent() {
               </div>
             )}
           </div>
-
-        
         </section>
 
-        {/* Why Choose Us */}
-        <section className="py-16 bg-gray-50">
+        {/* Why Choose Us - MOBILE RESPONSIVE */}
+        <section className="py-12 sm:py-16 bg-gray-50">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase mb-3">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
                 WHY CHOOSE JUST BECHO
               </h2>
-              <p className="text-gray-600 text-base font-light max-w-2xl mx-auto">
+              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto">
                 Experience luxury redefined with our curated collection of luxury items
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {features.map((feature, index) => (
                 <div key={index} className="text-center group">
-                  <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white text-xl font-light">{feature.icon}</span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-white text-lg sm:text-xl font-light">{feature.icon}</span>
                   </div>
-                  <h3 className="text-gray-900 text-base font-light tracking-widest uppercase mb-2">
+                  <h3 className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mb-1 sm:mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 text-sm font-light leading-relaxed">
+                  <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed px-2">
                     {feature.description}
                   </p>
                 </div>
@@ -909,81 +961,82 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="py-16 bg-white">
+        {/* Categories Section - MOBILE RESPONSIVE */}
+        <section className="py-12 sm:py-16 bg-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                 EXPLORE CATEGORIES
               </h2>
-              <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-3">
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
                 DISCOVER LUXURY ITEMS
               </p>
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6 sm:gap-8 lg:gap-10">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
                 {[...Array(7)].map((_, index) => (
                   <div key={index} className="flex flex-col items-center text-center">
-                    <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full bg-gray-200 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mt-4"></div>
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full bg-gray-200 animate-pulse category-image"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4 mt-3 sm:mt-4"></div>
                   </div>
                 ))}
               </div>
             ) : categoriesFromBackend.length > 0 ? (
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6 sm:gap-8 lg:gap-10">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
                 {categoriesFromBackend.slice(0, 7).map((cat, index) => (
                   <div
                     key={index}
                     className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
                     onClick={() => handleCategoryClick(cat)}
                   >
-                    <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full overflow-hidden shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full overflow-hidden shadow-lg sm:shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500 category-image">
                       <Image
                         src={cat.image}
                         alt={cat.name}
                         fill
                         className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                        sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, (max-width: 1280px) 128px, 160px"
                         onError={(e) => {
                           e.target.src = '/images/category-placeholder.jpg';
                         }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
                     </div>
-                    <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-4 sm:mt-6 leading-tight">
+                    <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-3 sm:mt-4 md:mt-6 leading-tight">
                       {safeToUpperCase(cat.name)}
                     </h3>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No categories available yet.</p>
+              <div className="text-center py-8 sm:py-12">
+                <p className="text-gray-500 text-base sm:text-lg">No categories available yet.</p>
               </div>
             )}
           </div>
         </section>
 
-        {/* Featured Collections */}
-        <section className="py-16 bg-gray-50">
+        {/* Featured Collections - MOBILE RESPONSIVE */}
+        <section className="py-12 sm:py-16 bg-gray-50">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                 FEATURED COLLECTIONS
               </h2>
-              <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-3">
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
                 CURATED LUXURY SELECTIONS
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 featured-collections-grid">
               {featuredCollections.map((collection, index) => (
                 <Link
                   href={collection.href}
                   key={index}
-                  className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
                 >
-                  <div className="relative h-64 sm:h-72 md:h-80 w-full">
+                  <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
                     <Image
                       src={collection.image}
                       alt={collection.title}
@@ -996,16 +1049,16 @@ function HomeContent() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                     
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-xl sm:text-2xl font-light tracking-widest uppercase mb-2">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2">
                         {collection.title}
                       </h3>
-                      <p className="text-sm font-light opacity-90">
+                      <p className="text-xs sm:text-sm font-light opacity-90">
                         {collection.description}
                       </p>
-                      <div className="mt-4 flex items-center text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         <span>Explore Collection</span>
-                        <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                       </div>
@@ -1017,32 +1070,32 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="py-16 bg-white">
+        {/* How It Works - MOBILE RESPONSIVE */}
+        <section className="py-12 sm:py-16 bg-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase mb-3">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
                 HOW IT WORKS
               </h2>
-              <p className="text-gray-600 text-base font-light max-w-2xl mx-auto">
+              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto">
                 Experience seamless luxury trading with our managed marketplace
               </p>
             </div>
 
             <div className="relative">
-              <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-4/5 h-0.5 bg-gray-200 hidden lg:block"></div>
+              <div className="absolute top-16 sm:top-20 left-1/2 transform -translate-x-1/2 w-4/5 h-0.5 bg-gray-200 hidden lg:block"></div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-4 lg:gap-4 how-it-works-grid">
                 {howItWorks.map((step, index) => (
                   <div key={index} className="text-center relative group">
-                    <div className="relative mb-6">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-white border-2 border-gray-900 flex items-center justify-center group-hover:bg-gray-900 group-hover:scale-110 transition-all duration-500 z-10 relative">
-                        <span className="text-gray-900 text-xl group-hover:text-white transition-colors duration-500">{step.icon}</span>
+                    <div className="relative mb-4 sm:mb-6">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-full bg-white border-2 border-gray-900 flex items-center justify-center group-hover:bg-gray-900 group-hover:scale-110 transition-all duration-500 z-10 relative">
+                        <span className="text-gray-900 text-lg sm:text-xl group-hover:text-white transition-colors duration-500">{step.icon}</span>
                       </div>
                     </div>
 
-                    <div className="px-2">
-                      <h3 className="text-gray-900 text-sm font-light tracking-widest uppercase mb-2 group-hover:text-gray-700 transition-colors duration-300">
+                    <div className="px-1 sm:px-2">
+                      <h3 className="text-gray-900 text-xs sm:text-sm font-light tracking-widest uppercase mb-1 sm:mb-2 group-hover:text-gray-700 transition-colors duration-300">
                         {step.title}
                       </h3>
                       <p className="text-gray-600 text-xs font-light leading-relaxed">
@@ -1056,7 +1109,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Category-wise Sections with Banners */}
+        {/* Category-wise Sections with Banners - MOBILE RESPONSIVE */}
         {categoriesFromBackend.map((category, index) => {
           const categoryBrandsData = category.brands || [];
           const duplicatedCategoryBrands = categoryBrandsData.length > 0 
@@ -1066,54 +1119,54 @@ function HomeContent() {
 
           return (
             <div key={category.name || index}>
-              <section className="py-16 bg-white border-t border-gray-100">
+              <section className="py-12 sm:py-16 bg-white border-t border-gray-100">
                 <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-                  <div className="text-center mb-12">
-                    <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase">
+                  <div className="text-center mb-8 sm:mb-12">
+                    <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                       {safeToUpperCase(category.name)}
                     </h2>
-                    <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-3">
+                    <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
                       EXPLORE OUR CURATED {safeToUpperCase(category.name)} COLLECTION
                     </p>
                   </div>
 
-                  {/* Product Grid */}
+                  {/* Product Grid - MOBILE RESPONSIVE */}
                   {loading ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                       {[...Array(4)].map((_, index) => (
                         <div key={index} className="animate-pulse">
-                          <div className="w-full aspect-square bg-gray-200 rounded-lg mb-3"></div>
-                          <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                          <div className="w-full aspect-square bg-gray-200 rounded-lg mb-2 sm:mb-3"></div>
+                          <div className="h-3 sm:h-4 bg-gray-200 rounded mb-1 sm:mb-2"></div>
+                          <div className="h-4 sm:h-6 bg-gray-200 rounded w-3/4"></div>
                         </div>
                       ))}
                     </div>
                   ) : products.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                       {products.map(renderProductCard)}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <p className="text-gray-500 text-lg">No products available in this category yet.</p>
-                      <p className="text-gray-400 text-sm mt-2">Be the first to list a product!</p>
+                    <div className="text-center py-8 sm:py-12">
+                      <p className="text-gray-500 text-base sm:text-lg">No products available in this category yet.</p>
+                      <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2">Be the first to list a product!</p>
                     </div>
                   )}
 
-                  {/* Popular Brands Carousel - ✅ UPDATED WITH FASTER ANIMATION */}
+                  {/* Popular Brands Carousel - MOBILE RESPONSIVE */}
                   {categoryBrandsData.length > 0 && (
-                    <div className="mt-16">
-                      <div className="text-center mb-8">
-                        <h3 className="text-gray-900 text-xl sm:text-3xl font-light tracking-widest uppercase">
+                    <div className="mt-12 sm:mt-16">
+                      <div className="text-center mb-6 sm:mb-8">
+                        <h3 className="text-gray-900 text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase">
                           POPULAR BRANDS IN {safeToUpperCase(category.name)}
                         </h3>
-                        <p className="text-gray-900 text-base font-light tracking-widest uppercase mt-2">
+                        <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mt-1 sm:mt-2">
                           AUTHENTIC LUXURY BRANDS YOU CAN TRUST
                         </p>
                       </div>
 
-                      {/* ✅ UPDATED: FASTER BRAND LOGO MARQUEE */}
-                      <div className="w-full overflow-hidden py-4">
-                        <div className="flex animate-faster-marquee-mobile sm:animate-faster-marquee whitespace-nowrap items-center space-x-4 sm:space-x-6 md:space-x-8">
+                      {/* ✅ UPDATED: FASTER BRAND LOGO MARQUEE - MOBILE OPTIMIZED */}
+                      <div className="w-full overflow-hidden py-3 sm:py-4">
+                        <div className="flex animate-faster-marquee-mobile sm:animate-faster-marquee whitespace-nowrap items-center space-x-3 sm:space-x-4 md:space-x-6 lg:space-x-8">
                           {duplicatedCategoryBrands.map((brand, brandIndex) => (
                             <BrandLogo 
                               key={brandIndex} 
@@ -1125,18 +1178,18 @@ function HomeContent() {
                         </div>
                       </div>
                       
-                      <div className="text-center mt-6">
-                        <p className="text-gray-500 text-sm">
+                      <div className="text-center mt-4 sm:mt-6">
+                        <p className="text-gray-500 text-xs sm:text-sm">
                           Click on any brand to view all {category.name} products from that brand
                         </p>
                       </div>
                     </div>
                   )}
 
-                  <div className="text-center mt-12">
+                  <div className="text-center mt-8 sm:mt-12">
                     <button
                       onClick={() => handleCategoryClick(category)}
-                      className="text-gray-900 text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative"
+                      className="text-gray-900 text-sm sm:text-base md:text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative"
                     >
                       <span className="relative">
                         → VIEW ALL {safeToUpperCase(category.name)}
@@ -1147,19 +1200,19 @@ function HomeContent() {
                 </div>
               </section>
 
-              {/* Banner after each category */}
+              {/* Banner after each category - MOBILE RESPONSIVE */}
               {index < categoriesFromBackend.length - 1 && (
-                <section className="py-16 bg-gradient-to-r from-gray-900 to-black">
+                <section className="py-12 sm:py-16 bg-gradient-to-r from-gray-900 to-black">
                   <div className="max-w-[1700px] mx-auto px-4 sm:px-6 text-center">
-                    <h2 className="text-white text-2xl sm:text-3xl font-light tracking-widest uppercase mb-4">
+                    <h2 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-3 sm:mb-4">
                       READY TO SELL YOUR {safeToUpperCase(category.name)}?
                     </h2>
-                    <p className="text-gray-300 text-base font-light tracking-widest uppercase mb-6 max-w-2xl mx-auto">
+                    <p className="text-gray-300 text-sm sm:text-base font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto">
                       Get the best value for your luxury items
                     </p>
                     <Link
                       href="/sell"
-                      className="bg-white text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-base inline-block"
+                      className="bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-sm sm:text-base inline-block"
                     >
                       SELL NOW
                     </Link>
@@ -1170,75 +1223,75 @@ function HomeContent() {
           )
         })}
 
-        {/* Testimonials */}
-        <section className="py-16 bg-gray-50">
+        {/* Testimonials - MOBILE RESPONSIVE */}
+        <section className="py-12 sm:py-16 bg-gray-50">
           <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-gray-900 text-2xl sm:text-4xl font-light tracking-widest uppercase mb-3">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
                 VOICES OF TRUST
               </h2>
-              <p className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase mt-2">
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-1 sm:mt-2">
                 DISCOVER WHY THOUSANDS CHOOSE JUST BECHO
               </p>
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center justify-center w-16">
+              <div className="absolute inset-y-0 left-0 flex items-center justify-center w-12 sm:w-16">
                 <button
                   onClick={prevTestimonials}
-                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group"
                 >
-                  <svg className="w-5 h-5 text-gray-900 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
               </div>
 
-              <div className="absolute inset-y-0 right-0 flex items-center justify-center w-16">
+              <div className="absolute inset-y-0 right-0 flex items-center justify-center w-12 sm:w-16">
                 <button
                   onClick={nextTestimonials}
-                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group"
                 >
-                  <svg className="w-5 h-5 text-gray-900 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               </div>
 
-              <div className="mx-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="mx-12 sm:mx-16">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 testimonials-grid">
                   {visibleTestimonials.map((testimonial, index) => (
-                    <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-80 flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer">
+                    <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-auto sm:h-80 flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer testimonial-card">
                       <div className="absolute top-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-700 group-hover:w-full transition-all duration-500"></div>
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-gray-100 to-transparent rounded-full -translate-y-10 translatex-10 opacity-50"></div>
+                      <div className="absolute top-0 right-0 w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-bl from-gray-100 to-transparent rounded-full -translate-y-8 sm:-translate-y-10 translatex-8 sm:translatex-10 opacity-50"></div>
 
                       <div className="flex-1 flex flex-col justify-between relative z-10">
                         <div>
-                          <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center justify-between mb-2 sm:mb-3">
                             <div className="flex">
                               {[...Array(testimonial.rating)].map((_, i) => (
-                                <span key={i} className="text-yellow-500 text-sm mr-1 drop-shadow-sm">★</span>
+                                <span key={i} className="text-yellow-500 text-xs sm:text-sm mr-0.5 sm:mr-1 drop-shadow-sm">★</span>
                               ))}
                             </div>
-                            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[9px] font-light tracking-widest uppercase px-2 py-1 rounded-full">
+                            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[8px] sm:text-[9px] font-light tracking-widest uppercase px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
                               Verified
                             </div>
                           </div>
 
-                          <p className="text-gray-700 mb-3 leading-relaxed text-[13px] font-light line-clamp-4 tracking-wide">
+                          <p className="text-gray-700 mb-2 sm:mb-3 leading-relaxed text-xs sm:text-[13px] font-light line-clamp-4 tracking-wide">
                             "{testimonial.comment}"
                           </p>
                         </div>
 
-                        <div className="flex items-center pt-3 border-t border-gray-200/50">
-                          <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center text-white font-light text-base mr-3 shadow-md">
+                        <div className="flex items-center pt-2 sm:pt-3 border-t border-gray-200/50">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-light text-sm sm:text-base mr-2 sm:mr-3 shadow-md">
                             {testimonial.name?.charAt(0) || 'U'}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-gray-900 text-sm font-light tracking-wide mb-0.5">{testimonial.name || 'User'}</h4>
+                            <h4 className="text-gray-900 text-xs sm:text-sm font-light tracking-wide mb-0.5">{testimonial.name || 'User'}</h4>
                             <p className="text-gray-600 text-xs font-light">{testimonial.location || 'India'}</p>
-                            <div className="mt-1">
-                              <span className="inline-block bg-gray-200/70 text-gray-700 text-[9px] font-light tracking-wider px-2 py-0.5 rounded-full">
+                            <div className="mt-0.5 sm:mt-1">
+                              <span className="inline-block bg-gray-200/70 text-gray-700 text-[8px] sm:text-[9px] font-light tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full">
                                 {testimonial.role || 'Customer'}
                               </span>
                             </div>
@@ -1250,12 +1303,12 @@ function HomeContent() {
                 </div>
               </div>
 
-              <div className="flex justify-center mt-8 space-x-2">
+              <div className="flex justify-center mt-6 sm:mt-8 space-x-1.5 sm:space-x-2">
                 {testimonials.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setTestimonialStart(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-500 ${index === testimonialStart ? 'bg-gray-900 scale-125 shadow-md' : 'bg-gray-300 hover:bg-gray-400'
+                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-500 ${index === testimonialStart ? 'bg-gray-900 scale-125 shadow-md' : 'bg-gray-300 hover:bg-gray-400'
                       }`}
                   />
                 ))}
@@ -1264,25 +1317,25 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-16 bg-gray-900 text-white">
+        {/* CTA Section - MOBILE RESPONSIVE */}
+        <section className="py-12 sm:py-16 bg-gray-900 text-white">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 text-center">
-            <h2 className="text-2xl sm:text-4xl font-light tracking-widest uppercase mb-4">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-light tracking-widest uppercase mb-3 sm:mb-4">
               READY TO EXPERIENCE SECURE LUXURY TRADING?
             </h2>
-            <p className="text-lg font-light tracking-widest uppercase mb-6 opacity-90 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mb-4 sm:mb-6 opacity-90 max-w-2xl mx-auto">
               Join India's most trusted managed marketplace for pre-loved and brand new luxury
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
               <Link
                 href="/products"
-                className="bg-white text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-base"
+                className="bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-sm sm:text-base"
               >
                 SHOP VERIFIED LUXURY
               </Link>
               <Link
                 href="/sell-now"
-                className="border border-white text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-base"
+                className="border border-white text-white px-4 sm:px-6 py-2 sm:py-3 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-sm sm:text-base"
               >
                 SELL WITH CONFIDENCE
               </Link>
