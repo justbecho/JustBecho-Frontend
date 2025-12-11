@@ -150,7 +150,7 @@ export default async function CategoryPage({ params }) {
             "women's fashion": {
                 title: "WOMEN'S FASHION",
                 subtitle: 'Explore curated luxury for women',
-                banner: '/banners/Women_s Fashion.png',
+                banner: '/banners/bagu.jpeg',
                 whyTitle: "WHY SHOP WOMEN'S FASHION AT JUST BECHO",
                 features: [
                     {
