@@ -604,14 +604,9 @@ export default function Header() {
 
   return (
     <>
-      {/* ✅ MAIN HEADER - CART PAGE PE BINA SCROLL KARE WHITE */}
+      {/* ✅ MAIN HEADER - ALWAYS WHITE BACKGROUND, BLACK TEXT */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${
-          isDashboardPage ? 'bg-white text-gray-900 shadow-sm' :
-          isProductPage || isSellNowPage ? 'bg-white text-gray-900 shadow-sm' : 
-          isCartPage ? 'bg-white text-gray-900 shadow-sm' : // ✅ Cart page pe bina scroll kare white
-          isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans bg-white text-gray-900 shadow-sm`}
       >
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4 sm:py-5">
@@ -619,7 +614,7 @@ export default function Header() {
             {/* ✅ LEFT SECTION: Desktop Search + Sell Now */}
             <div className="hidden md:flex items-center space-x-4">
               
-              {/* DESKTOP SEARCH BAR - SIMPLE DESIGN */}
+              {/* DESKTOP SEARCH BAR - DARK TEXT */}
               <div className="relative w-60 lg:w-72 search-container">
                 <form onSubmit={handleSearchSubmit}>
                   <input
@@ -628,19 +623,11 @@ export default function Header() {
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                     onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                    className={`border rounded-full px-4 py-2.5 text-sm outline-none w-full ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                        ? 'border-gray-300 text-gray-800 bg-gray-50 placeholder-gray-500'
-                        : 'border-white/30 text-white bg-white/10 placeholder-white/70'
-                    }`}
+                    className="border border-gray-300 rounded-full px-4 py-2.5 text-sm outline-none w-full text-gray-800 bg-white placeholder-gray-500"
                   />
                   <button
                     type="submit"
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                        ? 'text-gray-500'
-                        : 'text-white'
-                    }`}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
                   >
                     <FiSearch className="w-4 h-4" />
                   </button>
@@ -705,20 +692,16 @@ export default function Header() {
                 )}
               </div>
               
-              {/* DESKTOP SELL NOW BUTTON - SIMPLE DESIGN */}
+              {/* DESKTOP SELL NOW BUTTON - BLACK TEXT */}
               <button
                 onClick={handleSellNowClick}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                  isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
-                    ? 'bg-black text-white hover:bg-gray-800'
-                    : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
-                }`}
+                className="px-5 py-2.5 rounded-full text-sm font-medium transition-colors bg-black text-white hover:bg-gray-800"
               >
                 Sell Now
               </button>
             </div>
 
-            {/* ✅ MOBILE Burger Menu */}
+            {/* ✅ MOBILE Burger Menu - BLACK ICON */}
             <div className="md:hidden flex items-center">
               <button
                 className={`focus:outline-none p-1 ${
@@ -731,17 +714,17 @@ export default function Header() {
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? 'rotate-45 translate-y-0 bg-gray-900' 
-                      : '-translate-y-2 bg-current'
+                      : '-translate-y-2 bg-gray-900'
                   }`}></span>
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? 'opacity-0 translate-x-4' 
                       : 'opacity-100'
-                  } bg-current`}></span>
+                  } bg-gray-900`}></span>
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? '-rotate-45 translate-y-0 bg-gray-900' 
-                      : 'translate-y-2 bg-current'
+                      : 'translate-y-2 bg-gray-900'
                   }`}></span>
                 </div>
               </button>
@@ -753,38 +736,28 @@ export default function Header() {
                 <Image
                   src="/Just Becho Logo Golden.png"
                   alt="Just Becho"
-                  width={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
-                  height={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
-                  className={`transition-all duration-500 mt-1 ${
-                    isDashboardPage ? 'h-14 w-auto' : 
-                    isProductPage || isSellNowPage ? 'h-14 w-auto' : 
-                    isCartPage ? 'h-14 w-auto' : // ✅ Cart page pe chhota logo
-                    isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
-                  }`}
+                  width={70}
+                  height={70}
+                  className="h-14 w-auto transition-all duration-500 mt-1"
                   priority
                 />
               </Link>
             </div>
 
-            {/* ✅ RIGHT SECTION: ORIGINAL ICONS WAPAS */}
+            {/* ✅ RIGHT SECTION: ORIGINAL ICONS WAPAS - BLACK ICONS */}
             <div className="flex items-center space-x-4 sm:space-x-5">
-              {/* Desktop Icons - ORIGINAL SIZE AND SPACING */}
+              {/* Desktop Icons - BLACK */}
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                {/* Profile Icon with Dropdown - ORIGINAL */}
+                {/* Profile Icon with Dropdown - BLACK */}
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
-                    className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                      isDashboardPage ? 'text-gray-900' :
-                      isProductPage || isSellNowPage ? 'text-gray-900' : 
-                      isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
-                      isScrolled ? 'text-gray-900' : 'text-white'
-                    }`}
+                    className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
                   >
                     <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
 
-                  {/* User Dropdown - ORIGINAL */}
+                  {/* User Dropdown - ALREADY WHITE WITH BLACK TEXT */}
                   {showUserDropdown && user && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                       {/* User Info */}
@@ -804,7 +777,7 @@ export default function Header() {
                         )}
                       </div>
                       
-                      {/* Dashboard Links */}
+                      {/* Dashboard Links - BLACK TEXT */}
                       <div className="py-1">
                         <Link 
                           href="/dashboard" 
@@ -850,29 +823,19 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Wishlist Icon - ORIGINAL */}
+                {/* Wishlist Icon - BLACK */}
                 <button 
                   onClick={handleWishlistClick}
-                  className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                    isDashboardPage ? 'text-gray-900' :
-                    isProductPage || isSellNowPage ? 'text-gray-900' : 
-                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
-                    isScrolled ? 'text-gray-900' : 'text-white'
-                  }`}
+                  className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
                 >
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
-                {/* Cart Icon - Only show if cart API is available - ORIGINAL */}
+                {/* Cart Icon - BLACK */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleCartClick}
-                    className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
-                      isDashboardPage ? 'text-gray-900' :
-                      isProductPage || isSellNowPage ? 'text-gray-900' : 
-                      isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
-                      isScrolled ? 'text-gray-900' : 'text-white'
-                    }`}
+                    className="relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
                   >
                     <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
                     {cartCount > 0 && (
@@ -884,16 +847,11 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Mobile Cart Icon - ORIGINAL */}
+              {/* Mobile Cart Icon - BLACK */}
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
-                  className={`md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center ${
-                    isDashboardPage ? 'text-gray-900' :
-                    isProductPage || isSellNowPage ? 'text-gray-900' : 
-                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
-                    isScrolled ? 'text-gray-900' : 'text-white'
-                  }`}
+                  className="md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center text-gray-900"
                 >
                   <FiShoppingBag className="w-6 h-6" />
                   {cartCount > 0 && (
@@ -906,8 +864,8 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ✅ MOBILE SEARCH BAR */}
-          <div className="md:hidden border-t border-gray-200/50 mt-2 pt-2 pb-1 search-container">
+          {/* ✅ MOBILE SEARCH BAR - BLACK TEXT */}
+          <div className="md:hidden border-t border-gray-200 mt-2 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
                 <input
@@ -916,21 +874,11 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                  className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
-                    isDashboardPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
-                    isProductPage || isSellNowPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
-                    isCartPage ? 'text-gray-800 placeholder-gray-500 bg-white' : // ✅ Cart page pe white
-                    isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
-                  }`}
+                  className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide text-gray-800 placeholder-gray-500 bg-white"
                 />
                 <button
                   type="submit"
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                    isDashboardPage ? 'text-gray-600' :
-                    isProductPage || isSellNowPage ? 'text-gray-600' :
-                    isCartPage ? 'text-gray-600' : // ✅ Cart page pe gray
-                    isScrolled ? 'text-gray-600' : 'text-white'
-                  }`}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
                 >
                   <FiSearch className="w-4 h-4" />
                 </button>
@@ -1001,7 +949,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ MOBILE MENU */}
+        {/* ✅ MOBILE MENU - ALREADY WHITE WITH BLACK TEXT */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
@@ -1016,7 +964,7 @@ export default function Header() {
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}>
             <nav className="flex flex-col h-full overflow-y-auto">
-              {/* Header with Close Button */}
+              {/* Header with Close Button - BLACK TEXT */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div className="flex items-center">
                   <Image
@@ -1039,7 +987,7 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* CATEGORIES SECTION */}
+              {/* CATEGORIES SECTION - BLACK TEXT */}
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-900 mb-4 uppercase tracking-wider">CATEGORIES</h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -1062,7 +1010,7 @@ export default function Header() {
                 </div>
               </div>
 
-              {/* Mobile Menu Items */}
+              {/* Mobile Menu Items - BLACK TEXT */}
               <div className="flex-1 p-6 space-y-1">
                 {/* Home Link */}
                 <Link 
@@ -1070,7 +1018,7 @@ export default function Header() {
                   className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiHome className="w-5 h-5 mr-4" />
+                  <FiHome className="w-5 h-5 mr-4 text-gray-900" />
                   <span className="font-light tracking-widest uppercase">HOME</span>
                 </Link>
                 
@@ -1102,30 +1050,30 @@ export default function Header() {
                     )}
                     
                     <Link href="/dashboard" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                      <FiUser className="w-5 h-5 mr-4" />
+                      <FiUser className="w-5 h-5 mr-4 text-gray-900" />
                       <span className="font-light tracking-widest uppercase">DASHBOARD</span>
                     </Link>
                     
                     {user.role === 'seller' && (
                       <Link href="/dashboard?section=listings" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                        <FiPackage className="w-5 h-5 mr-4" />
+                        <FiPackage className="w-5 h-5 mr-4 text-gray-900" />
                         <span className="font-light tracking-widest uppercase">MY LISTINGS</span>
                       </Link>
                     )}
                     
                     <Link href="/dashboard?section=purchases" className="flex items-center py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300" onClick={() => setIsMenuOpen(false)}>
-                      <FiShoppingCart className="w-5 h-5 mr-4" />
+                      <FiShoppingCart className="w-5 h-5 mr-4 text-gray-900" />
                       <span className="font-light tracking-widest uppercase">MY PURCHASES</span>
                     </Link>
                     
                     <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300 text-left">
-                      <FiLogOut className="w-5 h-5 mr-4" />
+                      <FiLogOut className="w-5 h-5 mr-4 text-red-600" />
                       <span className="font-light tracking-widest uppercase">LOGOUT</span>
                     </button>
                   </>
                 ) : (
                   <button onClick={handleMobileProfileClick} className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left">
-                    <FiUser className="w-5 h-5 mr-4" />
+                    <FiUser className="w-5 h-5 mr-4 text-gray-900" />
                     <span className="font-light tracking-widest uppercase">PROFILE</span>
                   </button>
                 )}
@@ -1135,7 +1083,7 @@ export default function Header() {
                   onClick={handleMobileWishlistClick}
                   className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                 >
-                  <FiHeart className="w-5 h-5 mr-4" />
+                  <FiHeart className="w-5 h-5 mr-4 text-gray-900" />
                   <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
@@ -1145,7 +1093,7 @@ export default function Header() {
                     onClick={handleMobileCartClick}
                     className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
                   >
-                    <FiShoppingBag className="w-5 h-5 mr-4" />
+                    <FiShoppingBag className="w-5 h-5 mr-4 text-gray-900" />
                     <span className="font-light tracking-widest uppercase">
                       CART {cartCount > 0 && `(${cartCount})`}
                     </span>
@@ -1164,14 +1112,9 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ✅ SUBHEADER WITH CATEGORIES - ONLY FOR DESKTOP */}
+      {/* ✅ SUBHEADER WITH CATEGORIES - ALWAYS WHITE BACKGROUND, BLACK TEXT */}
       <div
-        className={`hidden md:block fixed top-20 left-0 right-0 z-40 transition-all duration-500 ${
-          isDashboardPage ? 'bg-white shadow-md' :
-          isProductPage || isSellNowPage ? 'bg-white shadow-md' :
-          isCartPage ? 'bg-white shadow-md' : // ✅ Cart page pe white
-          isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
-        }`}
+        className="hidden md:block fixed top-20 left-0 right-0 z-40 bg-white shadow-md"
       >
         {/* Main Categories Bar - Desktop Only */}
         <div className="w-[95%] sm:w-[90%] mx-auto">
@@ -1186,20 +1129,15 @@ export default function Header() {
                   onMouseEnter={() => setActiveCategory(category.name)}
                   onMouseLeave={() => setActiveCategory(null)}
                 >
-                  {/* Category Link */}
+                  {/* Category Link - BLACK TEXT */}
                   <Link
                     href={category.href}
-                    className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${
-                      isDashboardPage ? 'text-gray-800 hover:text-gray-600' :
-                      isProductPage || isSellNowPage ? 'text-gray-800 hover:text-gray-600' :
-                      isCartPage ? 'text-gray-800 hover:text-gray-600' : // ✅ Cart page pe black
-                      isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
-                    }`}
+                    className="text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 text-gray-800 hover:text-gray-600"
                   >
                     {category.name.toUpperCase()}
                   </Link>
 
-                  {/* COMPACT DROPDOWN */}
+                  {/* COMPACT DROPDOWN - BLACK TEXT */}
                   {activeCategory === category.name && (
                     <div 
                       className="fixed left-0 right-0 top-[130px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
