@@ -8,6 +8,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import AuthModal from '@/components/ui/AuthModal'
 
 export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMenuAnimating, setIsMenuAnimating] = useState(false)
   const [activeCategory, setActiveCategory] = useState(null)
@@ -18,21 +19,19 @@ export default function Header() {
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
   const [cartApiAvailable, setCartApiAvailable] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showSearchResults, setShowSearchResults] = useState(false)
-  const [searchResults, setSearchResults] = useState([])
-  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('') // ✅ Search query state
+  const [showSearchResults, setShowSearchResults] = useState(false) // ✅ Search results visibility
+  const [searchResults, setSearchResults] = useState([]) // ✅ Search results
+  const [searchLoading, setSearchLoading] = useState(false) // ✅ Search loading
   const pathname = usePathname()
   const router = useRouter()
 
   const isProductPage = pathname?.includes('/products/')
   const isSellNowPage = pathname === '/sell-now'
   const isDashboardPage = pathname?.includes('/dashboard')
-  const isCartPage = pathname === '/cart'
+  const isCartPage = pathname === '/cart' // ✅ CART PAGE DETECTION
 
-  // ✅ FIXED: Header is always white
-  const headerStyle = "bg-white text-gray-900 shadow-sm"
-
+  // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
     if (!username) return null;
     
@@ -50,6 +49,7 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
+  // ✅ FIXED: Listen for seller status updates - ERROR FIXED HERE
   useEffect(() => {
     const updateUserState = () => {
       try {
@@ -96,6 +96,7 @@ export default function Header() {
       }
     };
     
+    // ✅ CORRECT FUNCTION NAME - match karega cleanup mein
     const handleSellerStatusUpdate = () => {
       updateUserState();
     };
@@ -109,11 +110,13 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      // ✅ FIXED: Ab sahi function name use karein
       window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
       clearInterval(pollInterval);
     };
   }, [ensureJustbechoFormat])
 
+  // ✅ FIXED: Fetch categories from backend ONLY
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -134,11 +137,11 @@ export default function Header() {
           setCategories(data.categories)
         } else {
           console.error('❌ Backend API response structure incorrect')
-          setCategories([])
+          setCategories([]) // Empty array if no categories from backend
         }
       } catch (error) {
         console.error('💥 Error fetching categories from backend:', error)
-        setCategories([])
+        setCategories([]) // Empty array on error
       } finally {
         setLoading(false)
       }
@@ -147,6 +150,7 @@ export default function Header() {
     fetchCategories()
   }, [])
 
+  // ✅ FIXED: Fetch cart count
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -184,6 +188,24 @@ export default function Header() {
     }
   }, [])
 
+  // ✅ FIXED: Scroll effect - CART PAGE PE BINA SCROLL KARE WHITE
+  useEffect(() => {
+    const handleScroll = () => {
+      // ✅ Cart page pe bina scroll kare hi white
+      if (isCartPage) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(window.scrollY > 50);
+      }
+    }
+    
+    handleScroll();
+    
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isCartPage]) // ✅ isCartPage dependency add kiya
+
+  // ✅ SEARCH FUNCTIONALITY
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -235,6 +257,7 @@ export default function Header() {
     }
   };
 
+  // ✅ Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target.closest('.search-container')) return;
@@ -245,6 +268,7 @@ export default function Header() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // ✅ BURGER MENU ANIMATION HANDLER
   const handleBurgerClick = () => {
     setIsMenuAnimating(true);
     setIsMenuOpen(!isMenuOpen);
@@ -254,6 +278,7 @@ export default function Header() {
     }, 300);
   };
 
+  // ✅ Convert to Seller Function
   const convertToSeller = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -319,15 +344,18 @@ export default function Header() {
     }
   }, [router, ensureJustbechoFormat])
 
+  // ✅ FIXED: Transform categories - ONLY BACKEND DATA
   const transformedCategories = useMemo(() => {
     console.log('🔄 Transforming backend categories:', categories)
     
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
       console.log('⚠️ No categories from backend')
-      return [];
+      return []; // Empty array - will show "No categories available"
     }
     
+    // Transform backend categories based on their structure
     const transformed = categories.map((category, index) => {
+      // If category is a string (like ["Mobile Phones", "Laptops"])
       if (typeof category === 'string') {
         return {
           name: category,
@@ -341,6 +369,7 @@ export default function Header() {
         };
       }
       
+      // If category is an object (with name, href, subCategories)
       return {
         name: category?.name || `Category ${index + 1}`,
         href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
@@ -357,6 +386,7 @@ export default function Header() {
     return transformed;
   }, [categories]);
 
+  // ✅ Rest of your handlers remain the same...
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
@@ -574,15 +604,22 @@ export default function Header() {
 
   return (
     <>
-      {/* ✅ MAIN HEADER - ALWAYS WHITE ON EVERY PAGE */}
-      <header className="fixed top-0 left-0 right-0 z-50 font-sans bg-white text-gray-900 shadow-sm">
+      {/* ✅ MAIN HEADER - CART PAGE PE BINA SCROLL KARE WHITE */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans ${
+          isDashboardPage ? 'bg-white text-gray-900 shadow-sm' :
+          isProductPage || isSellNowPage ? 'bg-white text-gray-900 shadow-sm' : 
+          isCartPage ? 'bg-white text-gray-900 shadow-sm' : // ✅ Cart page pe bina scroll kare white
+          isScrolled ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-white'
+        }`}
+      >
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4 sm:py-5">
             
             {/* ✅ LEFT SECTION: Desktop Search + Sell Now */}
             <div className="hidden md:flex items-center space-x-4">
               
-              {/* DESKTOP SEARCH BAR */}
+              {/* DESKTOP SEARCH BAR - SIMPLE DESIGN */}
               <div className="relative w-60 lg:w-72 search-container">
                 <form onSubmit={handleSearchSubmit}>
                   <input
@@ -591,11 +628,19 @@ export default function Header() {
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                     onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                    className="border border-gray-300 rounded-full px-4 py-2.5 text-sm outline-none w-full text-gray-800 bg-gray-50 placeholder-gray-500"
+                    className={`border rounded-full px-4 py-2.5 text-sm outline-none w-full ${
+                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
+                        ? 'border-gray-300 text-gray-800 bg-gray-50 placeholder-gray-500'
+                        : 'border-white/30 text-white bg-white/10 placeholder-white/70'
+                    }`}
                   />
                   <button
                     type="submit"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                      isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
+                        ? 'text-gray-500'
+                        : 'text-white'
+                    }`}
                   >
                     <FiSearch className="w-4 h-4" />
                   </button>
@@ -660,10 +705,14 @@ export default function Header() {
                 )}
               </div>
               
-              {/* DESKTOP SELL NOW BUTTON */}
+              {/* DESKTOP SELL NOW BUTTON - SIMPLE DESIGN */}
               <button
                 onClick={handleSellNowClick}
-                className="px-5 py-2.5 rounded-full text-sm font-medium transition-colors bg-black text-white hover:bg-gray-800"
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                  isDashboardPage || isProductPage || isSellNowPage || isCartPage || isScrolled
+                    ? 'bg-black text-white hover:bg-gray-800'
+                    : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
+                }`}
               >
                 Sell Now
               </button>
@@ -682,17 +731,17 @@ export default function Header() {
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? 'rotate-45 translate-y-0 bg-gray-900' 
-                      : '-translate-y-2 bg-gray-900'
+                      : '-translate-y-2 bg-current'
                   }`}></span>
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? 'opacity-0 translate-x-4' 
                       : 'opacity-100'
-                  } bg-gray-900`}></span>
+                  } bg-current`}></span>
                   <span className={`absolute top-1/2 left-0 w-6 h-0.5 transform transition-all duration-300 ${
                     isMenuOpen 
                       ? '-rotate-45 translate-y-0 bg-gray-900' 
-                      : 'translate-y-2 bg-gray-900'
+                      : 'translate-y-2 bg-current'
                   }`}></span>
                 </div>
               </button>
@@ -704,33 +753,44 @@ export default function Header() {
                 <Image
                   src="/Just Becho Logo Golden.png"
                   alt="Just Becho"
-                  width={70}
-                  height={70}
-                  className="h-14 w-auto transition-all duration-500 mt-1"
+                  width={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
+                  height={isDashboardPage ? 70 : isProductPage || isSellNowPage ? 70 : isCartPage ? 70 : isScrolled ? 70 : 80}
+                  className={`transition-all duration-500 mt-1 ${
+                    isDashboardPage ? 'h-14 w-auto' : 
+                    isProductPage || isSellNowPage ? 'h-14 w-auto' : 
+                    isCartPage ? 'h-14 w-auto' : // ✅ Cart page pe chhota logo
+                    isScrolled ? 'h-14 w-auto' : 'h-16 w-auto'
+                  }`}
                   priority
                 />
               </Link>
             </div>
 
-            {/* ✅ RIGHT SECTION: Icons */}
+            {/* ✅ RIGHT SECTION: ORIGINAL ICONS WAPAS */}
             <div className="flex items-center space-x-4 sm:space-x-5">
-              {/* Desktop Icons */}
+              {/* Desktop Icons - ORIGINAL SIZE AND SPACING */}
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                {/* Profile Icon with Dropdown */}
+                {/* Profile Icon with Dropdown - ORIGINAL */}
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
-                    className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
+                    className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                      isDashboardPage ? 'text-gray-900' :
+                      isProductPage || isSellNowPage ? 'text-gray-900' : 
+                      isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                      isScrolled ? 'text-gray-900' : 'text-white'
+                    }`}
                   >
                     <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
 
-                  {/* User Dropdown */}
+                  {/* User Dropdown - ORIGINAL */}
                   {showUserDropdown && user && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                       {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-sm font-medium text-gray-900 truncate">{user.name || 'User'}</p>
+                      
                         
                         {/* Seller Status Badge */}
                         {user.role === 'seller' && (
@@ -790,19 +850,29 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Wishlist Icon */}
+                {/* Wishlist Icon - ORIGINAL */}
                 <button 
                   onClick={handleWishlistClick}
-                  className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
+                  className={`hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                    isDashboardPage ? 'text-gray-900' :
+                    isProductPage || isSellNowPage ? 'text-gray-900' : 
+                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                    isScrolled ? 'text-gray-900' : 'text-white'
+                  }`}
                 >
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
-                {/* Cart Icon */}
+                {/* Cart Icon - Only show if cart API is available - ORIGINAL */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleCartClick}
-                    className="relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
+                    className={`relative hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center ${
+                      isDashboardPage ? 'text-gray-900' :
+                      isProductPage || isSellNowPage ? 'text-gray-900' : 
+                      isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                      isScrolled ? 'text-gray-900' : 'text-white'
+                    }`}
                   >
                     <FiShoppingBag className="w-6 h-6 lg:w-7 lg:h-7" />
                     {cartCount > 0 && (
@@ -814,11 +884,16 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Mobile Cart Icon */}
+              {/* Mobile Cart Icon - ORIGINAL */}
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
-                  className="md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center text-gray-900"
+                  className={`md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center ${
+                    isDashboardPage ? 'text-gray-900' :
+                    isProductPage || isSellNowPage ? 'text-gray-900' : 
+                    isCartPage ? 'text-gray-900' : // ✅ Cart page pe black icon
+                    isScrolled ? 'text-gray-900' : 'text-white'
+                  }`}
                 >
                   <FiShoppingBag className="w-6 h-6" />
                   {cartCount > 0 && (
@@ -832,7 +907,7 @@ export default function Header() {
           </div>
 
           {/* ✅ MOBILE SEARCH BAR */}
-          <div className="md:hidden border-t border-gray-200 mt-2 pt-2 pb-1 search-container">
+          <div className="md:hidden border-t border-gray-200/50 mt-2 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
                 <input
@@ -841,11 +916,21 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                  className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide text-gray-800 placeholder-gray-500 bg-white"
+                  className={`flex-1 border border-gray-300/50 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide ${
+                    isDashboardPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
+                    isProductPage || isSellNowPage ? 'text-gray-800 placeholder-gray-500 bg-white' :
+                    isCartPage ? 'text-gray-800 placeholder-gray-500 bg-white' : // ✅ Cart page pe white
+                    isScrolled ? 'text-gray-800 placeholder-gray-500 bg-white' : 'text-white placeholder-white/80 bg-white/10'
+                  }`}
                 />
                 <button
                   type="submit"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                    isDashboardPage ? 'text-gray-600' :
+                    isProductPage || isSellNowPage ? 'text-gray-600' :
+                    isCartPage ? 'text-gray-600' : // ✅ Cart page pe gray
+                    isScrolled ? 'text-gray-600' : 'text-white'
+                  }`}
                 >
                   <FiSearch className="w-4 h-4" />
                 </button>
@@ -1054,7 +1139,7 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
-                {/* Mobile Cart */}
+                {/* Mobile Cart - Only show if cart API is available */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleMobileCartClick}
@@ -1079,8 +1164,15 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ✅ SUBHEADER WITH CATEGORIES - ALWAYS WHITE */}
-      <div className="hidden md:block fixed top-20 left-0 right-0 z-40 bg-white shadow-md">
+      {/* ✅ SUBHEADER WITH CATEGORIES - ONLY FOR DESKTOP */}
+      <div
+        className={`hidden md:block fixed top-20 left-0 right-0 z-40 transition-all duration-500 ${
+          isDashboardPage ? 'bg-white shadow-md' :
+          isProductPage || isSellNowPage ? 'bg-white shadow-md' :
+          isCartPage ? 'bg-white shadow-md' : // ✅ Cart page pe white
+          isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+        }`}
+      >
         {/* Main Categories Bar - Desktop Only */}
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-4">
@@ -1097,7 +1189,12 @@ export default function Header() {
                   {/* Category Link */}
                   <Link
                     href={category.href}
-                    className="text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 text-gray-800 hover:text-gray-600"
+                    className={`text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 ${
+                      isDashboardPage ? 'text-gray-800 hover:text-gray-600' :
+                      isProductPage || isSellNowPage ? 'text-gray-800 hover:text-gray-600' :
+                      isCartPage ? 'text-gray-800 hover:text-gray-600' : // ✅ Cart page pe black
+                      isScrolled ? 'text-gray-800 hover:text-gray-600' : 'text-white hover:text-gray-200'
+                    }`}
                   >
                     {category.name.toUpperCase()}
                   </Link>
