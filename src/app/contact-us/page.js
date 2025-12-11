@@ -257,7 +257,7 @@ export default function ContactUs() {
                   href="tel:+919876543210"
                   className="text-gray-900 font-medium hover:text-blue-600"
                 >
-                  Call us at +91 98765 43210
+                  Call us at +91 9301847748
                 </a>
               </div>
             </div>
