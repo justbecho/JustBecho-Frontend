@@ -1,4 +1,3 @@
-// app/page.js - COMPLETELY FIXED VERSION
 "use client"
 
 import Header from '@/components/layout/Header'
@@ -23,7 +22,7 @@ function HomeContent() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const carouselIntervalRef = useRef(null)
 
-  // ✅ UPDATED: Brand logos - FASTER MARQUEE KE LIYE
+  // ✅ UPDATED: Brand logos
   const categoryBrands = useMemo(() => ({
     "Men's Fashion": [
       { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png" },
@@ -685,11 +684,9 @@ function HomeContent() {
 
   return (
     <>
-      <main className="min-h-screen bg-white prevent-horizontal-scroll">
-        {/* ✅ FIXED: Carousel Hero Section - CONTENT BOTTOM MEIN */}
+      <main className="min-h-screen bg-white prevent-horizontal-scroll pt-24">
+        {/* ✅ FIXED: Carousel Hero Section - HEADER KE NICHE */}
         <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
-          <Header />
-          
           <div 
             className="absolute inset-0 z-0"
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
@@ -704,7 +701,7 @@ function HomeContent() {
                 src={carouselSlides[currentSlide]?.image || "/banners/Men_s Fashion.png"}
                 alt={carouselSlides[currentSlide]?.title || "Just Becho"}
                 fill
-                className="object-fit object-center brightness-110 contrast-105 saturate-110"
+                className="object-cover object-center brightness-110 contrast-105 saturate-110"
                 priority
                 sizes="100vw"
                 onError={(e) => {
@@ -713,7 +710,7 @@ function HomeContent() {
               />
               <div className="absolute inset-0 bg-black/40"></div>
               
-              {/* ✅ FIXED: Content bottom position - WORKING NOW */}
+              {/* ✅ FIXED: Content bottom position */}
               <div className="carousel-content">
                 <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
                   <h1 className="carousel-title text-white font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">

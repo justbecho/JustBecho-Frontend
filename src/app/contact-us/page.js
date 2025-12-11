@@ -303,7 +303,7 @@ export default function ContactUs() {
                   What are your business hours?
                 </h4>
                 <p className="text-gray-600 text-sm">
-                  Our support is available Monday to Saturday from 9:00 AM to 8:00 PM.
+                  Our support is available Monday to Saturday from 9:00 AM to 6:00 PM.
                 </p>
               </div>
               
