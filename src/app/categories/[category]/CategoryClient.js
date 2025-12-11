@@ -250,11 +250,15 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
 
   return (
     <>
+      {/* ✅ HEADER COMPONENT - REMOVED from main content */}
+      <Header />
+      
+      {/* ✅ HEADER KE BAAD SPACING - IMPORTANT */}
+      <div className="pt-24"></div>
+      
       <main className="min-h-screen bg-white">
         {/* Hero Section - WITH IMAGE FALLBACK */}
-        <section className="relative h-[60vh] sm:h-[75vh] md:h-[85vh] overflow-hidden">
-          <Header />
-          
+        <section className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
           <div className="absolute inset-0 z-0">
             {/* ✅ Gradient background as fallback */}
             <div className={`absolute inset-0 ${imageError ? 'bg-gradient-to-br from-gray-900 to-black' : 'bg-black/40'}`}></div>
