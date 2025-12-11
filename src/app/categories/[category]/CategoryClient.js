@@ -250,76 +250,59 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
 
   return (
     <>
-      {/* ✅ HEADER COMPONENT - REMOVED from main content */}
+      {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
       <Header />
       
-      {/* ✅ HEADER KE BAAD SPACING - IMPORTANT */}
-      <div className="pt-24"></div>
-      
-      <main className="min-h-screen bg-white">
-        {/* Hero Section - WITH IMAGE FALLBACK */}
-        <section className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            {/* ✅ Gradient background as fallback */}
-            <div className={`absolute inset-0 ${imageError ? 'bg-gradient-to-br from-gray-900 to-black' : 'bg-black/40'}`}></div>
+      {/* ✅ COMPLETE CATEGORY PAGE CONTENT (HEADER KE BAAAD) */}
+      <div className="bg-white">
+        {/* ✅ Hero Banner - HEADER KE BAAAD SHURU */}
+        <div className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-10"></div>
+          
+          {/* Banner Image */}
+          <Image
+            src={config.banner}
+            alt={config.title}
+            fill
+            className="object-cover"
+            priority
+            onError={handleImageError}
+          />
+          
+          {/* Hero Content */}
+          <div className="relative z-20 h-full flex flex-col justify-center items-center text-white px-4">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center">
+              {config.title}
+            </h1>
+            <p className="text-lg md:text-xl text-center max-w-2xl mb-8">
+              {config.subtitle}
+            </p>
             
-            {/* ✅ Try to load image, agar na ho toh gradient dikhega */}
-            {!imageError && (
-              <Image
-                src={config.banner}
-                alt={`${config.title} - Just Becho`}
-                fill
-                className="object-cover object-center"
-                priority
-                onError={handleImageError}
-              />
-            )}
-          </div>
-
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="text-center text-white px-4 sm:px-6">
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-widest uppercase mb-6 opacity-0 animate-fade-in-up"
-                  style={{animationDelay: '0.3s', animationFillMode: 'forwards'}}>
-                {config.title}
-              </h1>
-              <p className="text-xl sm:text-2xl font-light tracking-widest uppercase opacity-90 max-w-2xl mx-auto opacity-0 animate-fade-in-up"
-                 style={{animationDelay: '0.6s', animationFillMode: 'forwards'}}>
-                {config.subtitle}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 opacity-0 animate-fade-in-up"
-                   style={{animationDelay: '0.9s', animationFillMode: 'forwards'}}>
-                <Link
-                  href="#products"
-                  className="bg-white text-gray-900 px-8 py-4 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-lg"
-                >
-                  SHOP NOW
-                </Link>
-                <Link
-                  href="/sell-now"
-                  className="border-2 border-white text-white px-8 py-4 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-lg"
-                >
-                  SELL ITEMS
-                </Link>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="#products"
+                className="bg-white text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors"
+              >
+                SHOP NOW
+              </Link>
+              <Link
+                href="/sell-now"
+                className="border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors"
+              >
+                SELL ITEMS
+              </Link>
             </div>
           </div>
+        </div>
 
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-            <div className="w-5 h-8 border-2 border-white rounded-full flex justify-center">
-              <div className="w-1 h-2 bg-white rounded-full mt-1"></div>
-            </div>
-          </div>
-        </section>
-
-        {/* Main Content */}
-        <section id="products" className="py-16 bg-white">
+        {/* ✅ Products Section */}
+        <section id="products" className="py-12 md:py-16">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="flex flex-col lg:flex-row gap-8">
               
               {/* Sidebar Filters */}
               <div className="lg:w-80 flex-shrink-0">
-                <div className="bg-gray-50 rounded-2xl p-6 sticky top-32">
+                <div className="bg-gray-50 rounded-2xl p-6">
                   
                   <div className="mb-8">
                     <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-4">
@@ -494,8 +477,9 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
           </div>
         </section>
 
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+        {/* ✅ Why Shop Section */}
+        <section className="py-12 md:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
               <h2 className="text-gray-900 text-3xl sm:text-4xl font-light tracking-widest uppercase mb-4">
                 {config.whyTitle}
@@ -504,7 +488,7 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {config.features.map((feature, index) => (
-                <div key={index} className="text-center">
+                <div key={index} className="text-center p-6">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center">
                     <span className="text-white text-2xl">{feature.icon}</span>
                   </div>
@@ -519,8 +503,8 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
             </div>
           </div>
         </section>
-
-      </main>
+      </div>
+      
       <Footer />
     </>
   )
