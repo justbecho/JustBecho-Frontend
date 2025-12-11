@@ -704,7 +704,7 @@ function HomeContent() {
                 src={carouselSlides[currentSlide]?.image || "/banners/Men_s Fashion.png"}
                 alt={carouselSlides[currentSlide]?.title || "Just Becho"}
                 fill
-                className="object-cover object-center brightness-110 contrast-105 saturate-110"
+                className="object-fit object-center brightness-110 contrast-105 saturate-110"
                 priority
                 sizes="100vw"
                 onError={(e) => {

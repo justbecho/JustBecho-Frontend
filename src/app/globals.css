@@ -1,4 +1,4 @@
-/* globals.css - UPDATED WITH ALL FIXES */
+/* globals.css - UPDATED WITH ADJUSTED MOBILE SPEED */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -65,7 +65,7 @@ html {
   }
 }
 
-/* ✅ UPDATED: INFINITE Marquee WITHOUT GLITCH - PROPER INFINITE SCROLL */
+/* ✅ UPDATED: FASTER Marquee Animations for Brands - MOBILE SLOWER */
 @keyframes faster-marquee-mobile {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
@@ -77,11 +77,11 @@ html {
 }
 
 .animate-faster-marquee-mobile {
-  animation: faster-marquee-mobile 12s linear infinite !important; /* ✅ FASTER SPEED - Mobile: 12s */
+  animation: faster-marquee-mobile 22s linear infinite !important; /* ✅ MOBILE: 22s (dheere) */
 }
 
 .animate-faster-marquee {
-  animation: faster-marquee 20s linear infinite !important; /* ✅ FASTER SPEED - Desktop: 20s */
+  animation: faster-marquee 15s linear infinite !important; /* ✅ DESKTOP: 15s (fast) */
 }
 
 /* ✅ UPDATED: SINGLE MARQUEE CONTAINER (No duplicate marquees) */
@@ -109,14 +109,14 @@ html {
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: faster-marquee 20s linear infinite;
+  animation: faster-marquee 15s linear infinite;
   will-change: transform;
 }
 
 .marquee-track-mobile {
   display: flex;
   width: max-content;
-  animation: faster-marquee-mobile 12s linear infinite;
+  animation: faster-marquee-mobile 22s linear infinite; /* ✅ MOBILE: 22s */
   will-change: transform;
 }
 
@@ -155,12 +155,12 @@ html {
 
 .marquee-seamless {
   display: flex;
-  animation: seamless-loop 20s linear infinite;
+  animation: seamless-loop 15s linear infinite; /* ✅ DESKTOP: 15s */
 }
 
 .marquee-seamless-mobile {
   display: flex;
-  animation: seamless-loop 12s linear infinite;
+  animation: seamless-loop 22s linear infinite !important; /* ✅ MOBILE: 22s (dheere) */
 }
 
 /* ✅ MOBILE: Hide desktop marquee, Show mobile marquee */
@@ -174,7 +174,15 @@ html {
   }
   
   .animate-faster-marquee-mobile {
-    animation: faster-marquee-mobile 10s linear infinite !important; /* ✅ EVEN FASTER ON MOBILE */
+    animation: faster-marquee-mobile 22s linear infinite !important; /* ✅ MOBILE: 22s (dheere) */
+  }
+  
+  .marquee-track-mobile {
+    animation: faster-marquee-mobile 22s linear infinite !important; /* ✅ MOBILE: 22s */
+  }
+  
+  .marquee-seamless-mobile {
+    animation: seamless-loop 22s linear infinite !important; /* ✅ MOBILE: 22s */
   }
 }
 
@@ -189,7 +197,15 @@ html {
   }
   
   .animate-faster-marquee {
-    animation: faster-marquee 15s linear infinite !important; /* ✅ EVEN FASTER ON DESKTOP */
+    animation: faster-marquee 15s linear infinite !important; /* ✅ DESKTOP: 15s (fast) */
+  }
+  
+  .marquee-track {
+    animation: faster-marquee 15s linear infinite !important; /* ✅ DESKTOP: 15s */
+  }
+  
+  .marquee-seamless {
+    animation: seamless-loop 15s linear infinite !important; /* ✅ DESKTOP: 15s */
   }
 }
 
