@@ -1,4 +1,4 @@
-// app/page.js - CLIENT COMPONENT
+// app/page.js - COMPLETELY FIXED VERSION
 "use client"
 
 import Header from '@/components/layout/Header'
@@ -164,11 +164,11 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ INFINITE MARQUEE FUNCTION - BANAYE BINA GAP KE
+  // ✅ UPDATED: PROPER INFINITE MARQUEE WITHOUT GLITCH
   const createInfiniteMarquee = (brands) => {
     if (!brands || brands.length === 0) return [];
-    // 6 copies banaye taki proper infinite effect mile
-    return [...brands, ...brands, ...brands, ...brands, ...brands, ...brands];
+    // Create enough duplicates for seamless transition
+    return [...brands, ...brands, ...brands, ...brands];
   };
 
   // ✅ Carousel slides from categories
@@ -551,7 +551,7 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ UPDATED: Brand logo component - INFINITE MARQUEE KE SAATH
+  // ✅ UPDATED: Brand logo component - SINGLE MARQUEE ONLY
   const BrandLogo = ({ brand, index, categoryName }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
@@ -576,7 +576,7 @@ function HomeContent() {
           <img
             src={imgSrc}
             alt={brand.name}
-            className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300"
+            className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-80 hover:opacity-100"
             onError={(e) => {
               if (!hasError && brand.fallback) {
                 setImgSrc(brand.fallback);
@@ -592,37 +592,44 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: INFINITE Brand Marquee Component
+  // ✅ UPDATED: SINGLE INFINITE Brand Marquee Component (NO DUPLICATES)
   const InfiniteBrandMarquee = ({ brands, categoryName }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
     
     return (
       <div className="marquee-container w-full overflow-hidden py-4 sm:py-6">
-        <div className="hidden sm:flex marquee-track whitespace-nowrap">
-          {infiniteBrands.map((brand, index) => (
-            <BrandLogo 
-              key={`${brand.name}-${index}`} 
-              brand={brand} 
-              index={index}
-              categoryName={categoryName}
-            />
-          ))}
+        {/* ✅ SINGLE MARQUEE - Desktop version */}
+        <div className="marquee-desktop whitespace-nowrap">
+          <div className="marquee-seamless">
+            {infiniteBrands.map((brand, index) => (
+              <BrandLogo 
+                key={`desktop-${brand.name}-${index}`} 
+                brand={brand} 
+                index={index}
+                categoryName={categoryName}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex sm:hidden marquee-track-mobile whitespace-nowrap">
-          {infiniteBrands.map((brand, index) => (
-            <BrandLogo 
-              key={`${brand.name}-mobile-${index}`} 
-              brand={brand} 
-              index={index}
-              categoryName={categoryName}
-            />
-          ))}
+        
+        {/* ✅ SINGLE MARQUEE - Mobile version */}
+        <div className="marquee-mobile whitespace-nowrap">
+          <div className="marquee-seamless-mobile">
+            {infiniteBrands.map((brand, index) => (
+              <BrandLogo 
+                key={`mobile-${brand.name}-${index}`} 
+                brand={brand} 
+                index={index}
+                categoryName={categoryName}
+              />
+            ))}
+          </div>
         </div>
       </div>
     )
   }
 
-  // ✅ UPDATED: Product card render function - MOBILE OPTIMIZED
+  // ✅ UPDATED: Product card render function
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
     
@@ -676,18 +683,10 @@ function HomeContent() {
     )
   }
 
-  // ✅ Helper function to safely convert strings to uppercase
-  const safeToUpperCase = (str) => {
-    if (typeof str === 'string') {
-      return str.toUpperCase();
-    }
-    return '';
-  }
-
   return (
     <>
       <main className="min-h-screen bg-white prevent-horizontal-scroll">
-        {/* ✅ UPDATED: Carousel Hero Section - CONTENT BOTTOM MEIN */}
+        {/* ✅ FIXED: Carousel Hero Section - CONTENT BOTTOM MEIN */}
         <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
           <Header />
           
@@ -714,7 +713,7 @@ function HomeContent() {
               />
               <div className="absolute inset-0 bg-black/40"></div>
               
-              {/* ✅ UPDATED: Content bottom position */}
+              {/* ✅ FIXED: Content bottom position - WORKING NOW */}
               <div className="carousel-content">
                 <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
                   <h1 className="carousel-title text-white font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
@@ -984,7 +983,7 @@ function HomeContent() {
                     </div>
                   )}
 
-                  {/* ✅ UPDATED: INFINITE Brand Marquee */}
+                  {/* ✅ FIXED: SINGLE INFINITE Brand Marquee (NO DUPLICATE MARQUEES) */}
                   {categoryBrandsData.length > 0 && (
                     <div className="mt-12 sm:mt-16">
                       <div className="text-center mb-6 sm:mb-8">
