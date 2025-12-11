@@ -253,11 +253,14 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
       {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
       <Header />
       
-      {/* ✅ COMPLETE CATEGORY PAGE CONTENT (HEADER KE BAAAD) */}
+      {/* ✅ MAIN CONTENT - HEADER KE BAAAD SHURU */}
       <div className="bg-white">
-        {/* ✅ Hero Banner - HEADER KE BAAAD SHURU */}
-        <div className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-10"></div>
+        {/* ✅ TOP SPACING FOR COMPLETE HEADER (MAIN HEADER + SUBHEADER) */}
+        <div className="pt-32 md:pt-36"></div>
+        
+        {/* ✅ Hero Banner Section */}
+        <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-10"></div>
           
           {/* Banner Image */}
           <Image
@@ -302,7 +305,7 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
               
               {/* Sidebar Filters */}
               <div className="lg:w-80 flex-shrink-0">
-                <div className="bg-gray-50 rounded-2xl p-6">
+                <div className="bg-gray-50 rounded-2xl p-6 sticky top-44">
                   
                   <div className="mb-8">
                     <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-4">
