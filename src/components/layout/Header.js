@@ -19,19 +19,18 @@ export default function Header() {
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
   const [cartApiAvailable, setCartApiAvailable] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('') // ✅ Search query state
-  const [showSearchResults, setShowSearchResults] = useState(false) // ✅ Search results visibility
-  const [searchResults, setSearchResults] = useState([]) // ✅ Search results
-  const [searchLoading, setSearchLoading] = useState(false) // ✅ Search loading
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
 
   const isProductPage = pathname?.includes('/products/')
   const isSellNowPage = pathname === '/sell-now'
   const isDashboardPage = pathname?.includes('/dashboard')
-  const isCartPage = pathname === '/cart' // ✅ CART PAGE DETECTION
+  const isCartPage = pathname === '/cart'
 
-  // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
     if (!username) return null;
     
@@ -49,7 +48,6 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ FIXED: Listen for seller status updates - ERROR FIXED HERE
   useEffect(() => {
     const updateUserState = () => {
       try {
@@ -96,7 +94,6 @@ export default function Header() {
       }
     };
     
-    // ✅ CORRECT FUNCTION NAME - match karega cleanup mein
     const handleSellerStatusUpdate = () => {
       updateUserState();
     };
@@ -110,13 +107,11 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      // ✅ FIXED: Ab sahi function name use karein
       window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
       clearInterval(pollInterval);
     };
   }, [ensureJustbechoFormat])
 
-  // ✅ FIXED: Fetch categories from backend ONLY
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -137,11 +132,11 @@ export default function Header() {
           setCategories(data.categories)
         } else {
           console.error('❌ Backend API response structure incorrect')
-          setCategories([]) // Empty array if no categories from backend
+          setCategories([])
         }
       } catch (error) {
         console.error('💥 Error fetching categories from backend:', error)
-        setCategories([]) // Empty array on error
+        setCategories([])
       } finally {
         setLoading(false)
       }
@@ -150,7 +145,6 @@ export default function Header() {
     fetchCategories()
   }, [])
 
-  // ✅ FIXED: Fetch cart count
   const fetchCartCount = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
@@ -188,10 +182,8 @@ export default function Header() {
     }
   }, [])
 
-  // ✅ FIXED: Scroll effect - CART PAGE PE BINA SCROLL KARE WHITE
   useEffect(() => {
     const handleScroll = () => {
-      // ✅ Cart page pe bina scroll kare hi white
       if (isCartPage) {
         setIsScrolled(true);
       } else {
@@ -203,9 +195,8 @@ export default function Header() {
     
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isCartPage]) // ✅ isCartPage dependency add kiya
+  }, [isCartPage])
 
-  // ✅ SEARCH FUNCTIONALITY
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -257,7 +248,6 @@ export default function Header() {
     }
   };
 
-  // ✅ Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target.closest('.search-container')) return;
@@ -268,7 +258,6 @@ export default function Header() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // ✅ BURGER MENU ANIMATION HANDLER
   const handleBurgerClick = () => {
     setIsMenuAnimating(true);
     setIsMenuOpen(!isMenuOpen);
@@ -278,7 +267,6 @@ export default function Header() {
     }, 300);
   };
 
-  // ✅ Convert to Seller Function
   const convertToSeller = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -344,18 +332,15 @@ export default function Header() {
     }
   }, [router, ensureJustbechoFormat])
 
-  // ✅ FIXED: Transform categories - ONLY BACKEND DATA
   const transformedCategories = useMemo(() => {
     console.log('🔄 Transforming backend categories:', categories)
     
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
       console.log('⚠️ No categories from backend')
-      return []; // Empty array - will show "No categories available"
+      return [];
     }
     
-    // Transform backend categories based on their structure
     const transformed = categories.map((category, index) => {
-      // If category is a string (like ["Mobile Phones", "Laptops"])
       if (typeof category === 'string') {
         return {
           name: category,
@@ -369,7 +354,6 @@ export default function Header() {
         };
       }
       
-      // If category is an object (with name, href, subCategories)
       return {
         name: category?.name || `Category ${index + 1}`,
         href: category?.href || `/categories/${(category?.name || `category-${index}`).toLowerCase().replace(/\s+/g, '-')}`,
@@ -386,7 +370,6 @@ export default function Header() {
     return transformed;
   }, [categories]);
 
-  // ✅ Rest of your handlers remain the same...
   const handleSellNowClick = useCallback((e) => {
     e.preventDefault()
     
@@ -604,17 +587,16 @@ export default function Header() {
 
   return (
     <>
-      {/* ✅ MAIN HEADER - ALWAYS WHITE BACKGROUND, BLACK TEXT */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-sans bg-white text-gray-900 shadow-sm`}
       >
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <div className="flex items-center justify-between py-4 sm:py-5">
             
-            {/* ✅ LEFT SECTION: Desktop Search + Sell Now */}
+            {/* LEFT SECTION: Desktop Search + Sell Now */}
             <div className="hidden md:flex items-center space-x-4">
               
-              {/* DESKTOP SEARCH BAR - DARK TEXT */}
+              {/* DESKTOP SEARCH BAR */}
               <div className="relative w-60 lg:w-72 search-container">
                 <form onSubmit={handleSearchSubmit}>
                   <input
@@ -633,7 +615,7 @@ export default function Header() {
                   </button>
                 </form>
                 
-                {/* SEARCH RESULTS */}
+                {/* SEARCH RESULTS - WITHOUT "VIEW ALL RESULTS" */}
                 {showSearchResults && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
                     {searchLoading ? (
@@ -671,17 +653,6 @@ export default function Header() {
                             </div>
                           </Link>
                         ))}
-                        <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
-                          <button
-                            onClick={() => {
-                              setShowSearchResults(false);
-                              router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                            }}
-                            className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
-                          >
-                            View all results
-                          </button>
-                        </div>
                       </div>
                     ) : searchQuery.trim() && (
                       <div className="p-4 text-center text-gray-500">
@@ -692,7 +663,7 @@ export default function Header() {
                 )}
               </div>
               
-              {/* DESKTOP SELL NOW BUTTON - BLACK TEXT */}
+              {/* DESKTOP SELL NOW BUTTON */}
               <button
                 onClick={handleSellNowClick}
                 className="px-5 py-2.5 rounded-full text-sm font-medium transition-colors bg-black text-white hover:bg-gray-800"
@@ -701,7 +672,7 @@ export default function Header() {
               </button>
             </div>
 
-            {/* ✅ MOBILE Burger Menu - BLACK ICON */}
+            {/* MOBILE Burger Menu */}
             <div className="md:hidden flex items-center">
               <button
                 className={`focus:outline-none p-1 ${
@@ -730,7 +701,7 @@ export default function Header() {
               </button>
             </div>
 
-            {/* ✅ CENTER: Logo */}
+            {/* CENTER: Logo */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <Link href="/" className="flex items-center justify-center">
                 <Image
@@ -744,11 +715,11 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* ✅ RIGHT SECTION: ORIGINAL ICONS WAPAS - BLACK ICONS */}
+            {/* RIGHT SECTION: Icons */}
             <div className="flex items-center space-x-4 sm:space-x-5">
-              {/* Desktop Icons - BLACK */}
+              {/* Desktop Icons */}
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                {/* Profile Icon with Dropdown - BLACK */}
+                {/* Profile Icon with Dropdown */}
                 <div className="relative">
                   <button 
                     onClick={handleProfileClick}
@@ -757,13 +728,12 @@ export default function Header() {
                     <FiUser className="w-6 h-6 lg:w-7 lg:h-7" />
                   </button>
 
-                  {/* User Dropdown - ALREADY WHITE WITH BLACK TEXT */}
+                  {/* User Dropdown */}
                   {showUserDropdown && user && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                       {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-sm font-medium text-gray-900 truncate">{user.name || 'User'}</p>
-                      
                         
                         {/* Seller Status Badge */}
                         {user.role === 'seller' && (
@@ -777,7 +747,7 @@ export default function Header() {
                         )}
                       </div>
                       
-                      {/* Dashboard Links - BLACK TEXT */}
+                      {/* Dashboard Links */}
                       <div className="py-1">
                         <Link 
                           href="/dashboard" 
@@ -823,7 +793,7 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Wishlist Icon - BLACK */}
+                {/* Wishlist Icon */}
                 <button 
                   onClick={handleWishlistClick}
                   className="hover:text-gray-700 transition-all duration-300 transform hover:scale-110 flex items-center text-gray-900"
@@ -831,7 +801,7 @@ export default function Header() {
                   <FiHeart className="w-6 h-6 lg:w-7 lg:h-7" />
                 </button>
 
-                {/* Cart Icon - BLACK */}
+                {/* Cart Icon */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleCartClick}
@@ -847,7 +817,7 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Mobile Cart Icon - BLACK */}
+              {/* Mobile Cart Icon */}
               {cartApiAvailable && (
                 <button 
                   onClick={handleMobileCartClick}
@@ -864,7 +834,7 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ✅ MOBILE SEARCH BAR - BLACK TEXT */}
+          {/* MOBILE SEARCH BAR */}
           <div className="md:hidden border-t border-gray-200 mt-2 pt-2 pb-1 search-container">
             <div className="relative">
               <form onSubmit={handleSearchSubmit}>
@@ -884,7 +854,7 @@ export default function Header() {
                 </button>
               </form>
               
-              {/* Mobile Search Results */}
+              {/* Mobile Search Results - WITHOUT "VIEW ALL RESULTS" */}
               {showSearchResults && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
                   {searchLoading ? (
@@ -925,18 +895,6 @@ export default function Header() {
                           </div>
                         </Link>
                       ))}
-                      <div className="border-t border-gray-200 mt-2 pt-2 px-4 py-2">
-                        <button
-                          onClick={() => {
-                            setShowSearchResults(false);
-                            setIsMenuOpen(false);
-                            router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                          }}
-                          className="w-full text-center text-sm text-gray-700 hover:text-gray-900 py-1 font-medium"
-                        >
-                          View all results
-                        </button>
-                      </div>
                     </div>
                   ) : searchQuery.trim() && (
                     <div className="p-4 text-center text-gray-500">
@@ -949,7 +907,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ MOBILE MENU - ALREADY WHITE WITH BLACK TEXT */}
+        {/* MOBILE MENU */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
@@ -964,7 +922,7 @@ export default function Header() {
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}>
             <nav className="flex flex-col h-full overflow-y-auto">
-              {/* Header with Close Button - BLACK TEXT */}
+              {/* Header with Close Button */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div className="flex items-center">
                   <Image
@@ -987,7 +945,7 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* CATEGORIES SECTION - BLACK TEXT */}
+              {/* CATEGORIES SECTION */}
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-900 mb-4 uppercase tracking-wider">CATEGORIES</h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -1010,7 +968,7 @@ export default function Header() {
                 </div>
               </div>
 
-              {/* Mobile Menu Items - BLACK TEXT */}
+              {/* Mobile Menu Items */}
               <div className="flex-1 p-6 space-y-1">
                 {/* Home Link */}
                 <Link 
@@ -1087,7 +1045,7 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
-                {/* Mobile Cart - Only show if cart API is available */}
+                {/* Mobile Cart */}
                 {cartApiAvailable && (
                   <button 
                     onClick={handleMobileCartClick}
@@ -1112,11 +1070,11 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ✅ SUBHEADER WITH CATEGORIES - ALWAYS WHITE BACKGROUND, BLACK TEXT */}
+      {/* SUBHEADER WITH CATEGORIES */}
       <div
         className="hidden md:block fixed top-20 left-0 right-0 z-40 bg-white shadow-md"
       >
-        {/* Main Categories Bar - Desktop Only */}
+        {/* Main Categories Bar */}
         <div className="w-[95%] sm:w-[90%] mx-auto">
           <nav className="flex items-center justify-center space-x-8 lg:space-x-12 py-4">
             {loading ? (
@@ -1129,7 +1087,7 @@ export default function Header() {
                   onMouseEnter={() => setActiveCategory(category.name)}
                   onMouseLeave={() => setActiveCategory(null)}
                 >
-                  {/* Category Link - BLACK TEXT */}
+                  {/* Category Link */}
                   <Link
                     href={category.href}
                     className="text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 text-gray-800 hover:text-gray-600"
@@ -1137,7 +1095,7 @@ export default function Header() {
                     {category.name.toUpperCase()}
                   </Link>
 
-                  {/* COMPACT DROPDOWN - BLACK TEXT */}
+                  {/* COMPACT DROPDOWN */}
                   {activeCategory === category.name && (
                     <div 
                       className="fixed left-0 right-0 top-[130px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
@@ -1148,12 +1106,12 @@ export default function Header() {
                         <div className="grid grid-cols-5 gap-6">
                           {category.dropdown.sections.map((section, sectionIndex) => (
                             <div key={sectionIndex} className="space-y-2">
-                              {/* Section Title - Compact */}
+                              {/* Section Title */}
                               <h3 className="text-gray-900 text-[13px] font-semibold tracking-wide uppercase mb-1">
                                 {section.title}
                               </h3>
                               
-                              {/* Section Items - Compact */}
+                              {/* Section Items */}
                               <ul className="space-y-1">
                                 {section.items.map((item, itemIndex) => (
                                   <li key={itemIndex}>
@@ -1170,7 +1128,7 @@ export default function Header() {
                           ))}
                         </div>
                         
-                        {/* View All Button - Compact */}
+                        {/* View All Button */}
                         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
                           <Link
                             href={category.href}
