@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo, Suspense, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import AuthModal from '@/components/ui/AuthModal'
 
 // Main content ko alag component mein rakho
 function HomeContent() {
@@ -16,6 +17,10 @@ function HomeContent() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
   const [brandsFromBackend, setBrandsFromBackend] = useState([])
+  
+  // ✅ NEW: Auth Modal State
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   
   // ✅ Carousel states
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -29,7 +34,7 @@ function HomeContent() {
       { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png" },
       { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png" },
       { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png" },
       { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
       { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png", fallback: "/brands/burberry.png" },
       { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png" }
@@ -38,7 +43,7 @@ function HomeContent() {
       { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png" },
       { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png" },
       { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuitton.png" },
+      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png" },
       { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
       { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png", fallback: "/brands/givenchy.png" },
       { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png" }
@@ -338,6 +343,39 @@ function HomeContent() {
       rating: 5
     }
   ], [])
+
+  // ✅ Check if user is logged in
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token')
+        const user = localStorage.getItem('user')
+        setIsLoggedIn(!!(token && user))
+      }
+    }
+
+    checkLoginStatus()
+    window.addEventListener('authChange', checkLoginStatus)
+    window.addEventListener('storage', checkLoginStatus)
+
+    return () => {
+      window.removeEventListener('authChange', checkLoginStatus)
+      window.removeEventListener('storage', checkLoginStatus)
+    }
+  }, [])
+
+  // ✅ Handle Sell Now Click
+  const handleSellNowClick = (e) => {
+    e.preventDefault()
+    
+    if (isLoggedIn) {
+      // User is logged in, redirect to sell-now page
+      router.push('/sell-now')
+    } else {
+      // User is not logged in, show auth modal
+      setShowAuthModal(true)
+    }
+  }
 
   // ✅ Carousel functions
   const nextSlide = () => {
@@ -686,6 +724,14 @@ function HomeContent() {
     <>
       {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
       <Header />
+      
+      {/* ✅ AUTH MODAL */}
+      {showAuthModal && (
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={() => setShowAuthModal(false)} 
+        />
+      )}
       
       {/* ✅ FIXED: MAIN CONTENT WITH PROPER SPACING */}
       <div className="bg-white">
@@ -1036,12 +1082,13 @@ function HomeContent() {
                     <p className="text-gray-300 text-sm sm:text-base font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto responsive-text">
                       Get the best value for your luxury items
                     </p>
-                    <Link
-                      href="/complete-profile"
-                      className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text"
+                    {/* ✅ MODIFIED: SELL NOW BUTTON WITH HANDLER */}
+                    <button
+                      onClick={handleSellNowClick}
+                      className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text px-6 py-3"
                     >
                       SELL NOW
-                    </Link>
+                    </button>
                   </div>
                 </section>
               )}
@@ -1155,16 +1202,17 @@ function HomeContent() {
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
               <Link
                 href="/products"
-                className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full responsive-text"
+                className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full responsive-text px-6 py-3"
               >
                 SHOP VERIFIED LUXURY
               </Link>
-              <Link
-                href="/complete-profile"
-                className="touch-button border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full responsive-text"
+              {/* ✅ MODIFIED: SELL WITH CONFIDENCE BUTTON */}
+              <button
+                onClick={handleSellNowClick}
+                className="touch-button border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full responsive-text px-6 py-3"
               >
                 SELL WITH CONFIDENCE
-              </Link>
+              </button>
             </div>
           </div>
         </section>
