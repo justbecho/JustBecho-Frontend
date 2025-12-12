@@ -1037,7 +1037,7 @@ function HomeContent() {
                       Get the best value for your luxury items
                     </p>
                     <Link
-                      href="/sell-now"
+                      href="/complete-profile"
                       className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text"
                     >
                       SELL NOW
@@ -1160,7 +1160,7 @@ function HomeContent() {
                 SHOP VERIFIED LUXURY
               </Link>
               <Link
-                href="/sell-now"
+                href="/complete-profile"
                 className="touch-button border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full responsive-text"
               >
                 SELL WITH CONFIDENCE
