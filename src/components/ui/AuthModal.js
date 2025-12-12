@@ -163,29 +163,20 @@ export default function AuthModal({ isOpen, onClose }) {
     }
   }
 
+  // ✅ FIXED: Google Auth with proper redirect URIs
   const handleGoogleAuth = () => {
     try {
       localStorage.setItem('isGoogleSignup', 'true');
       localStorage.removeItem('changingRoleToSeller');
       
-      // Get current domain
-      const currentDomain = window.location.hostname;
-      
-      // Determine frontend URL
-      let frontendUrl;
-      if (currentDomain === 'justbecho.com') {
-        frontendUrl = 'https://justbecho.com';
-      } else if (currentDomain === 'localhost' || currentDomain === '127.0.0.1') {
-        frontendUrl = 'http://localhost:3000';
-      } else {
-        // For vercel preview deployments
-        frontendUrl = `https://${currentDomain}`;
-      }
-      
-      // Pass frontend URL to backend as per your backend code
-      const googleAuthUrl = `https://just-becho-backend.vercel.app/api/auth/google?frontend=${encodeURIComponent(frontendUrl)}`;
+      // ✅ FIX 1: Use backend's direct Google OAuth endpoint
+      // The backend is at just-becho-backend.vercel.app
+      // So the redirect URI must be from the backend domain
+      const googleAuthUrl = `https://just-becho-backend.vercel.app/api/auth/google`;
       
       console.log('🌐 Google Auth URL:', googleAuthUrl);
+      console.log('🔍 This will redirect to Google OAuth with backend callback URL');
+      
       window.location.href = googleAuthUrl;
     } catch (error) {
       console.error('Google auth error:', error)
