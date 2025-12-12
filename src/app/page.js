@@ -1037,7 +1037,7 @@ function HomeContent() {
                       Get the best value for your luxury items
                     </p>
                     <Link
-                      href="/sell"
+                      href="/sell-now"
                       className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text"
                     >
                       SELL NOW
