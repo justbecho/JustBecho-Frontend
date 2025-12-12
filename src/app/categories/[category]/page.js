@@ -1,76 +1,8 @@
-// app/categories/[category]/page.js - UPDATED SERVER COMPONENT
+// app/categories/[category]/page.js - SIMPLIFIED VERSION
 import CategoryClient from './CategoryClient'
 
-// ✅ Server-side function for static generation
+// ✅ Static params - SIMPLE
 export async function generateStaticParams() {
-    try {
-        // ✅ Categories fetch karne ke liye correct API endpoint
-        const apiUrl = 'https://just-becho-backend.vercel.app/api/categories'
-        console.log('📡 Fetching categories from:', apiUrl)
-
-        const response = await fetch(apiUrl, {
-            next: { revalidate: 3600 } // 1 hour cache
-        })
-
-        if (response.ok) {
-            const data = await response.json()
-
-            if (data.success && data.categories) {
-                console.log('✅ Categories found:', data.categories)
-
-                // ✅ Backend categories ko slug mein convert karte hain
-                const categories = data.categories.map(cat => {
-                    // Category name ko slug mein convert
-                    const categoryName = cat.name || cat
-
-                    // Slug mapping for common categories
-                    const slugMapping = {
-                        "men's fashion": "men",
-                        "men's clothing": "men",
-                        "men": "men",
-                        "women's fashion": "women",
-                        "women's clothing": "women",
-                        "women": "women",
-                        "footwear": "footwear",
-                        "shoes": "footwear",
-                        "accessories": "accessories",
-                        "watches": "watches",
-                        "perfumes": "perfumes",
-                        "fragrances": "perfumes",
-                        "toys & collectibles": "toys",
-                        "toys": "toys",
-                        "collectibles": "toys",
-                        "kids fashion": "kids",
-                        "kids": "kids",
-                        "children": "kids"
-                    }
-
-                    // Check slug mapping ya fir direct convert
-                    const slug = slugMapping[categoryName.toLowerCase()] ||
-                        categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
-
-                    return {
-                        category: slug
-                    }
-                })
-
-                // Unique categories return karo
-                const uniqueCategories = Array.from(
-                    new Map(categories.map(item => [item.category, item])).values()
-                )
-
-                console.log('📋 Generated static params:', uniqueCategories)
-                return uniqueCategories
-            }
-        } else {
-            console.error('❌ Failed to fetch categories:', response.status)
-        }
-    } catch (error) {
-        console.error('💥 Error fetching categories:', error)
-    }
-
-    // ✅ Fallback to default categories
-    console.log('🔄 Using fallback categories')
     return [
         { category: 'men' },
         { category: 'women' },
@@ -83,48 +15,24 @@ export async function generateStaticParams() {
     ]
 }
 
-// ✅ Server Component
+// ✅ Server Component - SIMPLIFIED
 export default async function CategoryPage({ params }) {
     try {
-        // ✅ Pehle params ko await karo
+        // ✅ DIRECT - No complex mapping
         const { category } = await params
-        console.log('📋 Received params:', { category })
-
+        
+        console.log('📋 Category Page - Slug:', category)
+        
         if (!category) {
             throw new Error('Category parameter is required')
         }
 
-        // ✅ URL slug ko backend category name mein convert karo
-        const getApiCategoryName = (slug) => {
-            const slugMapping = {
-                'men': "men's fashion",
-                'mens': "men's fashion",
-                'men-fashion': "men's fashion",
-                'women': "women's fashion",
-                'womens': "women's fashion",
-                'women-fashion': "women's fashion",
-                'footwear': 'footwear',
-                'shoes': 'footwear',
-                'sneakers': 'footwear',
-                'accessories': 'accessories',
-                'watches': 'watches',
-                'perfumes': 'perfumes',
-                'fragrances': 'perfumes',
-                'toys': 'toys & collectibles',
-                'collectibles': 'toys & collectibles',
-                'kids': 'kids fashion',
-                'children': 'kids fashion'
-            }
-
-            return slugMapping[slug] || slug.replace(/-/g, ' ')
-        }
-
-        const apiCategory = getApiCategoryName(category)
-        console.log('🎯 API Category:', apiCategory)
-
-        // ✅ Category configuration
+        // ✅ DIRECT MAPPING - Backend expects these exact slugs
+        const apiCategory = category // Just pass the slug as is
+        
+        // ✅ SIMPLE CONFIG
         const categoryConfig = {
-            "men's fashion": {
+            'men': {
                 title: "MEN'S FASHION",
                 subtitle: 'Discover luxury fashion for men',
                 banner: '/banners/Men_s Fashion.png',
@@ -147,7 +55,7 @@ export default async function CategoryPage({ params }) {
                     }
                 ]
             },
-            "women's fashion": {
+            'women': {
                 title: "WOMEN'S FASHION",
                 subtitle: 'Explore curated luxury for women',
                 banner: '/banners/bagu.jpeg',
@@ -262,7 +170,7 @@ export default async function CategoryPage({ params }) {
                     }
                 ]
             },
-            'toys & collectibles': {
+            'toys': {
                 title: 'TOYS & COLLECTIBLES',
                 subtitle: 'Luxury toys and collectible treasures',
                 banner: '/banners/Toys and Figurines.png',
@@ -285,7 +193,7 @@ export default async function CategoryPage({ params }) {
                     }
                 ]
             },
-            'kids fashion': {
+            'kids': {
                 title: 'KIDS FASHION',
                 subtitle: 'Adorable luxury fashion for kids',
                 banner: '/banners/Kids Fashion.png',
@@ -310,76 +218,12 @@ export default async function CategoryPage({ params }) {
             }
         }
 
-        // ✅ Configuration get function
-        const getConfig = (apiCatName) => {
-            if (!apiCatName || typeof apiCatName !== 'string') {
-                apiCatName = 'accessories'
-            }
-
-            // Direct match dekhte hain
-            if (categoryConfig[apiCatName]) {
-                return categoryConfig[apiCatName]
-            }
-
-            // Partial match try karo
-            const matchingKey = Object.keys(categoryConfig).find(key =>
-                apiCatName.toLowerCase().includes(key.toLowerCase()) ||
-                key.toLowerCase().includes(apiCatName.toLowerCase())
-            )
-
-            if (matchingKey) {
-                return categoryConfig[matchingKey]
-            }
-
-            // ✅ Default configuration
-            const bannerPath = '/categories/default-banner.jpg'
-
-            const defaultConfig = {
-                title: apiCatName.toUpperCase(),
-                subtitle: `Discover premium ${apiCatName}`,
-                banner: bannerPath,
-                whyTitle: `WHY SHOP ${apiCatName.toUpperCase()} AT JUST BECHO`,
-                features: [
-                    {
-                        icon: '🛡️',
-                        title: 'AUTHENTICITY GUARANTEED',
-                        description: 'Every item verified by our experts'
-                    },
-                    {
-                        icon: '💎',
-                        title: 'PREMIUM QUALITY',
-                        description: 'Only genuine luxury items'
-                    },
-                    {
-                        icon: '🚚',
-                        title: 'FREE SHIPPING',
-                        description: 'Free shipping on all orders above ₹1499'
-                    }
-                ]
-            }
-
-            return defaultConfig
-        }
-
-        const config = getConfig(apiCategory)
-        console.log('🎨 Config loaded for category:', config.title)
-
-        // ✅ Client component ko props pass karo
-        return <CategoryClient
-            categorySlug={category}
-            apiCategory={apiCategory}
-            config={config}
-        />
-
-    } catch (error) {
-        console.error('❌ Error in CategoryPage:', error)
-
-        // ✅ Error fallback
-        const errorConfig = {
-            title: 'CATEGORY',
-            subtitle: 'Explore our collection',
-            banner: '/categories/default-banner.jpg',
-            whyTitle: 'WHY SHOP AT JUST BECHO',
+        // ✅ Get config or use default
+        const config = categoryConfig[category] || {
+            title: category.toUpperCase(),
+            subtitle: `Discover premium ${category}`,
+            banner: '/banners/default-banner.jpg',
+            whyTitle: `WHY SHOP ${category.toUpperCase()} AT JUST BECHO`,
             features: [
                 {
                     icon: '🛡️',
@@ -399,10 +243,45 @@ export default async function CategoryPage({ params }) {
             ]
         }
 
+        console.log('🎨 Config for category:', config.title)
+
+        // ✅ Pass to client component
         return <CategoryClient
-            categorySlug={category || 'accessories'}
-            apiCategory={category || 'accessories'}
-            config={errorConfig}
+            categorySlug={category}
+            apiCategory={apiCategory} // This is just 'men', 'women', etc.
+            config={config}
+        />
+
+    } catch (error) {
+        console.error('❌ Error in CategoryPage:', error)
+        
+        // Fallback
+        return <CategoryClient
+            categorySlug="men"
+            apiCategory="men"
+            config={{
+                title: 'CATEGORY',
+                subtitle: 'Explore our collection',
+                banner: '/banners/default-banner.jpg',
+                whyTitle: 'WHY SHOP AT JUST BECHO',
+                features: [
+                    {
+                        icon: '🛡️',
+                        title: 'AUTHENTICITY GUARANTEED',
+                        description: 'Every item verified by our experts'
+                    },
+                    {
+                        icon: '💎',
+                        title: 'PREMIUM QUALITY',
+                        description: 'Only genuine luxury items'
+                    },
+                    {
+                        icon: '🚚',
+                        title: 'FREE SHIPPING',
+                        description: 'Free shipping on all orders above ₹1499'
+                    }
+                ]
+            }}
         />
     }
 }

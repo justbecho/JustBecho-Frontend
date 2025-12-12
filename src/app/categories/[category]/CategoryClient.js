@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/layout/Header'
@@ -17,210 +17,99 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
     minPrice: '',
     maxPrice: ''
   })
-  const [categoryName, setCategoryName] = useState('')
-  const [imageError, setImageError] = useState(false)
+  const [availableBrands, setAvailableBrands] = useState([])
+  const [availableConditions, setAvailableConditions] = useState([])
+  const [error, setError] = useState(null)
 
-  // ✅ Backend se products fetch karo
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true)
-        // ✅ URL encode the category name for API call
-        const encodedCategory = encodeURIComponent(apiCategory)
-        const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${encodedCategory}`
-        console.log('📡 Fetching from:', apiUrl)
-        
-        const response = await fetch(apiUrl)
-        
-        if (response.ok) {
-          const data = await response.json()
-          
-          if (data.success && data.products) {
-            console.log(`✅ ${data.products.length} products found for ${apiCategory}`)
-            setProducts(data.products)
-            
-            // ✅ Category name set karo (pehle product se)
-            if (data.products.length > 0) {
-              const firstCategory = data.products[0]?.category || apiCategory
-              setCategoryName(firstCategory)
-            } else {
-              setCategoryName(apiCategory)
-            }
-          } else {
-            console.log(`❌ No products found for ${apiCategory}`)
-            setProducts([])
-            setCategoryName(apiCategory)
-          }
-        } else {
-          console.log('❌ API call failed:', response.status)
-          setProducts([])
-          setCategoryName(apiCategory)
-        }
-      } catch (error) {
-        console.error('💥 Error fetching products:', error)
-        setProducts([])
-        setCategoryName(apiCategory)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProducts()
-  }, [categorySlug, apiCategory])
-
-  // ✅ Product card design - RATING HATA DIYA
-  const renderProductCard = (product) => (
-    <Link 
-      href={`/products/${product._id}`}
-      key={product._id}
-      className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300 block"
-    >
-      <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-        <img
-          src={product.images?.[0]?.url || '/placeholder-image.jpg'}
-          alt={product.productName}
-          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            e.target.src = '/placeholder-image.jpg'
-          }}
-        />
-        
-        {/* Condition Badge */}
-        {product.condition && (
-          <div className="absolute top-2 left-2">
-            <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
-              {product.condition.toUpperCase()}
-            </span>
-          </div>
-        )}
-
-        {/* Bestseller Badge */}
-        {product.isBestseller && (
-          <div className="absolute top-2 right-2">
-            <span className="bg-white text-gray-900 text-xs font-light tracking-widest uppercase px-2 py-1 rounded-full">
-              BESTSELLER
-            </span>
-          </div>
-        )}
-
-        {/* Verified Badge */}
-        {product.isVerified && (
-          <div className="absolute top-10 right-2">
-            <span className="bg-green-500 text-white text-xs font-light tracking-widest uppercase px-2 py-1 rounded-full">
-              VERIFIED
-            </span>
-          </div>
-        )}
-
-        {/* ✅ WISHLIST BUTTON */}
-        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button className="bg-white text-gray-900 p-2 rounded-full shadow-lg hover:scale-110 transition-transform">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      
-      <div className="text-left px-1 space-y-2">
-        <div className="flex justify-between items-start">
-          <h3 className="text-gray-900 text-sm font-light tracking-widest uppercase flex-1 line-clamp-2">
-            {product.productName?.toUpperCase()}
-          </h3>
-          {/* ✅ RATING REMOVED */}
-        </div>
-        
-        <p className="text-gray-600 text-xs font-light uppercase">
-          {product.brand || 'Brand'}
-        </p>
-        
-        <div className="flex items-center gap-2">
-          <span className="text-gray-900 text-base font-light">
-            ₹{product.finalPrice?.toLocaleString() || '0'}
-          </span>
-          {product.originalPrice && product.originalPrice > product.finalPrice && (
-            <span className="text-gray-400 text-sm line-through">
-              ₹{product.originalPrice.toLocaleString()}
-            </span>
-          )}
-        </div>
-      </div>
-    </Link>
-  )
-
-  // Extract unique sub-categories, brands, conditions from products
-  const extractFilters = (products) => {
-    const subCategoriesSet = new Set()
-    const brandsSet = new Set()
-    const conditionsSet = new Set()
-    
-    products.forEach(product => {
-      // ✅ Yeh sub-category hai (e.g., "sneakers", "handbags", etc.)
-      if (product.subCategory) subCategoriesSet.add(product.subCategory)
-      if (product.brand) brandsSet.add(product.brand)
-      if (product.condition) conditionsSet.add(product.condition)
+  // ✅ DEBUGGING: API call log karein
+  const logApiCall = (url, status, data) => {
+    console.log('📡 API CALL DETAILS:', {
+      url,
+      status,
+      productsCount: data?.products?.length || 0,
+      success: data?.success,
+      timestamp: new Date().toISOString()
     })
-    
-    return {
-      subCategories: Array.from(subCategoriesSet),
-      brands: Array.from(brandsSet),
-      conditions: Array.from(conditionsSet)
-    }
   }
 
-  const filterData = extractFilters(products)
+  // ✅ OPTIMIZED: Fetch products
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      console.log('🔍 Starting fetch for:', {
+        categorySlug,
+        apiCategory,
+        sortBy
+      })
+      
+      // ✅ OPTION 1: Direct category endpoint (Recommended)
+      const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${apiCategory}?sort=${sortBy}`
+      console.log('🎯 API URL:', apiUrl)
+      
+      // ✅ OPTION 2: Fallback - Use search endpoint if category fails
+      const fallbackUrl = `https://just-becho-backend.vercel.app/api/products/search?q=${apiCategory}&limit=50`
+      
+      let response = await fetch(apiUrl, {
+        cache: 'no-store',
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      
+      // ✅ If first API fails, try fallback
+      if (!response.ok) {
+        console.log('⚠️ Primary API failed, trying fallback...')
+        response = await fetch(fallbackUrl, {
+          cache: 'no-store'
+        })
+      }
+      
+      console.log('📥 Response Status:', response.status)
+      
+      if (response.ok) {
+        const data = await response.json()
+        logApiCall(apiUrl, response.status, data)
+        
+        if (data.success && data.products) {
+          console.log(`✅ Found ${data.products.length} products`)
+          console.log('📦 Sample products:', data.products.slice(0, 3))
+          
+          setProducts(data.products)
+          
+          // Extract filters from products
+          const brands = [...new Set(data.products.map(p => p.brand).filter(Boolean))]
+          const conditions = [...new Set(data.products.map(p => p.condition).filter(Boolean))]
+          
+          setAvailableBrands(brands)
+          setAvailableConditions(conditions)
+        } else {
+          console.log('❌ API returned success: false', data)
+          setProducts([])
+          setError('No products found in this category')
+        }
+      } else {
+        const errorText = await response.text()
+        console.log('❌ API Error Response:', errorText)
+        setProducts([])
+        setError(`API Error: ${response.status}`)
+      }
+    } catch (error) {
+      console.error('💥 Fetch Error:', error)
+      setProducts([])
+      setError('Failed to load products. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }, [apiCategory, sortBy])
 
-  // ✅ Sub-categories with counts (These are product.subCategory)
-  const subCategories = [
-    { id: 'all', name: 'All Items', count: products.length },
-    ...filterData.subCategories.map(subCat => ({
-      id: subCat.toLowerCase().replace(/\s+/g, '-'),
-      name: subCat,
-      count: products.filter(p => p.subCategory === subCat).length
-    }))
-  ]
+  // ✅ Fetch on component mount and when sort changes
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
 
-  // ✅ Filter products based on active filter and other filters
-  const filteredProducts = products.filter(product => {
-    // Sub-category filter (activeFilter is for sub-categories)
-    if (activeFilter !== 'all' && product.subCategory?.toLowerCase() !== activeFilter) {
-      return false
-    }
-    
-    // Brand filter
-    if (filters.brands.length > 0 && !filters.brands.includes(product.brand)) {
-      return false
-    }
-    
-    // Condition filter
-    if (filters.conditions.length > 0 && !filters.conditions.includes(product.condition)) {
-      return false
-    }
-    
-    // Price filter
-    if (filters.minPrice && product.finalPrice < parseInt(filters.minPrice)) {
-      return false
-    }
-    
-    if (filters.maxPrice && product.finalPrice > parseInt(filters.maxPrice)) {
-      return false
-    }
-    
-    return true
-  })
-
-  // ✅ Sort products - RATING WALA OPTION HATA DIYA
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.finalPrice - b.finalPrice
-      case 'price-high':
-        return b.finalPrice - a.finalPrice
-      default: // newest
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-    }
-  })
-
+  // ✅ Handle filter changes
   const handleBrandChange = (brand) => {
     setFilters(prev => ({
       ...prev,
@@ -239,46 +128,162 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
     }))
   }
 
-  const handlePriceApply = () => {
-    // Price filter already applied in filteredProducts
+  const handleClearFilters = () => {
+    setFilters({
+      brands: [],
+      conditions: [],
+      minPrice: '',
+      maxPrice: ''
+    })
+    setActiveFilter('all')
   }
 
-  // ✅ Handle image error
-  const handleImageError = () => {
-    setImageError(true)
-  }
+  // ✅ Filter products
+  const filteredProducts = products.filter(product => {
+    // Brand filter
+    if (filters.brands.length > 0 && !filters.brands.includes(product.brand)) {
+      return false
+    }
+    
+    // Condition filter
+    if (filters.conditions.length > 0 && !filters.conditions.includes(product.condition)) {
+      return false
+    }
+    
+    // Price filter
+    const price = product.finalPrice || 0
+    if (filters.minPrice && price < parseInt(filters.minPrice)) {
+      return false
+    }
+    
+    if (filters.maxPrice && price > parseInt(filters.maxPrice)) {
+      return false
+    }
+    
+    return true
+  })
+
+  // ✅ Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return (a.finalPrice || 0) - (b.finalPrice || 0)
+      case 'price-high':
+        return (b.finalPrice || 0) - (a.finalPrice || 0)
+      default: // newest
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    }
+  })
+
+  // ✅ Product Card Component
+  const ProductCard = ({ product }) => (
+    <Link 
+      href={`/products/${product._id}`}
+      className="group block cursor-pointer transform hover:-translate-y-1 transition-all duration-300"
+    >
+      <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+        <img
+          src={product.images?.[0]?.url || '/placeholder-image.jpg'}
+          alt={product.productName}
+          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            e.target.src = '/placeholder-image.jpg'
+          }}
+        />
+        
+        {/* Condition Badge */}
+        {product.condition && (
+          <div className="absolute top-2 left-2">
+            <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
+              {product.condition}
+            </span>
+          </div>
+        )}
+
+        {/* Views Count */}
+        {product.views > 0 && (
+          <div className="absolute bottom-2 left-2">
+            <span className="text-white text-xs bg-black/70 px-2 py-1 rounded-full">
+              👁️ {product.views}
+            </span>
+          </div>
+        )}
+
+        {/* Likes Count */}
+        {product.likes > 0 && (
+          <div className="absolute bottom-2 right-2">
+            <span className="text-white text-xs bg-red-500/70 px-2 py-1 rounded-full">
+              ❤️ {product.likes}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      <div className="text-left px-1 space-y-2">
+        <h3 className="text-gray-900 text-sm font-light tracking-widest uppercase line-clamp-2">
+          {product.productName?.toUpperCase() || 'Product Name'}
+        </h3>
+        
+        <p className="text-gray-600 text-xs font-light uppercase">
+          {product.brand || 'Brand'}
+        </p>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-gray-900 text-base font-light">
+            ₹{(product.finalPrice || 0).toLocaleString()}
+          </span>
+          {product.originalPrice && product.originalPrice > product.finalPrice && (
+            <span className="text-gray-400 text-sm line-through">
+              ₹{product.originalPrice.toLocaleString()}
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  )
+
+  // ✅ Debug Info Component
+  const DebugInfo = () => (
+    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs z-50 max-w-xs hidden md:block">
+      <div className="font-bold mb-2">🔧 Debug Info:</div>
+      <div>Category: {categorySlug}</div>
+      <div>API Category: {apiCategory}</div>
+      <div>Total Products: {products.length}</div>
+      <div>Filtered: {filteredProducts.length}</div>
+      <div>Loading: {loading ? 'Yes' : 'No'}</div>
+      {error && <div className="text-red-300">Error: {error}</div>}
+    </div>
+  )
 
   return (
     <>
-      {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
       <Header />
       
-      {/* ✅ MAIN CONTENT - HEADER KE BAAAD SHURU */}
       <div className="bg-white">
-        {/* ✅ TOP SPACING FOR COMPLETE HEADER (MAIN HEADER + SUBHEADER) */}
         <div className="pt-32 md:pt-36"></div>
         
-        {/* ✅ Hero Banner Section */}
+        {/* ✅ Hero Banner with Error Boundary */}
         <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-10"></div>
           
-          {/* Banner Image */}
           <Image
-            src={config.banner}
+            src={config.banner || '/banners/default-banner.jpg'}
             alt={config.title}
             fill
             className="object-cover"
             priority
-            onError={handleImageError}
+            onError={(e) => {
+              console.error('Banner image failed:', config.banner)
+              e.target.src = '/banners/default-banner.jpg'
+            }}
           />
           
-          {/* Hero Content */}
           <div className="relative z-20 h-full flex flex-col justify-center items-center text-white px-4">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center">
-              {config.title}
+              {config.title || 'CATEGORY'}
             </h1>
             <p className="text-lg md:text-xl text-center max-w-2xl mb-8">
-              {config.subtitle}
+              {config.subtitle || 'Explore our collection'}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
@@ -301,124 +306,199 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
         {/* ✅ Products Section */}
         <section id="products" className="py-12 md:py-16">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+            
+            {/* ✅ Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2 text-red-700">
+                  <span>⚠️</span>
+                  <span>{error}</span>
+                </div>
+                <button 
+                  onClick={fetchProducts}
+                  className="mt-2 text-red-600 underline text-sm"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+            
             <div className="flex flex-col lg:flex-row gap-8">
               
-              {/* Sidebar Filters */}
+              {/* ✅ Sidebar Filters */}
               <div className="lg:w-80 flex-shrink-0">
                 <div className="bg-gray-50 rounded-2xl p-6 sticky top-44">
                   
-                  <div className="mb-8">
-                    <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-4">
-                      CATEGORIES
+                  {/* Filters Header */}
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase">
+                      FILTERS
                     </h3>
-                    <div className="space-y-2">
-                      {subCategories.map(subCat => (
-                        <button
-                          key={subCat.id}
-                          onClick={() => setActiveFilter(subCat.id === 'all' ? 'all' : subCat.name.toLowerCase())}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-300 flex justify-between items-center ${
-                            (activeFilter === 'all' && subCat.id === 'all') || 
-                            (activeFilter === subCat.name.toLowerCase() && subCat.id !== 'all')
-                              ? 'bg-black text-white' 
-                              : 'text-gray-600 hover:bg-gray-200'
-                          }`}
-                        >
-                          <span className="text-sm font-light">{subCat.name}</span>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            (activeFilter === 'all' && subCat.id === 'all') || 
-                            (activeFilter === subCat.name.toLowerCase() && subCat.id !== 'all')
-                              ? 'bg-white text-black' 
-                              : 'bg-gray-300 text-gray-700'
-                          }`}>
-                            {subCat.count}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
+                    <button 
+                      onClick={handleClearFilters}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Clear All
+                    </button>
                   </div>
 
-                  <div className="mb-8">
-                    <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-4">
-                      BRANDS
-                    </h3>
-                    <div className="space-y-2">
-                      {filterData.brands.map(brand => (
-                        <label key={brand} className="flex items-center space-x-3 cursor-pointer group">
-                          <input 
-                            type="checkbox" 
-                            checked={filters.brands.includes(brand)}
-                            onChange={() => handleBrandChange(brand)}
-                            className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black" 
-                          />
-                          <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
-                            {brand}
-                          </span>
-                        </label>
-                      ))}
+                  {/* Brands Filter */}
+                  {availableBrands.length > 0 && (
+                    <div className="mb-8">
+                      <h4 className="text-gray-700 text-sm font-medium mb-3">
+                        BRANDS ({availableBrands.length})
+                      </h4>
+                      <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                        {availableBrands.map(brand => (
+                          <label key={brand} className="flex items-center space-x-3 cursor-pointer group py-1">
+                            <input 
+                              type="checkbox" 
+                              checked={filters.brands.includes(brand)}
+                              onChange={() => handleBrandChange(brand)}
+                              className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black" 
+                            />
+                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                              {brand}
+                            </span>
+                            <span className="text-gray-400 text-xs ml-auto">
+                              ({products.filter(p => p.brand === brand).length})
+                            </span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="mb-8">
-                    <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-4">
-                      CONDITION
-                    </h3>
-                    <div className="space-y-2">
-                      {filterData.conditions.map(condition => (
-                        <label key={condition} className="flex items-center space-x-3 cursor-pointer group">
-                          <input 
-                            type="checkbox" 
-                            checked={filters.conditions.includes(condition)}
-                            onChange={() => handleConditionChange(condition)}
-                            className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black" 
-                          />
-                          <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
-                            {condition}
-                          </span>
-                        </label>
-                      ))}
+                  {/* Condition Filter */}
+                  {availableConditions.length > 0 && (
+                    <div className="mb-8">
+                      <h4 className="text-gray-700 text-sm font-medium mb-3">
+                        CONDITION ({availableConditions.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {availableConditions.map(condition => (
+                          <label key={condition} className="flex items-center space-x-3 cursor-pointer group py-1">
+                            <input 
+                              type="checkbox" 
+                              checked={filters.conditions.includes(condition)}
+                              onChange={() => handleConditionChange(condition)}
+                              className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black" 
+                            />
+                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                              {condition}
+                            </span>
+                            <span className="text-gray-400 text-xs ml-auto">
+                              ({products.filter(p => p.condition === condition).length})
+                            </span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
+                  {/* Price Filter */}
                   <div>
-                    <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-4">
+                    <h4 className="text-gray-700 text-sm font-medium mb-3">
                       PRICE RANGE
-                    </h3>
+                    </h4>
                     <div className="space-y-4">
                       <div className="flex gap-2">
-                        <input 
-                          type="number" 
-                          placeholder="Min" 
-                          value={filters.minPrice}
-                          onChange={(e) => setFilters(prev => ({...prev, minPrice: e.target.value}))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
-                        />
-                        <input 
-                          type="number" 
-                          placeholder="Max" 
-                          value={filters.maxPrice}
-                          onChange={(e) => setFilters(prev => ({...prev, maxPrice: e.target.value}))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
-                        />
+                        <div className="flex-1">
+                          <label className="text-xs text-gray-500 block mb-1">Min</label>
+                          <input 
+                            type="number" 
+                            placeholder="₹0" 
+                            value={filters.minPrice}
+                            onChange={(e) => setFilters(prev => ({...prev, minPrice: e.target.value}))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                            min="0"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-xs text-gray-500 block mb-1">Max</label>
+                          <input 
+                            type="number" 
+                            placeholder="₹100000" 
+                            value={filters.maxPrice}
+                            onChange={(e) => setFilters(prev => ({...prev, maxPrice: e.target.value}))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                            min="0"
+                          />
+                        </div>
                       </div>
-                      <button 
-                        onClick={handlePriceApply}
-                        className="w-full bg-black text-white py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors"
-                      >
-                        APPLY
-                      </button>
                     </div>
                   </div>
+
+                  {/* Active Filters Summary */}
+                  {(filters.brands.length > 0 || filters.conditions.length > 0 || filters.minPrice || filters.maxPrice) && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h4 className="text-gray-700 text-sm font-medium mb-2">
+                        ACTIVE FILTERS
+                      </h4>
+                      <div className="space-y-1">
+                        {filters.brands.map(brand => (
+                          <div key={brand} className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">Brand: {brand}</span>
+                            <button 
+                              onClick={() => handleBrandChange(brand)}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                        {filters.conditions.map(condition => (
+                          <div key={condition} className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">Condition: {condition}</span>
+                            <button 
+                              onClick={() => handleConditionChange(condition)}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                        {filters.minPrice && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">Min Price: ₹{filters.minPrice}</span>
+                            <button 
+                              onClick={() => setFilters(prev => ({...prev, minPrice: ''}))}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                        {filters.maxPrice && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">Max Price: ₹{filters.maxPrice}</span>
+                            <button 
+                              onClick={() => setFilters(prev => ({...prev, maxPrice: ''}))}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                 </div>
               </div>
 
-              {/* Products Grid */}
+              {/* ✅ Products Grid */}
               <div className="flex-1">
                 
+                {/* Header with Stats */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                   <div>
+                    <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-1">
+                      {config.title || 'PRODUCTS'}
+                    </h2>
                     <p className="text-gray-600 text-sm font-light">
-                      Showing {filteredProducts.length} of {products.length} products in {categoryName}
+                      Showing {filteredProducts.length} of {products.length} products
+                      {loading && ' • Loading...'}
                     </p>
                   </div>
                   
@@ -426,7 +506,7 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
                     <select 
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black"
+                      className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
                     >
                       <option value="newest">Newest First</option>
                       <option value="price-low">Price: Low to High</option>
@@ -434,13 +514,14 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
                     </select>
                     
                     <Link href="/sell-now">
-                      <button className="bg-black text-white px-6 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors">
-                        SELL ITEM
+                      <button className="bg-black text-white px-6 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap">
+                        + SELL ITEM
                       </button>
                     </Link>
                   </div>
                 </div>
 
+                {/* Loading State */}
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[...Array(6)].map((_, i) => (
@@ -451,30 +532,58 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
                       </div>
                     ))}
                   </div>
-                ) : sortedProducts.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sortedProducts.map(renderProductCard)}
-                  </div>
-                ) : (
+                ) : 
+                
+                
+                sortedProducts.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">No products found in {categoryName}.</p>
-                    <Link 
-                      href="/sell-now" 
-                      className="inline-block mt-4 border-2 border-black text-black px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all"
-                    >
-                      Sell Items
-                    </Link>
+                    <div className="text-gray-400 mb-4">
+                      <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-500 text-lg mb-2">No products found.</p>
+                    <p className="text-gray-400 text-sm mb-6">
+                      {products.length === 0 
+                        ? 'No products available in this category.' 
+                        : 'No products match your filters.'}
+                    </p>
+                    <div className="flex gap-4 justify-center">
+                      <button 
+                        onClick={handleClearFilters}
+                        className="border-2 border-black text-black px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all"
+                      >
+                        Clear Filters
+                      </button>
+                      <Link 
+                        href="/sell-now" 
+                        className="bg-black text-white px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-gray-800 transition-all"
+                      >
+                        Sell Items
+                      </Link>
+                    </div>
                   </div>
+                ) : 
+                
+                {/* Products Grid */}
+                (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {sortedProducts.map(product => (
+                        <ProductCard key={product._id} product={product} />
+                      ))}
+                    </div>
+                    
+                    {/* Load More Button */}
+                    {!loading && filteredProducts.length > 0 && (
+                      <div className="text-center mt-12">
+                        <button className="border-2 border-black text-black px-8 py-3 font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300 rounded-full">
+                          LOAD MORE PRODUCTS
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
-
-                {!loading && sortedProducts.length > 0 && (
-                  <div className="text-center mt-12">
-                    <button className="border-2 border-black text-black px-8 py-3 font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300 rounded-full">
-                      LOAD MORE
-                    </button>
-                  </div>
-                )}
-
               </div>
             </div>
           </div>
@@ -485,21 +594,21 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
               <h2 className="text-gray-900 text-3xl sm:text-4xl font-light tracking-widest uppercase mb-4">
-                {config.whyTitle}
+                {config.whyTitle || 'WHY SHOP AT JUST BECHO'}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {config.features.map((feature, index) => (
+              {(config.features || []).map((feature, index) => (
                 <div key={index} className="text-center p-6">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center">
-                    <span className="text-white text-2xl">{feature.icon}</span>
+                    <span className="text-white text-2xl">{feature.icon || '✨'}</span>
                   </div>
                   <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-2">
-                    {feature.title}
+                    {feature.title || 'FEATURE'}
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    {feature.description}
+                    {feature.description || 'Premium service and quality guaranteed'}
                   </p>
                 </div>
               ))}
@@ -507,6 +616,9 @@ export default function CategoryClient({ categorySlug, apiCategory, config }) {
           </div>
         </section>
       </div>
+      
+      {/* ✅ Debug Info (Visible in development) */}
+      {process.env.NODE_ENV === 'development' && <DebugInfo />}
       
       <Footer />
     </>
