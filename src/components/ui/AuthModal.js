@@ -14,25 +14,59 @@ export default function AuthModal({ isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
+  // ✅ IMPROVED: Handle Google OAuth redirect with ALL parameters
   useEffect(() => {
     if (isOpen) {
       const checkGoogleAuth = () => {
         const urlParams = new URLSearchParams(window.location.search)
         const token = urlParams.get('token')
+        const name = urlParams.get('name')
+        const email = urlParams.get('email')
+        const source = urlParams.get('source')
         
         if (token) {
+          console.log('✅ Google OAuth redirect detected')
+          console.log('📱 Token:', token.substring(0, 30) + '...')
+          console.log('👤 Name:', name)
+          console.log('📧 Email:', email)
+          console.log('🔗 Source:', source)
+          
+          // ✅ Save all data
           localStorage.setItem('token', token)
           localStorage.setItem('isGoogleSignup', 'true')
           localStorage.removeItem('changingRoleToSeller')
-          fetchUserData(token)
-          window.history.replaceState({}, document.title, window.location.pathname)
+          
+          if (name && email) {
+            const tempUser = {
+              id: 'temp-google-id',
+              email: email,
+              name: name,
+              profileCompleted: false,
+              role: 'user',
+              isGoogleUser: true
+            }
+            localStorage.setItem('user', JSON.stringify(tempUser))
+            window.dispatchEvent(new Event('authChange'))
+          }
+          
+          // ✅ Clear ALL URL parameters
+          const cleanUrl = window.location.pathname
+          window.history.replaceState({}, document.title, cleanUrl)
+          
+          // ✅ Close modal
           onClose()
+          
+          // ✅ Redirect to complete-profile
+          console.log('🔄 Redirecting to complete profile...')
+          setTimeout(() => {
+            router.push('/complete-profile')
+          }, 300)
         }
       }
 
       checkGoogleAuth()
     }
-  }, [isOpen, onClose])
+  }, [isOpen, onClose, router])
 
   if (!isOpen) return null
 
@@ -64,8 +98,16 @@ export default function AuthModal({ isOpen, onClose }) {
     setIsLoading(true)
     
     try {
-      const endpoint = isLogin ? 'https://just-becho-backend.vercel.app/api/auth/login' : 'https://just-becho-backend.vercel.app/api/auth/signup'
-      const payload = { email: formData.email, password: formData.password }
+      const endpoint = isLogin 
+        ? 'https://just-becho-backend.vercel.app/api/auth/login' 
+        : 'https://just-becho-backend.vercel.app/api/auth/signup'
+      
+      const payload = { 
+        email: formData.email, 
+        password: formData.password 
+      }
+      
+      console.log(`📤 Sending ${isLogin ? 'login' : 'signup'} request to:`, endpoint)
       
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -97,6 +139,8 @@ export default function AuthModal({ isOpen, onClose }) {
         throw new Error(data.message || `Server error: ${response.status}`)
       }
       
+      console.log('✅ Auth successful:', data.message)
+      
       if (data.token) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
@@ -106,8 +150,15 @@ export default function AuthModal({ isOpen, onClose }) {
 
       onClose()
       
+      // Handle redirection based on profile status
       setTimeout(async () => {
-        const token = data.token;
+        const token = data.token || localStorage.getItem('token');
+        
+        if (!token) {
+          console.error('❌ No token found after auth')
+          router.push('/')
+          return
+        }
         
         try {
           const statusResponse = await fetch('https://just-becho-backend.vercel.app/api/auth/profile-status', {
@@ -121,24 +172,26 @@ export default function AuthModal({ isOpen, onClose }) {
           
           if (statusData.success) {
             if (!statusData.profileCompleted) {
+              console.log('🔄 Profile not completed, redirecting...')
               router.push('/complete-profile');
             } else {
               if (statusData.role === 'seller') {
                 if (statusData.sellerVerified) {
-                  router.push('/');
+                  router.push('/dashboard');
                 } else {
                   router.push('/dashboard?section=listings');
                 }
               } else {
-                router.push('/');
+                router.push('/dashboard');
               }
             }
           } else {
-            throw new Error('Failed to check profile status');
+            console.error('❌ Failed to check profile status')
+            router.push('/complete-profile');
           }
         } catch (error) {
           console.error('Profile status check error:', error);
-          router.push('/');
+          router.push('/complete-profile');
         }
       }, 100);
       
@@ -163,81 +216,24 @@ export default function AuthModal({ isOpen, onClose }) {
     }
   }
 
-  // ✅ FIXED: Google Auth with proper redirect URIs
+  // ✅ Google Auth - SIMPLE & RELIABLE
   const handleGoogleAuth = () => {
     try {
-      localStorage.setItem('isGoogleSignup', 'true');
-      localStorage.removeItem('changingRoleToSeller');
+      console.log('🚀 Initiating Google OAuth...')
       
-      // ✅ FIX 1: Use backend's direct Google OAuth endpoint
-      // The backend is at just-becho-backend.vercel.app
-      // So the redirect URI must be from the backend domain
-      const googleAuthUrl = `https://just-becho-backend.vercel.app/api/auth/google`;
+      // Set flags for Google signup
+      localStorage.setItem('isGoogleSignup', 'true')
+      localStorage.removeItem('changingRoleToSeller')
       
-      console.log('🌐 Google Auth URL:', googleAuthUrl);
-      console.log('🔍 This will redirect to Google OAuth with backend callback URL');
+      // Simple redirect to backend Google OAuth endpoint
+      const googleAuthUrl = 'https://just-becho-backend.vercel.app/api/auth/google'
       
-      window.location.href = googleAuthUrl;
+      console.log('🌐 Redirecting to:', googleAuthUrl)
+      window.location.href = googleAuthUrl
+      
     } catch (error) {
       console.error('Google auth error:', error)
-      setErrors({ submit: 'Google authentication failed' })
-    }
-  }
-
-  const fetchUserData = async (token) => {
-    try {
-      const response = await fetch('https://just-becho-backend.vercel.app/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.removeItem('changingRoleToSeller');
-        window.dispatchEvent(new Event('authChange'));
-        
-        const isGoogleSignup = localStorage.getItem('isGoogleSignup') === 'true';
-        
-        if (isGoogleSignup) {
-          localStorage.removeItem('isGoogleSignup');
-          router.push('/complete-profile');
-          return;
-        }
-        
-        const statusResponse = await fetch('https://just-becho-backend.vercel.app/api/auth/profile-status', {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const statusData = await statusResponse.json();
-        
-        if (statusData.success) {
-          if (!statusData.profileCompleted) {
-            router.push('/complete-profile');
-          } else {
-            if (statusData.role === 'seller') {
-              if (statusData.sellerVerified) {
-                router.push('/');
-              } else {
-                router.push('/dashboard?section=listings');
-              }
-            } else {
-              router.push('/');
-            }
-          }
-        }
-      } else {
-        throw new Error('Failed to fetch user data');
-      }
-    } catch (error) {
-      console.error('Error fetching user data after Google auth:', error);
-      router.push('/');
+      setErrors({ submit: 'Google authentication failed. Please try again.' })
     }
   }
 
@@ -268,6 +264,7 @@ export default function AuthModal({ isOpen, onClose }) {
             <button
               onClick={onClose}
               className="text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+              aria-label="Close modal"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -284,7 +281,9 @@ export default function AuthModal({ isOpen, onClose }) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,6 +301,7 @@ export default function AuthModal({ isOpen, onClose }) {
                   }`}
                   placeholder="you@example.com"
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
               {errors.email && (
@@ -311,7 +311,9 @@ export default function AuthModal({ isOpen, onClose }) {
 
             {/* Password */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,6 +331,7 @@ export default function AuthModal({ isOpen, onClose }) {
                   }`}
                   placeholder="••••••••"
                   disabled={isLoading}
+                  autoComplete={isLogin ? "current-password" : "new-password"}
                 />
               </div>
               {errors.password && (
@@ -339,7 +342,9 @@ export default function AuthModal({ isOpen, onClose }) {
             {/* Confirm Password (Sign Up Only) */}
             {!isLogin && (
               <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,6 +362,7 @@ export default function AuthModal({ isOpen, onClose }) {
                     }`}
                     placeholder="••••••••"
                     disabled={isLoading}
+                    autoComplete="new-password"
                   />
                 </div>
                 {errors.confirmPassword && (
@@ -379,7 +385,7 @@ export default function AuthModal({ isOpen, onClose }) {
                       resetForm()
                       setErrors({})
                     }}
-                    className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                    className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
                   >
                     Click here to sign up →
                   </button>
@@ -439,7 +445,7 @@ export default function AuthModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={handleToggleMode}
-                  className="text-gray-900 font-medium hover:underline"
+                  className="text-gray-900 font-medium hover:underline transition-colors"
                   disabled={isLoading}
                 >
                   {isLogin ? 'Sign Up' : 'Sign In'}
