@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import AuthModal from '@/components/AuthModal' // ✅ AuthModal import karein
+import AuthModal from '@/components/ui/AuthModal' // ✅ AuthModal import karein
 import { useRouter } from 'next/navigation'
 
 export default function CategoryClient({ 
