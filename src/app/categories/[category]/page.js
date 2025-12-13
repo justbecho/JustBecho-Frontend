@@ -80,7 +80,7 @@ function getCategoryConfig(categorySlug) {
         'women': {
             title: "WOMEN'S FASHION",
             subtitle: 'Explore curated luxury fashion for women - Designer pieces reimagined',
-            banner: '/banners/womesn new.png',
+            banner: '/banners/womens new.png',
             metaTitle: "Women's Luxury Fashion | Pre-Loved Designer Collection",
             metaDescription: 'Discover authentic pre-loved luxury fashion for women. Premium brands at unbeatable prices.',
             whyTitle: "WHY SHOP WOMEN'S FASHION AT JUST BECHO",
@@ -307,11 +307,12 @@ function getDefaultConfig(categorySlug) {
     }
 }
 
-// ✅ Fetch products from API
+// ✅ Fetch products from API - FIXED ENDPOINT
 async function fetchCategoryProducts(categorySlug, sortBy = 'newest') {
     try {
-        const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${categorySlug}?sort=${sortBy}&limit=100`
-        console.log('📡 Fetching products from:', apiUrl)
+        // ✅ FIXED: Using correct category endpoint
+        const apiUrl = `https://just-becho-backend.vercel.app/api/categories/${categorySlug}/products?sort=${sortBy}&limit=100`
+        console.log('📡 [SERVER] Fetching products from CATEGORY endpoint:', apiUrl)
         
         const response = await fetch(apiUrl, {
             next: { revalidate: 3600 }, // Revalidate every hour
@@ -322,15 +323,16 @@ async function fetchCategoryProducts(categorySlug, sortBy = 'newest') {
         })
         
         if (!response.ok) {
-            console.log('⚠️ Primary API failed, trying search endpoint...')
-            // Fallback to search endpoint
-            const fallbackUrl = `https://just-becho-backend.vercel.app/api/products/search?q=${categorySlug}&limit=50`
+            console.log('⚠️ [SERVER] Category endpoint failed, trying product endpoint...')
+            // Fallback to product category endpoint
+            const fallbackUrl = `https://just-becho-backend.vercel.app/api/products/category/${categorySlug}?sort=${sortBy}&limit=50`
             const fallbackResponse = await fetch(fallbackUrl, {
                 cache: 'no-store'
             })
             
             if (fallbackResponse.ok) {
                 const data = await fallbackResponse.json()
+                console.log(`🔄 [SERVER] Fallback found ${data.products?.length || 0} products`)
                 return data.products || []
             }
             
@@ -340,13 +342,13 @@ async function fetchCategoryProducts(categorySlug, sortBy = 'newest') {
         const data = await response.json()
         
         if (data.success && data.products) {
-            console.log(`✅ Found ${data.products.length} products for ${categorySlug}`)
+            console.log(`✅ [SERVER] Found ${data.products.length} products for ${categorySlug}`)
             return data.products
         }
         
         return []
     } catch (error) {
-        console.error('❌ Error fetching products:', error)
+        console.error('❌ [SERVER] Error fetching products:', error)
         return []
     }
 }

@@ -46,7 +46,7 @@ export default function CategoryClient({
         })
     }, [categorySlug, apiCategory, config.title, products.length])
     
-    // ✅ Optimized product fetching
+    // ✅ Optimized product fetching - FIXED API ENDPOINT
     const fetchProducts = useCallback(async (pageNum = 1, isLoadMore = false) => {
         try {
             if (pageNum === 1) {
@@ -80,8 +80,9 @@ export default function CategoryClient({
                 queryParams.append('maxPrice', filters.maxPrice)
             }
             
-            const apiUrl = `https://just-becho-backend.vercel.app/api/products/category/${apiCategory}?${queryParams.toString()}`
-            console.log('📡 Fetching products:', apiUrl)
+            // ✅ FIXED: Using correct category endpoint
+            const apiUrl = `https://just-becho-backend.vercel.app/api/categories/${categorySlug}/products?${queryParams.toString()}`
+            console.log('📡 Fetching products from CATEGORY endpoint:', apiUrl)
             
             const response = await fetch(apiUrl, {
                 cache: 'no-store',
@@ -91,10 +92,52 @@ export default function CategoryClient({
             })
             
             if (!response.ok) {
+                // Try fallback to product category endpoint
+                console.log('⚠️ Category endpoint failed, trying product endpoint...')
+                const fallbackUrl = `https://just-becho-backend.vercel.app/api/products/category/${apiCategory}?${queryParams.toString()}`
+                console.log('🔄 Fallback URL:', fallbackUrl)
+                
+                const fallbackResponse = await fetch(fallbackUrl, {
+                    cache: 'no-store',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                
+                if (!fallbackResponse.ok) {
+                    throw new Error(`API Error: ${response.status} (Both endpoints failed)`)
+                }
+                
+                const fallbackData = await fallbackResponse.json()
+                console.log('🔄 Fallback data:', fallbackData)
+                
+                if (fallbackData.success && fallbackData.products) {
+                    if (isLoadMore) {
+                        setProducts(prev => [...prev, ...fallbackData.products])
+                    } else {
+                        setProducts(fallbackData.products)
+                    }
+                    
+                    // Update available filters
+                    if (pageNum === 1) {
+                        const brands = [...new Set(fallbackData.products.map(p => p.brand).filter(Boolean))]
+                        const conditions = [...new Set(fallbackData.products.map(p => p.condition).filter(Boolean))]
+                        
+                        setAvailableBrands(brands)
+                        setAvailableConditions(conditions)
+                    }
+                    
+                    // Check if there are more pages
+                    setHasMore(fallbackData.products.length === 12)
+                    setPage(pageNum)
+                    return
+                }
+                
                 throw new Error(`API Error: ${response.status}`)
             }
             
             const data = await response.json()
+            console.log('✅ Category products response:', data)
             
             if (data.success && data.products) {
                 if (isLoadMore) {
@@ -113,7 +156,7 @@ export default function CategoryClient({
                 }
                 
                 // Check if there are more pages
-                setHasMore(data.products.length === 12) // Assuming limit is 12
+                setHasMore(data.products.length === 12)
                 setPage(pageNum)
             } else {
                 if (!isLoadMore) {
@@ -134,10 +177,11 @@ export default function CategoryClient({
                 setLoadingMore(false)
             }
         }
-    }, [apiCategory, sortBy, filters])
+    }, [categorySlug, apiCategory, sortBy, filters])
     
     // ✅ Initial fetch and filter/sort changes
     useEffect(() => {
+        console.log('🔄 Triggering product fetch...')
         fetchProducts(1, false)
     }, [apiCategory, sortBy, filters.brands, filters.conditions, filters.minPrice, filters.maxPrice])
     
@@ -378,6 +422,20 @@ export default function CategoryClient({
                                 </button>
                             </div>
                         )}
+                        
+                        {/* ✅ Debug Info (remove in production) */}
+                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+                            <div className="flex items-center gap-2 text-blue-700 mb-1">
+                                <span>🔍</span>
+                                <span>Debug Info:</span>
+                            </div>
+                            <div className="text-blue-600 text-xs">
+                                <p>Category Slug: <strong>{categorySlug}</strong></p>
+                                <p>API Category: <strong>{apiCategory}</strong></p>
+                                <p>Products Found: <strong>{products.length}</strong></p>
+                                <p>Loading: <strong>{loading ? 'Yes' : 'No'}</strong></p>
+                            </div>
+                        </div>
                         
                         <div className="flex flex-col lg:flex-row gap-8">
                             

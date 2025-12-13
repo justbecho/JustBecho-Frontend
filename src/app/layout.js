@@ -1,7 +1,6 @@
 // app/layout.js - SERVER COMPONENT (NO 'use client')
 import './globals.css'
 import { Quicksand } from 'next/font/google'
-import Header from '@/components/layout/Header'
 
 const quicksand = Quicksand({ 
   subsets: ['latin'],
@@ -19,8 +18,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${quicksand.variable} ${quicksand.className}`}>
       <body className="font-sans">
-        {/* ✅ ADD HEADER HERE */}
-        <Header />
+        {/* ❌ HEADER YAHAN SE HATA DO - Kyunki aap already homepage mein import kar rahe ho */}
         <main>{children}</main>
       </body>
     </html>

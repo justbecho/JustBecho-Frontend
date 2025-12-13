@@ -230,7 +230,7 @@ function HomeContent() {
     {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
-      image: "/banners/rolex.jpg",
+      image: "/banners/watches new.png",
       href: "/categories/watches"
     },
     {
@@ -242,7 +242,7 @@ function HomeContent() {
     {
       title: "POPULAR FOOTWEAR",
       description: "Innovation meets luxury",
-      image: "/banners/Footwear.png",
+      image: "/banners/footwear new.png",
       href: "/categories/footwear"
     }
   ], [])
@@ -722,6 +722,31 @@ function HomeContent() {
 
   return (
     <>
+      {/* ✅ ADD CUSTOM CSS FOR FIXED HEADER ISSUE */}
+      <style jsx global>{`
+        /* Fix for header spacing */
+        body {
+          overflow-x: hidden;
+          padding-top: 140px;
+        }
+        
+        /* Ensure header is on top */
+        header {
+          z-index: 1000 !important;
+          position: fixed !important;
+          top: 0;
+          left: 0;
+          right: 0;
+        }
+        
+        /* Fix for mobile */
+        @media (max-width: 768px) {
+          body {
+            padding-top: 100px;
+          }
+        }
+      `}</style>
+      
       {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
       <Header />
       
@@ -733,13 +758,11 @@ function HomeContent() {
         />
       )}
       
-      {/* ✅ FIXED: MAIN CONTENT WITH PROPER SPACING */}
-      <div className="bg-white">
-        {/* ✅ HEADER KE BAAAD SPACING - IMPORTANT */}
-        <div className="pt-24"></div>
+      {/* ✅ FIXED: MAIN CONTENT WITH PROPER SPACING - HEADER KE BAAAD */}
+      <div className="bg-white pt-0">
         
-        {/* ✅ FIXED: Carousel Hero Section - HEADER KE NICHE */}
-        <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
+        {/* ✅ FIXED: Carousel Hero Section - NOW IT STARTS RIGHT AFTER HEADER */}
+        <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden mt-0">
           <div 
             className="absolute inset-0 z-0"
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
@@ -764,20 +787,22 @@ function HomeContent() {
               <div className="absolute inset-0 bg-black/40"></div>
               
               {/* ✅ FIXED: Content bottom position */}
-              <div className="carousel-content">
-                <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
-                  <h1 className="carousel-title text-white font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
-                    {carouselSlides[currentSlide]?.title || "JUST BECHO"}
-                  </h1>
-                  <p className="carousel-description text-white font-light tracking-widest uppercase mb-3 sm:mb-4 max-w-2xl mx-auto responsive-subheading">
-                    {carouselSlides[currentSlide]?.description || "Luxury Reborn • Trust Redefined"}
-                  </p>
-                  <Link
-                    href={carouselSlides[currentSlide]?.href || "/products"}
-                    className="carousel-button touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text"
-                  >
-                    EXPLORE NOW
-                  </Link>
+              <div className="absolute inset-0 flex items-end pb-8 sm:pb-12 md:pb-16 lg:pb-20">
+                <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12">
+                  <div className={`transform transition-all duration-1000 max-w-7xl mx-auto ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
+                    <h1 className="carousel-title text-white font-light tracking-widest uppercase mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                      {carouselSlides[currentSlide]?.title || "JUST BECHO"}
+                    </h1>
+                    <p className="carousel-description text-white font-light tracking-widest uppercase mb-3 sm:mb-4 text-sm sm:text-base md:text-lg max-w-2xl">
+                      {carouselSlides[currentSlide]?.description || "Luxury Reborn • Trust Redefined"}
+                    </p>
+                    <Link
+                      href={carouselSlides[currentSlide]?.href || "/products"}
+                      className="carousel-button inline-block bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full px-6 py-3 text-sm sm:text-base"
+                    >
+                      EXPLORE NOW
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -785,20 +810,20 @@ function HomeContent() {
             {/* Navigation Buttons */}
             <button
               onClick={prevSlide}
-              className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 touch-button-small bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group tap-highlight-none mobile-hidden sm:flex"
+              className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition-all duration-300 group"
               aria-label="Previous slide"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             
             <button
               onClick={nextSlide}
-              className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 touch-button-small bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group tap-highlight-none mobile-hidden sm:flex"
+              className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition-all duration-300 group"
               aria-label="Next slide"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -809,7 +834,7 @@ function HomeContent() {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 tap-highlight-none ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
+                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
@@ -818,13 +843,13 @@ function HomeContent() {
         </section>
 
         {/* Why Choose Us */}
-        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
+        <section className="py-10 sm:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
                 WHY CHOOSE JUST BECHO
               </h2>
-              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto responsive-text">
+              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto">
                 Experience luxury redefined with our curated collection of luxury items
               </p>
             </div>
@@ -835,10 +860,10 @@ function HomeContent() {
                   <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <span className="text-white text-lg sm:text-xl font-light">{feature.icon}</span>
                   </div>
-                  <h3 className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-text">
+                  <h3 className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mb-1 sm:mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed px-2 responsive-text-sm">
+                  <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed px-2">
                     {feature.description}
                   </p>
                 </div>
@@ -848,35 +873,35 @@ function HomeContent() {
         </section>
 
         {/* Categories Section */}
-        <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
+        <section className="py-10 sm:py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                 EXPLORE CATEGORIES
               </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
                 DISCOVER LUXURY ITEMS
               </p>
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 {[...Array(7)].map((_, index) => (
                   <div key={index} className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full bg-gray-200 animate-pulse category-image"></div>
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full bg-gray-200 animate-pulse"></div>
                     <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4 mt-3 sm:mt-4"></div>
                   </div>
                 ))}
               </div>
             ) : categoriesFromBackend.length > 0 ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 {categoriesFromBackend.slice(0, 7).map((cat, index) => (
                   <div
                     key={index}
-                    className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
+                    className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
                     onClick={() => router.push(cat.href)}
                   >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full overflow-hidden shadow-lg sm:shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500 category-image">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full overflow-hidden shadow-lg sm:shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500">
                       <Image
                         src={cat.image}
                         alt={cat.name}
@@ -887,7 +912,7 @@ function HomeContent() {
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
                     </div>
-                    <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-3 sm:mt-4 md:mt-6 leading-tight mobile-text-sm">
+                    <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-3 sm:mt-4 md:mt-6 leading-tight">
                       {cat.name.toUpperCase()}
                     </h3>
                   </div>
@@ -895,30 +920,30 @@ function HomeContent() {
               </div>
             ) : (
               <div className="text-center py-8 sm:py-12">
-                <p className="text-gray-500 text-base sm:text-lg responsive-text">No categories available yet.</p>
+                <p className="text-gray-500 text-base sm:text-lg">No categories available yet.</p>
               </div>
             )}
           </div>
         </section>
 
         {/* Featured Collections */}
-        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
+        <section className="py-10 sm:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                 FEATURED COLLECTIONS
               </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
                 CURATED LUXURY SELECTIONS
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 featured-collections-grid">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {featuredCollections.map((collection, index) => (
                 <Link
                   href={collection.href}
                   key={index}
-                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
                 >
                   <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
                     <Image
@@ -934,10 +959,10 @@ function HomeContent() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                     
                     <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-subheading">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2">
                         {collection.title}
                       </h3>
-                      <p className="text-xs sm:text-sm font-light opacity-90 responsive-text-sm">
+                      <p className="text-xs sm:text-sm font-light opacity-90">
                         {collection.description}
                       </p>
                       <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -955,13 +980,13 @@ function HomeContent() {
         </section>
 
         {/* How It Works */}
-        <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
+        <section className="py-10 sm:py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
                 HOW IT WORKS
               </h2>
-              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto responsive-text">
+              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto">
                 Experience seamless luxury trading with our managed marketplace
               </p>
             </div>
@@ -969,7 +994,7 @@ function HomeContent() {
             <div className="relative">
               <div className="absolute top-16 sm:top-20 left-1/2 transform -translate-x-1/2 w-4/5 h-0.5 bg-gray-200 hidden lg:block"></div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-4 lg:gap-4 how-it-works-grid">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-4 lg:gap-4">
                 {howItWorks.map((step, index) => (
                   <div key={index} className="text-center relative group">
                     <div className="relative mb-4 sm:mb-6">
@@ -979,10 +1004,10 @@ function HomeContent() {
                     </div>
 
                     <div className="px-1 sm:px-2">
-                      <h3 className="text-gray-900 text-xs sm:text-sm font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-text">
+                      <h3 className="text-gray-900 text-xs sm:text-sm font-light tracking-widest uppercase mb-1 sm:mb-2">
                         {step.title}
                       </h3>
-                      <p className="text-gray-600 text-xs font-light leading-relaxed responsive-text-sm">
+                      <p className="text-gray-600 text-xs font-light leading-relaxed">
                         {step.description}
                       </p>
                     </div>
@@ -1000,20 +1025,20 @@ function HomeContent() {
 
           return (
             <div key={category.name || index}>
-              <section className="py-10 sm:py-16 bg-white border-t border-gray-100 section-padding safe-area-padding">
-                <div className="max-w-[1700px] mx-auto">
+              <section className="py-10 sm:py-16 bg-white border-t border-gray-100">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                   <div className="text-center mb-8 sm:mb-12">
-                    <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
+                    <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                       {category.name.toUpperCase()}
                     </h2>
-                    <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
+                    <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
                       EXPLORE OUR CURATED {category.name.toUpperCase()} COLLECTION
                     </p>
                   </div>
 
                   {/* Product Grid */}
                   {loading ? (
-                    <div className="grid mobile-grid-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                       {[...Array(4)].map((_, index) => (
                         <div key={index} className="animate-pulse">
                           <div className="w-full aspect-square bg-gray-200 rounded-lg mb-2 sm:mb-3"></div>
@@ -1023,13 +1048,13 @@ function HomeContent() {
                       ))}
                     </div>
                   ) : products.length > 0 ? (
-                    <div className="grid mobile-grid-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                       {products.map(renderProductCard)}
                     </div>
                   ) : (
                     <div className="text-center py-8 sm:py-12">
-                      <p className="text-gray-500 text-base sm:text-lg responsive-text">No products available in this category yet.</p>
-                      <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2 responsive-text-sm">Be the first to list a product!</p>
+                      <p className="text-gray-500 text-base sm:text-lg">No products available in this category yet.</p>
+                      <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2">Be the first to list a product!</p>
                     </div>
                   )}
 
@@ -1037,10 +1062,10 @@ function HomeContent() {
                   {categoryBrandsData.length > 0 && (
                     <div className="mt-12 sm:mt-16">
                       <div className="text-center mb-6 sm:mb-8">
-                        <h3 className="text-gray-900 text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase responsive-subheading">
+                        <h3 className="text-gray-900 text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase">
                           POPULAR BRANDS IN {category.name.toUpperCase()}
                         </h3>
-                        <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mt-1 sm:mt-2 responsive-text">
+                        <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mt-1 sm:mt-2">
                           AUTHENTIC LUXURY BRANDS YOU CAN TRUST
                         </p>
                       </div>
@@ -1051,7 +1076,7 @@ function HomeContent() {
                       />
                       
                       <div className="text-center mt-4 sm:mt-6">
-                        <p className="text-gray-500 text-xs sm:text-sm responsive-text-sm">
+                        <p className="text-gray-500 text-xs sm:text-sm">
                           Click on any brand to view all {category.name} products from that brand
                         </p>
                       </div>
@@ -1061,7 +1086,7 @@ function HomeContent() {
                   <div className="text-center mt-8 sm:mt-12">
                     <button
                       onClick={() => router.push(category.href)}
-                      className="text-gray-900 text-sm sm:text-base md:text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative touch-button responsive-text"
+                      className="text-gray-900 text-sm sm:text-base md:text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative"
                     >
                       <span className="relative">
                         → VIEW ALL {category.name.toUpperCase()}
@@ -1074,18 +1099,18 @@ function HomeContent() {
 
               {/* Banner after each category */}
               {index < categoriesFromBackend.length - 1 && (
-                <section className="py-10 sm:py-16 bg-gradient-to-r from-gray-900 to-black section-padding safe-area-padding">
-                  <div className="max-w-[1700px] mx-auto text-center">
-                    <h2 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-3 sm:mb-4 responsive-subheading">
+                <section className="py-10 sm:py-16 bg-gradient-to-r from-gray-900 to-black">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 text-center">
+                    <h2 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-3 sm:mb-4">
                       READY TO SELL YOUR {category.name.toUpperCase()}?
                     </h2>
-                    <p className="text-gray-300 text-sm sm:text-base font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto responsive-text">
+                    <p className="text-gray-300 text-sm sm:text-base font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto">
                       Get the best value for your luxury items
                     </p>
                     {/* ✅ MODIFIED: SELL NOW BUTTON WITH HANDLER */}
                     <button
                       onClick={handleSellNowClick}
-                      className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text px-6 py-3"
+                      className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block px-6 py-3 text-sm sm:text-base"
                     >
                       SELL NOW
                     </button>
@@ -1097,22 +1122,22 @@ function HomeContent() {
         })}
 
         {/* Testimonials */}
-        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
-          <div className="max-w-[1800px] mx-auto">
+        <section className="py-10 sm:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
                 VOICES OF TRUST
               </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-1 sm:mt-2 responsive-subheading">
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-1 sm:mt-2">
                 DISCOVER WHY THOUSANDS CHOOSE JUST BECHO
               </p>
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center justify-center w-12 sm:w-16 mobile-hidden sm:flex">
+              <div className="absolute inset-y-0 left-0 flex items-center justify-center w-12 sm:w-16 hidden sm:flex">
                 <button
                   onClick={prevTestimonials}
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group touch-button-small tap-highlight-none"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
@@ -1120,10 +1145,10 @@ function HomeContent() {
                 </button>
               </div>
 
-              <div className="absolute inset-y-0 right-0 flex items-center justify-center w-12 sm:w-16 mobile-hidden sm:flex">
+              <div className="absolute inset-y-0 right-0 flex items-center justify-center w-12 sm:w-16 hidden sm:flex">
                 <button
                   onClick={nextTestimonials}
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group touch-button-small tap-highlight-none"
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 border border-gray-200 z-10 hover:bg-gray-50 group"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
@@ -1132,9 +1157,9 @@ function HomeContent() {
               </div>
 
               <div className="mx-0 sm:mx-12 lg:mx-16">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 testimonials-grid">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                   {visibleTestimonials.map((testimonial, index) => (
-                    <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-auto sm:h-80 flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer testimonial-card tap-highlight">
+                    <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-auto sm:h-80 flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer">
                       <div className="absolute top-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-700 group-hover:w-full transition-all duration-500"></div>
                       <div className="absolute top-0 right-0 w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-bl from-gray-100 to-transparent rounded-full -translate-y-8 sm:-translate-y-10 translatex-8 sm:translatex-10 opacity-50"></div>
 
@@ -1151,7 +1176,7 @@ function HomeContent() {
                             </div>
                           </div>
 
-                          <p className="text-gray-700 mb-2 sm:mb-3 leading-relaxed text-xs sm:text-[13px] font-light line-clamp-4 tracking-wide responsive-text-sm">
+                          <p className="text-gray-700 mb-2 sm:mb-3 leading-relaxed text-xs sm:text-[13px] font-light line-clamp-4 tracking-wide">
                             "{testimonial.comment}"
                           </p>
                         </div>
@@ -1161,8 +1186,8 @@ function HomeContent() {
                             {testimonial.name?.charAt(0) || 'U'}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-gray-900 text-xs sm:text-sm font-light tracking-wide mb-0.5 responsive-text-sm">{testimonial.name || 'User'}</h4>
-                            <p className="text-gray-600 text-xs font-light responsive-text-sm">{testimonial.location || 'India'}</p>
+                            <h4 className="text-gray-900 text-xs sm:text-sm font-light tracking-wide mb-0.5">{testimonial.name || 'User'}</h4>
+                            <p className="text-gray-600 text-xs font-light">{testimonial.location || 'India'}</p>
                             <div className="mt-0.5 sm:mt-1">
                               <span className="inline-block bg-gray-200/70 text-gray-700 text-[8px] sm:text-[9px] font-light tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full">
                                 {testimonial.role || 'Customer'}
@@ -1181,7 +1206,7 @@ function HomeContent() {
                   <button
                     key={index}
                     onClick={() => setTestimonialStart(index)}
-                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 tap-highlight-none ${index === testimonialStart ? 'bg-gray-900 scale-125 shadow-md' : 'bg-gray-300 hover:bg-gray-400'
+                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${index === testimonialStart ? 'bg-gray-900 scale-125 shadow-md' : 'bg-gray-300 hover:bg-gray-400'
                       }`}
                   />
                 ))}
@@ -1191,25 +1216,25 @@ function HomeContent() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-10 sm:py-16 bg-gray-900 text-white section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto text-center">
-            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-light tracking-widest uppercase mb-3 sm:mb-4 responsive-heading">
+        <section className="py-10 sm:py-16 bg-gray-900 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 text-center">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-light tracking-widest uppercase mb-3 sm:mb-4">
               READY TO EXPERIENCE SECURE LUXURY TRADING?
             </h2>
-            <p className="text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mb-4 sm:mb-6 opacity-90 max-w-2xl mx-auto responsive-subheading">
+            <p className="text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mb-4 sm:mb-6 opacity-90 max-w-2xl mx-auto">
               Join India's most trusted managed marketplace for pre-loved and brand new luxury
             </p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
               <Link
                 href="/products"
-                className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full responsive-text px-6 py-3"
+                className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full px-6 py-3 text-sm sm:text-base"
               >
                 SHOP VERIFIED LUXURY
               </Link>
               {/* ✅ MODIFIED: SELL WITH CONFIDENCE BUTTON */}
               <button
                 onClick={handleSellNowClick}
-                className="touch-button border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full responsive-text px-6 py-3"
+                className="border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full px-6 py-3 text-sm sm:text-base"
               >
                 SELL WITH CONFIDENCE
               </button>
@@ -1230,7 +1255,7 @@ export default function Home() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600 responsive-text">Loading Just Becho...</p>
+          <p className="text-gray-600">Loading Just Becho...</p>
         </div>
       </div>
     }>
