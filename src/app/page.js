@@ -55,8 +55,11 @@ function HomeContent() {
       { name: "ALAIA", logo: "/brandslogo/footwear/ALAIA.jpg", fallback: "/brands/puma.png" },
       { name: "Alexander McQueen", logo: "/brandslogo/footwear/Alexander-McQueen.jpg", fallback: "/brands/gucci.png" },
       { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png" },
-      { name: "Alo Yoga", logo: "/brandslogo/footwear/Alo-Yoga.png", fallback: "/brands/reebok.png" },
-      { name: "Altra Running", logo: "/brandslogo/footwear/Altra Running.png", fallback: "/brands/Balenciaga.png" },
+      { name: "Nike", logo: "/brandslogo/footwear/palmm.jpeg", fallback: "/brands/gucci.png" },
+      { name: "Nike", logo: "/brandslogo/footwear/off-white.jpeg", fallback: "/brands/gucci.png" },
+      { name: "Nike", logo: "/brandslogo/footwear/hermess.jpeg", fallback: "/brands/gucci.png" },
+      
+      
       { name: "Amiri", logo: "/brandslogo/footwear/Amiri.jpg", fallback: "/brands/jimmy-choo.png" },
       { name: "ANTA", logo: "/brandslogo/footwear/ANTA.jpg", fallback: "/brands/prada.png" },
       { name: "Armani", logo: "/brandslogo/footwear/Armani.png", fallback: "/brands/puma.png" },
@@ -111,7 +114,10 @@ function HomeContent() {
       { name: "HUBLOT", logo: "/brandslogo/watches/HUBLOT.png", fallback: "/brands/wildhorn.jpg" },
       { name: "LONGINES", logo: "/brandslogo/watches/LONGINES.jpg", fallback: "/brands/nike.png" },
       { name: "OMEGA", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/OMEGA.png" },
-      { name: "CHOPARD", logo: "/brandslogo/watches/CHOPARD.png", fallback: "/brands/baggit.png" }
+      { name: "CHOPARD", logo: "/brandslogo/watches/CHOPARD.png", fallback: "/brands/baggit.png" },
+      { name: "CHOPARD", logo: "/brandslogo/watches/fossill.jpeg", fallback: "/brands/baggit.png" },
+      { name: "CHOPARD", logo: "/brandslogo/watches/rolexx.jpeg", fallback: "/brands/baggit.png" },
+      { name: "CHOPARD", logo: "/brandslogo/watches/titann.jpeg", fallback: "/brands/baggit.png" }
     ],
     "TOYS & COLLECTIBLES": [
       { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },

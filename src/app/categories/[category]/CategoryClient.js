@@ -1,3 +1,4 @@
+// app/categories/[category]/CategoryClient.js - COMPLETE UPDATED VERSION
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
@@ -5,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import AuthModal from '@/components/AuthModal' // ✅ AuthModal import karein
 import { useRouter } from 'next/navigation'
 
 export default function CategoryClient({ 
@@ -13,6 +15,10 @@ export default function CategoryClient({
     config 
 }) {
     const router = useRouter()
+    
+    // ✅ NEW: Auth Modal state
+    const [showAuthModal, setShowAuthModal] = useState(false)
+    const [authAction, setAuthAction] = useState(null)
     
     // State Management
     const [activeFilter, setActiveFilter] = useState('all')
@@ -35,6 +41,27 @@ export default function CategoryClient({
     const [availableBrands, setAvailableBrands] = useState(config.initialFilters?.brands || [])
     const [availableConditions, setAvailableConditions] = useState(config.initialFilters?.conditions || [])
     const [error, setError] = useState(null)
+    
+    // ✅ Auth Modal close handler
+    const handleAuthModalClose = () => {
+        setShowAuthModal(false)
+        setAuthAction(null)
+    }
+    
+    // ✅ SELL ITEMS button handler
+    const handleSellItems = () => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token')
+        if (!token) {
+            // User not logged in, show auth modal
+            setAuthAction('sell')
+            setShowAuthModal(true)
+            return
+        }
+        
+        // If logged in, navigate to sell page
+        router.push('/sell-now')
+    }
     
     // ✅ Debug logging
     useEffect(() => {
@@ -362,51 +389,50 @@ export default function CategoryClient({
                 <div className="pt-32 md:pt-36"></div>
                 
                 {/* ✅ Hero Banner */}
-                {/* ✅ Hero Banner - FIXED IMAGE SIZE */}
-<div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-10"></div>
-    
-    {/* Banner Image with object-fit: cover */}
-    <div className="absolute inset-0">
-        <Image
-            src={config.banner || '/banners/default-banner.jpg'}
-            alt={config.title}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-            onError={(e) => {
-                console.error('Banner image failed:', config.banner)
-                e.target.src = '/banners/default-banner.jpg'
-            }}
-        />
-    </div>
-    
-    {/* Content */}
-    <div className="relative z-20 h-full flex flex-col justify-center items-center text-white px-4">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center">
-            {config.title || 'CATEGORY'}
-        </h1>
-        <p className="text-lg md:text-xl text-center max-w-2xl mb-8">
-            {config.subtitle || 'Explore our collection'}
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-4">
-            <button
-                onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
-                className="bg-white text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors"
-            >
-                SHOP NOW
-            </button>
-            <Link
-                href="/sell-now"
-                className="border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors text-center"
-            >
-                SELL ITEMS
-            </Link>
-        </div>
-    </div>
-</div>
+                <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-10"></div>
+                    
+                    {/* Banner Image with object-fit: cover */}
+                    <div className="absolute inset-0">
+                        <Image
+                            src={config.banner || '/banners/default-banner.jpg'}
+                            alt={config.title}
+                            fill
+                            className="object-cover"
+                            priority
+                            sizes="100vw"
+                            onError={(e) => {
+                                console.error('Banner image failed:', config.banner)
+                                e.target.src = '/banners/default-banner.jpg'
+                            }}
+                        />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="relative z-20 h-full flex flex-col justify-center items-center text-white px-4">
+                        <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center">
+                            {config.title || 'CATEGORY'}
+                        </h1>
+                        <p className="text-lg md:text-xl text-center max-w-2xl mb-8">
+                            {config.subtitle || 'Explore our collection'}
+                        </p>
+                        
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <button
+                                onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+                                className="bg-white text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                            >
+                                SHOP NOW
+                            </button>
+                            <button
+                                onClick={handleSellItems}
+                                className="border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors text-center"
+                            >
+                                SELL ITEMS
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 {/* ✅ Products Section */}
                 <section id="products" className="py-12 md:py-16">
@@ -427,8 +453,6 @@ export default function CategoryClient({
                                 </button>
                             </div>
                         )}
-                        
-                     
                         
                         <div className="flex flex-col lg:flex-row gap-8">
                             
@@ -621,11 +645,12 @@ export default function CategoryClient({
                                             <option value="popular">Most Popular</option>
                                         </select>
                                         
-                                        <Link href="/sell-now">
-                                            <button className="bg-black text-white px-6 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap">
-                                                + SELL ITEM
-                                            </button>
-                                        </Link>
+                                        <button 
+                                            onClick={handleSellItems}
+                                            className="bg-black text-white px-6 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap"
+                                        >
+                                            + SELL ITEM
+                                        </button>
                                     </div>
                                 </div>
                                 
@@ -654,12 +679,12 @@ export default function CategoryClient({
                                             >
                                                 Clear Filters
                                             </button>
-                                            <Link 
-                                                href="/sell-now" 
+                                            <button
+                                                onClick={handleSellItems}
                                                 className="bg-black text-white px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-gray-800 transition-all"
                                             >
                                                 Sell Items
-                                            </Link>
+                                            </button>
                                         </div>
                                     </div>
                                 ) : 
@@ -721,6 +746,12 @@ export default function CategoryClient({
             </div>
             
             <Footer />
+            
+            {/* ✅ Auth Modal */}
+            <AuthModal 
+                isOpen={showAuthModal}
+                onClose={handleAuthModalClose}
+            />
         </>
     )
 }
