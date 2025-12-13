@@ -143,7 +143,7 @@ function HomeContent() {
       { name: "Filorga", logo: "/brandslogo/perfumes/Filorga.png", fallback: "/brands/baggit.png" },
       { name: "Guerlain", logo: "/brandslogo/perfumes/Guerlain.png", fallback: "/brands/ray-ban.png" }
     ],
-    "KIDS": [
+    "KID'S FASHION": [  // ✅ Updated key
       { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },
       { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
       { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
@@ -164,7 +164,7 @@ function HomeContent() {
     "Watches": "/banners/watches new.png", 
     "Perfumes": "/banners/perfumes new.png",
     "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
-    "KIDS": "/banners/kids new.png",
+    "KID'S FASHION": "/banners/kids new.png",  // ✅ Updated key
     "default": "/banners/default.jpg"
   }), [])
 
@@ -230,7 +230,7 @@ function HomeContent() {
     {
       title: "LUXURY TIMEPIECES",
       description: "Elevate your style with iconic watches",
-      image: "/banners/rolex.jpg",
+      image: "/banners/watches new.png",
       href: "/categories/watches"
     },
     {
@@ -242,7 +242,7 @@ function HomeContent() {
     {
       title: "POPULAR FOOTWEAR",
       description: "Innovation meets luxury",
-      image: "/banners/Footwear.png",
+      image: "/banners/Footwear new.png",
       href: "/categories/footwear"
     }
   ], [])
@@ -343,6 +343,46 @@ function HomeContent() {
       rating: 5
     }
   ], [])
+
+  // ✅ Get category configuration for homepage
+  const getCategoryConfig = (categorySlug) => {
+    const configs = {
+      'men': {
+        title: "MEN'S FASHION",
+        apiSlug: 'men'
+      },
+      'women': {
+        title: "WOMEN'S FASHION",
+        apiSlug: 'women'
+      },
+      'footwear': {
+        title: 'FOOTWEAR',
+        apiSlug: 'footwear'
+      },
+      'accessories': {
+        title: 'ACCESSORIES',
+        apiSlug: 'accessories'
+      },
+      'watches': {
+        title: 'WATCHES',
+        apiSlug: 'watches'
+      },
+      'perfumes': {
+        title: 'PERFUMES',
+        apiSlug: 'perfumes'
+      },
+      'toys': {
+        title: 'TOYS & COLLECTIBLES',
+        apiSlug: 'toys'
+      },
+      'kids-fashion': {  // ✅ Updated
+        title: "KID'S FASHION",  // ✅ Updated
+        apiSlug: 'kids'
+      }
+    }
+
+    return configs[categorySlug] || { title: categorySlug, apiSlug: categorySlug }
+  }
 
   // ✅ Check if user is logged in
   useEffect(() => {
@@ -495,10 +535,18 @@ function HomeContent() {
               const imagePath = getCategoryImage(categoryName);
               const brandLogos = getCategoryBrands(categoryName);
               
+              // Generate proper URL slug
+              let urlSlug = cat.slug || categoryName.toLowerCase().replace(/\s+/g, '-');
+              
+              // Special handling for kids
+              if (categoryName === "KID'S FASHION" || categoryName === "Kids") {
+                urlSlug = "kids-fashion";
+              }
+              
               return {
                 name: displayName,
                 originalName: categoryName,
-                href: `/categories/${cat.slug || categoryName.toLowerCase().replace(/\s+/g, '-')}`,
+                href: `/categories/${urlSlug}`,
                 apiCategory: categoryName,
                 image: imagePath,
                 brands: brandLogos

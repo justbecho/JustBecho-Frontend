@@ -31,7 +31,7 @@ export default function SellNowPage() {
   const [productTypes, setProductTypes] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(true)
 
-  // ✅ STRICT CATEGORY MAPPING - FIXED
+  // ✅ STRICT CATEGORY MAPPING - UPDATED
   const strictCategoryMap = useCallback(() => {
     return {
       // Men's - All variations mapped to EXACT database name
@@ -73,9 +73,13 @@ export default function SellNowPage() {
       "Toys & Collectibles": "TOYS & COLLECTIBLES",
       "toys": "TOYS & COLLECTIBLES",
       
-      "KIDS": "KIDS",
-      "Kids": "KIDS",
-      "kids": "KIDS"
+      // ✅ UPDATED: KID'S FASHION mapping
+      "KID'S FASHION": "KID'S FASHION",
+      "Kids Fashion": "KID'S FASHION",
+      "Kids": "KID'S FASHION",
+      "kids": "KID'S FASHION",
+      "kid's fashion": "KID'S FASHION",
+      "kids fashion": "KID'S FASHION"
     }
   }, [])
 

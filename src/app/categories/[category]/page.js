@@ -1,3 +1,4 @@
+// app/categories/[category]/page.js
 import CategoryClient from './CategoryClient'
 import { notFound } from 'next/navigation'
 
@@ -11,7 +12,7 @@ export async function generateStaticParams() {
         { category: 'watches' },
         { category: 'perfumes' },
         { category: 'toys' },
-        { category: 'kids' }
+        { category: 'kids-fashion' }  // ✅ Updated
     ]
 }
 
@@ -239,13 +240,13 @@ function getCategoryConfig(categorySlug) {
             apiSlug: 'toys',
             seoKeywords: ['luxury toys', 'collectibles', 'figurines', 'pre-loved toys', 'rare toys']
         },
-        'kids': {
-            title: 'KIDS FASHION',
+        'kids-fashion': {  // ✅ Updated URL slug
+            title: "KID'S FASHION",  // ✅ Updated display name
             subtitle: 'Adorable luxury fashion for kids',
             banner: '/banners/kids new.png',
             metaTitle: 'Kids Luxury Fashion | Designer Kids Clothes',
             metaDescription: 'Authentic pre-loved luxury fashion for kids. Premium brands for children.',
-            whyTitle: 'WHY SHOP KIDS FASHION AT JUST BECHO',
+            whyTitle: "WHY SHOP KIDS FASHION AT JUST BECHO",
             features: [
                 {
                     icon: '🛡️',
@@ -263,7 +264,7 @@ function getCategoryConfig(categorySlug) {
                     description: 'Free shipping on all orders above ₹1499'
                 }
             ],
-            apiSlug: 'kids',
+            apiSlug: 'kids',  // ✅ API slug remains same for backend
             seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
         }
     }
