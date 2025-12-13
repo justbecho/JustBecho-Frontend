@@ -428,19 +428,7 @@ export default function CategoryClient({
                             </div>
                         )}
                         
-                        {/* ✅ Debug Info (remove in production) */}
-                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                            <div className="flex items-center gap-2 text-blue-700 mb-1">
-                                <span>🔍</span>
-                                <span>Debug Info:</span>
-                            </div>
-                            <div className="text-blue-600 text-xs">
-                                <p>Category Slug: <strong>{categorySlug}</strong></p>
-                                <p>API Category: <strong>{apiCategory}</strong></p>
-                                <p>Products Found: <strong>{products.length}</strong></p>
-                                <p>Loading: <strong>{loading ? 'Yes' : 'No'}</strong></p>
-                            </div>
-                        </div>
+                     
                         
                         <div className="flex flex-col lg:flex-row gap-8">
                             
