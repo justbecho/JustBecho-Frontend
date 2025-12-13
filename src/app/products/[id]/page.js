@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - COMPLETELY UPDATED VERSION
+// app/products/[id]/page.js - COMPLETE UPDATED VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -6,11 +6,17 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import AuthModal from '@/components/AuthModal' // ✅ AuthModal import karein
 
 export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
   const productId = params.id
+  
+  // ✅ NEW: Auth Modal state
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authAction, setAuthAction] = useState(null) // 'addToCart' or 'buyNow'
+  
   const [selectedImage, setSelectedImage] = useState(0)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -116,7 +122,33 @@ export default function ProductPage() {
     }
   }
 
-  const handleAddToCart = async () => {
+  // ✅ Auth Modal close handler
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false)
+    
+    // Agar user successfully login/signup kiya, toh original action perform karein
+    const token = localStorage.getItem('token')
+    if (token && authAction) {
+      if (authAction === 'addToCart') {
+        handleAddToCartAfterAuth()
+      } else if (authAction === 'buyNow') {
+        handleBuyNowAfterAuth()
+      } else if (authAction === 'wishlist') {
+        // Wishlist ke liye action
+        if (isInWishlist) {
+          handleRemoveFromWishlistAfterAuth()
+        } else {
+          handleAddToWishlistAfterAuth()
+        }
+      }
+    }
+    
+    // Reset auth action
+    setAuthAction(null)
+  }
+
+  // ✅ Handle Add to Cart after authentication
+  const handleAddToCartAfterAuth = async () => {
     if (!product) return
     
     setAddingToCart(true)
@@ -168,7 +200,8 @@ export default function ProductPage() {
     }
   }
 
-  const handleBuyNow = async () => {
+  // ✅ Handle Buy Now after authentication
+  const handleBuyNowAfterAuth = async () => {
     if (!product) return
     
     try {
@@ -224,16 +257,8 @@ export default function ProductPage() {
     }
   }
 
-  const conditionOptions = [
-    "Brand New With Tag",
-    "Brand New Without Tag", 
-    "Like New",
-    "Excellent",
-    "Good",
-    "Fairly Used"
-  ]
-
-  const handleAddToWishlist = async () => {
+  // ✅ Handle Add to Wishlist after authentication
+  const handleAddToWishlistAfterAuth = async () => {
     if (!product) return
 
     try {
@@ -269,7 +294,8 @@ export default function ProductPage() {
     }
   }
 
-  const handleRemoveFromWishlist = async () => {
+  // ✅ Handle Remove from Wishlist after authentication
+  const handleRemoveFromWishlistAfterAuth = async () => {
     if (!product) return
 
     try {
@@ -297,6 +323,87 @@ export default function ProductPage() {
       alert('Error removing from wishlist')
     }
   }
+
+  // ✅ Updated Add to Cart function with auth check
+  const handleAddToCart = async () => {
+    if (!product) return
+    
+    // ✅ Check if user is logged in
+    const token = localStorage.getItem('token')
+    if (!token) {
+      // User not logged in, show auth modal
+      setAuthAction('addToCart')
+      setShowAuthModal(true)
+      return
+    }
+    
+    // Agar logged in hai toh directly add to cart karein
+    handleAddToCartAfterAuth()
+  }
+
+  // ✅ Updated Buy Now function with auth check
+  const handleBuyNow = async () => {
+    if (!product) return
+    
+    // ✅ Check if user is logged in
+    const token = localStorage.getItem('token')
+    if (!token) {
+      // User not logged in, show auth modal
+      setAuthAction('buyNow')
+      setShowAuthModal(true)
+      return
+    }
+    
+    // Agar logged in hai toh directly buy now karein
+    handleBuyNowAfterAuth()
+  }
+
+  // ✅ Updated Add to Wishlist function with auth check
+  const handleAddToWishlist = async () => {
+    if (!product) return
+
+    // ✅ Check if user is logged in
+    const token = localStorage.getItem('token')
+    if (!token) {
+      // User not logged in, show auth modal
+      setAuthAction('wishlist')
+      setShowAuthModal(true)
+      return
+    }
+
+    // Agar logged in hai toh directly wishlist karein
+    if (isInWishlist) {
+      handleRemoveFromWishlistAfterAuth()
+    } else {
+      handleAddToWishlistAfterAuth()
+    }
+  }
+
+  // ✅ Updated Remove from Wishlist function with auth check
+  const handleRemoveFromWishlist = async () => {
+    if (!product) return
+
+    // ✅ Check if user is logged in
+    const token = localStorage.getItem('token')
+    if (!token) {
+      // User not logged in, show auth modal
+      setAuthAction('wishlist')
+      setShowAuthModal(true)
+      return
+    }
+
+    // Agar logged in hai toh directly remove karein
+    handleRemoveFromWishlistAfterAuth()
+  }
+
+  const conditionOptions = [
+    "Brand New With Tag",
+    "Brand New Without Tag", 
+    "Like New",
+    "Excellent",
+    "Good",
+    "Fairly Used"
+  ]
 
   if (loading) {
     return (
@@ -608,7 +715,7 @@ export default function ProductPage() {
                       {addingToCart ? 'ADDING TO CART...' : 'ADD TO CART'}
                     </button>
                     <button
-                      onClick={isInWishlist ? handleRemoveFromWishlist : handleAddToWishlist}
+                      onClick={handleAddToWishlist}
                       className={`w-12 border-2 py-3 flex items-center justify-center transition-all duration-300 rounded-lg ${
                         isInWishlist 
                           ? 'border-red-500 text-red-500 bg-red-50 hover:bg-red-100' 
@@ -759,6 +866,12 @@ export default function ProductPage() {
         )}
       </main>
       <Footer />
+      
+      {/* ✅ Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={handleAuthModalClose}
+      />
     </>
   )
 }
