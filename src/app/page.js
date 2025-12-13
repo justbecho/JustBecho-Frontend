@@ -181,7 +181,7 @@ function HomeContent() {
       return categoriesFromBackend.slice(0, 6).map(cat => ({
         image: cat.image,
         title: cat.name,
-        description: `Explore luxury ${cat.name.toLowerCase()} Fashion`,
+        description: `Explore luxury ${cat.name.toLowerCase()}`,
         href: cat.href
       }))
     }
