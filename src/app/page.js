@@ -157,14 +157,14 @@ function HomeContent() {
 
   // ✅ Category images mapping for carousel
   const categoryImages = useMemo(() => ({
-    "Men's Fashion": "/banners/Men_s Fashion.png",
-    "Women's Fashion": "/banners/bagu.jpeg", 
-    "Footwear": "/banners/DIOR LOAFERS.png",
-    "Accessories": "/banners/Fashion Accessories.png",
-    "Watches": "/banners/rolex.jpg", 
-    "Perfumes": "/banners/perfumes.png",
+    "Men's Fashion": "/banners/mens new.jpeg",
+    "Women's Fashion": "/banners/womens new.png", 
+    "Footwear": "/banners/footwear new.png",
+    "Accessories": "/banners/accessories new.png",
+    "Watches": "/banners/watches new.png", 
+    "Perfumes": "/banners/perfumes new.png",
     "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
-    "KIDS": "/banners/Kids Fashion.png",
+    "KIDS": "/banners/kids new.png",
     "default": "/banners/default.jpg"
   }), [])
 
