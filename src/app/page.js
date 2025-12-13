@@ -1254,12 +1254,7 @@ function HomeContent() {
               Join India's most trusted managed marketplace for pre-loved and brand new luxury
             </p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-              <Link
-                href="/products"
-                className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full responsive-text px-6 py-3"
-              >
-                SHOP VERIFIED LUXURY
-              </Link>
+             
               {/* ✅ MODIFIED: SELL WITH CONFIDENCE BUTTON */}
               <button
                 onClick={handleSellNowClick}
