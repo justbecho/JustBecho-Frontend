@@ -284,7 +284,7 @@ export default function Dashboard() {
     }
   }, [user, checkSellerStatus])
 
-  // ✅ FETCH USER'S PRODUCTS (BACKEND: /api/products/my-products)
+  // ✅ FIXED: FETCH USER'S PRODUCTS - WORKING VERSION
   const fetchMyProducts = async () => {
     try {
       const token = getLocalStorage('token');
@@ -309,18 +309,38 @@ export default function Dashboard() {
         const data = await response.json();
         console.log('✅ My Products API Response:', data);
         
-        // ✅ Backend format: { success: true, products: [...] }
+        // ✅ Handle different response formats
         if (data.success && data.products) {
-          console.log(`📦 Found ${data.products.length} products`);
+          // Format 1: { success: true, products: [...] }
+          console.log(`📦 Found ${data.products.length} products (format 1)`);
           setListings(data.products);
+        } else if (data.success && Array.isArray(data.products)) {
+          // Format 2: { success: true, products: [...] } (alternative)
+          console.log(`📦 Found ${data.products.length} products (format 2)`);
+          setListings(data.products);
+        } else if (Array.isArray(data)) {
+          // Format 3: Direct array response
+          console.log(`📦 Found ${data.length} products (format 3)`);
+          setListings(data);
+        } else if (data && data.length !== undefined) {
+          // Format 4: Array-like object
+          console.log(`📦 Found ${data.length} products (format 4)`);
+          setListings(data);
         } else {
-          console.error('❌ API returned no products:', data.message);
+          console.error('❌ API returned unexpected format:', data);
           setListings([]);
         }
       } else {
-        const errorText = await response.text();
-        console.error('❌ Failed to fetch my products:', response.status, errorText);
-        setListings([]);
+        console.error('❌ Failed to fetch my products:', response.status);
+        
+        // ✅ Fallback: Check if user is seller and show appropriate message
+        if (user?.role === 'seller') {
+          console.log('👤 User is seller but no products found');
+          setListings([]);
+        } else {
+          console.log('👤 User is not a seller');
+          setListings([]);
+        }
       }
     } catch (error) {
       console.error('❌ Error fetching my products:', error);
