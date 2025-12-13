@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import AuthModal from '@/components/AuthModal' // ✅ AuthModal import karein
+import AuthModal from '@/components/ui/AuthModal'
 
 export default function ProductPage() {
   const params = useParams()
