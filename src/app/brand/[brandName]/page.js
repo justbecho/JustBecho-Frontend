@@ -315,20 +315,6 @@ export default function BrandPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link
-                    href="/sell-now"
-                    className="bg-gray-900 text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-800 transition-all duration-300 rounded-full text-sm"
-                  >
-                    SELL {safeToUpperCase(brandName)}
-                  </Link>
-                  <Link
-                    href="/products"
-                    className="border border-gray-900 text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-50 transition-all duration-300 rounded-full text-sm"
-                  >
-                    BROWSE ALL BRANDS
-                  </Link>
-                </div>
               </div>
             </section>
           )}
