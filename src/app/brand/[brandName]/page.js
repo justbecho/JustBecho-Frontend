@@ -354,31 +354,7 @@ export default function BrandPage() {
           )}
         </div>
 
-        {/* ✅ UPDATED: Full Width CTA Section with Reduced Height */}
-        <section className="py-12 bg-gradient-to-r from-gray-900 to-black mt-12">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 text-center">
-            <h2 className="text-white text-2xl sm:text-3xl font-light tracking-widest uppercase mb-4">
-              READY TO SELL YOUR {safeToUpperCase(brandName)}?
-            </h2>
-            <p className="text-gray-300 text-base font-light tracking-widest uppercase mb-6 max-w-2xl mx-auto">
-              Get the best value for your authentic {brandName} items
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/sell-now"
-                className="bg-white text-gray-900 px-6 py-3 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full text-base"
-              >
-                SELL {safeToUpperCase(brandName)}
-              </Link>
-              <Link
-                href="/products"
-                className="border border-white text-white px-6 py-3 font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full text-base"
-              >
-                BROWSE ALL LUXURY
-              </Link>
-            </div>
-          </div>
-        </section>
+      
       </main>
 
       <Footer />
