@@ -31,6 +31,54 @@ export default function SellNowPage() {
   const [productTypes, setProductTypes] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(true)
 
+  // ✅ STRICT CATEGORY MAPPING - FIXED
+  const strictCategoryMap = useCallback(() => {
+    return {
+      // Men's - All variations mapped to EXACT database name
+      "Men's Fashion": "Men's Fashion",
+      "Mens Fashion": "Men's Fashion",
+      "Mens": "Men's Fashion",
+      "Men": "Men's Fashion",
+      "men": "Men's Fashion",
+      "mens": "Men's Fashion",
+      "men-fashion": "Men's Fashion",
+      "men's": "Men's Fashion",
+      
+      // Women's - All variations mapped to EXACT database name
+      "Women's Fashion": "Women's Fashion",
+      "Womens Fashion": "Women's Fashion",
+      "Womens": "Women's Fashion",
+      "Women": "Women's Fashion",
+      "women": "Women's Fashion",
+      "womens": "Women's Fashion",
+      "women-fashion": "Women's Fashion",
+      "women's": "Women's Fashion",
+      
+      // Others - EXACT names as stored in database
+      "Footwear": "Footwear",
+      "footwear": "Footwear",
+      "Shoes": "Footwear",
+      "shoes": "Footwear",
+      
+      "Accessories": "Accessories",
+      "accessories": "Accessories",
+      
+      "Watches": "Watches",
+      "watches": "Watches",
+      
+      "Perfumes": "Perfumes",
+      "perfumes": "Perfumes",
+      
+      "TOYS & COLLECTIBLES": "TOYS & COLLECTIBLES",
+      "Toys & Collectibles": "TOYS & COLLECTIBLES",
+      "toys": "TOYS & COLLECTIBLES",
+      
+      "KIDS": "KIDS",
+      "Kids": "KIDS",
+      "kids": "KIDS"
+    }
+  }, [])
+
   // ✅ FIXED: Safe localStorage access
   const getLocalStorage = (key) => {
     if (typeof window === 'undefined') return null
@@ -57,31 +105,25 @@ export default function SellNowPage() {
   const handleBrandInput = (e) => {
     const { name, value } = e.target;
     
-    // Process the brand name
     let processedValue = value;
     
     if (value.trim()) {
-      // Capitalize first letter of each word
       processedValue = value
-        .toLowerCase() // First convert all to lowercase
-        .split(' ') // Split by spaces
+        .toLowerCase()
+        .split(' ')
         .map(word => {
-          // Handle special cases like '&' and abbreviations
           if (word.includes('&')) {
             return word.toUpperCase();
           }
           
-          // Handle abbreviations (2-3 letters)
           if (word.length <= 3 && !['the', 'and', 'for', 'but', 'nor', 'yet', 'so'].includes(word)) {
             return word.toUpperCase();
           }
           
-          // Capitalize first letter of other words
           return word.charAt(0).toUpperCase() + word.slice(1);
         })
         .join(' ');
         
-      // Special handling for known brand formats
       const specialBrands = {
         'mcqueen': 'McQueen',
         'mcm': 'MCM',
@@ -105,7 +147,6 @@ export default function SellNowPage() {
         'louis vuitton': 'Louis Vuitton',
         'dolce & gabbana': 'Dolce & Gabbana',
         'alexander mcqueen': 'Alexander McQueen',
-        'alexander mc queen': 'Alexander McQueen',
         'yves saint laurent': 'Yves Saint Laurent',
         'ysl': 'YSL',
         'tom ford': 'Tom Ford',
@@ -122,7 +163,6 @@ export default function SellNowPage() {
         'jimmy choo': 'Jimmy Choo',
         'tod\'s': 'Tod\'s',
         'valentino': 'Valentino',
-        'versace': 'Versace',
         'zara': 'Zara',
         'h&m': 'H&M',
         'uniqlo': 'Uniqlo',
@@ -139,24 +179,19 @@ export default function SellNowPage() {
         'woodland': 'Woodland'
       };
       
-      // Check for special brand formatting
       const lowerValue = value.toLowerCase().trim();
       if (specialBrands[lowerValue]) {
         processedValue = specialBrands[lowerValue];
       }
       
-      // Handle common brand patterns
       if (processedValue.includes('Mc') && processedValue.length > 2) {
-        // Keep 'Mc' uppercase and capitalize next letter
         processedValue = processedValue.replace(/Mc([a-z])/g, (match, p1) => `Mc${p1.toUpperCase()}`);
       }
       
-      // Handle apostrophe cases
       if (processedValue.includes('\'s')) {
         processedValue = processedValue.replace(/'s/gi, '\'s');
       }
       
-      // Remove extra spaces
       processedValue = processedValue.replace(/\s+/g, ' ').trim();
     }
     
@@ -166,12 +201,20 @@ export default function SellNowPage() {
     }));
   };
 
-  // ✅ General input handler for other fields
+  // ✅ General input handler with CATEGORY FIX
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Special handling for product name - capitalize first letter
-    if (name === 'productName') {
+    if (name === 'category') {
+      // ✅ Apply strict category mapping
+      const mappedValue = strictCategoryMap()[value] || value;
+      console.log(`🗺️ Category mapping: "${value}" → "${mappedValue}"`);
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: mappedValue
+      }));
+    } else if (name === 'productName') {
       let processedValue = value;
       if (value.trim()) {
         processedValue = value
@@ -203,8 +246,18 @@ export default function SellNowPage() {
       const data = await response.json()
       
       if (data.success) {
-        console.log('✅ Categories fetched:', data.categories)
-        setCategories(data.categories)
+        console.log('✅ Categories fetched:', data.categories.length)
+        
+        // ✅ Apply strict mapping to fetched categories
+        const mappedCategories = data.categories.map(cat => {
+          const mappedName = strictCategoryMap()[cat.name] || cat.name;
+          return {
+            ...cat,
+            name: mappedName
+          };
+        });
+        
+        setCategories(mappedCategories)
       } else {
         console.error('Failed to fetch categories:', data.message)
         setCategories([])
@@ -215,70 +268,61 @@ export default function SellNowPage() {
     } finally {
       setLoadingCategories(false)
     }
-  }, [])
+  }, [strictCategoryMap])
 
   // ✅ TRANSFORM CATEGORIES FOR SELECT
   const transformCategoriesForSelect = useCallback((backendCategories) => {
-    return backendCategories.map(category => ({
-      name: category.name,
-      value: category.name,
-      subCategories: category.subCategories || []
-    }))
+    // Get unique categories after mapping
+    const uniqueCategories = [];
+    const seen = new Set();
+    
+    backendCategories.forEach(category => {
+      if (!seen.has(category.name)) {
+        seen.add(category.name);
+        uniqueCategories.push({
+          name: category.name,
+          value: category.name,
+          subCategories: category.subCategories || []
+        });
+      }
+    });
+    
+    return uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
   }, [])
 
-  // ✅ GET PRODUCT TYPES BASED ON SELECTED CATEGORY (EXCLUDING ONLY POPULAR BRANDS & FEATURES)
+  // ✅ GET PRODUCT TYPES BASED ON SELECTED CATEGORY
   const getProductTypesForCategory = useCallback((selectedCategory) => {
     if (!selectedCategory || !categories.length) return []
     
     const category = categories.find(cat => cat.name === selectedCategory)
     if (!category || !category.subCategories) return []
     
-    // ✅ ONLY EXCLUDE THESE SPECIFIC SECTIONS:
     const excludedSectionTitles = [
       'POPULAR BRANDS',
       'FEATURES',
       'STYLE FEATURES'
     ]
     
-    // Collect all items from allowed sections
     const allItems = []
     
     category.subCategories.forEach(subCategory => {
       const sectionTitle = subCategory.title || ''
       
-      // Check if section should be excluded
       const shouldExclude = excludedSectionTitles.includes(sectionTitle.toUpperCase())
       
-      // Only exclude specific sections, include everything else
       if (!shouldExclude && 
           subCategory.items && 
           Array.isArray(subCategory.items)) {
-        
-        // Add all items from this section
         allItems.push(...subCategory.items)
       }
     })
     
-    // Remove duplicates and empty values
     const uniqueItems = [...new Set(allItems)].filter(item => 
       item && typeof item === 'string' && item.trim() !== ''
     )
     
     console.log(`📊 Product types for ${selectedCategory}:`, uniqueItems.length, 'items')
     return uniqueItems
-  }, [categories])
-
-  // ✅ DEBUG: SEE ALL SECTIONS
-  const debugSections = useCallback((selectedCategory) => {
-    if (!selectedCategory || !categories.length) return
-    
-    const category = categories.find(cat => cat.name === selectedCategory)
-    if (category && category.subCategories) {
-      console.log('🔍 ALL SECTIONS for category:', selectedCategory)
-      category.subCategories.forEach((section, index) => {
-        console.log(`Section ${index + 1}: "${section.title}" - ${section.items?.length || 0} items`)
-      })
-    }
   }, [categories])
 
   const conditions = [
@@ -312,7 +356,7 @@ export default function SellNowPage() {
       }
 
       const feeAmount = (price * feePercentage) / 100
-      const finalPrice = price + feeAmount
+      const finalPrice = Math.ceil(price + feeAmount)
 
       setPlatformFee(feePercentage)
       setJustBechoPrice(finalPrice)
@@ -328,19 +372,15 @@ export default function SellNowPage() {
       const types = getProductTypesForCategory(formData.category)
       setProductTypes(types)
       
-      // Reset product type if not in new list
       if (formData.productType && !types.includes(formData.productType)) {
         setFormData(prev => ({ ...prev, productType: '' }))
       }
-      
-      // Debug: Show sections
-      debugSections(formData.category)
     } else {
       setProductTypes([])
     }
-  }, [formData.category, getProductTypesForCategory, debugSections])
+  }, [formData.category, getProductTypesForCategory])
 
-  // ✅ UPDATED: Check user authentication and seller verification
+  // ✅ Check user authentication and seller verification
   useEffect(() => {
     const checkUserAuth = async () => {
       console.log('🔄 Checking user auth for sell now...')
@@ -374,14 +414,11 @@ export default function SellNowPage() {
 
           setUser(userObj)
 
-          // ✅ Check if user is a seller
           if (userObj.role !== 'seller') {
             console.log('❌ Not a seller, checking if wants to become seller...')
 
-            // 🔴 NEW: Check if user wants to become seller
             const shouldBecomeSeller = window.confirm('You need to be a seller to list products. Would you like to become a seller?');
             if (shouldBecomeSeller) {
-              // Set flag and redirect to complete-profile
               localStorage.setItem('changingRoleToSeller', 'true');
               router.push('/complete-profile?role=seller');
             } else {
@@ -390,11 +427,9 @@ export default function SellNowPage() {
             return;
           }
 
-          // ✅ CRITICAL: Check if seller is VERIFIED
           if (!userObj.sellerVerified) {
             console.log('❌ Seller not verified, checking status...')
 
-            // Fetch latest status from backend
             try {
               const response = await fetch('https://just-becho-backend.vercel.app/api/auth/profile-status', {
                 headers: {
@@ -407,14 +442,12 @@ export default function SellNowPage() {
                 const data = await response.json();
 
                 if (data.success && data.sellerVerified) {
-                  // Seller is now verified, update local storage
                   const updatedUser = { ...userObj, ...data };
                   localStorage.setItem('user', JSON.stringify(updatedUser));
                   setUser(updatedUser);
                   console.log('✅ Seller is now verified!');
                 } else {
                   setError('Your seller account is pending approval. You cannot list products until approved.');
-                  // Redirect to dashboard to see status
                   setTimeout(() => {
                     router.push('/dashboard')
                   }, 3000)
@@ -439,7 +472,6 @@ export default function SellNowPage() {
 
           console.log('✅ Seller auth check passed - VERIFIED SELLER')
         } else {
-          // No user data, redirect to login
           console.log('❌ No user data, redirecting to login')
           setError('Please login to sell products')
           setTimeout(() => {
@@ -456,7 +488,6 @@ export default function SellNowPage() {
       }
     }
 
-    // Fetch categories when component mounts
     fetchCategories()
     checkUserAuth()
   }, [router, fetchCategories])
@@ -530,7 +561,6 @@ export default function SellNowPage() {
         return;
       }
 
-      // Validate user is logged in and is a VERIFIED seller
       const userData = getLocalStorage('user');
       if (!userData) {
         alert('Please login to list a product');
@@ -545,26 +575,27 @@ export default function SellNowPage() {
         return;
       }
 
-      // ✅ Verify seller is approved
       if (!userObj.sellerVerified) {
         alert('Your seller account is pending approval. You cannot list products until approved.');
         router.push('/dashboard');
         return;
       }
 
-      // Validate minimum requirements
       if (formData.images.length === 0) {
         alert('Please upload at least one product image');
         return;
       }
 
-      // Create FormData
+      // ✅ STRICT CATEGORY MAPPING before sending to backend
+      const mappedCategory = strictCategoryMap()[formData.category] || formData.category;
+      console.log(`🚀 Submitting with category: "${formData.category}" → "${mappedCategory}"`);
+
       const submitFormData = new FormData();
 
-      // Add product data
+      // Add product data with MAPPED category
       submitFormData.append('productName', formData.productName);
       submitFormData.append('brand', formData.brand);
-      submitFormData.append('category', formData.category);
+      submitFormData.append('category', mappedCategory); // ✅ MAPPED CATEGORY
       submitFormData.append('productType', formData.productType);
       submitFormData.append('purchaseYear', formData.purchaseYear || '');
       submitFormData.append('condition', formData.condition);
@@ -576,6 +607,14 @@ export default function SellNowPage() {
       // Add images
       formData.images.forEach((image, index) => {
         submitFormData.append('images', image, image.name);
+      });
+
+      console.log('📤 Submitting form data:', {
+        productName: formData.productName,
+        brand: formData.brand,
+        category: mappedCategory,
+        productType: formData.productType,
+        askingPrice: formData.askingPrice
       });
 
       const response = await fetch('https://just-becho-backend.vercel.app/api/products', {
@@ -658,12 +697,11 @@ export default function SellNowPage() {
     )
   }
 
-  // ✅ Main form - Show only when user is authenticated and is a VERIFIED seller
+  // ✅ Main form
   return (
     <>
       <Header />
       <main className="min-h-screen bg-gray-50 pt-40">
-        {/* Success Banner for Verified Seller */}
         {user?.sellerVerified && (
           <div className="bg-green-50 border-b border-green-200 py-3">
             <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
@@ -681,7 +719,6 @@ export default function SellNowPage() {
           </div>
         )}
 
-        {/* Header Section */}
         <section className="bg-white border-b border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
             <div className="text-center">
@@ -695,7 +732,6 @@ export default function SellNowPage() {
           </div>
         </section>
 
-        {/* Progress Steps */}
         <section className="bg-white border-b border-gray-200">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
             <div className="py-12">
@@ -736,22 +772,18 @@ export default function SellNowPage() {
           </div>
         </section>
 
-        {/* Form Section */}
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div className="bg-white rounded-lg border border-gray-200 p-8">
 
-              {/* Step 1: Product Details */}
               {currentStep === 1 && (
                 <div className="space-y-8">
-                  {/* ✅ CENTERED HEADING */}
                   <div className="text-center border-b border-gray-200 pb-6">
                     <h2 className="text-2xl font-light text-gray-900">Product Information</h2>
                     <p className="text-gray-600 mt-2">Tell us about your item</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Left Column */}
                     <div className="space-y-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -817,7 +849,6 @@ export default function SellNowPage() {
                       </div>
                     </div>
 
-                    {/* Right Column */}
                     <div className="space-y-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -830,7 +861,6 @@ export default function SellNowPage() {
                           value={formData.brand}
                           onChange={handleBrandInput}
                           onBlur={(e) => {
-                            // Additional formatting on blur
                             if (e.target.value.trim()) {
                               handleBrandInput(e);
                             }
@@ -905,7 +935,6 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  {/* ✅ OPTION 2 - DESCRIPTION WITH WARNING BOX */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Product Description *
@@ -920,7 +949,6 @@ export default function SellNowPage() {
                       placeholder="Describe your item in detail... Include features, specifications, size, color, and any notable aspects."
                     />
 
-                    {/* ✅ WARNING MESSAGE */}
                     <div className="mt-2 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -952,18 +980,14 @@ export default function SellNowPage() {
                 </div>
               )}
 
-              {/* Step 2: Pricing & Images */}
               {currentStep === 2 && (
                 <div className="space-y-8">
-                  {/* ✅ CENTERED HEADING */}
                   <div className="text-center border-b border-gray-200 pb-6">
                     <h2 className="text-2xl font-light text-gray-900">Pricing & Images</h2>
                     <p className="text-gray-600 mt-2">Set your price and upload images</p>
                   </div>
 
-                  {/* Pricing Section - Two Columns */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Left Column - Your Asking Price */}
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <label className="block text-sm font-medium text-gray-700">
@@ -979,7 +1003,6 @@ export default function SellNowPage() {
                             </svg>
                           </button>
 
-                          {/* Tooltip */}
                           <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-lg p-3 z-10">
                             <div className="font-medium mb-1">Platform Fee Structure:</div>
                             <div className="space-y-1">
@@ -1026,7 +1049,6 @@ export default function SellNowPage() {
                       <p className="text-xs text-gray-500">Enter the price you want to sell for</p>
                     </div>
 
-                    {/* Right Column - Just Becho Pricing */}
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <label className="block text-sm font-medium text-gray-700">
@@ -1042,7 +1064,6 @@ export default function SellNowPage() {
                             </svg>
                           </button>
 
-                          {/* Tooltip */}
                           <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-lg p-3 z-10">
                             <div className="font-medium mb-1">Price Calculation:</div>
                             <div className="space-y-1">
@@ -1077,7 +1098,6 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  {/* Image Upload Section */}
                   <div className="pt-8 border-t border-gray-200">
                     <label className="block text-sm font-medium text-gray-700 mb-4">
                       Product Images * (Max 5 images)
@@ -1104,7 +1124,6 @@ export default function SellNowPage() {
                       </label>
                     </div>
 
-                    {/* Preview Images */}
                     {formData.images.length > 0 && (
                       <div className="mt-6">
                         <h4 className="text-sm font-medium text-gray-700 mb-4">
@@ -1142,7 +1161,6 @@ export default function SellNowPage() {
                       </div>
                     )}
 
-                    {/* Image Guidelines */}
                     <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -1162,7 +1180,6 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  {/* Navigation Buttons */}
                   <div className="flex justify-between pt-8 border-t border-gray-200">
                     <button
                       type="button"
@@ -1183,23 +1200,19 @@ export default function SellNowPage() {
                 </div>
               )}
 
-              {/* Step 3: Review & Submit */}
               {currentStep === 3 && (
                 <div className="space-y-8">
-                  {/* ✅ CENTERED HEADING */}
                   <div className="text-center border-b border-gray-200 pb-6">
                     <h2 className="text-2xl font-light text-gray-900">Review & Submit</h2>
                     <p className="text-gray-600 mt-2">Review your listing before publishing</p>
                   </div>
 
-                  {/* Professional Summary Layout */}
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b pb-4 text-center">
                       Listing Summary
                     </h3>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Product Details */}
                       <div className="space-y-6">
                         <h4 className="font-medium text-gray-900 text-lg">Product Information</h4>
 
@@ -1231,7 +1244,6 @@ export default function SellNowPage() {
                         </div>
                       </div>
 
-                      {/* Pricing & Images */}
                       <div className="space-y-6">
                         <h4 className="font-medium text-gray-900 text-lg">Pricing & Media</h4>
 
@@ -1262,7 +1274,6 @@ export default function SellNowPage() {
                           </div>
                         </div>
 
-                        {/* Image Preview */}
                         {formData.images.length > 0 && (
                           <div className="mt-4">
                             <h5 className="font-medium text-gray-900 mb-3">Image Preview</h5>
@@ -1286,7 +1297,6 @@ export default function SellNowPage() {
                       </div>
                     </div>
 
-                    {/* Description */}
                     <div className="mt-8 pt-6 border-t border-gray-200">
                       <h4 className="font-medium text-gray-900 mb-3 text-center">Product Description</h4>
                       <p className="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -1295,7 +1305,6 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  {/* Final Fee Breakdown */}
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                     <h3 className="font-semibold text-yellow-900 mb-4 text-lg text-center">Final Price Breakdown</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
