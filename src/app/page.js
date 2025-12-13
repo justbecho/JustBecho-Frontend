@@ -187,37 +187,37 @@ function HomeContent() {
     }
     return [
       {
-        image: "/banners/Men_s Fashion.png",
+        image: "/banners/Mens new.png",
         title: "Men's Fashion",
         description: "Discover premium men's fashion",
         href: "/categories/mens-fashion"
       },
       {
-        image: "/banners/bagu.jpeg",
+        image: "/banners/womens new.png",
         title: "Women's Fashion",
         description: "Explore luxury women's collections",
         href: "/categories/womens-fashion"
       },
       {
-        image: "/banners/DIOR LOAFERS.png",
+        image: "/banners/footwear new.png",
         title: "Footwear",
         description: "Step into luxury footwear",
         href: "/categories/footwear"
       },
       {
-        image: "/banners/Fashion Accessories.png",
+        image: "/banners/accessories new.png",
         title: "Accessories",
         description: "Complete your look with accessories",
         href: "/categories/accessories"
       },
       {
-        image: "/banners/rolex.jpg",
+        image: "/banners/watches new.png",
         title: "Watches",
         description: "Timeless luxury timepieces",
         href: "/categories/watches"
       },
       {
-        image: "/banners/perfumes.png",
+        image: "/banners/perfumes new.png",
         title: "Perfumes",
         description: "Signature scents and fragrances",
         href: "/categories/perfumes"
@@ -242,7 +242,7 @@ function HomeContent() {
     {
       title: "POPULAR FOOTWEAR",
       description: "Innovation meets luxury",
-      image: "/banners/Footwear new.png",
+      image: "/banners/footwear new.png",
       href: "/categories/footwear"
     }
   ], [])
