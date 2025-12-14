@@ -243,7 +243,7 @@ function HomeContent() {
       title: "DESIGNER HANDBAGS",
       description: "Carry timeless elegance",
       image: "/banners/HERMES MINI KELLY.jpg",
-      href: "/categories/bags"
+      href: "/categories/women"
     },
     {
       title: "POPULAR FOOTWEAR",
