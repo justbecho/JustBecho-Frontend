@@ -35,7 +35,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1999'
         }
       ],
-      apiSlug: 'men',
+      apiSlug: 'Men',
       seoKeywords: ['mens fashion', 'pre-loved men', 'luxury brands', 'designer clothes', 'second hand']
     },
     'women': {
@@ -62,7 +62,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1999'
         }
       ],
-      apiSlug: 'women',
+      apiSlug: 'Women',
       seoKeywords: ['womens fashion', 'designer dresses', 'luxury handbags', 'pre-loved women', 'fashion accessories']
     },
     'footwear': {
@@ -89,7 +89,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1999'
         }
       ],
-      apiSlug: 'footwear',
+      apiSlug: 'Footwear',
       seoKeywords: ['designer shoes', 'luxury sneakers', 'pre-loved footwear', 'branded shoes', 'footwear']
     },
     'accessories': {
@@ -116,7 +116,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1499'
         }
       ],
-      apiSlug: 'accessories',
+      apiSlug: 'Accessories',
       seoKeywords: ['luxury accessories', 'designer bags', 'pre-loved jewelry', 'fashion accessories', 'belts']
     },
     'watches': {
@@ -143,7 +143,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹2999'
         }
       ],
-      apiSlug: 'watches',
+      apiSlug: 'Watches',
       seoKeywords: ['luxury watches', 'rolex', 'designer watches', 'pre-loved watches', 'timepieces']
     },
     'perfumes': {
@@ -170,7 +170,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1499'
         }
       ],
-      apiSlug: 'perfumes',
+      apiSlug: 'Perfumes',
       seoKeywords: ['designer perfumes', 'luxury fragrances', 'cologne', 'perfume', 'scents']
     },
     'toys': {
@@ -197,7 +197,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1299'
         }
       ],
-      apiSlug: 'toys',
+      apiSlug: 'Toys',
       seoKeywords: ['luxury toys', 'collectibles', 'figurines', 'pre-loved toys', 'rare toys']
     },
     'kids-fashion': {
@@ -224,7 +224,7 @@ const getCategoryConfig = (categorySlug) => {
           description: 'Free shipping on all orders above ₹1499'
         }
       ],
-      apiSlug: 'kids',
+      apiSlug: 'Kids',
       seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
     }
   }
@@ -263,7 +263,7 @@ const getDefaultConfig = (categorySlug) => {
         description: 'Free shipping on all orders above ₹1499'
       }
     ],
-    apiSlug: categorySlug,
+    apiSlug: formattedName,
     seoKeywords: [formattedName.toLowerCase(), 'pre-loved', 'luxury', 'designer']
   }
 }
@@ -332,7 +332,7 @@ export default function CategoryClient({
         })
     }, [categorySlug, apiCategory, config.title, products.length])
     
-    // ✅ Optimized product fetching - FIXED API ENDPOINT
+    // ✅ FIXED: Optimized product fetching - CORRECT API ENDPOINT
     const fetchProducts = useCallback(async (pageNum = 1, isLoadMore = false) => {
         try {
             if (pageNum === 1) {
@@ -366,9 +366,10 @@ export default function CategoryClient({
                 queryParams.append('maxPrice', filters.maxPrice)
             }
             
-            // ✅ FIXED: Using correct category endpoint
-            const apiUrl = `https://just-becho-backend.vercel.app/api/categories/${categorySlug}/products?${queryParams.toString()}`
-            console.log('📡 Fetching products from CATEGORY endpoint:', apiUrl)
+            // ✅ CORRECT API URL: /api/products with category parameter
+            const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(apiCategory)}&${queryParams.toString()}`
+            
+            console.log('📡 [CLIENT] Fetching products from:', apiUrl)
             
             const response = await fetch(apiUrl, {
                 cache: 'no-store',
@@ -378,52 +379,10 @@ export default function CategoryClient({
             })
             
             if (!response.ok) {
-                // Try fallback to product category endpoint
-                console.log('⚠️ Category endpoint failed, trying product endpoint...')
-                const fallbackUrl = `https://just-becho-backend.vercel.app/api/products/category/${apiCategory}?${queryParams.toString()}`
-                console.log('🔄 Fallback URL:', fallbackUrl)
-                
-                const fallbackResponse = await fetch(fallbackUrl, {
-                    cache: 'no-store',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                })
-                
-                if (!fallbackResponse.ok) {
-                    throw new Error(`API Error: ${response.status} (Both endpoints failed)`)
-                }
-                
-                const fallbackData = await fallbackResponse.json()
-                console.log('🔄 Fallback data:', fallbackData)
-                
-                if (fallbackData.success && fallbackData.products) {
-                    if (isLoadMore) {
-                        setProducts(prev => [...prev, ...fallbackData.products])
-                    } else {
-                        setProducts(fallbackData.products)
-                    }
-                    
-                    // Update available filters
-                    if (pageNum === 1) {
-                        const brands = [...new Set(fallbackData.products.map(p => p.brand).filter(Boolean))]
-                        const conditions = [...new Set(fallbackData.products.map(p => p.condition).filter(Boolean))]
-                        
-                        setAvailableBrands(brands)
-                        setAvailableConditions(conditions)
-                    }
-                    
-                    // Check if there are more pages
-                    setHasMore(fallbackData.products.length === 12)
-                    setPage(pageNum)
-                    return
-                }
-                
                 throw new Error(`API Error: ${response.status}`)
             }
             
             const data = await response.json()
-            console.log('✅ Category products response:', data)
             
             if (data.success && data.products) {
                 if (isLoadMore) {
@@ -463,11 +422,11 @@ export default function CategoryClient({
                 setLoadingMore(false)
             }
         }
-    }, [categorySlug, apiCategory, sortBy, filters])
+    }, [apiCategory, sortBy, filters])
     
     // ✅ Initial fetch and filter/sort changes
     useEffect(() => {
-        console.log('🔄 Triggering product fetch...')
+        console.log('🔄 Triggering product fetch for:', apiCategory)
         fetchProducts(1, false)
     }, [apiCategory, sortBy, filters.brands, filters.conditions, filters.minPrice, filters.maxPrice])
     

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -196,13 +196,13 @@ function HomeContent() {
         image: "/banners/Mens new.png",
         title: "Men's Fashion",
         description: "Discover premium men's fashion",
-        href: "/categories/mens-fashion"
+        href: "/categories/men"
       },
       {
         image: "/banners/womens new.png",
         title: "Women's Fashion",
         description: "Explore luxury women's collections",
-        href: "/categories/womens-fashion"
+        href: "/categories/women"
       },
       {
         image: "/banners/footwear new.png",
@@ -350,45 +350,39 @@ function HomeContent() {
     }
   ], [])
 
-  // ✅ Get category configuration for homepage
-  const getCategoryConfig = (categorySlug) => {
-    const configs = {
-      'men': {
-        title: "MEN'S FASHION",
-        apiSlug: 'men'
-      },
-      'women': {
-        title: "WOMEN'S FASHION",
-        apiSlug: 'women'
-      },
-      'footwear': {
-        title: 'FOOTWEAR',
-        apiSlug: 'footwear'
-      },
-      'accessories': {
-        title: 'ACCESSORIES',
-        apiSlug: 'accessories'
-      },
-      'watches': {
-        title: 'WATCHES',
-        apiSlug: 'watches'
-      },
-      'perfumes': {
-        title: 'PERFUMES',
-        apiSlug: 'perfumes'
-      },
-      'toys': {
-        title: 'TOYS & COLLECTIBLES',
-        apiSlug: 'toys'
-      },
-      'kids-fashion': {  // ✅ Updated
-        title: "KID'S FASHION",  // ✅ Updated
-        apiSlug: 'kids'
-      }
-    }
+  // ✅ FIXED: Category to URL slug mapping
+  const getCategorySlug = (categoryName) => {
+    const slugMap = {
+      "Men's Fashion": "men",
+      "Women's Fashion": "women", 
+      "Footwear": "footwear",
+      "Accessories": "accessories",
+      "Watches": "watches",
+      "Perfumes": "perfumes",
+      "PERFUMES": "perfumes",
+      "TOYS & COLLECTIBLES": "toys",
+      "KID'S FASHION": "kids-fashion"
+    };
+    
+    return slugMap[categoryName] || categoryName.toLowerCase().replace(/\s+/g, '-').replace(/'/g, '');
+  };
 
-    return configs[categorySlug] || { title: categorySlug, apiSlug: categorySlug }
-  }
+  // ✅ FIXED: Category to API category mapping (backend exact names)
+  const getApiCategory = (categoryName) => {
+    const apiMap = {
+      "Men's Fashion": "Men",
+      "Women's Fashion": "Women",
+      "Footwear": "Footwear",
+      "Accessories": "Accessories", 
+      "Watches": "Watches",
+      "Perfumes": "Perfumes",
+      "PERFUMES": "Perfumes",
+      "TOYS & COLLECTIBLES": "Toys",
+      "KID'S FASHION": "Kids"
+    };
+    
+    return apiMap[categoryName] || categoryName;
+  };
 
   // ✅ Check if user is logged in
   useEffect(() => {
@@ -415,10 +409,8 @@ function HomeContent() {
     e.preventDefault()
     
     if (isLoggedIn) {
-      // User is logged in, redirect to sell-now page
       router.push('/sell-now')
     } else {
-      // User is not logged in, show auth modal
       setShowAuthModal(true)
     }
   }
@@ -467,7 +459,7 @@ function HomeContent() {
         clearInterval(carouselIntervalRef.current);
       }
     };
-  }, [carouselSlides.length, currentSlide]);
+  }, [carouselSlides.length, currentSlide])
 
   // ✅ Helper function to get category image
   const getCategoryImage = (categoryName) => {
@@ -519,7 +511,7 @@ function HomeContent() {
     return [];
   }
 
-  // ✅ Fetch categories and brands from backend
+  // ✅ FIXED: Fetch categories and brands from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -534,6 +526,8 @@ function HomeContent() {
           if (categoriesData.success && categoriesData.categories) {
             const formattedCategories = categoriesData.categories.map(cat => {
               const categoryName = cat.name || '';
+              
+              // ✅ Display name properly capitalize
               const displayName = categoryName.split(' ')
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                 .join(' ');
@@ -541,38 +535,24 @@ function HomeContent() {
               const imagePath = getCategoryImage(categoryName);
               const brandLogos = getCategoryBrands(categoryName);
               
-              // Generate proper URL slug
-              let urlSlug = cat.slug || categoryName.toLowerCase().replace(/\s+/g, '-');
+              // ✅ Generate correct URL slug for frontend
+              const urlSlug = getCategorySlug(displayName);
               
-              // Special handling for kids
-              if (categoryName === "KID'S FASHION" || categoryName === "Kids") {
-                urlSlug = "kids-fashion";
-              }
+              // ✅ Generate correct API category for backend
+              const apiCategory = getApiCategory(displayName);
               
               return {
                 name: displayName,
                 originalName: categoryName,
-                href: `/categories/${urlSlug}`,
-                apiCategory: categoryName,
+                href: `/categories/${urlSlug}`,  // ✅ Correct URL
+                apiCategory: apiCategory,  // ✅ Correct API category
                 image: imagePath,
                 brands: brandLogos
               }
             })
             
             setCategoriesFromBackend(formattedCategories)
-            
-            // ✅ Fetch brands from backend (optional - for future use)
-            try {
-              const brandsResponse = await fetch('https://just-becho-backend.vercel.app/api/products/brands/all')
-              if (brandsResponse.ok) {
-                const brandsData = await brandsResponse.json()
-                if (brandsData.success && brandsData.brands) {
-                  setBrandsFromBackend(brandsData.brands)
-                }
-              }
-            } catch (brandsError) {
-              console.log('Could not fetch brands from backend:', brandsError.message)
-            }
+            console.log('✅ Categories loaded:', formattedCategories.map(c => ({ name: c.name, href: c.href, api: c.apiCategory })))
             
             // ✅ Fetch products for each category
             const productsByCategory = {}
@@ -580,6 +560,7 @@ function HomeContent() {
             for (const category of formattedCategories) {
               try {
                 if (category.apiCategory) {
+                  // ✅ Correct API URL for backend
                   const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
                   
                   const response = await fetch(apiUrl)
@@ -689,7 +670,6 @@ function HomeContent() {
     
     return (
       <div className="marquee-container w-full overflow-hidden py-4 sm:py-6">
-        {/* ✅ SINGLE MARQUEE - Desktop version */}
         <div className="marquee-desktop whitespace-nowrap">
           <div className="marquee-seamless">
             {infiniteBrands.map((brand, index) => (
@@ -703,7 +683,6 @@ function HomeContent() {
           </div>
         </div>
         
-        {/* ✅ SINGLE MARQUEE - Mobile version */}
         <div className="marquee-mobile whitespace-nowrap">
           <div className="marquee-seamless-mobile">
             {infiniteBrands.map((brand, index) => (
@@ -776,10 +755,8 @@ function HomeContent() {
 
   return (
     <>
-      {/* ✅ HEADER COMPONENT - FIXED AT TOP */}
       <Header />
       
-      {/* ✅ AUTH MODAL */}
       {showAuthModal && (
         <AuthModal 
           isOpen={showAuthModal} 
@@ -787,12 +764,9 @@ function HomeContent() {
         />
       )}
       
-      {/* ✅ FIXED: MAIN CONTENT WITH PROPER SPACING */}
       <div className="bg-white">
-        {/* ✅ HEADER KE BAAAD SPACING - IMPORTANT */}
         <div className="pt-24"></div>
         
-        {/* ✅ FIXED: Carousel Hero Section - HEADER KE NICHE */}
         <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
           <div 
             className="absolute inset-0 z-0"
@@ -817,7 +791,6 @@ function HomeContent() {
               />
               <div className="absolute inset-0 bg-black/40"></div>
               
-              {/* ✅ FIXED: Content bottom position */}
               <div className="carousel-content">
                 <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
                   <h1 className="carousel-title text-white font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
@@ -836,7 +809,6 @@ function HomeContent() {
               </div>
             </div>
 
-            {/* Navigation Buttons */}
             <button
               onClick={prevSlide}
               className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 touch-button-small bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group tap-highlight-none mobile-hidden sm:flex"
@@ -857,7 +829,6 @@ function HomeContent() {
               </svg>
             </button>
 
-            {/* Indicators */}
             <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-1 sm:space-x-2">
               {carouselSlides.map((_, index) => (
                 <button
@@ -871,7 +842,6 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Why Choose Us */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -901,7 +871,6 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Categories Section */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -955,7 +924,6 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Featured Collections */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1008,7 +976,6 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* How It Works */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1047,7 +1014,6 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Category-wise Sections with Banners */}
         {categoriesFromBackend.map((category, index) => {
           const categoryBrandsData = category.brands || [];
           const products = categoryProducts[category.name] || [];
@@ -1065,7 +1031,6 @@ function HomeContent() {
                     </p>
                   </div>
 
-                  {/* Product Grid */}
                   {loading ? (
                     <div className="grid mobile-grid-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                       {[...Array(4)].map((_, index) => (
@@ -1087,7 +1052,6 @@ function HomeContent() {
                     </div>
                   )}
 
-                  {/* ✅ FIXED: SINGLE INFINITE Brand Marquee (NO DUPLICATE MARQUEES) */}
                   {categoryBrandsData.length > 0 && (
                     <div className="mt-12 sm:mt-16">
                       <div className="text-center mb-6 sm:mb-8">
@@ -1126,7 +1090,6 @@ function HomeContent() {
                 </div>
               </section>
 
-              {/* Banner after each category */}
               {index < categoriesFromBackend.length - 1 && (
                 <section className="py-10 sm:py-16 bg-gradient-to-r from-gray-900 to-black section-padding safe-area-padding">
                   <div className="max-w-[1700px] mx-auto text-center">
@@ -1136,7 +1099,6 @@ function HomeContent() {
                     <p className="text-gray-300 text-sm sm:text-base font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto responsive-text">
                       Get the best value for your luxury items
                     </p>
-                    {/* ✅ MODIFIED: SELL NOW BUTTON WITH HANDLER */}
                     <button
                       onClick={handleSellNowClick}
                       className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text px-6 py-3"
@@ -1150,7 +1112,6 @@ function HomeContent() {
           )
         })}
 
-        {/* Testimonials */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1800px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1244,7 +1205,6 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* CTA Section */}
         <section className="py-10 sm:py-16 bg-gray-900 text-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto text-center">
             <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-light tracking-widest uppercase mb-3 sm:mb-4 responsive-heading">
@@ -1254,8 +1214,6 @@ function HomeContent() {
               Join India's most trusted managed marketplace for pre-loved and brand new luxury
             </p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-             
-              {/* ✅ MODIFIED: SELL WITH CONFIDENCE BUTTON */}
               <button
                 onClick={handleSellNowClick}
                 className="touch-button border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full responsive-text px-6 py-3"
