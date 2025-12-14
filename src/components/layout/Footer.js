@@ -47,7 +47,6 @@ export default function Footer() {
               <Link href="/terms/seller-terms" className="block text-gray-600 hover:text-black">Seller Terms & Condition</Link>
               <Link href="/terms/buyer-terms" className="block text-gray-600 hover:text-black">Buyer Terms & Condition</Link>
               <Link href="/privacy-policy" className="block text-gray-600 hover:text-black">Privacy Policy</Link>
-              <Link href="/authenticity" prefetch={false} className="block text-gray-600 hover:text-black">Authenticity Guarantee</Link>
             </div>
           </div>
         </div>

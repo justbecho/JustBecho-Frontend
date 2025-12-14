@@ -788,7 +788,7 @@ export default function RefundReturnPolicyPage() {
               {/* Navigation Links */}
               <div className="flex flex-col sm:flex-row justify-between items-center mt-12 pt-8 border-t border-gray-200 gap-4">
                 <Link 
-                  href="/shipping-policy" 
+                  href="/shipping" 
                   className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   <span>←</span> Shipping Policy
@@ -801,7 +801,7 @@ export default function RefundReturnPolicyPage() {
                     Privacy Policy
                   </Link>
                   <Link 
-                    href="/contact" 
+                    href="/contact-us" 
                     className="text-red-600 hover:text-red-800 font-semibold px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
                     Contact Us
