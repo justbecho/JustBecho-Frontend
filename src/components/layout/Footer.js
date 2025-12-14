@@ -36,7 +36,7 @@ export default function Footer() {
               
               <Link href="/contact-us"   className="block text-gray-600 hover:text-black">Contact Us</Link>
               <Link href="/shipping"  className="block text-gray-600 hover:text-black">Shipping</Link>
-              <Link href="/returns" prefetch={false} className="block text-gray-600 hover:text-black">Returns & Refunds</Link>
+              <Link href="/returns"className="block text-gray-600 hover:text-black">Returns & Refunds</Link>
             </div>
           </div>
 
