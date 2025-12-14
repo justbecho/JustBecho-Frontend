@@ -33,10 +33,10 @@ export default function Footer() {
           <div>
             <h4 className="font-medium text-black mb-4">Support</h4>
             <div className="space-y-2 text-sm">
-              <Link href="/help" prefetch={false} className="block text-gray-600 hover:text-black">Help Center</Link>
+              
               <Link href="/contact-us"   className="block text-gray-600 hover:text-black">Contact Us</Link>
               <Link href="/shipping"  className="block text-gray-600 hover:text-black">Shipping</Link>
-              <Link href="/returns" prefetch={false} className="block text-gray-600 hover:text-black">Returns</Link>
+              
             </div>
           </div>
 
