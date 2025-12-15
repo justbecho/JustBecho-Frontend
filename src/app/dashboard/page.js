@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import io from 'socket.io-client'
 
 export default function Dashboard() {
   const [user, setUser] = useState(null)
@@ -27,7 +26,6 @@ export default function Dashboard() {
   const [purchases, setPurchases] = useState([])
   const [orders, setOrders] = useState([])
   const [wishlist, setWishlist] = useState([])
-  const [socket, setSocket] = useState(null)
 
   // ✅ FIXED: Safe localStorage access
   const getLocalStorage = useCallback((key) => {
@@ -72,63 +70,6 @@ export default function Dashboard() {
     // Add @justbecho suffix
     return `${clean}@justbecho`;
   }, [])
-
-  // ✅ Setup Socket.IO connection
-  useEffect(() => {
-    if (typeof window !== 'undefined' && user) {
-      const socket = io('https://just-becho-backend.vercel.app', {
-        transports: ['websocket', 'polling']
-      })
-      
-      socket.on('connect', () => {
-        console.log('🔌 Connected to Socket.IO server')
-        
-        // Join seller room for real-time updates
-        if (user.role === 'seller' && user._id) {
-          socket.emit('join-seller-room', user._id)
-        }
-      })
-      
-      socket.on('seller-notification', (data) => {
-        console.log('📢 Received seller notification:', data)
-        
-        if (data.type === 'seller-status-update') {
-          // ✅ FIXED: Ensure username is in "name@justbecho" format
-          const formattedUsername = ensureJustbechoFormat(data.data.username);
-          
-          setSellerStatus(prev => ({
-            ...prev,
-            verified: data.data.sellerVerified,
-            status: data.data.sellerVerificationStatus,
-            username: formattedUsername
-          }))
-          
-          // Update user in localStorage
-          const updatedUser = {
-            ...user,
-            sellerVerified: data.data.sellerVerified,
-            sellerVerificationStatus: data.data.sellerVerificationStatus,
-            username: formattedUsername
-          }
-          localStorage.setItem('user', JSON.stringify(updatedUser))
-          setUser(updatedUser)
-          
-          // Show notification alert
-          alert(`🎉 ${data.message}`)
-        }
-      })
-      
-      socket.on('disconnect', () => {
-        console.log('🔌 Disconnected from Socket.IO server')
-      })
-      
-      setSocket(socket)
-      
-      return () => {
-        socket.disconnect()
-      }
-    }
-  }, [user, ensureJustbechoFormat])
 
   // ✅ Format address function
   const formatAddress = useCallback((address) => {
@@ -269,22 +210,7 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ POLL FOR STATUS UPDATES EVERY 10 SECONDS
-  useEffect(() => {
-    if (user && user.role === 'seller' && !user.sellerVerified) {
-      // Check immediately
-      checkSellerStatus();
-      
-      // Then check every 10 seconds
-      const interval = setInterval(() => {
-        checkSellerStatus();
-      }, 10000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [user, checkSellerStatus])
-
-  // ✅ FIXED: FETCH USER'S PRODUCTS - WORKING VERSION
+  // ✅ FETCH USER'S PRODUCTS - WORKING VERSION
   const fetchMyProducts = async () => {
     try {
       const token = getLocalStorage('token');
@@ -375,6 +301,36 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error fetching wishlist:', error);
       setWishlist([]);
+    }
+  }
+
+  // ✅ FETCH ORDERS
+  const fetchOrders = async () => {
+    try {
+      const token = getLocalStorage('token');
+      if (!token) return;
+      
+      const response = await fetch('https://just-becho-backend.vercel.app/api/orders/my-orders', {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const ordersData = await response.json();
+        console.log('📦 Orders API Response:', ordersData);
+        
+        if (ordersData.success) {
+          setOrders(ordersData.orders || []);
+        }
+      } else {
+        console.error('Failed to fetch orders');
+        setOrders([]);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setOrders([]);
     }
   }
 
@@ -495,11 +451,13 @@ export default function Dashboard() {
         // Fetch all data in parallel
         await Promise.allSettled([
           fetchMyProducts(),
-          fetchWishlist()
+          fetchWishlist(),
+          fetchOrders()
         ]);
         
         console.log('✅ All data fetched successfully');
         console.log('📊 Products count:', listings.length);
+        console.log('📊 Orders count:', orders.length);
         console.log('📊 Wishlist count:', wishlist.length);
         
         setAuthChecked(true);
@@ -530,6 +488,11 @@ export default function Dashboard() {
     if (user && authChecked && activeSection === 'wishlist') {
       console.log('🔄 Refreshing wishlist...');
       fetchWishlist();
+    }
+    
+    if (user && authChecked && activeSection === 'orders') {
+      console.log('🔄 Refreshing orders...');
+      fetchOrders();
     }
   }, [user, authChecked, activeSection])
 
@@ -610,7 +573,6 @@ export default function Dashboard() {
                     Your seller account is now active. You can start listing products.
                     {formattedUsername && (
                       <span className="block mt-1 font-medium">
-                        {/* ✅ FIXED: Display username as "name@justbecho" */}
                         Username: {formattedUsername}
                       </span>
                     )}
@@ -753,15 +715,6 @@ export default function Dashboard() {
       )
     },
     {
-      id: 'purchases',
-      label: 'My Purchases',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-      )
-    },
-    {
       id: 'orders',
       label: 'My Orders',
       icon: (
@@ -857,9 +810,10 @@ export default function Dashboard() {
   const stats = {
     totalListings: listings.length,
     activeListings: listings.filter(l => l.status === 'active').length,
-    totalPurchases: purchases.length,
+    soldListings: listings.filter(l => l.status === 'sold').length,
     totalOrders: orders.length,
-    wishlistItems: wishlist.length
+    wishlistItems: wishlist.length,
+    totalSales: user?.totalSales || 0
   }
 
   // ✅ LOADING STATE
@@ -911,6 +865,16 @@ export default function Dashboard() {
     )
   }
 
+  // ✅ FORMAT DATE
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
   // ✅ RENDER ACTIVE SECTION
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -937,7 +901,6 @@ export default function Dashboard() {
                     <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider text-xs">
                       Full Name
                     </label>
-                    {/* ✅ Name field always non-editable */}
                     <p className="text-gray-900 text-base font-light">{user?.name || 'Not provided'}</p>
                   </div>
 
@@ -945,7 +908,6 @@ export default function Dashboard() {
                     <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider text-xs">
                       Email Address
                     </label>
-                    {/* ✅ Email field always non-editable */}
                     <p className="text-gray-900 text-base font-light">{user?.email}</p>
                   </div>
                 </div>
@@ -1010,7 +972,8 @@ export default function Dashboard() {
               <div>
                 <h3 className="text-xl font-light text-gray-900">My Product Listings</h3>
                 <p className="text-gray-600 mt-1 text-sm">
-                  Showing {listings.length} {listings.length === 1 ? 'listing' : 'listings'}
+                  Showing {listings.length} {listings.length === 1 ? 'listing' : 'listings'} 
+                  ({stats.activeListings} active, {stats.soldListings} sold)
                 </p>
               </div>
               {user?.sellerVerified && (
@@ -1101,57 +1064,43 @@ export default function Dashboard() {
                       <p className="text-gray-900 text-base font-light tracking-widest uppercase">
                         ₹{item.finalPrice?.toLocaleString()}
                       </p>
+                      {item.status === 'sold' && (
+                        <div className="mt-2">
+                          <p className="text-xs text-red-600 font-medium">SOLD</p>
+                          {item.soldAt && (
+                            <p className="text-xs text-gray-500">Sold on: {formatDate(item.soldAt)}</p>
+                          )}
+                        </div>
+                      )}
                       <div className="flex space-x-2 mt-2">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/edit-listing/${item._id}`);
-                          }}
-                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteListing(item._id);
-                          }}
-                          className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors font-medium"
-                        >
-                          Delete
-                        </button>
+                        {item.status === 'active' && (
+                          <>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/edit-listing/${item._id}`);
+                              }}
+                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteListing(item._id);
+                              }}
+                              className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors font-medium"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-          </div>
-        );
-
-      case 'purchases':
-        return (
-          <div>
-            <div className="mb-6">
-              <h3 className="text-xl font-light text-gray-900">My Purchases</h3>
-              <p className="text-gray-600 mt-1 text-sm">Items you have purchased</p>
-            </div>
-
-            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-              <div className="text-gray-300 mb-4">
-                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-              <h4 className="text-xl font-light text-gray-900 mb-3">No purchases yet</h4>
-              <p className="text-gray-600 text-base mb-6">Your purchase history will appear here</p>
-              <Link
-                href="/products"
-                className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
-              >
-                Start Shopping
-              </Link>
-            </div>
           </div>
         );
 
@@ -1163,21 +1112,100 @@ export default function Dashboard() {
               <p className="text-gray-600 mt-1 text-sm">Track your recent orders</p>
             </div>
 
-            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-              <div className="text-gray-300 mb-4">
-                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+            {orders.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <div className="text-gray-300 mb-4">
+                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-light text-gray-900 mb-3">No orders yet</h4>
+                <p className="text-gray-600 text-base mb-6">Your order history will appear here</p>
+                <Link
+                  href="/products"
+                  className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
+                >
+                  Start Shopping
+                </Link>
               </div>
-              <h4 className="text-xl font-light text-gray-900 mb-3">No orders yet</h4>
-              <p className="text-gray-600 text-base mb-6">Your order history will appear here</p>
-              <Link
-                href="/products"
-                className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
-              >
-                Browse Products
-              </Link>
-            </div>
+            ) : (
+              <div className="space-y-6">
+                {orders.map((order) => (
+                  <div key={order._id} className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-sm font-medium text-gray-900">
+                            Order #{order._id.toString().substring(0, 8)}
+                          </span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            order.status === 'paid' ? 'bg-green-100 text-green-800' :
+                            order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {order.status?.toUpperCase()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Placed on {formatDate(order.createdAt)}
+                        </p>
+                      </div>
+                      
+                      <div className="mt-3 md:mt-0 text-right">
+                        <p className="text-lg font-semibold text-gray-900">
+                          ₹{order.totalAmount?.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Total Amount
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Order Items */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-light text-gray-900 mb-3">Order Items</h3>
+                      {order.products && order.products.length > 0 ? (
+                        order.products.map((product, index) => (
+                          <div key={index} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                            {product.images?.[0]?.url && (
+                              <img 
+                                src={product.images[0].url} 
+                                alt={product.productName}
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900">{product.productName}</h4>
+                              <p className="text-sm text-gray-600">Status: {product.status || 'Sold'}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium text-gray-900">
+                                ₹{product.finalPrice?.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No product details available</p>
+                      )}
+                    </div>
+                    
+                    {/* Shipping Address */}
+                    {order.shippingAddress && (
+                      <div className="mt-6 pt-6 border-t border-gray-200">
+                        <h4 className="text-lg font-light text-gray-900 mb-3">Shipping Address</h4>
+                        <div className="text-gray-600">
+                          <p>{order.shippingAddress.street}</p>
+                          <p>{order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}</p>
+                          <p>Phone: {order.shippingAddress.phone}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
 
@@ -1329,12 +1357,12 @@ export default function Dashboard() {
               </div>
               
               <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-blue-600 mb-1">{stats.totalPurchases}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Purchases</div>
+                <div className="text-xl font-light text-red-600 mb-1">{stats.soldListings}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Sold Listings</div>
               </div>
               
               <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-orange-600 mb-1">{stats.totalOrders}</div>
+                <div className="text-xl font-light text-blue-600 mb-1">{stats.totalOrders}</div>
                 <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Orders</div>
               </div>
               
@@ -1361,7 +1389,6 @@ export default function Dashboard() {
                       {user?.role === 'seller' && user?.username && (
                         <div className="flex items-center gap-1 mt-1">
                           <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                            {/* ✅ FIXED: Display username as "name@justbecho" */}
                             {ensureJustbechoFormat(user.username)}
                           </span>
                         </div>
