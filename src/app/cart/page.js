@@ -333,47 +333,66 @@ export default function CartPage() {
   }
 
   // Calculate totals
-  const calculateTotals = () => {
-    if (!cart) return { 
-      subtotal: 0, 
-      platformFee: 0, 
-      platformFeePercentage: 0,
-      tax: 0, 
-      shipping: SHIPPING_CHARGE, 
-      grandTotal: 0 
-    };
-    
-    const subtotal = cart.subtotal || 0;
-    const bechoProtectTotal = cart.bechoProtectTotal || 0;
-    
-    let platformFeePercentage = 0;
-    
-    if (subtotal <= 2000) {
-      platformFeePercentage = 30;
-    } else if (subtotal >= 2001 && subtotal <= 5000) {
-      platformFeePercentage = 28;
-    } else if (subtotal >= 5001 && subtotal <= 10000) {
-      platformFeePercentage = 25;
-    } else if (subtotal >= 10001 && subtotal <= 15000) {
-      platformFeePercentage = 20;
-    } else {
-      platformFeePercentage = 15;
-    }
-    
-    const platformFee = Math.round((subtotal * platformFeePercentage) / 100);
-    const tax = Math.round(platformFee * 0.18);
-    const grandTotal = subtotal + bechoProtectTotal + platformFee + tax + SHIPPING_CHARGE;
-    
-    return {
-      subtotal,
-      bechoProtectTotal,
-      platformFee,
-      platformFeePercentage,
-      tax,
-      shipping: SHIPPING_CHARGE,
-      grandTotal
-    };
+  // Calculate totals - FIXED VERSION
+const calculateTotals = () => {
+  if (!cart) return { 
+    subtotal: 0, 
+    bechoProtectTotal: 0,
+    platformFee: 0, 
+    platformFeePercentage: 0,
+    tax: 0, 
+    shipping: SHIPPING_CHARGE, 
+    grandTotal: 0 
   };
+  
+  // Cart se values lo
+  const subtotal = cart.subtotal || 0;
+  const bechoProtectTotal = cart.bechoProtectTotal || 0;
+  
+  // ✅ CORRECT: Platform fee percentage SUBTOTAL pe calculate karo
+  let platformFeePercentage = 0;
+  
+  if (subtotal <= 2000) {
+    platformFeePercentage = 30;
+  } else if (subtotal >= 2001 && subtotal <= 5000) {
+    platformFeePercentage = 28;
+  } else if (subtotal >= 5001 && subtotal <= 10000) {
+    platformFeePercentage = 25;
+  } else if (subtotal >= 10001 && subtotal <= 15000) {
+    platformFeePercentage = 20;
+  } else {
+    platformFeePercentage = 15;
+  }
+  
+  // Platform fee calculate karo (sirf subtotal pe)
+  const platformFee = Math.round((subtotal * platformFeePercentage) / 100);
+  
+  // ✅ Tax sirf platform fee pe calculate karo
+  const tax = Math.round(platformFee * 0.18);
+  
+  // ✅ Grand total CORRECT calculation
+  const grandTotal = subtotal + bechoProtectTotal + platformFee + tax + SHIPPING_CHARGE;
+  
+  console.log('🧮 Calculation Breakdown:', {
+    subtotal,
+    bechoProtectTotal,
+    platformFeePercentage,
+    platformFee,
+    tax,
+    shipping: SHIPPING_CHARGE,
+    grandTotal
+  });
+  
+  return {
+    subtotal,
+    bechoProtectTotal,
+    platformFee,
+    platformFeePercentage,
+    tax,
+    shipping: SHIPPING_CHARGE,
+    grandTotal
+  };
+};
 
   const totals = calculateTotals();
 
