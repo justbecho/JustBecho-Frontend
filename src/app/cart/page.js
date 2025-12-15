@@ -690,7 +690,7 @@ export default function CartPage() {
                           <span className="text-gray-600">Becho Protect</span>
                           <FiShield className="w-3 h-3 text-green-600" />
                         </div>
-                        <span className="text-green-600">+ ₹{(cart.bechoProtectTotal || 0).toLocaleString()}</span>
+                        <span className="text-green-600">₹{(cart.bechoProtectTotal || 0).toLocaleString()}</span>
                       </div>
                     )}
                     
@@ -700,7 +700,7 @@ export default function CartPage() {
                         <FiTruck className="w-3 h-3 text-gray-500" />
                         <span className="text-gray-600">Shipping</span>
                       </div>
-                      <span className="text-gray-900">+ ₹{SHIPPING_CHARGE.toLocaleString()}</span>
+                      <span className="text-gray-900"> ₹{SHIPPING_CHARGE.toLocaleString()}</span>
                     </div>
                     
                     {/* GST (18% on hidden platform fee) */}
@@ -710,7 +710,7 @@ export default function CartPage() {
                         <span className="text-gray-600">GST</span>
                         <span className="text-xs text-gray-500">(18%)</span>
                       </div>
-                      <span className="text-gray-900">+ ₹{displayTotals.gst.toLocaleString()}</span>
+                      <span className="text-gray-900"> ₹{displayTotals.gst.toLocaleString()}</span>
                     </div>
                     
                     {/* Divider */}
