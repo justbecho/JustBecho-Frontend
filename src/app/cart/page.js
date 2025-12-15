@@ -1,4 +1,4 @@
-// app/cart/page.js - WITH RAZORPAY INTEGRATION
+// app/cart/page.js - UPDATED WITH FIXED CALCULATION AND VERIFICATION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -7,7 +7,8 @@ import Link from 'next/link'
 import Script from 'next/script'
 import { 
   FiShoppingBag, FiTrash2, FiPlus, FiMinus, FiArrowLeft, 
-  FiShoppingCart, FiShield, FiCheck, FiX, FiInfo, FiUser 
+  FiShoppingCart, FiShield, FiCheck, FiX, FiInfo, FiUser,
+  FiAlertTriangle, FiRefreshCw
 } from 'react-icons/fi'
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
@@ -19,6 +20,8 @@ export default function CartPage() {
   const [togglingBechoProtect, setTogglingBechoProtect] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [user, setUser] = useState(null)
+  const [verifyingTotals, setVerifyingTotals] = useState(false)
+  const [totalsMismatch, setTotalsMismatch] = useState(null)
   const router = useRouter()
 
   // Constants
@@ -36,6 +39,13 @@ export default function CartPage() {
     window.addEventListener('cartUpdate', handleCartUpdate)
     return () => window.removeEventListener('cartUpdate', handleCartUpdate)
   }, [])
+
+  // When cart updates, verify totals
+  useEffect(() => {
+    if (cart && cart.items && cart.items.length > 0) {
+      verifyTotalsWithBackend()
+    }
+  }, [cart])
 
   const fetchUserData = async () => {
     try {
@@ -87,6 +97,53 @@ export default function CartPage() {
       console.error('Error fetching cart:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // ✅ NEW: Verify totals with backend
+  const verifyTotalsWithBackend = async () => {
+    try {
+      setVerifyingTotals(true)
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const response = await fetch('https://just-becho-backend.vercel.app/api/cart/checkout-totals', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        const frontendTotals = calculateTotals()
+        const backendTotals = data.totals
+        
+        const mismatch = {
+          subtotal: frontendTotals.subtotal !== backendTotals.subtotal,
+          bechoProtectTotal: frontendTotals.bechoProtectTotal !== backendTotals.bechoProtectTotal,
+          platformFee: frontendTotals.platformFee !== backendTotals.platformFee,
+          tax: frontendTotals.tax !== backendTotals.tax,
+          grandTotal: frontendTotals.grandTotal !== backendTotals.grandTotal
+        }
+        
+        if (Object.values(mismatch).some(Boolean)) {
+          setTotalsMismatch({
+            frontend: frontendTotals,
+            backend: backendTotals,
+            mismatch
+          })
+          console.warn('⚠️ Totals mismatch detected:', mismatch)
+        } else {
+          setTotalsMismatch(null)
+          console.log('✅ All totals match!')
+        }
+      }
+    } catch (error) {
+      console.error('Error verifying totals:', error)
+    } finally {
+      setVerifyingTotals(false)
     }
   }
 
@@ -200,7 +257,77 @@ export default function CartPage() {
     }
   }
 
-  // ✅ RAZORPAY CHECKOUT FUNCTION
+  // ✅ FIXED: Calculate totals function
+  const calculateTotals = () => {
+    if (!cart) return { 
+      subtotal: 0, 
+      bechoProtectTotal: 0,
+      platformFee: 0, 
+      platformFeePercentage: 0,
+      tax: 0, 
+      shipping: SHIPPING_CHARGE, 
+      grandTotal: 0 
+    };
+    
+    // IMPORTANT: Use cart.subtotal (which should be ONLY product prices)
+    const subtotal = cart.subtotal || 0;
+    const bechoProtectTotal = cart.bechoProtectTotal || 0;
+    
+    console.log('🛒 Cart values for calculation:', {
+      cartSubtotal: cart.subtotal,
+      cartBechoProtectTotal: cart.bechoProtectTotal,
+      calculatedSubtotal: subtotal,
+      calculatedBechoProtectTotal: bechoProtectTotal
+    });
+    
+    // ✅ Platform fee percentage calculation based on SUBTOTAL ONLY
+    let platformFeePercentage = 0;
+    
+    if (subtotal <= 2000) {
+      platformFeePercentage = 30;
+    } else if (subtotal >= 2001 && subtotal <= 5000) {
+      platformFeePercentage = 28;
+    } else if (subtotal >= 5001 && subtotal <= 10000) {
+      platformFeePercentage = 25;
+    } else if (subtotal >= 10001 && subtotal <= 15000) {
+      platformFeePercentage = 20;
+    } else {
+      platformFeePercentage = 15;
+    }
+    
+    // Platform fee calculate karo (sirf subtotal pe)
+    const platformFee = Math.round((subtotal * platformFeePercentage) / 100);
+    
+    // ✅ Tax sirf platform fee pe calculate karo (18%)
+    const tax = Math.round(platformFee * 0.18);
+    
+    // ✅ CORRECT Grand total calculation
+    const grandTotal = subtotal + bechoProtectTotal + platformFee + tax + SHIPPING_CHARGE;
+    
+    console.log('🧮 Frontend Calculation:', {
+      subtotal,
+      bechoProtectTotal,
+      platformFeePercentage: `${platformFeePercentage}%`,
+      platformFee,
+      tax,
+      shipping: SHIPPING_CHARGE,
+      grandTotal
+    });
+    
+    return {
+      subtotal,
+      bechoProtectTotal,
+      platformFee,
+      platformFeePercentage,
+      tax,
+      shipping: SHIPPING_CHARGE,
+      grandTotal
+    };
+  };
+
+  const totals = calculateTotals();
+
+  // ✅ RAZORPAY CHECKOUT FUNCTION - UPDATED WITH VERIFICATION
   const handleCheckout = async () => {
     if (!user) {
       alert('Please login to checkout')
@@ -226,6 +353,19 @@ export default function CartPage() {
       return
     }
 
+    // Verify totals before checkout
+    if (totalsMismatch) {
+      const confirmCheckout = window.confirm(
+        'There is a mismatch between frontend and backend calculations. Do you want to proceed anyway?\n\n' +
+        'Frontend Total: ₹' + totals.grandTotal.toLocaleString() + '\n' +
+        'Recommended: Refresh the page to sync with server.'
+      )
+      
+      if (!confirmCheckout) {
+        return
+      }
+    }
+
     setCheckoutLoading(true)
 
     try {
@@ -233,8 +373,8 @@ export default function CartPage() {
       const totals = calculateTotals()
 
       console.log('🚀 Starting checkout process...')
-      console.log('📊 Total amount:', totals.grandTotal)
-      console.log('👤 User ID:', user.id)
+      console.log('📊 Calculated Total:', totals.grandTotal)
+      console.log('📦 Cart ID:', cart._id)
 
       // Step 1: Create order in backend
       const orderResponse = await fetch('https://just-becho-backend.vercel.app/api/razorpay/create-order', {
@@ -332,69 +472,12 @@ export default function CartPage() {
     }
   }
 
-  // Calculate totals
-  // Calculate totals - FIXED VERSION
-const calculateTotals = () => {
-  if (!cart) return { 
-    subtotal: 0, 
-    bechoProtectTotal: 0,
-    platformFee: 0, 
-    platformFeePercentage: 0,
-    tax: 0, 
-    shipping: SHIPPING_CHARGE, 
-    grandTotal: 0 
-  };
-  
-  // Cart se values lo
-  const subtotal = cart.subtotal || 0;
-  const bechoProtectTotal = cart.bechoProtectTotal || 0;
-  
-  // ✅ CORRECT: Platform fee percentage SUBTOTAL pe calculate karo
-  let platformFeePercentage = 0;
-  
-  if (subtotal <= 2000) {
-    platformFeePercentage = 30;
-  } else if (subtotal >= 2001 && subtotal <= 5000) {
-    platformFeePercentage = 28;
-  } else if (subtotal >= 5001 && subtotal <= 10000) {
-    platformFeePercentage = 25;
-  } else if (subtotal >= 10001 && subtotal <= 15000) {
-    platformFeePercentage = 20;
-  } else {
-    platformFeePercentage = 15;
+  // ✅ Refresh cart data
+  const refreshCart = async () => {
+    setLoading(true)
+    await fetchCart()
+    await verifyTotalsWithBackend()
   }
-  
-  // Platform fee calculate karo (sirf subtotal pe)
-  const platformFee = Math.round((subtotal * platformFeePercentage) / 100);
-  
-  // ✅ Tax sirf platform fee pe calculate karo
-  const tax = Math.round(platformFee * 0.18);
-  
-  // ✅ Grand total CORRECT calculation
-  const grandTotal = subtotal + bechoProtectTotal + platformFee + tax + SHIPPING_CHARGE;
-  
-  console.log('🧮 Calculation Breakdown:', {
-    subtotal,
-    bechoProtectTotal,
-    platformFeePercentage,
-    platformFee,
-    tax,
-    shipping: SHIPPING_CHARGE,
-    grandTotal
-  });
-  
-  return {
-    subtotal,
-    bechoProtectTotal,
-    platformFee,
-    platformFeePercentage,
-    tax,
-    shipping: SHIPPING_CHARGE,
-    grandTotal
-  };
-};
-
-  const totals = calculateTotals();
 
   if (loading) {
     return (
@@ -450,6 +533,15 @@ const calculateTotals = () => {
               
               {cart && cart.items && cart.items.length > 0 && (
                 <div className="flex items-center gap-4 self-start sm:self-center">
+                  <button
+                    onClick={refreshCart}
+                    disabled={verifyingTotals}
+                    className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm font-light tracking-widest uppercase"
+                  >
+                    <FiRefreshCw className={`w-4 h-4 mr-2 ${verifyingTotals ? 'animate-spin' : ''}`} />
+                    {verifyingTotals ? 'Syncing...' : 'Refresh Cart'}
+                  </button>
+                  
                   <Link 
                     href="/" 
                     className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm font-light tracking-widest uppercase"
@@ -469,6 +561,46 @@ const calculateTotals = () => {
               )}
             </div>
           </div>
+
+          {/* ✅ TOTALS MISMATCH ALERT */}
+          {totalsMismatch && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <FiAlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-yellow-800 mb-1">
+                    Calculation Mismatch Detected
+                  </h3>
+                  <p className="text-sm text-yellow-700 mb-2">
+                    There's a difference between frontend and backend calculations. This may affect checkout.
+                  </p>
+                  <div className="text-xs text-yellow-600 space-y-1">
+                    {totalsMismatch.mismatch.subtotal && (
+                      <p>• Subtotal: Frontend ₹{totalsMismatch.frontend.subtotal.toLocaleString()} ≠ Backend ₹{totalsMismatch.backend.subtotal.toLocaleString()}</p>
+                    )}
+                    {totalsMismatch.mismatch.bechoProtectTotal && (
+                      <p>• Becho Protect: Frontend ₹{totalsMismatch.frontend.bechoProtectTotal.toLocaleString()} ≠ Backend ₹{totalsMismatch.backend.bechoProtectTotal.toLocaleString()}</p>
+                    )}
+                    {totalsMismatch.mismatch.platformFee && (
+                      <p>• Platform Fee: Frontend ₹{totalsMismatch.frontend.platformFee.toLocaleString()} ≠ Backend ₹{totalsMismatch.backend.platformFee.toLocaleString()}</p>
+                    )}
+                    {totalsMismatch.mismatch.tax && (
+                      <p>• Tax: Frontend ₹{totalsMismatch.frontend.tax.toLocaleString()} ≠ Backend ₹{totalsMismatch.backend.tax.toLocaleString()}</p>
+                    )}
+                    {totalsMismatch.mismatch.grandTotal && (
+                      <p className="font-medium">• Total: Frontend ₹{totalsMismatch.frontend.grandTotal.toLocaleString()} ≠ Backend ₹{totalsMismatch.backend.grandTotal.toLocaleString()}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={refreshCart}
+                    className="mt-3 px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded hover:bg-yellow-200 transition-colors"
+                  >
+                    Refresh to Sync
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {cart && cart.items && cart.items.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -497,15 +629,43 @@ const calculateTotals = () => {
                   </div>
                 )}
                 
+                {/* Cart Stats */}
+                <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Items</p>
+                    <p className="text-lg font-semibold">{cart.totalItems || 0}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Products</p>
+                    <p className="text-lg font-semibold">{cart.items.length}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Subtotal</p>
+                    <p className="text-lg font-semibold">₹{(cart.subtotal || 0).toLocaleString()}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Becho Protect</p>
+                    <p className="text-lg font-semibold text-green-600">+ ₹{(cart.bechoProtectTotal || 0).toLocaleString()}</p>
+                  </div>
+                </div>
+                
                 {/* Items Header */}
                 <div className="bg-white rounded-t-lg border border-gray-200 px-6 py-4 mb-4">
                   <div className="flex justify-between items-center">
                     <h2 className="text-lg font-light tracking-widest uppercase text-gray-900">
                       Products
                     </h2>
-                    <span className="text-sm text-gray-600">
-                      Total: {cart.totalItems || 0} items
-                    </span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">
+                        Total: {cart.totalItems || 0} items
+                      </span>
+                      {verifyingTotals && (
+                        <span className="text-xs text-blue-600 flex items-center gap-1">
+                          <FiRefreshCw className="w-3 h-3 animate-spin" />
+                          Verifying totals...
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
@@ -573,6 +733,9 @@ const calculateTotals = () => {
                               <p className="text-xs text-gray-500">
                                 per item
                               </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                × {item.quantity} = ₹{(item.price * item.quantity).toLocaleString()}
+                              </p>
                             </div>
                           </div>
 
@@ -583,7 +746,7 @@ const calculateTotals = () => {
                                 {item.bechoProtect?.selected && <FiCheck className="w-2 h-2 text-white" />}
                               </div>
                               <span className="text-sm font-medium text-gray-700">
-                                Becho Protect - ₹{item.bechoProtect?.price || 0}
+                                Becho Protect - ₹{item.bechoProtect?.price || 0} per item
                               </span>
                               <span className="text-xs text-gray-500">
                                 (Authenticity Guaranteed)
@@ -602,12 +765,12 @@ const calculateTotals = () => {
                               ) : item.bechoProtect?.selected ? (
                                 <>
                                   <FiX className="w-3 h-3" />
-                                  Remove Protection
+                                  Remove
                                 </>
                               ) : (
                                 <>
                                   <FiShield className="w-3 h-3" />
-                                  Add Protection
+                                  Add
                                 </>
                               )}
                             </button>
@@ -643,7 +806,7 @@ const calculateTotals = () => {
                                 ₹{item.totalPrice?.toLocaleString()}
                               </p>
                               <p className="text-xs text-gray-500">
-                                Item total
+                                Item total (incl. protection)
                               </p>
                             </div>
                           </div>
@@ -665,7 +828,15 @@ const calculateTotals = () => {
               {/* ✅ RIGHT SECTION - CHECKOUT */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-32">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900">Order Summary</h2>
+                    {verifyingTotals && (
+                      <span className="text-xs text-blue-600 flex items-center gap-1">
+                        <FiRefreshCw className="w-3 h-3 animate-spin" />
+                        Syncing
+                      </span>
+                    )}
+                  </div>
                   
                   <div className="space-y-3 mb-6">
                     {/* Subtotal */}
@@ -681,22 +852,31 @@ const calculateTotals = () => {
                           <span className="text-gray-600">Becho Protect</span>
                           <FiShield className="w-3 h-3 text-green-600" />
                         </div>
-                        <span className="text-green-600">₹{(cart.bechoProtectTotal || 0).toLocaleString()}</span>
+                        <span className="text-green-600">+ ₹{(cart.bechoProtectTotal || 0).toLocaleString()}</span>
                       </div>
                     )}
+                    
+                    {/* Platform Fee */}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">
+                        Platform Fee ({totals.platformFeePercentage}%)
+                      </span>
+                      <span className="text-gray-900">+ ₹{totals.platformFee.toLocaleString()}</span>
+                    </div>
+                    
+                    {/* GST on Platform Fee */}
+                    <div className="flex justify-between text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-600">GST (18%)</span>
+                        <span className="text-xs text-gray-500">(on platform fee)</span>
+                      </div>
+                      <span className="text-gray-900">+ ₹{totals.tax.toLocaleString()}</span>
+                    </div>
                     
                     {/* Shipping */}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Shipping</span>
-                      <span className="text-gray-900">₹{SHIPPING_CHARGE.toLocaleString()}</span>
-                    </div>
-                    
-                    {/* GST */}
-                    <div className="flex justify-between text-sm">
-                      <div className="flex items-center gap-1">
-                        <span className="text-gray-600">GST (18%)</span>
-                      </div>
-                      <span className="text-gray-900">₹{totals.tax.toLocaleString()}</span>
+                      <span className="text-gray-900">+ ₹{SHIPPING_CHARGE.toLocaleString()}</span>
                     </div>
                     
                     {/* Divider */}
@@ -708,47 +888,8 @@ const calculateTotals = () => {
                         </span>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        Inclusive of GST 
+                        Inclusive of all taxes and charges
                       </p>
-                      
-                      {/* Simplified Breakdown Tooltip */}
-                      <div className="mt-2 text-xs text-gray-500">
-                        <details>
-                          <summary className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
-                            <FiInfo className="w-3 h-3" />
-                            View summary
-                          </summary>
-                          <div className="mt-2 p-3 bg-gray-50 rounded border border-gray-200">
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Items total:</span>
-                                <span className="font-medium">₹{totals.subtotal.toLocaleString()}</span>
-                              </div>
-                              {totals.bechoProtectTotal > 0 && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Becho Protect:</span>
-                                  <span className="font-medium">₹{totals.bechoProtectTotal.toLocaleString()}</span>
-                                </div>
-                              )}
-                              
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">GST (18%):</span>
-                                <span className="font-medium">₹{totals.tax.toLocaleString()}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Shipping:</span>
-                                <span className="font-medium">₹{SHIPPING_CHARGE.toLocaleString()}</span>
-                              </div>
-                              <div className="border-t border-gray-300 pt-2 mt-2">
-                                <div className="flex justify-between font-bold">
-                                  <span>Total Payable:</span>
-                                  <span>₹{totals.grandTotal.toLocaleString()}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </details>
-                      </div>
                     </div>
                   </div>
 
