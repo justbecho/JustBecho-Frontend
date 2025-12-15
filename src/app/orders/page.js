@@ -1,17 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
 
-export default function OrdersPage() {
+function OrdersContent() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const router = useRouter()
-  const searchParams = useSearchParams()
   
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -22,16 +21,7 @@ export default function OrdersPage() {
     
     fetchUserData(token)
     fetchOrders(token)
-    
-    // Check for success parameter
-    const success = searchParams.get('success')
-    if (success === 'true') {
-      // Show success message
-      setTimeout(() => {
-        alert('🎉 Order placed successfully! Check your orders below.')
-      }, 500)
-    }
-  }, [router, searchParams])
+  }, [router])
   
   const fetchUserData = async (token) => {
     try {
@@ -238,5 +228,22 @@ export default function OrdersPage() {
       </div>
       <Footer />
     </>
+  )
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 pt-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading orders...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <OrdersContent />
+    </Suspense>
   )
 }
