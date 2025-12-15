@@ -1,4 +1,3 @@
-// app/cart/page.js - UPDATED WITHOUT PLATFORM FEE DISPLAY
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -274,7 +273,7 @@ export default function CartPage() {
   // Use backend totals if available, otherwise use frontend calculation
   const displayTotals = checkoutTotals || calculateFrontendTotals()
 
-  // ✅ RAZORPAY CHECKOUT FUNCTION
+  // ✅ RAZORPAY CHECKOUT FUNCTION - UPDATED REDIRECT
   const handleCheckout = async () => {
     if (!user) {
       alert('Please login to checkout')
@@ -352,29 +351,67 @@ export default function CartPage() {
         handler: async function (response) {
           console.log('✅ Payment successful, verifying...', response)
           
-          // Step 4: Verify payment with backend
-          const verifyResponse = await fetch('https://just-becho-backend.vercel.app/api/razorpay/verify-payment', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(response)
-          })
+          try {
+            // Step 4: Verify payment with backend
+            const verifyResponse = await fetch('https://just-becho-backend.vercel.app/api/razorpay/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(response)
+            })
 
-          const verifyData = await verifyResponse.json()
-          console.log('🔐 Verification response:', verifyData)
+            const verifyData = await verifyResponse.json()
+            console.log('🔐 Verification response:', verifyData)
 
-          if (verifyData.success) {
-            alert('🎉 Payment Successful! Your order has been placed.')
-            
-            // Trigger cart update
-            window.dispatchEvent(new Event('cartUpdate'))
-            
-            // Redirect to orders page
-            router.push('/orders?success=true')
-          } else {
-            alert('❌ Payment verification failed. Please contact support.')
+            if (verifyData.success) {
+              console.log('🎉 Payment verified successfully!')
+              
+              // ✅ Show success message
+              alert('🎉 Payment Successful! Your order has been placed.')
+              
+              // ✅ Clear cart after successful payment
+              try {
+                const clearCartResponse = await fetch('https://just-becho-backend.vercel.app/api/cart/clear', {
+                  method: 'DELETE',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  }
+                })
+                
+                const clearCartData = await clearCartResponse.json()
+                if (clearCartData.success) {
+                  console.log('🛒 Cart cleared after successful payment')
+                  setCart(null)
+                  setCheckoutTotals(null)
+                }
+              } catch (clearError) {
+                console.error('Error clearing cart:', clearError)
+              }
+              
+              // ✅ IMPORTANT: Trigger cart update for other components
+              window.dispatchEvent(new CustomEvent('cartUpdate', { 
+                detail: { cleared: true } 
+              }))
+              
+              // ✅ Store payment success flag for dashboard
+              localStorage.setItem('showOrderSuccess', 'true')
+              localStorage.setItem('lastOrderId', verifyData.order?._id || '')
+              
+              // ✅ Redirect to DASHBOARD ORDERS SECTION with success parameter
+              setTimeout(() => {
+                router.push('/dashboard?section=orders&payment=success')
+              }, 1500)
+              
+            } else {
+              console.error('❌ Payment verification failed:', verifyData.message)
+              alert(`❌ Payment verification failed: ${verifyData.message}`)
+            }
+          } catch (verifyError) {
+            console.error('❌ Verification error:', verifyError)
+            alert('❌ Payment verification error. Please contact support.')
           }
         },
         prefill: {
@@ -390,6 +427,10 @@ export default function CartPage() {
             console.log('Payment modal closed')
             setCheckoutLoading(false)
           }
+        },
+        notes: {
+          platform: 'justbecho',
+          userId: user._id || user.userId
         }
       }
 
@@ -595,7 +636,7 @@ export default function CartPage() {
                                 Becho Protect - ₹{item.bechoProtect?.price || 0}
                               </span>
                               <span className="text-xs text-gray-500">
-                                (Authenticity Guaranteed)
+                                (Authenticity Guaranteed Only With BECHO PROTECT)
                               </span>
                             </div>
                             

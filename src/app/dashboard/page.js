@@ -27,6 +27,9 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([])
   const [wishlist, setWishlist] = useState([])
 
+  // ✅ ADDED: Listing filter state
+  const [listingFilter, setListingFilter] = useState('all')
+
   // ✅ FIXED: Safe localStorage access
   const getLocalStorage = useCallback((key) => {
     if (typeof window === 'undefined') return null
@@ -694,6 +697,92 @@ export default function Dashboard() {
     }
   }
 
+  // ✅ MARK AS SHIPPED FUNCTION
+  const markAsShipped = async (productId) => {
+    if (!confirm('Mark this item as shipped? Buyer will be notified.')) return;
+
+    try {
+      const token = getLocalStorage('token')
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+      
+      console.log('🚚 Marking as shipped:', productId);
+      
+      const response = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}/ship`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          shippingStatus: 'shipped',
+          shippedAt: new Date().toISOString()
+        })
+      })
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Product marked as shipped:', result);
+        
+        // Refresh products list
+        await fetchMyProducts();
+        alert('Product marked as shipped! Buyer will be notified.');
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Mark as shipped failed:', response.status, errorText);
+        alert('Failed to mark as shipped');
+      }
+    } catch (error) {
+      console.error('Error marking as shipped:', error);
+      alert('Error marking as shipped');
+    }
+  }
+
+  // ✅ MARK AS DELIVERED FUNCTION
+  const markAsDelivered = async (productId) => {
+    if (!confirm('Mark this item as delivered? Order will be completed.')) return;
+
+    try {
+      const token = getLocalStorage('token')
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+      
+      console.log('✅ Marking as delivered:', productId);
+      
+      const response = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}/deliver`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          shippingStatus: 'delivered',
+          deliveredAt: new Date().toISOString()
+        })
+      })
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Product marked as delivered:', result);
+        
+        // Refresh products list
+        await fetchMyProducts();
+        alert('Product marked as delivered! Order completed.');
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Mark as delivered failed:', response.status, errorText);
+        alert('Failed to mark as delivered');
+      }
+    } catch (error) {
+      console.error('Error marking as delivered:', error);
+      alert('Error marking as delivered');
+    }
+  }
+
   // ✅ MENU ITEMS
   const menuItems = [
     {
@@ -806,11 +895,47 @@ export default function Dashboard() {
     }
   }
 
+  // ✅ FORMAT DATE
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  // ✅ FILTERED LISTINGS
+  const filteredListings = listings.filter(item => {
+    if (listingFilter === 'all') return true;
+    if (listingFilter === 'active') return item.status === 'active';
+    if (listingFilter === 'sold') return item.status === 'sold';
+    if (listingFilter === 'ready') return item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready');
+    if (listingFilter === 'shipped') return item.status === 'sold' && item.shippingStatus === 'shipped';
+    if (listingFilter === 'delivered') return item.status === 'sold' && item.shippingStatus === 'delivered';
+    return true;
+  });
+
   // ✅ STATS
+  const readyForShipmentCount = listings.filter(item => 
+    item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
+  ).length;
+  
+  const shippedCount = listings.filter(item => 
+    item.status === 'sold' && item.shippingStatus === 'shipped'
+  ).length;
+  
+  const deliveredCount = listings.filter(item => 
+    item.status === 'sold' && item.shippingStatus === 'delivered'
+  ).length;
+
   const stats = {
     totalListings: listings.length,
     activeListings: listings.filter(l => l.status === 'active').length,
     soldListings: listings.filter(l => l.status === 'sold').length,
+    readyForShipment: readyForShipmentCount,
+    shipped: shippedCount,
+    delivered: deliveredCount,
     totalOrders: orders.length,
     wishlistItems: wishlist.length,
     totalSales: user?.totalSales || 0
@@ -863,16 +988,6 @@ export default function Dashboard() {
         <Footer />
       </>
     )
-  }
-
-  // ✅ FORMAT DATE
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    })
   }
 
   // ✅ RENDER ACTIVE SECTION
@@ -972,8 +1087,7 @@ export default function Dashboard() {
               <div>
                 <h3 className="text-xl font-light text-gray-900">My Product Listings</h3>
                 <p className="text-gray-600 mt-1 text-sm">
-                  Showing {listings.length} {listings.length === 1 ? 'listing' : 'listings'} 
-                  ({stats.activeListings} active, {stats.soldListings} sold)
+                  Total {listings.length} • Active {stats.activeListings} • Sold {stats.soldListings}
                 </p>
               </div>
               {user?.sellerVerified && (
@@ -986,16 +1100,69 @@ export default function Dashboard() {
               )}
             </div>
 
-            {listings.length === 0 ? (
+            {/* ✅ ADDED: Listing Tabs */}
+            <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-4">
+              <button
+                onClick={() => setListingFilter('all')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                All ({listings.length})
+              </button>
+              <button
+                onClick={() => setListingFilter('active')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'active' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                Active ({stats.activeListings})
+              </button>
+              <button
+                onClick={() => setListingFilter('sold')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'sold' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                Sold ({stats.soldListings})
+              </button>
+              <button
+                onClick={() => setListingFilter('ready')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'ready' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                Ready to Ship ({stats.readyForShipment})
+              </button>
+              <button
+                onClick={() => setListingFilter('shipped')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'shipped' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                Shipped ({stats.shipped})
+              </button>
+              <button
+                onClick={() => setListingFilter('delivered')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'delivered' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                Delivered ({stats.delivered})
+              </button>
+            </div>
+
+            {filteredListings.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <div className="text-gray-300 mb-4">
                   <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-light text-gray-900 mb-3">No listings yet</h4>
-                <p className="text-gray-600 mb-6 text-base">Start selling your luxury items and earn money!</p>
-                {user?.sellerVerified ? (
+                <h4 className="text-xl font-light text-gray-900 mb-3">
+                  {listingFilter === 'all' ? 'No listings yet' :
+                   listingFilter === 'active' ? 'No active listings' :
+                   listingFilter === 'sold' ? 'No sold items' :
+                   listingFilter === 'ready' ? 'No items ready for shipment' :
+                   listingFilter === 'shipped' ? 'No shipped items' :
+                   'No delivered items'}
+                </h4>
+                <p className="text-gray-600 mb-6 text-base">
+                  {listingFilter === 'all' ? 'Start selling your luxury items and earn money!' :
+                   listingFilter === 'active' ? 'List new items to start selling' :
+                   listingFilter === 'sold' ? 'Your sold items will appear here' :
+                   listingFilter === 'ready' ? 'Items that need shipping will appear here' :
+                   'Your shipped/delivered items will appear here'}
+                </p>
+                {user?.sellerVerified && listingFilter !== 'sold' && listingFilter !== 'ready' && listingFilter !== 'shipped' && listingFilter !== 'delivered' ? (
                   <button
                     onClick={() => router.push('/sell-now')}
                     className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
@@ -1023,7 +1190,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                {listings.map((item) => (
+                {filteredListings.map((item) => (
                   <div
                     key={item._id}
                     onClick={() => handleProductClick(item._id)}
@@ -1038,40 +1205,76 @@ export default function Dashboard() {
                           e.target.src = '/placeholder-image.jpg';
                         }}
                       />
-                      {item.isBestseller && (
-                        <div className="absolute top-2 left-2">
-                          <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
-                            BESTSELLER
-                          </span>
-                        </div>
-                      )}
+                      
+                      {/* ✅ ADDED: Status Badge */}
                       <div className="absolute top-2 right-2">
                         <span className={`text-xs font-light tracking-widest uppercase px-2 py-1 rounded-full ${
                           item.status === 'active' 
-                            ? 'bg-green-100 text-green-800'
-                            : item.status === 'sold'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800' :
+                          item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
+                            ? 'bg-yellow-100 text-yellow-800' :
+                          item.status === 'sold' && item.shippingStatus === 'shipped'
+                            ? 'bg-blue-100 text-blue-800' :
+                          item.status === 'sold' && item.shippingStatus === 'delivered'
+                            ? 'bg-purple-100 text-purple-800' :
+                          item.status === 'sold'
+                            ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
                         }`}>
-                          {item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
+                          {item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
+                            ? 'READY TO SHIP' :
+                           item.status === 'sold' && item.shippingStatus === 'shipped'
+                            ? 'SHIPPED' :
+                           item.status === 'sold' && item.shippingStatus === 'delivered'
+                            ? 'DELIVERED' :
+                           item.status === 'sold'
+                            ? 'SOLD' :
+                           item.status?.toUpperCase()}
                         </span>
                       </div>
                     </div>
+                    
                     <div className="text-left px-1">
                       <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
                         {item.productName?.toUpperCase()}
                       </h3>
-                      <p className="text-gray-900 text-base font-light tracking-widest uppercase">
+                      <p className="text-gray-900 text-base font-light tracking-widest uppercase mb-2">
                         ₹{item.finalPrice?.toLocaleString()}
                       </p>
+                      
+                      {/* ✅ ADDED: Sold Item Details */}
                       {item.status === 'sold' && (
-                        <div className="mt-2">
-                          <p className="text-xs text-red-600 font-medium">SOLD</p>
+                        <div className="space-y-1 mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready') ? 'bg-yellow-500' :
+                              item.shippingStatus === 'shipped' ? 'bg-blue-500' :
+                              item.shippingStatus === 'delivered' ? 'bg-green-500' :
+                              'bg-gray-500'
+                            }`}></div>
+                            <span className="text-xs font-medium">
+                              {(!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready') ? 'Ready for Shipment' :
+                               item.shippingStatus === 'shipped' ? 'Shipped' :
+                               item.shippingStatus === 'delivered' ? 'Delivered' :
+                               'Processing'}
+                            </span>
+                          </div>
+                          
                           {item.soldAt && (
                             <p className="text-xs text-gray-500">Sold on: {formatDate(item.soldAt)}</p>
                           )}
+                          
+                          {item.shippedAt && (
+                            <p className="text-xs text-gray-500">Shipped on: {formatDate(item.shippedAt)}</p>
+                          )}
+                          
+                          {item.deliveredAt && (
+                            <p className="text-xs text-gray-500">Delivered on: {formatDate(item.deliveredAt)}</p>
+                          )}
                         </div>
                       )}
+                      
+                      {/* ✅ ADDED: Action Buttons */}
                       <div className="flex space-x-2 mt-2">
                         {item.status === 'active' && (
                           <>
@@ -1080,7 +1283,7 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 router.push(`/edit-listing/${item._id}`);
                               }}
-                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
+                              className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
                             >
                               Edit
                             </button>
@@ -1089,11 +1292,35 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 deleteListing(item._id);
                               }}
-                              className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors font-medium"
+                              className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors font-medium"
                             >
                               Delete
                             </button>
                           </>
+                        )}
+                        
+                        {item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready') && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markAsShipped(item._id);
+                            }}
+                            className="flex-1 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors font-medium"
+                          >
+                            Mark as Shipped
+                          </button>
+                        )}
+                        
+                        {item.status === 'sold' && item.shippingStatus === 'shipped' && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markAsDelivered(item._id);
+                            }}
+                            className="flex-1 px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors font-medium"
+                          >
+                            Mark Delivered
+                          </button>
                         )}
                       </div>
                     </div>
@@ -1109,7 +1336,10 @@ export default function Dashboard() {
           <div>
             <div className="mb-6">
               <h3 className="text-xl font-light text-gray-900">My Orders</h3>
-              <p className="text-gray-600 mt-1 text-sm">Track your recent orders</p>
+              <p className="text-gray-600 mt-1 text-sm">
+                {orders.length} ORDER{orders.length !== 1 ? 'S' : ''} • 
+                Track your purchases and shipments
+              </p>
             </div>
 
             {orders.length === 0 ? (
@@ -1132,23 +1362,25 @@ export default function Dashboard() {
               <div className="space-y-6">
                 {orders.map((order) => (
                   <div key={order._id} className="bg-white rounded-lg border border-gray-200 p-6">
+                    {/* Order Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
                       <div>
                         <div className="flex items-center gap-3 mb-2">
                           <span className="text-sm font-medium text-gray-900">
-                            Order #{order._id.toString().substring(0, 8)}
+                            Order #{order._id.toString().substring(0, 8).toUpperCase()}
                           </span>
                           <span className={`px-2 py-1 text-xs rounded-full ${
-                            order.status === 'paid' ? 'bg-green-100 text-green-800' :
-                            order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'shipped' ? 'bg-green-100 text-green-800' :
                             order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
                             'bg-yellow-100 text-yellow-800'
                           }`}>
-                            {order.status?.toUpperCase()}
+                            {order.status?.toUpperCase() || 'PAID'}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600">
-                          Placed on {formatDate(order.createdAt)}
+                          📅 Placed on {formatDate(order.createdAt)}
+                          {order.paidAt && ` • 💰 Paid on ${formatDate(order.paidAt)}`}
                         </p>
                       </div>
                       
@@ -1164,44 +1396,137 @@ export default function Dashboard() {
                     
                     {/* Order Items */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-light text-gray-900 mb-3">Order Items</h3>
+                      <h3 className="text-lg font-light text-gray-900 mb-3">🛍️ Order Items</h3>
                       {order.products && order.products.length > 0 ? (
                         order.products.map((product, index) => (
-                          <div key={index} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                            {product.images?.[0]?.url && (
-                              <img 
-                                src={product.images[0].url} 
-                                alt={product.productName}
-                                className="w-16 h-16 object-cover rounded"
-                              />
-                            )}
-                            <div className="flex-1">
-                              <h4 className="font-medium text-gray-900">{product.productName}</h4>
-                              <p className="text-sm text-gray-600">Status: {product.status || 'Sold'}</p>
+                          <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            {/* Product Image */}
+                            <div className="flex-shrink-0">
+                              {product.images?.[0]?.url ? (
+                                <img 
+                                  src={product.images[0].url} 
+                                  alt={product.productName}
+                                  className="w-20 h-20 object-cover rounded-lg"
+                                />
+                              ) : (
+                                <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                </div>
+                              )}
                             </div>
-                            <div className="text-right">
-                              <p className="font-medium text-gray-900">
+                            
+                            {/* Product Details */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-gray-900 text-lg mb-1">{product.productName}</h4>
+                              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-2">
+                                <span>Brand: {product.brand || 'Unknown'}</span>
+                                <span>•</span>
+                                <span>Condition: {product.condition}</span>
+                                <span>•</span>
+                                <span className={`px-2 py-0.5 rounded-full text-xs ${
+                                  product.status === 'sold' ? 'bg-red-100 text-red-800' :
+                                  'bg-green-100 text-green-800'
+                                }`}>
+                                  {product.status === 'sold' ? 'SOLD' : 'PURCHASED'}
+                                </span>
+                              </div>
+                              
+                              {/* Seller Info */}
+                              {product.sellerName && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <span className="text-gray-500">Sold by:</span>
+                                  <span className="font-medium text-gray-900">{product.sellerName}</span>
+                                  {product.sellerUsername && (
+                                    <span className="text-blue-600">({product.sellerUsername})</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Price and Actions */}
+                            <div className="flex flex-col items-end gap-2">
+                              <p className="text-lg font-bold text-gray-900">
                                 ₹{product.finalPrice?.toLocaleString()}
                               </p>
+                              
+                              {/* Tracking Status */}
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${
+                                  order.status === 'shipped' ? 'bg-green-500' :
+                                  order.status === 'delivered' ? 'bg-purple-500' :
+                                  'bg-blue-500'
+                                }`}></div>
+                                <span className="text-sm font-medium">
+                                  {order.status === 'paid' ? 'Processing' : 
+                                   order.status === 'shipped' ? 'Shipped' :
+                                   order.status === 'delivered' ? 'Delivered' : 
+                                   'Processing'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-gray-500">No product details available</p>
+                        <p className="text-gray-500 text-center py-4">No product details available</p>
                       )}
                     </div>
                     
-                    {/* Shipping Address */}
-                    {order.shippingAddress && (
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <h4 className="text-lg font-light text-gray-900 mb-3">Shipping Address</h4>
-                        <div className="text-gray-600">
-                          <p>{order.shippingAddress.street}</p>
-                          <p>{order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}</p>
-                          <p>Phone: {order.shippingAddress.phone}</p>
+                    {/* Order Summary */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Shipping Address */}
+                        {order.shippingAddress && (
+                          <div>
+                            <h4 className="text-lg font-light text-gray-900 mb-3">🚚 Shipping Address</h4>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <p className="font-medium text-gray-900">{order.shippingAddress.street}</p>
+                              <p className="text-gray-600">{order.shippingAddress.city}, {order.shippingAddress.state}</p>
+                              <p className="text-gray-600">Pincode: {order.shippingAddress.pincode}</p>
+                              <p className="text-gray-600">📞 {order.shippingAddress.phone}</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Order Summary */}
+                        <div>
+                          <h4 className="text-lg font-light text-gray-900 mb-3">📋 Order Summary</h4>
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Items Total</span>
+                                <span className="text-gray-900">₹{(order.totalAmount - 299)?.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Shipping</span>
+                                <span className="text-gray-900">₹299</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Taxes & Fees</span>
+                                <span className="text-gray-900">Included</span>
+                              </div>
+                              <div className="border-t border-gray-300 pt-2 mt-2">
+                                <div className="flex justify-between font-medium">
+                                  <span className="text-gray-900">Total Amount</span>
+                                  <span className="text-gray-900">₹{order.totalAmount?.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex gap-3 mt-4">
+                            <button className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors font-medium">
+                              Track Order
+                            </button>
+                            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                              Download Invoice
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1362,13 +1687,13 @@ export default function Dashboard() {
               </div>
               
               <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-blue-600 mb-1">{stats.totalOrders}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Orders</div>
+                <div className="text-xl font-light text-yellow-600 mb-1">{stats.readyForShipment}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Ready to Ship</div>
               </div>
               
               <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-purple-600 mb-1">{stats.wishlistItems}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Wishlist Items</div>
+                <div className="text-xl font-light text-blue-600 mb-1">{stats.totalOrders}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Orders</div>
               </div>
             </div>
           </div>
