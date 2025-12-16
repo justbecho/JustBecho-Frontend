@@ -23,7 +23,7 @@ export default function CartPage() {
   const router = useRouter()
 
   // Constants
-  const SHIPPING_CHARGE = 299
+  const SHIPPING_CHARGE = 1
 
   // Fetch cart and user data
   useEffect(() => {
