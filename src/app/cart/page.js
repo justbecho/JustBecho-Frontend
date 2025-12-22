@@ -768,7 +768,7 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  {/* ✅ CHECKOUT BUTTON */}
+                  {/* ✅ CHECKOT BUTTON */}
                   <button
                     onClick={handleCheckout}
                     disabled={checkoutLoading || !user?.profileCompleted || !user?.address || !user?.phone}
