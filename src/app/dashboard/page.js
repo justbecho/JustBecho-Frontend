@@ -26,6 +26,10 @@ export default function Dashboard() {
   const [purchases, setPurchases] = useState([])
   const [orders, setOrders] = useState([])
   const [wishlist, setWishlist] = useState([])
+  
+  // ✅ ADDED: Shipping tracking state
+  const [shippingTracking, setShippingTracking] = useState({})
+  const [trackingLoading, setTrackingLoading] = useState({})
 
   // ✅ ADDED: Listing filter state
   const [listingFilter, setListingFilter] = useState('all')
@@ -94,6 +98,97 @@ export default function Dashboard() {
     
     return 'Not provided'
   }, [])
+
+  // ✅ NEW FUNCTION: Fetch Shipping Tracking
+  const fetchShippingTracking = async (orderId, forceRefresh = false) => {
+    try {
+      const token = getLocalStorage('token');
+      if (!token || !orderId) return null;
+      
+      // Check if we already have cached data
+      if (!forceRefresh && shippingTracking[orderId]) {
+        return shippingTracking[orderId];
+      }
+      
+      setTrackingLoading(prev => ({ ...prev, [orderId]: true }));
+      
+      const response = await fetch(`https://just-becho-backend.vercel.app/api/shipping/track/${orderId}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🚚 Shipping tracking data:', data);
+        
+        if (data.success) {
+          // Update shipping tracking state
+          setShippingTracking(prev => ({
+            ...prev,
+            [orderId]: data
+          }));
+          
+          return data;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching shipping tracking:', error);
+      return null;
+    } finally {
+      setTrackingLoading(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
+
+  // ✅ NEW FUNCTION: Open Live Tracking Link
+  const openLiveTracking = (orderId) => {
+    const trackingData = shippingTracking[orderId];
+    if (trackingData && trackingData.shipments) {
+      // Open tracking URLs in new tabs
+      trackingData.shipments.forEach(shipment => {
+        if (shipment.trackingUrl) {
+          window.open(shipment.trackingUrl, '_blank');
+        }
+      });
+    }
+  };
+
+  // ✅ NEW FUNCTION: Get Shipment Status Badge
+  const getShipmentStatusBadge = (status) => {
+    switch(status) {
+      case 'booked':
+        return { label: 'Booked', color: 'bg-blue-100 text-blue-800', text: 'Shipment created' };
+      case 'pickup_scheduled':
+        return { label: 'Pickup Scheduled', color: 'bg-yellow-100 text-yellow-800', text: 'Pickup scheduled' };
+      case 'in_transit':
+        return { label: 'In Transit', color: 'bg-purple-100 text-purple-800', text: 'On the way' };
+      case 'out_for_delivery':
+        return { label: 'Out for Delivery', color: 'bg-green-100 text-green-800', text: 'Will be delivered today' };
+      case 'delivered':
+        return { label: 'Delivered', color: 'bg-green-100 text-green-800', text: 'Successfully delivered' };
+      case 'failed':
+        return { label: 'Failed', color: 'bg-red-100 text-red-800', text: 'Delivery failed' };
+      default:
+        return { label: 'Processing', color: 'bg-gray-100 text-gray-800', text: 'Processing shipment' };
+    }
+  };
+
+  // ✅ NEW FUNCTION: Get Shipping Leg Status
+  const getShippingLegStatus = (legs) => {
+    if (!legs || legs.length === 0) {
+      return { current: 'pending', text: 'Awaiting shipment' };
+    }
+    
+    const lastLeg = legs[legs.length - 1];
+    return {
+      current: lastLeg.status,
+      text: `${lastLeg.leg.replace('_', ' ')} - ${lastLeg.status}`,
+      startedAt: lastLeg.startedAt,
+      completedAt: lastLeg.completedAt
+    };
+  };
 
   // ✅ SELLER STATUS CHECK FUNCTION
   const checkSellerStatus = useCallback(async () => {
@@ -326,6 +421,13 @@ export default function Dashboard() {
         
         if (ordersData.success) {
           setOrders(ordersData.orders || []);
+          
+          // Fetch shipping tracking for each order
+          ordersData.orders.forEach(order => {
+            if (order.status === 'paid' || order.status === 'shipped' || order.status === 'delivered') {
+              fetchShippingTracking(order._id);
+            }
+          });
         }
       } else {
         console.error('Failed to fetch orders');
@@ -616,6 +718,124 @@ export default function Dashboard() {
     }
   }
 
+  // ✅ NEW COMPONENT: Render Shipping Tracking Info
+  const renderShippingTracking = (order) => {
+    const trackingData = shippingTracking[order._id];
+    const isLoading = trackingLoading[order._id];
+    const legs = order.shippingLegs || [];
+    const legStatus = getShippingLegStatus(legs);
+    
+    if (!trackingData && !isLoading && (order.status === 'paid' || order.status === 'shipped' || order.status === 'delivered')) {
+      // Auto-fetch tracking data if not loaded
+      fetchShippingTracking(order._id);
+    }
+    
+    return (
+      <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-lg font-light text-gray-900 flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Shipping Status
+          </h4>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getShipmentStatusBadge(order.status === 'shipped' ? 'in_transit' : order.status === 'delivered' ? 'delivered' : 'booked').color}`}>
+            {legStatus.text}
+          </span>
+        </div>
+        
+        {/* Shipping Legs Progress */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full ${legs.length >= 1 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <span className="text-sm font-medium">Seller Pickup</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full ${legs.length >= 2 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <span className="text-sm font-medium">Warehouse Processing</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full ${order.status === 'delivered' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <span className="text-sm font-medium">Delivery</span>
+            </div>
+          </div>
+          
+          <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className={`absolute left-0 top-0 h-full transition-all duration-500 ${
+                order.status === 'delivered' ? 'bg-green-500 w-full' :
+                order.status === 'shipped' ? 'bg-blue-500 w-2/3' :
+                'bg-yellow-500 w-1/3'
+              }`}
+            ></div>
+          </div>
+        </div>
+        
+        {/* Tracking Details */}
+        {isLoading ? (
+          <div className="text-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <p className="text-sm text-gray-600">Loading tracking information...</p>
+          </div>
+        ) : trackingData && trackingData.shipments && trackingData.shipments.length > 0 ? (
+          <div>
+            <h5 className="text-sm font-medium text-gray-700 mb-2">Tracking Numbers:</h5>
+            <div className="space-y-2 mb-4">
+              {trackingData.shipments.map((shipment, index) => (
+                <div key={index} className="bg-white rounded-lg border border-gray-200 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-900">AWB: {shipment.awbNumber}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${getShipmentStatusBadge(shipment.status).color}`}>
+                        {getShipmentStatusBadge(shipment.status).label}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => window.open(shipment.trackingUrl || `https://track.nimbuspost.com/track/${shipment.awbNumber}`, '_blank')}
+                      className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      Track
+                    </button>
+                  </div>
+                  {shipment.courierName && (
+                    <p className="text-xs text-gray-600">Courier: {shipment.courierName}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Live Tracking Button */}
+            <button
+              onClick={() => openLiveTracking(order._id)}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Open Live Tracking
+            </button>
+            
+            {/* Last Updated */}
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Last updated: {new Date().toLocaleTimeString()}
+            </p>
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-gray-600 text-sm mb-3">Tracking information will be available soon</p>
+            <button
+              onClick={() => fetchShippingTracking(order._id, true)}
+              className="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300 transition-colors font-medium"
+            >
+              Refresh Status
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // ✅ REMOVE FROM WISHLIST
   const removeFromWishlist = async (productId) => {
     if (!confirm('Are you sure you want to remove this item from wishlist?')) return;
@@ -902,6 +1122,15 @@ export default function Dashboard() {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
+    })
+  }
+
+  // ✅ FORMAT TIME
+  const formatTime = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit'
     })
   }
 
@@ -1361,7 +1590,7 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-6">
                 {orders.map((order) => (
-                  <div key={order._id} className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div key={order._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all duration-300">
                     {/* Order Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
                       <div>
@@ -1394,8 +1623,11 @@ export default function Dashboard() {
                       </div>
                     </div>
                     
+                    {/* ✅ ADDED: Shipping Tracking Section */}
+                    {renderShippingTracking(order)}
+                    
                     {/* Order Items */}
-                    <div className="space-y-4">
+                    <div className="mt-6 space-y-4">
                       <h3 className="text-lg font-light text-gray-900 mb-3">🛍️ Order Items</h3>
                       {order.products && order.products.length > 0 ? (
                         order.products.map((product, index) => (
@@ -1450,21 +1682,6 @@ export default function Dashboard() {
                               <p className="text-lg font-bold text-gray-900">
                                 ₹{product.finalPrice?.toLocaleString()}
                               </p>
-                              
-                              {/* Tracking Status */}
-                              <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${
-                                  order.status === 'shipped' ? 'bg-green-500' :
-                                  order.status === 'delivered' ? 'bg-purple-500' :
-                                  'bg-blue-500'
-                                }`}></div>
-                                <span className="text-sm font-medium">
-                                  {order.status === 'paid' ? 'Processing' : 
-                                   order.status === 'shipped' ? 'Shipped' :
-                                   order.status === 'delivered' ? 'Delivered' : 
-                                   'Processing'}
-                                </span>
-                              </div>
                             </div>
                           </div>
                         ))
