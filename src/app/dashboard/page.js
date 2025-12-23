@@ -5,6 +5,28 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import { 
+  FiUser, 
+  FiPackage, 
+  FiShoppingBag, 
+  FiHeart,
+  FiHome,
+  FiSettings,
+  FiBell,
+  FiTrendingUp,
+  FiDollarSign,
+  FiTruck,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiGrid,
+  FiMenu,
+  FiX,
+  FiChevronRight,
+  FiClock,
+  FiStar,
+  FiMessageSquare,
+  FiHelpCircle
+} from 'react-icons/fi'
 
 export default function Dashboard() {
   const [user, setUser] = useState(null)
@@ -13,6 +35,8 @@ export default function Dashboard() {
   const [authChecked, setAuthChecked] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const [redirectPath, setRedirectPath] = useState('')
+  const [isMobile, setIsMobile] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const router = useRouter()
   
   const [sellerStatus, setSellerStatus] = useState({
@@ -33,6 +57,18 @@ export default function Dashboard() {
 
   // ✅ ADDED: Listing filter state
   const [listingFilter, setListingFilter] = useState('all')
+
+  // ✅ Check for mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // ✅ FIXED: Safe localStorage access
   const getLocalStorage = useCallback((key) => {
@@ -620,221 +656,78 @@ export default function Dashboard() {
     handleUrlParams();
   }, [])
 
-  // ✅ RENDER SELLER STATUS BANNER - FIXED USERNAME DISPLAY
-  const renderSellerStatusBanner = () => {
-    if (user?.role !== 'seller') return null;
-    
-    // ✅ FIXED: Ensure username is in "name@justbecho" format
-    const formattedUsername = sellerStatus.username 
-      ? ensureJustbechoFormat(sellerStatus.username)
-      : null;
-    
-    switch(sellerStatus.status) {
-      case 'pending':
-        return (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-yellow-900">Seller Approval Pending</h4>
-                  <p className="text-yellow-700 text-sm">
-                    Your verification is under review. You'll be notified once approved.
-                    {sellerStatus.verificationId && (
-                      <span className="block mt-1 text-xs">
-                        Verification ID: <code className="bg-yellow-100 px-2 py-1 rounded">{sellerStatus.verificationId}</code>
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={checkSellerStatus}
-                className="px-4 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700 transition-colors"
-              >
-                Refresh Status
-              </button>
-            </div>
-          </div>
-        );
-      
-      case 'approved':
-        return (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-green-900">Seller Approved! 🎉</h4>
-                  <p className="text-green-700 text-sm">
-                    Your seller account is now active. You can start listing products.
-                    {formattedUsername && (
-                      <span className="block mt-1 font-medium">
-                        Username: {formattedUsername}
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={() => router.push('/sell-now')}
-                className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Start Selling
-              </button>
-            </div>
-          </div>
-        );
-      
-      case 'rejected':
-        return (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="font-medium text-red-900">Seller Verification Rejected</h4>
-                <p className="text-red-700 text-sm">
-                  Your verification request was rejected. Please contact support.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      
-      default:
-        return null;
+  // ✅ MENU ITEMS FOR MOBILE
+  const menuItems = [
+    {
+      id: 'profile',
+      label: 'My Profile',
+      icon: <FiUser className="w-5 h-5" />,
+      color: 'text-blue-600 bg-blue-50'
+    },
+    {
+      id: 'listings',
+      label: 'My Listings', 
+      icon: <FiPackage className="w-5 h-5" />,
+      color: 'text-green-600 bg-green-50'
+    },
+    {
+      id: 'orders',
+      label: 'My Orders',
+      icon: <FiShoppingBag className="w-5 h-5" />,
+      color: 'text-purple-600 bg-purple-50'
+    },
+    {
+      id: 'wishlist',
+      label: 'My Wishlist',
+      icon: <FiHeart className="w-5 h-5" />,
+      color: 'text-pink-600 bg-pink-50'
     }
+  ]
+
+  // ✅ MOBILE QUICK ACTIONS
+  const quickActions = [
+    {
+      label: 'Home',
+      icon: <FiHome className="w-4 h-4" />,
+      onClick: () => router.push('/')
+    },
+    {
+      label: 'Settings',
+      icon: <FiSettings className="w-4 h-4" />,
+      onClick: () => router.push('/profile')
+    },
+    {
+      label: 'Notifications',
+      icon: <FiBell className="w-4 h-4" />,
+      onClick: () => {}
+    },
+    {
+      label: 'Help',
+      icon: <FiHelpCircle className="w-4 h-4" />,
+      onClick: () => router.push('/contact-us')
+    }
+  ]
+
+  // ✅ FORMAT DATE
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
   }
 
-  // ✅ NEW COMPONENT: Render Shipping Tracking Info
-  const renderShippingTracking = (order) => {
-    const trackingData = shippingTracking[order._id];
-    const isLoading = trackingLoading[order._id];
-    const legs = order.shippingLegs || [];
-    const legStatus = getShippingLegStatus(legs);
-    
-    if (!trackingData && !isLoading && (order.status === 'paid' || order.status === 'shipped' || order.status === 'delivered')) {
-      // Auto-fetch tracking data if not loaded
-      fetchShippingTracking(order._id);
-    }
-    
-    return (
-      <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-lg font-light text-gray-900 flex items-center gap-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Shipping Status
-          </h4>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getShipmentStatusBadge(order.status === 'shipped' ? 'in_transit' : order.status === 'delivered' ? 'delivered' : 'booked').color}`}>
-            {legStatus.text}
-          </span>
-        </div>
-        
-        {/* Shipping Legs Progress */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${legs.length >= 1 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-              <span className="text-sm font-medium">Seller Pickup</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${legs.length >= 2 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-              <span className="text-sm font-medium">Warehouse Processing</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${order.status === 'delivered' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-              <span className="text-sm font-medium">Delivery</span>
-            </div>
-          </div>
-          
-          <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className={`absolute left-0 top-0 h-full transition-all duration-500 ${
-                order.status === 'delivered' ? 'bg-green-500 w-full' :
-                order.status === 'shipped' ? 'bg-blue-500 w-2/3' :
-                'bg-yellow-500 w-1/3'
-              }`}
-            ></div>
-          </div>
-        </div>
-        
-        {/* Tracking Details */}
-        {isLoading ? (
-          <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p className="text-sm text-gray-600">Loading tracking information...</p>
-          </div>
-        ) : trackingData && trackingData.shipments && trackingData.shipments.length > 0 ? (
-          <div>
-            <h5 className="text-sm font-medium text-gray-700 mb-2">Tracking Numbers:</h5>
-            <div className="space-y-2 mb-4">
-              {trackingData.shipments.map((shipment, index) => (
-                <div key={index} className="bg-white rounded-lg border border-gray-200 p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-900">AWB: {shipment.awbNumber}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${getShipmentStatusBadge(shipment.status).color}`}>
-                        {getShipmentStatusBadge(shipment.status).label}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => window.open(shipment.trackingUrl || `https://track.nimbuspost.com/track/${shipment.awbNumber}`, '_blank')}
-                      className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Track
-                    </button>
-                  </div>
-                  {shipment.courierName && (
-                    <p className="text-xs text-gray-600">Courier: {shipment.courierName}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-            
-            {/* Live Tracking Button */}
-            <button
-              onClick={() => openLiveTracking(order._id)}
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              Open Live Tracking
-            </button>
-            
-            {/* Last Updated */}
-            <p className="text-xs text-gray-500 text-center mt-2">
-              Last updated: {new Date().toLocaleTimeString()}
-            </p>
-          </div>
-        ) : (
-          <div className="text-center py-4">
-            <p className="text-gray-600 text-sm mb-3">Tracking information will be available soon</p>
-            <button
-              onClick={() => fetchShippingTracking(order._id, true)}
-              className="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300 transition-colors font-medium"
-            >
-              Refresh Status
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  };
+  // ✅ FORMAT TIME
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 
   // ✅ REMOVE FROM WISHLIST
   const removeFromWishlist = async (productId) => {
@@ -1003,45 +896,111 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ MENU ITEMS
-  const menuItems = [
-    {
-      id: 'profile',
-      label: 'My Profile',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      )
-    },
-    {
-      id: 'listings',
-      label: 'My Listings', 
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      )
-    },
-    {
-      id: 'orders',
-      label: 'My Orders',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      )
-    },
-    {
-      id: 'wishlist',
-      label: 'My Wishlist',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      )
+  // ✅ RENDER SELLER STATUS BANNER - MOBILE OPTIMIZED
+  const renderSellerStatusBanner = () => {
+    if (user?.role !== 'seller') return null;
+    
+    const formattedUsername = sellerStatus.username 
+      ? ensureJustbechoFormat(sellerStatus.username)
+      : null;
+    
+    if (sellerStatus.status === 'pending') {
+      return (
+        <div className="bg-yellow-50 border-yellow-200 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <FiClock className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-yellow-900">Seller Approval Pending</h4>
+              <p className="text-yellow-700 text-sm mt-1">
+                Your verification is under review. You'll be notified once approved.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
     }
-  ]
+    
+    if (sellerStatus.status === 'approved') {
+      return (
+        <div className="bg-green-50 border-green-200 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <FiCheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-green-900">Seller Approved! 🎉</h4>
+              <p className="text-green-700 text-sm mt-1">
+                Your seller account is now active.
+                {formattedUsername && (
+                  <span className="block font-medium mt-1">
+                    Username: {formattedUsername}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    if (sellerStatus.status === 'rejected') {
+      return (
+        <div className="bg-red-50 border-red-200 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <FiAlertCircle className="w-5 h-5 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-red-900">Seller Verification Rejected</h4>
+              <p className="text-red-700 text-sm mt-1">
+                Your verification request was rejected. Please contact support.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return null;
+  }
+
+  // ✅ FILTERED LISTINGS
+  const filteredListings = listings.filter(item => {
+    if (listingFilter === 'all') return true;
+    if (listingFilter === 'active') return item.status === 'active';
+    if (listingFilter === 'sold') return item.status === 'sold';
+    if (listingFilter === 'ready') return item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready');
+    if (listingFilter === 'shipped') return item.status === 'sold' && item.shippingStatus === 'shipped';
+    if (listingFilter === 'delivered') return item.status === 'sold' && item.shippingStatus === 'delivered';
+    return true;
+  });
+
+  // ✅ STATS
+  const readyForShipmentCount = listings.filter(item => 
+    item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
+  ).length;
+  
+  const shippedCount = listings.filter(item => 
+    item.status === 'sold' && item.shippingStatus === 'shipped'
+  ).length;
+  
+  const deliveredCount = listings.filter(item => 
+    item.status === 'sold' && item.shippingStatus === 'delivered'
+  ).length;
+
+  const stats = {
+    totalListings: listings.length,
+    activeListings: listings.filter(l => l.status === 'active').length,
+    soldListings: listings.filter(l => l.status === 'sold').length,
+    readyForShipment: readyForShipmentCount,
+    shipped: shippedCount,
+    delivered: deliveredCount,
+    totalOrders: orders.length,
+    wishlistItems: wishlist.length,
+    totalSales: user?.totalSales || 0
+  }
 
   // ✅ PROFILE EDIT STATE
   const [isEditing, setIsEditing] = useState(false)
@@ -1115,71 +1074,38 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ FORMAT DATE
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    })
-  }
-
-  // ✅ FORMAT TIME
-  const formatTime = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  // ✅ FILTERED LISTINGS
-  const filteredListings = listings.filter(item => {
-    if (listingFilter === 'all') return true;
-    if (listingFilter === 'active') return item.status === 'active';
-    if (listingFilter === 'sold') return item.status === 'sold';
-    if (listingFilter === 'ready') return item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready');
-    if (listingFilter === 'shipped') return item.status === 'sold' && item.shippingStatus === 'shipped';
-    if (listingFilter === 'delivered') return item.status === 'sold' && item.shippingStatus === 'delivered';
-    return true;
-  });
-
-  // ✅ STATS
-  const readyForShipmentCount = listings.filter(item => 
-    item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
-  ).length;
-  
-  const shippedCount = listings.filter(item => 
-    item.status === 'sold' && item.shippingStatus === 'shipped'
-  ).length;
-  
-  const deliveredCount = listings.filter(item => 
-    item.status === 'sold' && item.shippingStatus === 'delivered'
-  ).length;
-
-  const stats = {
-    totalListings: listings.length,
-    activeListings: listings.filter(l => l.status === 'active').length,
-    soldListings: listings.filter(l => l.status === 'sold').length,
-    readyForShipment: readyForShipmentCount,
-    shipped: shippedCount,
-    delivered: deliveredCount,
-    totalOrders: orders.length,
-    wishlistItems: wishlist.length,
-    totalSales: user?.totalSales || 0
-  }
-
   // ✅ LOADING STATE
   if (loading) {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-40 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 pt-24 md:pt-32 flex flex-col items-center justify-center p-4">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your dashboard...</p>
-            <p className="text-gray-400 text-sm mt-2">Please wait while we fetch your data</p>
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              <div className="animate-spin rounded-full h-full w-full border-4 border-gray-200 border-t-gray-900"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <FiUser className="w-8 h-8 text-gray-400" />
+              </div>
+            </div>
+            
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Dashboard</h2>
+            <p className="text-gray-600 text-sm">Please wait while we load your information</p>
+            
+            {/* Progress steps */}
+            <div className="mt-6 space-y-2 max-w-xs mx-auto">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-700">User data</span>
+                <FiCheckCircle className="w-4 h-4 text-green-500" />
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-700">Products</span>
+                <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-300 border-t-gray-600"></div>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-700">Orders</span>
+                <div className="h-3 w-3 bg-gray-200 rounded-full"></div>
+              </div>
+            </div>
           </div>
         </div>
         <Footer />
@@ -1197,18 +1123,16 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-40 flex items-center justify-center">
-          <div className="text-center">
+        <div className="min-h-screen bg-gray-50 pt-24 md:pt-32 flex items-center justify-center p-4">
+          <div className="text-center max-w-sm">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+              <FiAlertCircle className="w-8 h-8 text-red-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h3>
-            <p className="text-gray-600 mb-4">Please log in to access your dashboard</p>
+            <p className="text-gray-600 mb-6">Please log in to access your dashboard</p>
             <Link 
               href="/login"
-              className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+              className="inline-flex items-center justify-center bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium w-full"
             >
               Go to Login
             </Link>
@@ -1219,225 +1143,364 @@ export default function Dashboard() {
     )
   }
 
+  // ✅ RENDER MOBILE HEADER
+  const renderMobileHeader = () => (
+    <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
+      <div className="px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {showMobileMenu ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Dashboard</p>
+              <p className="text-xs text-gray-500">Hello, {user?.name?.split(' ')[0] || 'User'}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <FiBell className="w-5 h-5 text-gray-600" />
+          </button>
+          <button 
+            onClick={() => router.push('/')}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <FiHome className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setShowMobileMenu(false)}>
+          <div className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-xl transform transition-transform duration-300">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{user?.name || 'User'}</h3>
+                  <p className="text-sm text-gray-600">{user?.email}</p>
+                </div>
+              </div>
+              
+              <nav className="space-y-2">
+                {menuItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveSection(item.id);
+                      setShowMobileMenu(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-3 rounded-lg text-left ${
+                      activeSection === item.id
+                        ? 'bg-gray-900 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={item.color.replace('text-', '').split(' ')[0] + ' p-2 rounded-lg'}>
+                        {item.icon}
+                      </span>
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    <FiChevronRight className="w-5 h-5" />
+                  </button>
+                ))}
+              </nav>
+              
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="grid grid-cols-2 gap-3">
+                  {quickActions.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={action.onClick}
+                      className="p-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-center transition-colors"
+                    >
+                      {action.icon}
+                      <p className="text-xs font-medium mt-1">{action.label}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  // ✅ RENDER MOBILE STATS
+  const renderMobileStats = () => (
+    <div className="px-4 mb-6">
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <div className="text-lg font-semibold text-gray-900 mb-1">{stats.totalListings}</div>
+          <div className="text-xs text-gray-600 uppercase">Listings</div>
+        </div>
+        
+        <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <div className="text-lg font-semibold text-green-600 mb-1">{stats.activeListings}</div>
+          <div className="text-xs text-gray-600 uppercase">Active</div>
+        </div>
+        
+        <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <div className="text-lg font-semibold text-purple-600 mb-1">{stats.totalOrders}</div>
+          <div className="text-xs text-gray-600 uppercase">Orders</div>
+        </div>
+      </div>
+    </div>
+  )
+
+  // ✅ RENDER MOBILE NAVIGATION TABS
+  const renderMobileNavTabs = () => (
+    <div className="sticky top-[64px] z-40 bg-white border-b border-gray-200">
+      <div className="flex overflow-x-auto scrollbar-hide px-4">
+        {menuItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveSection(item.id)}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
+              activeSection === item.id
+                ? 'text-gray-900 border-gray-900'
+                : 'text-gray-500 border-transparent hover:text-gray-700'
+            }`}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+
   // ✅ RENDER ACTIVE SECTION
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'profile':
         return (
-          <div className="max-w-4xl">
+          <div className="px-4 py-6">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-xl font-light text-gray-900">Personal Information</h3>
-                <p className="text-gray-600 mt-1 text-sm">Manage your personal details and contact information</p>
+                <h2 className="text-xl font-semibold text-gray-900">Profile</h2>
+                <p className="text-gray-600 text-sm">Manage your personal information</p>
               </div>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-sm"
+                className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
               >
-                {isEditing ? 'Cancel Editing' : 'Edit Profile'}
+                {isEditing ? 'Cancel' : 'Edit'}
               </button>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="font-medium text-gray-900 mb-4">Basic Information</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider text-xs">
-                      Full Name
-                    </label>
-                    <p className="text-gray-900 text-base font-light">{user?.name || 'Not provided'}</p>
+                    <label className="block text-sm text-gray-600 mb-2">Full Name</label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
+                    ) : (
+                      <p className="text-gray-900 font-medium">{user?.name || 'Not provided'}</p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider text-xs">
-                      Email Address
-                    </label>
-                    <p className="text-gray-900 text-base font-light">{user?.email}</p>
+                    <label className="block text-sm text-gray-600 mb-2">Email</label>
+                    <p className="text-gray-900 font-medium">{user?.email}</p>
                   </div>
-                </div>
 
-                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider text-xs">
-                      Phone Number
-                    </label>
+                    <label className="block text-sm text-gray-600 mb-2">Phone</label>
                     {isEditing ? (
                       <input
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all text-sm"
-                        placeholder="Enter your phone number"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Enter phone number"
                       />
                     ) : (
-                      <p className="text-gray-900 text-base font-light">{user?.phone || 'Not provided'}</p>
+                      <p className="text-gray-900 font-medium">{user?.phone || 'Not provided'}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider text-xs">
-                      Address
-                    </label>
+                    <label className="block text-sm text-gray-600 mb-2">Address</label>
                     {isEditing ? (
                       <textarea
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         rows={3}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all text-sm"
-                        placeholder="Enter your complete address (Street, City, State, Pincode)"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+                        placeholder="Enter your complete address"
                       />
                     ) : (
-                      <p className="text-gray-900 text-base font-light">
+                      <p className="text-gray-900 font-medium">
                         {formatAddress(user?.address)}
                       </p>
                     )}
                   </div>
                 </div>
-              </div>
 
-              {isEditing && (
-                <div className="flex justify-end pt-6 mt-6 border-t border-gray-200">
+                {isEditing && (
                   <button
                     onClick={handleSaveProfile}
-                    className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-sm"
+                    className="w-full mt-6 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
                   >
                     Save Changes
                   </button>
+                )}
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="font-medium text-gray-900 mb-4">Account Status</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Role</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      user?.role === 'seller' ? 'bg-blue-100 text-blue-800' :
+                      user?.role === 'influencer' ? 'bg-purple-100 text-purple-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user?.role?.toUpperCase() || 'BUYER'}
+                    </span>
+                  </div>
+                  
+                  {user?.role === 'seller' && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Verification</span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        sellerStatus.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {sellerStatus.verified ? 'Verified' : 'Pending'}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Member Since</span>
+                    <span className="text-gray-900 font-medium">
+                      {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
+                    </span>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         );
 
       case 'listings':
         return (
-          <div>
+          <div className="px-4 py-6">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-xl font-light text-gray-900">My Product Listings</h3>
-                <p className="text-gray-600 mt-1 text-sm">
-                  Total {listings.length} • Active {stats.activeListings} • Sold {stats.soldListings}
+                <h2 className="text-xl font-semibold text-gray-900">My Listings</h2>
+                <p className="text-gray-600 text-sm">
+                  {listings.length} item{listings.length !== 1 ? 's' : ''}
                 </p>
               </div>
               {user?.sellerVerified && (
                 <button
                   onClick={() => router.push('/sell-now')}
-                  className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-sm"
+                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm rounded-lg hover:from-green-700 hover:to-green-800 transition-colors font-medium"
                 >
-                  + List New Item
+                  + Add Item
                 </button>
               )}
             </div>
 
-            {/* ✅ ADDED: Listing Tabs */}
-            <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-4">
-              <button
-                onClick={() => setListingFilter('all')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                All ({listings.length})
-              </button>
-              <button
-                onClick={() => setListingFilter('active')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'active' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Active ({stats.activeListings})
-              </button>
-              <button
-                onClick={() => setListingFilter('sold')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'sold' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Sold ({stats.soldListings})
-              </button>
-              <button
-                onClick={() => setListingFilter('ready')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'ready' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Ready to Ship ({stats.readyForShipment})
-              </button>
-              <button
-                onClick={() => setListingFilter('shipped')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'shipped' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Shipped ({stats.shipped})
-              </button>
-              <button
-                onClick={() => setListingFilter('delivered')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${listingFilter === 'delivered' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Delivered ({stats.delivered})
-              </button>
+            {/* Mobile Filter Tabs */}
+            <div className="flex overflow-x-auto scrollbar-hide gap-2 mb-6">
+              {['all', 'active', 'sold', 'ready', 'shipped', 'delivered'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setListingFilter(filter)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                    listingFilter === filter
+                      ? filter === 'all' ? 'bg-gray-900 text-white' :
+                        filter === 'active' ? 'bg-green-600 text-white' :
+                        filter === 'sold' ? 'bg-red-600 text-white' :
+                        filter === 'ready' ? 'bg-yellow-600 text-white' :
+                        filter === 'shipped' ? 'bg-blue-600 text-white' :
+                        'bg-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {filter === 'all' ? 'All' :
+                   filter === 'active' ? 'Active' :
+                   filter === 'sold' ? 'Sold' :
+                   filter === 'ready' ? 'Ready' :
+                   filter === 'shipped' ? 'Shipped' : 'Delivered'}
+                </button>
+              ))}
             </div>
 
             {filteredListings.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                <div className="text-gray-300 mb-4">
-                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                  </svg>
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiPackage className="w-8 h-8 text-gray-400" />
                 </div>
-                <h4 className="text-xl font-light text-gray-900 mb-3">
-                  {listingFilter === 'all' ? 'No listings yet' :
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings found</h3>
+                <p className="text-gray-600 text-sm mb-6">
+                  {listingFilter === 'all' ? 'Start selling your items!' :
                    listingFilter === 'active' ? 'No active listings' :
                    listingFilter === 'sold' ? 'No sold items' :
-                   listingFilter === 'ready' ? 'No items ready for shipment' :
-                   listingFilter === 'shipped' ? 'No shipped items' :
-                   'No delivered items'}
-                </h4>
-                <p className="text-gray-600 mb-6 text-base">
-                  {listingFilter === 'all' ? 'Start selling your luxury items and earn money!' :
-                   listingFilter === 'active' ? 'List new items to start selling' :
-                   listingFilter === 'sold' ? 'Your sold items will appear here' :
-                   listingFilter === 'ready' ? 'Items that need shipping will appear here' :
-                   'Your shipped/delivered items will appear here'}
+                   'No items in this category'}
                 </p>
-                {user?.sellerVerified && listingFilter !== 'sold' && listingFilter !== 'ready' && listingFilter !== 'shipped' && listingFilter !== 'delivered' ? (
+                {user?.sellerVerified ? (
                   <button
                     onClick={() => router.push('/sell-now')}
-                    className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
+                    className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
                   >
                     Create Your First Listing
                   </button>
-                ) : user?.role === 'seller' ? (
-                  <div className="space-y-3">
-                    <p className="text-yellow-600">Your seller verification is pending approval</p>
-                    <button 
-                      onClick={checkSellerStatus}
-                      className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
-                    >
-                      Check Status
-                    </button>
-                  </div>
                 ) : (
                   <button 
                     onClick={handleBecomeSeller}
-                    className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
+                    className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium"
                   >
-                    Become a Seller to List Products
+                    Become a Seller
                   </button>
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+              <div className="grid grid-cols-2 gap-4">
                 {filteredListings.map((item) => (
                   <div
                     key={item._id}
                     onClick={() => handleProductClick(item._id)}
-                    className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300"
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden"
                   >
-                    <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                    <div className="relative aspect-square">
                       <img
                         src={item.images?.[0]?.url || '/placeholder-image.jpg'}
                         alt={item.productName}
-                        className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.src = '/placeholder-image.jpg';
                         }}
                       />
                       
-                      {/* ✅ ADDED: Status Badge */}
+                      {/* Status Badge */}
                       <div className="absolute top-2 right-2">
-                        <span className={`text-xs font-light tracking-widest uppercase px-2 py-1 rounded-full ${
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           item.status === 'active' 
                             ? 'bg-green-100 text-green-800' :
                           item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
@@ -1451,60 +1514,25 @@ export default function Dashboard() {
                             'bg-gray-100 text-gray-800'
                         }`}>
                           {item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready')
-                            ? 'READY TO SHIP' :
+                            ? 'Ready' :
                            item.status === 'sold' && item.shippingStatus === 'shipped'
-                            ? 'SHIPPED' :
+                            ? 'Shipped' :
                            item.status === 'sold' && item.shippingStatus === 'delivered'
-                            ? 'DELIVERED' :
-                           item.status === 'sold'
-                            ? 'SOLD' :
+                            ? 'Delivered' :
                            item.status?.toUpperCase()}
                         </span>
                       </div>
                     </div>
                     
-                    <div className="text-left px-1">
-                      <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
-                        {item.productName?.toUpperCase()}
+                    <div className="p-3">
+                      <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                        {item.productName}
                       </h3>
-                      <p className="text-gray-900 text-base font-light tracking-widest uppercase mb-2">
+                      <p className="text-gray-900 font-semibold mb-2">
                         ₹{item.finalPrice?.toLocaleString()}
                       </p>
                       
-                      {/* ✅ ADDED: Sold Item Details */}
-                      {item.status === 'sold' && (
-                        <div className="space-y-1 mb-3">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              (!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready') ? 'bg-yellow-500' :
-                              item.shippingStatus === 'shipped' ? 'bg-blue-500' :
-                              item.shippingStatus === 'delivered' ? 'bg-green-500' :
-                              'bg-gray-500'
-                            }`}></div>
-                            <span className="text-xs font-medium">
-                              {(!item.shippingStatus || item.shippingStatus === 'pending' || item.shippingStatus === 'ready') ? 'Ready for Shipment' :
-                               item.shippingStatus === 'shipped' ? 'Shipped' :
-                               item.shippingStatus === 'delivered' ? 'Delivered' :
-                               'Processing'}
-                            </span>
-                          </div>
-                          
-                          {item.soldAt && (
-                            <p className="text-xs text-gray-500">Sold on: {formatDate(item.soldAt)}</p>
-                          )}
-                          
-                          {item.shippedAt && (
-                            <p className="text-xs text-gray-500">Shipped on: {formatDate(item.shippedAt)}</p>
-                          )}
-                          
-                          {item.deliveredAt && (
-                            <p className="text-xs text-gray-500">Delivered on: {formatDate(item.deliveredAt)}</p>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* ✅ ADDED: Action Buttons */}
-                      <div className="flex space-x-2 mt-2">
+                      <div className="flex gap-2">
                         {item.status === 'active' && (
                           <>
                             <button 
@@ -1512,7 +1540,7 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 router.push(`/edit-listing/${item._id}`);
                               }}
-                              className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-medium"
+                              className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
                             >
                               Edit
                             </button>
@@ -1521,7 +1549,7 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 deleteListing(item._id);
                               }}
-                              className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors font-medium"
+                              className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
                             >
                               Delete
                             </button>
@@ -1534,9 +1562,9 @@ export default function Dashboard() {
                               e.stopPropagation();
                               markAsShipped(item._id);
                             }}
-                            className="flex-1 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors font-medium"
+                            className="flex-1 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
                           >
-                            Mark as Shipped
+                            Ship
                           </button>
                         )}
                         
@@ -1546,9 +1574,9 @@ export default function Dashboard() {
                               e.stopPropagation();
                               markAsDelivered(item._id);
                             }}
-                            className="flex-1 px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors font-medium"
+                            className="flex-1 px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
                           >
-                            Mark Delivered
+                            Deliver
                           </button>
                         )}
                       </div>
@@ -1562,187 +1590,64 @@ export default function Dashboard() {
 
       case 'orders':
         return (
-          <div>
+          <div className="px-4 py-6">
             <div className="mb-6">
-              <h3 className="text-xl font-light text-gray-900">My Orders</h3>
-              <p className="text-gray-600 mt-1 text-sm">
-                {orders.length} ORDER{orders.length !== 1 ? 'S' : ''} • 
-                Track your purchases and shipments
+              <h2 className="text-xl font-semibold text-gray-900">My Orders</h2>
+              <p className="text-gray-600 text-sm">
+                {orders.length} order{orders.length !== 1 ? 's' : ''} • Track your purchases
               </p>
             </div>
 
             {orders.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                <div className="text-gray-300 mb-4">
-                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiShoppingBag className="w-8 h-8 text-gray-400" />
                 </div>
-                <h4 className="text-xl font-light text-gray-900 mb-3">No orders yet</h4>
-                <p className="text-gray-600 text-base mb-6">Your order history will appear here</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
+                <p className="text-gray-600 text-sm mb-6">Your order history will appear here</p>
                 <Link
                   href="/products"
-                  className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
+                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium block text-center"
                 >
                   Start Shopping
                 </Link>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {orders.map((order) => (
-                  <div key={order._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all duration-300">
-                    {/* Order Header */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-sm font-medium text-gray-900">
+                  <div key={order._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div className="p-4 border-b border-gray-200">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
                             Order #{order._id.toString().substring(0, 8).toUpperCase()}
-                          </span>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
-                            order.status === 'shipped' ? 'bg-green-100 text-green-800' :
-                            order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {order.status?.toUpperCase() || 'PAID'}
-                          </span>
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatDate(order.createdAt)} • {formatTime(order.createdAt)}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          📅 Placed on {formatDate(order.createdAt)}
-                          {order.paidAt && ` • 💰 Paid on ${formatDate(order.paidAt)}`}
-                        </p>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
+                          order.status === 'shipped' ? 'bg-green-100 text-green-800' :
+                          order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {order.status?.toUpperCase()}
+                        </span>
                       </div>
                       
-                      <div className="mt-3 md:mt-0 text-right">
-                        <p className="text-lg font-semibold text-gray-900">
-                          ₹{order.totalAmount?.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Total Amount
-                        </p>
-                      </div>
+                      <p className="text-lg font-semibold text-gray-900">
+                        ₹{order.totalAmount?.toLocaleString()}
+                      </p>
                     </div>
                     
-                    {/* ✅ ADDED: Shipping Tracking Section */}
-                    {renderShippingTracking(order)}
-                    
-                    {/* Order Items */}
-                    <div className="mt-6 space-y-4">
-                      <h3 className="text-lg font-light text-gray-900 mb-3">🛍️ Order Items</h3>
-                      {order.products && order.products.length > 0 ? (
-                        order.products.map((product, index) => (
-                          <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            {/* Product Image */}
-                            <div className="flex-shrink-0">
-                              {product.images?.[0]?.url ? (
-                                <img 
-                                  src={product.images[0].url} 
-                                  alt={product.productName}
-                                  className="w-20 h-20 object-cover rounded-lg"
-                                />
-                              ) : (
-                                <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Product Details */}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-gray-900 text-lg mb-1">{product.productName}</h4>
-                              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-2">
-                                <span>Brand: {product.brand || 'Unknown'}</span>
-                                <span>•</span>
-                                <span>Condition: {product.condition}</span>
-                                <span>•</span>
-                                <span className={`px-2 py-0.5 rounded-full text-xs ${
-                                  product.status === 'sold' ? 'bg-red-100 text-red-800' :
-                                  'bg-green-100 text-green-800'
-                                }`}>
-                                  {product.status === 'sold' ? 'SOLD' : 'PURCHASED'}
-                                </span>
-                              </div>
-                              
-                              {/* Seller Info */}
-                              {product.sellerName && (
-                                <div className="flex items-center gap-2 text-sm">
-                                  <span className="text-gray-500">Sold by:</span>
-                                  <span className="font-medium text-gray-900">{product.sellerName}</span>
-                                  {product.sellerUsername && (
-                                    <span className="text-blue-600">({product.sellerUsername})</span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Price and Actions */}
-                            <div className="flex flex-col items-end gap-2">
-                              <p className="text-lg font-bold text-gray-900">
-                                ₹{product.finalPrice?.toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500 text-center py-4">No product details available</p>
-                      )}
-                    </div>
-                    
-                    {/* Order Summary */}
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Shipping Address */}
-                        {order.shippingAddress && (
-                          <div>
-                            <h4 className="text-lg font-light text-gray-900 mb-3">🚚 Shipping Address</h4>
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                              <p className="font-medium text-gray-900">{order.shippingAddress.street}</p>
-                              <p className="text-gray-600">{order.shippingAddress.city}, {order.shippingAddress.state}</p>
-                              <p className="text-gray-600">Pincode: {order.shippingAddress.pincode}</p>
-                              <p className="text-gray-600">📞 {order.shippingAddress.phone}</p>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Order Summary */}
-                        <div>
-                          <h4 className="text-lg font-light text-gray-900 mb-3">📋 Order Summary</h4>
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Items Total</span>
-                                <span className="text-gray-900">₹{(order.totalAmount - 299)?.toLocaleString()}</span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Shipping</span>
-                                <span className="text-gray-900">₹299</span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Taxes & Fees</span>
-                                <span className="text-gray-900">Included</span>
-                              </div>
-                              <div className="border-t border-gray-300 pt-2 mt-2">
-                                <div className="flex justify-between font-medium">
-                                  <span className="text-gray-900">Total Amount</span>
-                                  <span className="text-gray-900">₹{order.totalAmount?.toLocaleString()}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Action Buttons */}
-                          <div className="flex gap-3 mt-4">
-                            <button className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors font-medium">
-                              Track Order
-                            </button>
-                            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                              Download Invoice
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                    <div className="p-4">
+                      <button 
+                        onClick={() => router.push(`/orders/${order._id}`)}
+                        className="w-full py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+                      >
+                        View Order Details
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1753,30 +1658,30 @@ export default function Dashboard() {
 
       case 'wishlist':
         return (
-          <div>
+          <div className="px-4 py-6">
             <div className="mb-6">
-              <h3 className="text-xl font-light text-gray-900">My Wishlist</h3>
-              <p className="text-gray-600 mt-1 text-sm">Items you've saved for later purchase</p>
+              <h2 className="text-xl font-semibold text-gray-900">My Wishlist</h2>
+              <p className="text-gray-600 text-sm">
+                {wishlist.length} item{wishlist.length !== 1 ? 's' : ''} saved
+              </p>
             </div>
 
             {wishlist.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                <div className="text-gray-300 mb-4">
-                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiHeart className="w-8 h-8 text-gray-400" />
                 </div>
-                <h4 className="text-xl font-light text-gray-900 mb-3">Your wishlist is empty</h4>
-                <p className="text-gray-600 text-base mb-6">Start adding items you love to your wishlist!</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
+                <p className="text-gray-600 text-sm mb-6">Start adding items you love to your wishlist!</p>
                 <Link
                   href="/products"
-                  className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium tracking-wide text-base"
+                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium block text-center"
                 >
                   Browse Products
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+              <div className="grid grid-cols-2 gap-4">
                 {wishlist.map((item) => {
                   const product = item.product || item;
                   const productId = product._id || item._id;
@@ -1787,14 +1692,16 @@ export default function Dashboard() {
                   return (
                     <div
                       key={productId}
-                      onClick={() => handleProductClick(productId)}
-                      className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300"
+                      className="bg-white rounded-xl border border-gray-200 overflow-hidden"
                     >
-                      <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                      <div 
+                        onClick={() => handleProductClick(productId)}
+                        className="relative aspect-square cursor-pointer"
+                      >
                         <img
                           src={productImage || '/placeholder-image.jpg'}
                           alt={productName}
-                          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             e.target.src = '/placeholder-image.jpg';
                           }}
@@ -1805,43 +1712,29 @@ export default function Dashboard() {
                             e.stopPropagation();
                             removeFromWishlist(productId);
                           }}
-                          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-lg"
+                          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-500 shadow-lg"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
+                          <FiHeart className="w-4 h-4 fill-current" />
                         </button>
                       </div>
                       
-                      <div className="text-left px-1">
-                        <h3 className="text-gray-800 text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
-                          {productName?.toUpperCase()}
+                      <div className="p-3">
+                        <h3 
+                          onClick={() => handleProductClick(productId)}
+                          className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 cursor-pointer"
+                        >
+                          {productName}
                         </h3>
+                        <p className="text-gray-900 font-semibold mb-3">
+                          ₹{productPrice?.toLocaleString()}
+                        </p>
                         
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-gray-900 text-base font-light tracking-widest uppercase">
-                            ₹{productPrice?.toLocaleString()}
-                          </span>
-                        </div>
-                        
-                        <div className="flex space-x-2 mt-2">
+                        <div className="flex gap-2">
                           <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleProductClick(productId);
-                            }}
-                            className="flex-1 px-2 py-1 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors font-medium"
+                            onClick={() => handleProductClick(productId)}
+                            className="flex-1 px-2 py-1 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors"
                           >
                             Buy Now
-                          </button>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFromWishlist(productId);
-                            }}
-                            className="px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded hover:bg-gray-50 transition-colors font-medium"
-                          >
-                            Remove
                           </button>
                         </div>
                       </div>
@@ -1855,25 +1748,43 @@ export default function Dashboard() {
 
       default:
         return (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-light text-gray-900 mb-4">Select a section from the menu</h3>
-            <p className="text-gray-600">Choose a section to view your dashboard content</p>
+          <div className="px-4 py-6">
+            <div className="text-center py-12">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a section</h3>
+              <p className="text-gray-600 text-sm">Choose a section to view your dashboard content</p>
+            </div>
           </div>
         );
     }
   }
 
-  // ✅ MAIN RETURN
+  // ✅ MAIN RETURN - MOBILE VERSION
+  if (isMobile) {
+    return (
+      <>
+        <Header />
+        {renderMobileHeader()}
+        {renderSellerStatusBanner()}
+        {renderMobileStats()}
+        {renderMobileNavTabs()}
+        {renderActiveSection()}
+        <Footer />
+      </>
+    )
+  }
+
+  // ✅ DESKTOP VERSION
   return (
     <>
       <Header />
       
-      <main className="min-h-screen bg-gray-50 pt-40 pb-16">
+      <main className="min-h-screen bg-gray-50 pt-32 pb-16">
         {/* Seller Status Banner */}
         {renderSellerStatusBanner()}
         
+        {/* Desktop Header */}
         <section className="bg-white border-b border-gray-200">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
             <div className="text-center">
               <h1 className="text-3xl sm:text-4xl font-light tracking-widest uppercase text-gray-900 mb-3">
                 My Dashboard
@@ -1885,8 +1796,9 @@ export default function Dashboard() {
           </div>
         </section>
 
+        {/* Desktop Stats */}
         <section className="bg-gray-50 border-b border-gray-200 py-8">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
                 <div className="text-xl font-light text-gray-900 mb-1">{stats.totalListings}</div>
@@ -1916,9 +1828,11 @@ export default function Dashboard() {
           </div>
         </section>
 
+        {/* Desktop Content */}
         <section className="py-12">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col lg:flex-row gap-6">
+              {/* Sidebar */}
               <div className="lg:w-1/4">
                 <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-40">
                   <div className="flex items-center space-x-3 mb-6 pb-6 border-b border-gray-200">
@@ -1927,7 +1841,6 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 text-base">{user?.name || 'User'}</h3>
-                     
                       {user?.role === 'seller' && user?.username && (
                         <div className="flex items-center gap-1 mt-1">
                           <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
@@ -2001,9 +1914,11 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Main Content */}
               <div className="lg:w-3/4">
                 <div className="bg-white rounded-xl border border-gray-200 min-h-[600px]">
                   <div className="p-6">
+                    {/* Desktop render active section */}
                     {renderActiveSection()}
                   </div>
                 </div>

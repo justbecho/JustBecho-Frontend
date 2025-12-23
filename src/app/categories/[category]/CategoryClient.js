@@ -367,7 +367,7 @@ export default function CategoryClient({
             }
             
             // ✅ CORRECT API URL: /api/products with category parameter
-            const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(apiCategory)}&${queryParams.toString()}`
+const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(apiCategory)}&${queryParams.toString()}`
             
             console.log('📡 [CLIENT] Fetching products from:', apiUrl)
             

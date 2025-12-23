@@ -663,10 +663,10 @@ export default function SellNowPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-40 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 pt-20 md:pt-40 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">Checking seller status...</p>
+            <div className="animate-spin rounded-full h-8 md:h-12 w-8 md:w-12 border-b-2 border-gray-900 mx-auto mb-3 md:mb-4"></div>
+            <p className="text-gray-600 text-sm md:text-base">Checking seller status...</p>
           </div>
         </div>
         <Footer />
@@ -679,18 +679,18 @@ export default function SellNowPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-40 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 pt-20 md:pt-40 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+              <svg className="w-6 h-6 md:w-8 md:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">Access Denied</h3>
+            <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4">{error}</p>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+              className="px-4 py-2 md:px-6 md:py-2 bg-gray-900 text-white text-sm md:text-base rounded-lg hover:bg-gray-800 transition-colors font-medium"
             >
               Go to Dashboard
             </button>
@@ -705,31 +705,32 @@ export default function SellNowPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 pt-40">
+      <main className="min-h-screen bg-gray-50 pt-20 md:pt-40">
         {user?.sellerVerified && (
-          <div className="bg-green-50 border-b border-green-200 py-3">
-            <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-              <div className="flex items-center justify-center gap-2 text-green-800 text-sm">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-green-50 border-b border-green-200 py-2 md:py-3">
+            <div className="max-w-[1700px] mx-auto px-3 md:px-4 sm:px-6">
+              <div className="flex flex-wrap items-center justify-center gap-1 md:gap-2 text-green-800 text-xs md:text-sm">
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="font-medium">✅ Seller Verified</span>
                 <span>|</span>
-                <span>Username: {user?.username}</span>
+                <span className="truncate">Username: {user?.username}</span>
                 <span>|</span>
-                <span>You can now list products on JustBecho!</span>
+                <span className="hidden sm:inline">You can now list products on JustBecho!</span>
+                <span className="sm:hidden">Ready to list!</span>
               </div>
             </div>
           </div>
         )}
 
         <section className="bg-white border-b border-gray-200">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-4 md:py-8">
             <div className="text-center">
-              <h1 className="text-3xl sm:text-4xl font-light tracking-widest uppercase text-gray-900">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-light tracking-widest uppercase text-gray-900">
                 SELL YOUR ITEM
               </h1>
-              <p className="text-gray-600 mt-3 text-lg font-light">
+              <p className="text-gray-600 mt-1 md:mt-3 text-sm md:text-lg font-light">
                 List your Luxury items and get the best value
               </p>
             </div>
@@ -737,8 +738,8 @@ export default function SellNowPage() {
         </section>
 
         <section className="bg-white border-b border-gray-200">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6">
-            <div className="py-12">
+          <div className="max-w-3xl mx-auto px-3 md:px-4 sm:px-6">
+            <div className="py-6 md:py-12">
               <div className="flex items-center justify-center">
                 {[
                   { number: 1, label: 'Product Details' },
@@ -747,26 +748,26 @@ export default function SellNowPage() {
                 ].map((step, index, array) => (
                   <div key={step.number} className="flex items-center">
                     <div className="flex flex-col items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${currentStep >= step.number
+                      <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${currentStep >= step.number
                           ? 'bg-gray-900 border-gray-900 text-white'
                           : 'bg-white border-gray-300 text-gray-400'
                         }`}>
                         {currentStep > step.number ? (
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                         ) : (
-                          <span className="text-sm font-medium">{step.number}</span>
+                          <span className="text-xs md:text-sm font-medium">{step.number}</span>
                         )}
                       </div>
-                      <span className={`mt-3 text-xs font-medium whitespace-nowrap ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'
+                      <span className={`mt-1 md:mt-3 text-xs font-medium whitespace-nowrap ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'
                         }`}>
                         {step.label}
                       </span>
                     </div>
 
                     {index < array.length - 1 && (
-                      <div className={`w-24 h-0.5 mx-8 ${currentStep > step.number ? 'bg-gray-900' : 'bg-gray-200'
+                      <div className={`w-12 md:w-24 h-0.5 mx-4 md:mx-8 ${currentStep > step.number ? 'bg-gray-900' : 'bg-gray-200'
                         }`}></div>
                     )}
                   </div>
@@ -776,21 +777,21 @@ export default function SellNowPage() {
           </div>
         </section>
 
-        <section className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="bg-white rounded-lg border border-gray-200 p-8">
+        <section className="py-8 md:py-16">
+          <div className="max-w-4xl mx-auto px-3 md:px-4 sm:px-6">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6 lg:p-8">
 
               {currentStep === 1 && (
-                <div className="space-y-8">
-                  <div className="text-center border-b border-gray-200 pb-6">
-                    <h2 className="text-2xl font-light text-gray-900">Product Information</h2>
-                    <p className="text-gray-600 mt-2">Tell us about your item</p>
+                <div className="space-y-6 md:space-y-8">
+                  <div className="text-center border-b border-gray-200 pb-4 md:pb-6">
+                    <h2 className="text-lg md:text-xl lg:text-2xl font-light text-gray-900">Product Information</h2>
+                    <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Tell us about your item</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <div className="space-y-4 md:space-y-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                           Product Name *
                           <span className="text-xs text-gray-500 ml-1">(Auto-capitalized)</span>
                         </label>
@@ -800,18 +801,18 @@ export default function SellNowPage() {
                           value={formData.productName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                           placeholder="e.g., Nike Air Jordan 1"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                           Select Category *
                         </label>
                         {loadingCategories ? (
-                          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">
-                            <p className="text-gray-500 text-sm">Loading categories...</p>
+                          <div className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg bg-gray-50">
+                            <p className="text-gray-500 text-xs md:text-sm">Loading categories...</p>
                           </div>
                         ) : transformedCategories.length > 0 ? (
                           <select
@@ -819,7 +820,7 @@ export default function SellNowPage() {
                             value={formData.category}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                           >
                             <option value="">Select Category</option>
                             {transformedCategories.map(category => (
@@ -829,21 +830,21 @@ export default function SellNowPage() {
                             ))}
                           </select>
                         ) : (
-                          <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-yellow-50">
-                            <p className="text-yellow-700 text-sm">No categories available. Please try refreshing.</p>
+                          <div className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg bg-yellow-50">
+                            <p className="text-yellow-700 text-xs md:text-sm">No categories available. Please try refreshing.</p>
                           </div>
                         )}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                           Purchase Year
                         </label>
                         <select
                           name="purchaseYear"
                           value={formData.purchaseYear}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                         >
                           <option value="">Select Year</option>
                           {years.map(year => (
@@ -853,9 +854,9 @@ export default function SellNowPage() {
                       </div>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                           Brand *
                           <span className="text-xs text-gray-500 ml-1">(Auto-formatted)</span>
                         </label>
@@ -870,7 +871,7 @@ export default function SellNowPage() {
                             }
                           }}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                           placeholder="e.g., Nike, Adidas, Louis Vuitton"
                           autoComplete="off"
                         />
@@ -881,7 +882,7 @@ export default function SellNowPage() {
 
                       {formData.category && productTypes.length > 0 && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                             Select Product Type *
                           </label>
                           <select
@@ -889,7 +890,7 @@ export default function SellNowPage() {
                             value={formData.productType}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                           >
                             <option value="">Select Type</option>
                             {productTypes.map(type => (
@@ -903,8 +904,8 @@ export default function SellNowPage() {
                       )}
 
                       {formData.category && productTypes.length === 0 && (
-                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                          <p className="text-yellow-700 text-sm">
+                        <div className="p-2 md:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <p className="text-yellow-700 text-xs md:text-sm">
                             No product types available for this category. Please enter a custom product type below:
                           </p>
                           <input
@@ -914,13 +915,13 @@ export default function SellNowPage() {
                             onChange={handleInputChange}
                             required
                             placeholder="e.g., Custom Type"
-                            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
+                            className="w-full mt-2 px-2 py-1.5 md:px-3 md:py-2 border border-gray-300 rounded text-xs md:text-sm"
                           />
                         </div>
                       )}
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                           Select Condition *
                         </label>
                         <select
@@ -928,7 +929,7 @@ export default function SellNowPage() {
                           value={formData.condition}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                         >
                           <option value="">Select Condition</option>
                           {conditions.map(condition => (
@@ -940,7 +941,7 @@ export default function SellNowPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                       Product Description *
                     </label>
                     <textarea
@@ -948,20 +949,20 @@ export default function SellNowPage() {
                       value={formData.description}
                       onChange={handleInputChange}
                       required
-                      rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      rows={4}
+                      className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm md:text-base"
                       placeholder="Describe your item in detail... Include features, specifications, size, color, and any notable aspects."
                     />
 
-                    <div className="mt-2 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="mt-2 flex items-start gap-2 p-2 md:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
                       <div>
-                        <p className="text-yellow-800 text-sm font-medium">Your description is being monitored</p>
-                        <p className="text-yellow-700 text-xs mt-1">
+                        <p className="text-yellow-800 text-xs md:text-sm font-medium">Your description is being monitored</p>
+                        <p className="text-yellow-700 text-xs mt-0.5 md:mt-1">
                           All product descriptions are reviewed by our team. Inaccurate or misleading descriptions may lead to:
-                          <ul className="list-disc pl-4 mt-1 space-y-1">
+                          <ul className="list-disc pl-3 md:pl-4 mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
                             <li>Listing removal</li>
                             <li>Account warnings</li>
                             <li>Suspension of selling privileges</li>
@@ -971,12 +972,12 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end pt-4">
+                  <div className="flex justify-end pt-3 md:pt-4">
                     <button
                       type="button"
                       onClick={nextStep}
                       disabled={!formData.productName || !formData.brand || !formData.category || !formData.productType || !formData.condition || !formData.description}
-                      className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gray-900 text-white text-sm md:text-base px-4 py-2 md:px-8 md:py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Continue to Pricing & Images
                     </button>
@@ -985,16 +986,16 @@ export default function SellNowPage() {
               )}
 
               {currentStep === 2 && (
-                <div className="space-y-8">
-                  <div className="text-center border-b border-gray-200 pb-6">
-                    <h2 className="text-2xl font-light text-gray-900">Pricing & Images</h2>
-                    <p className="text-gray-600 mt-2">Set your price and upload images</p>
+                <div className="space-y-6 md:space-y-8">
+                  <div className="text-center border-b border-gray-200 pb-4 md:pb-6">
+                    <h2 className="text-lg md:text-xl lg:text-2xl font-light text-gray-900">Pricing & Images</h2>
+                    <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Set your price and upload images</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <div className="space-y-3 md:space-y-4">
                       <div className="flex items-center gap-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700">
                           Your Asking Price (₹) *
                         </label>
                         <div className="relative group">
@@ -1002,14 +1003,14 @@ export default function SellNowPage() {
                             type="button"
                             className="text-gray-400 hover:text-gray-600 transition-colors"
                           >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                             </svg>
                           </button>
 
-                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-lg p-3 z-10">
+                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 md:w-64 bg-gray-900 text-white text-xs rounded-lg p-2 md:p-3 z-10">
                             <div className="font-medium mb-1">Platform Fee Structure:</div>
-                            <div className="space-y-1">
+                            <div className="space-y-0.5 md:space-y-1">
                               <div className="flex justify-between">
                                 <span>₹0 - ₹2,000</span>
                                 <span>30% fee</span>
@@ -1031,7 +1032,7 @@ export default function SellNowPage() {
                                 <span>15% fee</span>
                               </div>
                             </div>
-                            <div className="border-t border-gray-700 mt-2 pt-2 text-gray-300">
+                            <div className="border-t border-gray-700 mt-1 md:mt-2 pt-1 md:pt-2 text-gray-300 text-xs">
                               Final price includes platform fees for marketing, payment processing, and buyer protection.
                             </div>
 
@@ -1047,15 +1048,15 @@ export default function SellNowPage() {
                         onChange={handleInputChange}
                         required
                         min="0"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg font-medium"
+                        className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-base md:text-lg font-medium"
                         placeholder="e.g., 5000"
                       />
                       <p className="text-xs text-gray-500">Enter the price you want to sell for</p>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       <div className="flex items-center gap-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700">
                           Just Becho Pricing (₹)
                         </label>
                         <div className="relative group">
@@ -1063,14 +1064,14 @@ export default function SellNowPage() {
                             type="button"
                             className="text-gray-400 hover:text-gray-600 transition-colors"
                           >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                             </svg>
                           </button>
 
-                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-lg p-3 z-10">
+                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 md:w-64 bg-gray-900 text-white text-xs rounded-lg p-2 md:p-3 z-10">
                             <div className="font-medium mb-1">Price Calculation:</div>
-                            <div className="space-y-1">
+                            <div className="space-y-0.5 md:space-y-1">
                               <div className="flex justify-between">
                                 <span>Your Asking Price:</span>
                                 <span>₹{parseInt(formData.askingPrice || 0).toLocaleString()}</span>
@@ -1079,12 +1080,12 @@ export default function SellNowPage() {
                                 <span>Platform Fee ({platformFee}%):</span>
                                 <span>₹{((parseInt(formData.askingPrice || 0) * platformFee) / 100).toLocaleString()}</span>
                               </div>
-                              <div className="flex justify-between border-t border-gray-700 pt-1">
+                              <div className="flex justify-between border-t border-gray-700 pt-0.5 md:pt-1">
                                 <span className="font-medium">Final Price:</span>
                                 <span className="font-medium">₹{justBechoPrice.toLocaleString()}</span>
                               </div>
                             </div>
-                            <div className="border-t border-gray-700 mt-2 pt-2 text-gray-300">
+                            <div className="border-t border-gray-700 mt-1 md:mt-2 pt-1 md:pt-2 text-gray-300 text-xs">
                               This is the price buyers will see. Platform fees help us provide better service and buyer protection.
                             </div>
 
@@ -1093,7 +1094,7 @@ export default function SellNowPage() {
                         </div>
                       </div>
 
-                      <div className="w-full px-4 py-3 border border-green-300 bg-green-50 rounded-lg text-lg font-medium text-green-800">
+                      <div className="w-full px-3 py-2 md:px-4 md:py-3 border border-green-300 bg-green-50 rounded-lg text-base md:text-lg font-medium text-green-800">
                         ₹{justBechoPrice.toLocaleString()}
                       </div>
                       <p className="text-xs text-green-600">
@@ -1102,12 +1103,12 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  <div className="pt-8 border-t border-gray-200">
-                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                  <div className="pt-6 md:pt-8 border-t border-gray-200">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
                       Product Images * (Max 5 images)
                     </label>
 
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-6 lg:p-8 text-center hover:border-gray-400 transition-colors">
                       <input
                         type="file"
                         multiple
@@ -1117,34 +1118,34 @@ export default function SellNowPage() {
                         id="image-upload"
                       />
                       <label htmlFor="image-upload" className="cursor-pointer block">
-                        <div className="text-gray-400 mb-3">
-                          <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="text-gray-400 mb-2 md:mb-3">
+                          <svg className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <p className="text-gray-600 text-lg font-medium">Click to upload images</p>
-                        <p className="text-gray-400 text-sm mt-2">PNG, JPG, JPEG up to 5MB each</p>
-                        <p className="text-gray-400 text-xs mt-1">Upload clear, well-lit photos from different angles</p>
+                        <p className="text-gray-600 text-sm md:text-base lg:text-lg font-medium">Click to upload images</p>
+                        <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">PNG, JPG, JPEG up to 5MB each</p>
+                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">Upload clear, well-lit photos from different angles</p>
                       </label>
                     </div>
 
                     {formData.images.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="text-sm font-medium text-gray-700 mb-4">
+                      <div className="mt-4 md:mt-6">
+                        <h4 className="text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
                           Uploaded Images ({formData.images.length}/5)
                         </h4>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3 lg:gap-4">
                           {formData.images.map((image, index) => (
                             <div key={index} className="relative group">
                               <img
                                 src={URL.createObjectURL(image)}
                                 alt={`Preview ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-lg border border-gray-200 group-hover:opacity-75 transition-opacity"
+                                className="w-full h-16 md:h-20 lg:h-24 object-cover rounded-lg border border-gray-200 group-hover:opacity-75 transition-opacity"
                               />
                               <button
                                 type="button"
                                 onClick={() => removeImage(index)}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                                className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-red-500 text-white rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
                               >
                                 ×
                               </button>
@@ -1153,8 +1154,8 @@ export default function SellNowPage() {
 
                           {formData.images.length < 5 && (
                             <label htmlFor="image-upload" className="cursor-pointer">
-                              <div className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors">
-                                <svg className="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="w-full h-16 md:h-20 lg:h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors">
+                                <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 mb-0.5 md:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
                                 <span className="text-xs">Add More</span>
@@ -1165,14 +1166,14 @@ export default function SellNowPage() {
                       </div>
                     )}
 
-                    <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="mt-3 md:mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+                      <div className="flex items-start gap-2 md:gap-3">
+                        <div className="w-4 h-4 md:w-5 md:h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-xs">💡</span>
                         </div>
                         <div>
-                          <p className="text-blue-800 font-medium text-sm">Guidelines</p>
-                          <ul className="text-blue-700 text-sm mt-1 space-y-1">
+                          <p className="text-blue-800 font-medium text-xs md:text-sm">Guidelines</p>
+                          <ul className="text-blue-700 text-xs md:text-sm mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
@@ -1184,11 +1185,11 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between pt-8 border-t border-gray-200">
+                  <div className="flex justify-between pt-6 md:pt-8 border-t border-gray-200">
                     <button
                       type="button"
                       onClick={prevStep}
-                      className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      className="px-4 py-2 md:px-6 md:py-3 border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 transition-colors font-medium"
                     >
                       Back
                     </button>
@@ -1196,7 +1197,7 @@ export default function SellNowPage() {
                       type="button"
                       onClick={nextStep}
                       disabled={!formData.askingPrice || formData.images.length === 0}
-                      className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gray-900 text-white text-sm md:text-base px-4 py-2 md:px-8 md:py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Review Listing
                     </button>
@@ -1205,94 +1206,94 @@ export default function SellNowPage() {
               )}
 
               {currentStep === 3 && (
-                <div className="space-y-8">
-                  <div className="text-center border-b border-gray-200 pb-6">
-                    <h2 className="text-2xl font-light text-gray-900">Review & Submit</h2>
-                    <p className="text-gray-600 mt-2">Review your listing before publishing</p>
+                <div className="space-y-6 md:space-y-8">
+                  <div className="text-center border-b border-gray-200 pb-4 md:pb-6">
+                    <h2 className="text-lg md:text-xl lg:text-2xl font-light text-gray-900">Review & Submit</h2>
+                    <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Review your listing before publishing</p>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b pb-4 text-center">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
+                    <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4 text-center">
                       Listing Summary
                     </h3>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      <div className="space-y-6">
-                        <h4 className="font-medium text-gray-900 text-lg">Product Information</h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                      <div className="space-y-4 md:space-y-6">
+                        <h4 className="font-medium text-gray-900 text-base md:text-lg">Product Information</h4>
 
-                        <div className="space-y-4">
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Product Name:</span>
-                            <span className="font-medium text-gray-900">{formData.productName}</span>
+                        <div className="space-y-2 md:space-y-4">
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Product Name:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.productName}</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Brand:</span>
-                            <span className="font-medium text-gray-900">{formData.brand}</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Brand:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.brand}</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Category:</span>
-                            <span className="font-medium text-gray-900">{formData.category}</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Category:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.category}</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Product Type:</span>
-                            <span className="font-medium text-gray-900">{formData.productType}</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Product Type:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.productType}</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Condition:</span>
-                            <span className="font-medium text-gray-900">{formData.condition}</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Condition:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.condition}</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Purchase Year:</span>
-                            <span className="font-medium text-gray-900">{formData.purchaseYear || 'Not specified'}</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Purchase Year:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.purchaseYear || 'Not specified'}</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="space-y-6">
-                        <h4 className="font-medium text-gray-900 text-lg">Pricing & Media</h4>
+                      <div className="space-y-4 md:space-y-6">
+                        <h4 className="font-medium text-gray-900 text-base md:text-lg">Pricing & Media</h4>
 
-                        <div className="space-y-4">
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Your Asking Price:</span>
-                            <span className="font-medium text-gray-900">₹{parseInt(formData.askingPrice).toLocaleString()}</span>
+                        <div className="space-y-2 md:space-y-4">
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Your Asking Price:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">₹{parseInt(formData.askingPrice).toLocaleString()}</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Platform Fee:</span>
-                            <span className="font-medium text-red-600">{platformFee}%</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Platform Fee:</span>
+                            <span className="font-medium text-red-600 text-sm md:text-base">{platformFee}%</span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Fee Amount:</span>
-                            <span className="font-medium text-red-600">
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Fee Amount:</span>
+                            <span className="font-medium text-red-600 text-sm md:text-base">
                               ₹{((parseInt(formData.askingPrice) * platformFee) / 100).toLocaleString()}
                             </span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600 font-semibold">Final Selling Price:</span>
-                            <span className="font-bold text-green-600 text-lg">
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 font-semibold text-sm md:text-base">Final Selling Price:</span>
+                            <span className="font-bold text-green-600 text-base md:text-lg">
                               ₹{justBechoPrice.toLocaleString()}
                             </span>
                           </div>
-                          <div className="flex justify-between border-b pb-3">
-                            <span className="text-gray-600">Images Uploaded:</span>
-                            <span className="font-medium text-gray-900">{formData.images.length} photos</span>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Images Uploaded:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.images.length} photos</span>
                           </div>
                         </div>
 
                         {formData.images.length > 0 && (
-                          <div className="mt-4">
-                            <h5 className="font-medium text-gray-900 mb-3">Image Preview</h5>
-                            <div className="grid grid-cols-3 gap-3">
+                          <div className="mt-3 md:mt-4">
+                            <h5 className="font-medium text-gray-900 text-sm md:text-base mb-2 md:mb-3">Image Preview</h5>
+                            <div className="grid grid-cols-3 gap-2 md:gap-3">
                               {formData.images.slice(0, 3).map((image, index) => (
                                 <img
                                   key={index}
                                   src={URL.createObjectURL(image)}
                                   alt={`Preview ${index + 1}`}
-                                  className="w-full h-20 object-cover rounded border border-gray-200"
+                                  className="w-full h-14 md:h-16 lg:h-20 object-cover rounded border border-gray-200"
                                 />
                               ))}
                               {formData.images.length > 3 && (
-                                <div className="w-full h-20 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
-                                  <span className="text-gray-500 text-sm">+{formData.images.length - 3} more</span>
+                                <div className="w-full h-14 md:h-16 lg:h-20 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+                                  <span className="text-gray-500 text-xs md:text-sm">+{formData.images.length - 3} more</span>
                                 </div>
                               )}
                             </div>
@@ -1301,35 +1302,35 @@ export default function SellNowPage() {
                       </div>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-gray-200">
-                      <h4 className="font-medium text-gray-900 mb-3 text-center">Product Description</h4>
-                      <p className="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-200">
+                      <h4 className="font-medium text-gray-900 mb-2 md:mb-3 text-center text-sm md:text-base">Product Description</h4>
+                      <p className="text-gray-700 bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200 text-sm md:text-base">
                         {formData.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-yellow-900 mb-4 text-lg text-center">Final Price Breakdown</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-3">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6">
+                    <h3 className="font-semibold text-yellow-900 mb-3 md:mb-4 text-base md:text-lg text-center">Final Price Breakdown</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                      <div className="space-y-2 md:space-y-3">
                         <div className="flex justify-between">
-                          <span className="text-yellow-800">Your Asking Price</span>
-                          <span className="font-medium">₹{parseInt(formData.askingPrice).toLocaleString()}</span>
+                          <span className="text-yellow-800 text-sm md:text-base">Your Asking Price</span>
+                          <span className="font-medium text-sm md:text-base">₹{parseInt(formData.askingPrice).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-yellow-800">Platform Fee ({platformFee}%)</span>
-                          <span className="font-medium text-red-600">
+                          <span className="text-yellow-800 text-sm md:text-base">Platform Fee ({platformFee}%)</span>
+                          <span className="font-medium text-red-600 text-sm md:text-base">
                             ₹{((parseInt(formData.askingPrice) * platformFee) / 100).toLocaleString()}
                           </span>
                         </div>
-                        <div className="border-t border-yellow-200 pt-2 flex justify-between">
-                          <span className="text-yellow-900 font-semibold">You Will Receive</span>
-                          <span className="text-yellow-900 font-bold">₹{parseInt(formData.askingPrice).toLocaleString()}</span>
+                        <div className="border-t border-yellow-200 pt-1 md:pt-2 flex justify-between">
+                          <span className="text-yellow-900 font-semibold text-sm md:text-base">You Will Receive</span>
+                          <span className="text-yellow-900 font-bold text-sm md:text-base">₹{parseInt(formData.askingPrice).toLocaleString()}</span>
                         </div>
                       </div>
-                      <div className="bg-white rounded-lg p-4 border border-yellow-300">
-                        <p className="text-yellow-800 text-sm">
+                      <div className="bg-white rounded-lg p-3 md:p-4 border border-yellow-300">
+                        <p className="text-yellow-800 text-xs md:text-sm">
                           <span className="font-semibold">Note:</span> The platform fee covers marketing,
                           payment processing, customer support, and buyer protection services.
                         </p>
@@ -1337,11 +1338,11 @@ export default function SellNowPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between pt-4">
+                  <div className="flex justify-between pt-3 md:pt-4">
                     <button
                       type="button"
                       onClick={prevStep}
-                      className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      className="px-4 py-2 md:px-6 md:py-3 border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 transition-colors font-medium"
                     >
                       Back
                     </button>
@@ -1349,7 +1350,7 @@ export default function SellNowPage() {
                       type="submit"
                       onClick={handleSubmit}
                       disabled={isSubmitting}
-                      className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50"
+                      className="bg-green-600 text-white text-sm md:text-base px-4 py-2 md:px-8 md:py-3 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50"
                     >
                       {isSubmitting ? 'Publishing Listing...' : 'Publish Listing'}
                     </button>
