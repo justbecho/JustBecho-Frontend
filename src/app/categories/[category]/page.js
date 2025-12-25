@@ -267,7 +267,7 @@ function getCategoryConfig(categorySlug) {
       seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
     },
     'Influencer-only': {
-      title: "INFLUENCER'S ONLY",
+      title: "INFLUENCER ONLY",
       subtitle: 'Adorable luxury Influencer fashion',
       banner: '/banners/influencer.jpeg',
       metaTitle: 'Influencer Fashion | Designer Influencer Clothes',
