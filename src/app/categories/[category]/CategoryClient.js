@@ -227,7 +227,7 @@ const getCategoryConfig = (categorySlug) => {
             apiSlug: 'Kids',
             seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
         },
-    'Influencer-only': {
+    'Influencer': {
       title: "INFLUENCER ONLY",
       subtitle: 'Adorable luxury Influencer fashion',
       banner: '/banners/influencer.jpeg',
