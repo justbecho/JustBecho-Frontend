@@ -1472,8 +1472,6 @@ export default function Dashboard() {
                           </>
                         )}
                         
-                        {/* ✅ REMOVED: Ship/Deliver buttons - Now automation handles it */}
-                        
                         {/* ✅ ADDED: Tracking button for shipped items */}
                         {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                           <button 
