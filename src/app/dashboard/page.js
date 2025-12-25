@@ -1,4 +1,4 @@
-// pages/dashboard.js - COMPLETE WITH ALL FIXES
+// pages/dashboard.js - COMPLETE MOBILE RESPONSIVE VERSION
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -70,19 +70,15 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([])
   const [wishlist, setWishlist] = useState([])
   
-  // ✅ ADDED: Shipping tracking state
   const [shippingTracking, setShippingTracking] = useState({})
   const [trackingLoading, setTrackingLoading] = useState({})
 
-  // ✅ ADDED: Listing filter state
   const [listingFilter, setListingFilter] = useState('all')
 
-  // ✅ NEW: Profile update state
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
   const [updateSuccess, setUpdateSuccess] = useState(false)
   const [updateError, setUpdateError] = useState('')
 
-  // ✅ NEW: Order stats
   const [orderStats, setOrderStats] = useState({
     total: 0,
     pending: 0,
@@ -91,7 +87,7 @@ export default function Dashboard() {
     cancelled: 0
   })
 
-  // ✅ Check for mobile device
+  // ✅ Check for mobile device with updated breakpoints
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -103,7 +99,6 @@ export default function Dashboard() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // ✅ FIXED: Safe localStorage access
   const getLocalStorage = useCallback((key) => {
     if (typeof window === 'undefined') return null
     try {
@@ -114,7 +109,6 @@ export default function Dashboard() {
     }
   }, [])
 
-  // ✅ FIXED: Safe JSON parsing
   const parseUserData = useCallback((data) => {
     if (!data) return null
     try {
@@ -125,29 +119,23 @@ export default function Dashboard() {
     }
   }, [])
 
-  // ✅ FIXED: Ensure username is in "name@justbecho" format
   const ensureJustbechoFormat = useCallback((username) => {
     if (!username) return null;
     
-    // Remove any leading @
     let clean = username.replace(/^@+/, '');
     
-    // If already ends with @justbecho, return as-is
     if (clean.endsWith('@justbecho')) {
       return clean;
     }
     
-    // If contains @justbecho elsewhere, fix it
     if (clean.includes('@justbecho')) {
       const namePart = clean.replace('@justbecho', '');
       return `${namePart}@justbecho`;
     }
     
-    // Add @justbecho suffix
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ FIXED: Format address function - handles both string and object
   const formatAddress = useCallback((address) => {
     if (!address) return 'Not provided'
     
@@ -168,7 +156,6 @@ export default function Dashboard() {
     return 'Not provided'
   }, [])
 
-  // ✅ NEW FUNCTION: Parse address for editing
   const parseAddressForEdit = (address) => {
     if (!address) {
       return {
@@ -180,7 +167,6 @@ export default function Dashboard() {
     }
     
     if (typeof address === 'string') {
-      // Try to parse string address
       const parts = address.split(',');
       return {
         street: parts[0]?.trim() || '',
@@ -207,13 +193,11 @@ export default function Dashboard() {
     };
   };
 
-  // ✅ NEW FUNCTION: Fetch Shipping Tracking
   const fetchShippingTracking = async (orderId, forceRefresh = false) => {
     try {
       const token = getLocalStorage('token');
       if (!token || !orderId) return null;
       
-      // Check if we already have cached data
       if (!forceRefresh && shippingTracking[orderId]) {
         return shippingTracking[orderId];
       }
@@ -229,10 +213,8 @@ export default function Dashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('🚚 Order data received:', data);
         
         if (data.success) {
-          // Update shipping tracking state
           setShippingTracking(prev => ({
             ...prev,
             [orderId]: data.order
@@ -250,14 +232,12 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ NEW FUNCTION: Open Live Tracking Link
   const openLiveTracking = (awbNumber) => {
     if (awbNumber) {
       window.open(`https://track.nimbuspost.com/track/${awbNumber}`, '_blank');
     }
   };
 
-  // ✅ NEW FUNCTION: Get Shipment Status Badge
   const getShipmentStatusBadge = (status) => {
     switch(status) {
       case 'booked':
@@ -280,7 +260,6 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ NEW FUNCTION: Get Order Status Badge
   const getOrderStatusBadge = (status) => {
     switch(status?.toLowerCase()) {
       case 'pending':
@@ -300,7 +279,6 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ SELLER STATUS CHECK FUNCTION
   const checkSellerStatus = useCallback(async () => {
     try {
       const token = getLocalStorage('token');
@@ -317,7 +295,6 @@ export default function Dashboard() {
         const data = await response.json();
         
         if (data.success) {
-          // ✅ FIXED: Ensure username is in "name@justbecho" format
           const formattedUsername = ensureJustbechoFormat(data.username);
           
           setSellerStatus({
@@ -327,7 +304,6 @@ export default function Dashboard() {
             username: formattedUsername
           });
           
-          // Update user data with latest status
           if (user) {
             const updatedUser = { 
               ...user, 
@@ -344,7 +320,6 @@ export default function Dashboard() {
     }
   }, [user, getLocalStorage, ensureJustbechoFormat])
 
-  // ✅ FETCH USER'S PRODUCTS - WORKING VERSION
   const fetchMyProducts = async () => {
     try {
       const token = getLocalStorage('token');
@@ -352,8 +327,6 @@ export default function Dashboard() {
         console.log('❌ No token found for fetching products');
         return;
       }
-      
-      console.log('📡 Fetching my products from /api/products/my-products...');
       
       const response = await fetch('https://just-becho-backend.vercel.app/api/products/my-products', {
         method: 'GET',
@@ -363,42 +336,24 @@ export default function Dashboard() {
         }
       });
       
-      console.log('📊 My Products Response Status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ My Products API Response:', data);
         
-        // ✅ Handle different response formats
         if (data.success && data.products) {
-          // Format 1: { success: true, products: [...] }
-          console.log(`📦 Found ${data.products.length} products (format 1)`);
           setListings(data.products);
         } else if (data.success && Array.isArray(data.products)) {
-          // Format 2: { success: true, products: [...] } (alternative)
-          console.log(`📦 Found ${data.products.length} products (format 2)`);
           setListings(data.products);
         } else if (Array.isArray(data)) {
-          // Format 3: Direct array response
-          console.log(`📦 Found ${data.length} products (format 3)`);
           setListings(data);
         } else if (data && data.length !== undefined) {
-          // Format 4: Array-like object
-          console.log(`📦 Found ${data.length} products (format 4)`);
           setListings(data);
         } else {
-          console.error('❌ API returned unexpected format:', data);
           setListings([]);
         }
       } else {
-        console.error('❌ Failed to fetch my products:', response.status);
-        
-        // ✅ Fallback: Check if user is seller and show appropriate message
         if (user?.role === 'seller') {
-          console.log('👤 User is seller but no products found');
           setListings([]);
         } else {
-          console.log('👤 User is not a seller');
           setListings([]);
         }
       }
@@ -408,7 +363,6 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ FETCH WISHLIST
   const fetchWishlist = async () => {
     try {
       const token = getLocalStorage('token');
@@ -423,7 +377,6 @@ export default function Dashboard() {
       
       if (response.ok) {
         const wishlistData = await response.json();
-        console.log('🎯 Wishlist API Response:', wishlistData);
         
         if (wishlistData.success) {
           setWishlist(wishlistData.products || wishlistData.wishlist?.products || []);
@@ -438,13 +391,10 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ FETCH ORDERS - UPDATED WITH ORDER STATS
   const fetchOrders = async () => {
     try {
       const token = getLocalStorage('token');
       if (!token) return;
-      
-      console.log('📦 Fetching orders...');
       
       const response = await fetch('https://just-becho-backend.vercel.app/api/orders/my-orders', {
         headers: { 
@@ -455,13 +405,11 @@ export default function Dashboard() {
       
       if (response.ok) {
         const ordersData = await response.json();
-        console.log('✅ Orders API Response:', ordersData);
         
         if (ordersData.success) {
           const fetchedOrders = ordersData.orders || [];
           setOrders(fetchedOrders);
           
-          // Calculate order stats
           const stats = {
             total: fetchedOrders.length,
             pending: fetchedOrders.filter(o => 
@@ -479,7 +427,6 @@ export default function Dashboard() {
           };
           setOrderStats(stats);
           
-          // Fetch shipping tracking for each order with shipments
           fetchedOrders.forEach(order => {
             if (order.nimbuspostShipments && order.nimbuspostShipments.length > 0) {
               fetchShippingTracking(order._id);
@@ -496,39 +443,29 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ HANDLE REDIRECTS
   useEffect(() => {
     if (shouldRedirect && redirectPath) {
-      console.log(`🔄 Redirecting to: ${redirectPath}`);
       router.push(redirectPath);
       setShouldRedirect(false);
     }
   }, [shouldRedirect, redirectPath, router])
 
-  // ✅ MAIN AUTH CHECK
   useEffect(() => {
     const checkAuth = async () => {
-      console.log('🔄 Starting auth check...');
       
       try {
         const token = getLocalStorage('token');
         const storedUserData = getLocalStorage('user');
         
-        console.log('🔑 Token exists:', !!token);
-        console.log('👤 User data exists:', !!storedUserData);
-        
         if (!token || !storedUserData) {
-          console.log('❌ No auth data, redirecting to login');
           setRedirectPath('/login');
           setShouldRedirect(true);
           return;
         }
         
         const userObj = parseUserData(storedUserData);
-        console.log('📋 Parsed user data:', userObj);
         
         if (!userObj) {
-          console.log('❌ Invalid user data, redirecting to login');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           setRedirectPath('/login');
@@ -536,40 +473,27 @@ export default function Dashboard() {
           return;
         }
         
-        // ✅ FIXED: Ensure username is in "name@justbecho" format
         if (userObj.username) {
           userObj.username = ensureJustbechoFormat(userObj.username);
         }
         
-        // Set user immediately for better UX
         setUser(userObj);
         
-        // Check profile completion
         if (!userObj.profileCompleted) {
-          console.log('🔄 Profile not completed, redirecting...');
           setRedirectPath('/complete-profile');
           setShouldRedirect(true);
           return;
         }
         
-        // Check seller status if user is seller
         if (userObj.role === 'seller') {
           await checkSellerStatus();
         }
         
-        console.log('🚀 Fetching dashboard data...');
-        
-        // Fetch all data in parallel
         await Promise.allSettled([
           fetchMyProducts(),
           fetchWishlist(),
           fetchOrders()
         ]);
-        
-        console.log('✅ All data fetched successfully');
-        console.log('📊 Products count:', listings.length);
-        console.log('📊 Orders count:', orders.length);
-        console.log('📊 Wishlist count:', wishlist.length);
         
         setAuthChecked(true);
         
@@ -589,25 +513,20 @@ export default function Dashboard() {
     }
   }, [router])
 
-  // ✅ REFRESH DATA WHEN SECTION CHANGES
   useEffect(() => {
     if (user && authChecked && activeSection === 'listings') {
-      console.log('🔄 Refreshing products for listings section...');
       fetchMyProducts();
     }
     
     if (user && authChecked && activeSection === 'wishlist') {
-      console.log('🔄 Refreshing wishlist...');
       fetchWishlist();
     }
     
     if (user && authChecked && activeSection === 'orders') {
-      console.log('🔄 Refreshing orders...');
       fetchOrders();
     }
   }, [user, authChecked, activeSection])
 
-  // ✅ HANDLE URL PARAMS
   useEffect(() => {
     const handleUrlParams = () => {
       if (typeof window !== 'undefined') {
@@ -626,7 +545,6 @@ export default function Dashboard() {
     handleUrlParams();
   }, [])
 
-  // ✅ MENU ITEMS FOR MOBILE
   const menuItems = [
     {
       id: 'profile',
@@ -654,31 +572,6 @@ export default function Dashboard() {
     }
   ]
 
-  // ✅ MOBILE QUICK ACTIONS
-  const quickActions = [
-    {
-      label: 'Home',
-      icon: <FiHome className="w-4 h-4" />,
-      onClick: () => router.push('/')
-    },
-    {
-      label: 'Settings',
-      icon: <FiSettings className="w-4 h-4" />,
-      onClick: () => router.push('/profile')
-    },
-    {
-      label: 'Notifications',
-      icon: <FiBell className="w-4 h-4" />,
-      onClick: () => {}
-    },
-    {
-      label: 'Help',
-      icon: <FiHelpCircle className="w-4 h-4" />,
-      onClick: () => router.push('/contact-us')
-    }
-  ]
-
-  // ✅ FORMAT DATE
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -689,7 +582,6 @@ export default function Dashboard() {
     });
   }
 
-  // ✅ FORMAT TIME
   const formatTime = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -700,13 +592,11 @@ export default function Dashboard() {
     });
   }
 
-  // ✅ FORMAT DATE TIME
   const formatDateTime = (dateString) => {
     if (!dateString) return '';
     return `${formatDate(dateString)} at ${formatTime(dateString)}`;
   }
 
-  // ✅ REMOVE FROM WISHLIST
   const removeFromWishlist = async (productId) => {
     if (!confirm('Are you sure you want to remove this item from wishlist?')) return;
 
@@ -741,14 +631,12 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ HANDLE PRODUCT CLICK
   const handleProductClick = (productId) => {
     if (productId) {
       router.push(`/products/${productId}`);
     }
   }
 
-  // ✅ DELETE PRODUCT LISTING
   const deleteListing = async (productId) => {
     if (!confirm('Are you sure you want to delete this listing?')) return
 
@@ -758,8 +646,6 @@ export default function Dashboard() {
         alert('Please login first');
         return;
       }
-      
-      console.log('🗑️ Deleting listing:', productId);
       
       const response = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}`, {
         method: 'DELETE',
@@ -771,9 +657,7 @@ export default function Dashboard() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Listing deleted:', result);
         
-        // Refresh products list
         await fetchMyProducts();
         alert('Listing deleted successfully!');
       } else {
@@ -787,7 +671,6 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ RENDER SELLER STATUS BANNER - MOBILE OPTIMIZED
   const renderSellerStatusBanner = () => {
     if (user?.role !== 'seller') return null;
     
@@ -797,7 +680,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'pending') {
       return (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 mx-4 mt-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4 mx-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiClock className="w-5 h-5 text-yellow-600" />
@@ -815,7 +698,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'approved') {
       return (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 mx-4 mt-4">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 mx-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiCheckCircle className="w-5 h-5 text-green-600" />
@@ -838,7 +721,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'rejected') {
       return (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 mx-4 mt-4">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 mx-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiAlertCircle className="w-5 h-5 text-red-600" />
@@ -857,7 +740,6 @@ export default function Dashboard() {
     return null;
   }
 
-  // ✅ FILTERED LISTINGS
   const filteredListings = listings.filter(item => {
     if (listingFilter === 'all') return true;
     if (listingFilter === 'active') return item.status === 'active';
@@ -867,7 +749,6 @@ export default function Dashboard() {
     return true;
   });
 
-  // ✅ STATS
   const readyForShipmentCount = listings.filter(item => 
     item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending')
   ).length;
@@ -892,7 +773,6 @@ export default function Dashboard() {
     totalSales: user?.totalSales || 0
   }
 
-  // ✅ PROFILE EDIT STATE - FIXED FOR ADDRESS OBJECT
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -906,10 +786,8 @@ export default function Dashboard() {
     }
   })
 
-  // ✅ SET FORM DATA WHEN USER CHANGES - FIXED FOR ADDRESS OBJECT
   useEffect(() => {
     if (user) {
-      // Parse address from user data (could be string or object)
       const addressData = parseAddressForEdit(user.address);
       
       setFormData({
@@ -921,7 +799,6 @@ export default function Dashboard() {
     }
   }, [user])
 
-  // ✅ Handle address input changes
   const handleAddressChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -932,7 +809,6 @@ export default function Dashboard() {
     }));
   };
 
-  // ✅ FIXED: SAVE PROFILE FUNCTION - NOW HANDLES ADDRESS AS OBJECT
   const handleSaveProfile = async () => {
     try {
       const token = getLocalStorage('token')
@@ -941,14 +817,10 @@ export default function Dashboard() {
         return;
       }
       
-      // Reset error/success states
       setUpdateError('');
       setUpdateSuccess(false);
       setIsUpdatingProfile(true);
       
-      console.log('📤 Sending profile update:', formData);
-      
-      // Prepare the data for API - Address as object
       const updateData = {
         name: formData.name.trim(),
         phone: formData.phone.trim(),
@@ -960,9 +832,6 @@ export default function Dashboard() {
         }
       };
       
-      console.log('📦 Update payload:', JSON.stringify(updateData, null, 2));
-      
-      // Try multiple API endpoints
       const endpoints = [
         'https://just-becho-backend.vercel.app/api/users/profile',
         'https://just-becho-backend.vercel.app/api/auth/profile',
@@ -974,7 +843,6 @@ export default function Dashboard() {
       
       for (const endpoint of endpoints) {
         try {
-          console.log(`🔄 Trying endpoint: ${endpoint}`);
           response = await fetch(endpoint, {
             method: 'PUT',
             headers: {
@@ -984,14 +852,11 @@ export default function Dashboard() {
             body: JSON.stringify(updateData)
           });
           
-          console.log(`📊 Response status for ${endpoint}:`, response.status);
-          
           if (response.ok) {
             success = true;
             break;
           }
         } catch (endpointError) {
-          console.error(`❌ Error with endpoint ${endpoint}:`, endpointError);
           continue;
         }
       }
@@ -1001,10 +866,8 @@ export default function Dashboard() {
       }
       
       const result = await response.json();
-      console.log('✅ Update response:', result);
       
       if (result.success) {
-        // Update local storage with new user data
         const updatedUser = {
           ...user,
           name: updateData.name,
@@ -1018,12 +881,9 @@ export default function Dashboard() {
         setIsEditing(false);
         setUpdateSuccess(true);
         
-        // Show success message
         setTimeout(() => {
           setUpdateSuccess(false);
         }, 3000);
-        
-        console.log('✅ Profile updated successfully!');
       } else {
         throw new Error(result.message || 'Update failed');
       }
@@ -1036,38 +896,23 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ LOADING STATE
+  // ✅ LOADING STATE - Optimized for mobile
   if (loading) {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-24 md:pt-32 flex flex-col items-center justify-center p-4">
+        {/* ✅ Fixed spacing for header (80px) + safe area */}
+        <div className="min-h-screen bg-gray-50 pt-20 pb-16 safe-top safe-bottom flex flex-col items-center justify-center p-4">
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="relative w-16 h-16 mx-auto mb-4">
               <div className="animate-spin rounded-full h-full w-full border-4 border-gray-200 border-t-gray-900"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <FiUser className="w-8 h-8 text-gray-400" />
+                <FiUser className="w-6 h-6 text-gray-400" />
               </div>
             </div>
             
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Dashboard</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Loading Dashboard</h2>
             <p className="text-gray-600 text-sm">Please wait while we load your information</p>
-            
-            {/* Progress steps */}
-            <div className="mt-6 space-y-2 max-w-xs mx-auto">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-700">User data</span>
-                <FiCheckCircle className="w-4 h-4 text-green-500" />
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-700">Products</span>
-                <div className="animate-spin rounded-full h-3 w-3 border-2 border-gray-300 border-t-gray-600"></div>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-700">Orders</span>
-                <div className="h-3 w-3 bg-gray-200 rounded-full"></div>
-              </div>
-            </div>
           </div>
         </div>
         <Footer />
@@ -1075,22 +920,20 @@ export default function Dashboard() {
     )
   }
 
-  // ✅ DON'T SHOW CONTENT IF REDIRECTING
   if (shouldRedirect || !authChecked) {
     return null;
   }
 
-  // ✅ IF NO USER AFTER AUTH CHECK
   if (!user) {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-24 md:pt-32 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 pt-20 pb-16 safe-top safe-bottom flex items-center justify-center p-4">
           <div className="text-center max-w-sm">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiAlertCircle className="w-8 h-8 text-red-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Authentication Required</h3>
             <p className="text-gray-600 mb-6">Please log in to access your dashboard</p>
             <Link 
               href="/login"
@@ -1105,340 +948,288 @@ export default function Dashboard() {
     )
   }
 
-  // ✅ RENDER MOBILE HEADER
-  const renderMobileHeader = () => (
-    <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      <div className="px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            {showMobileMenu ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-              {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Dashboard</p>
-              <p className="text-xs text-gray-500">Hello, {user?.name?.split(' ')[0] || 'User'}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <FiBell className="w-5 h-5 text-gray-600" />
-          </button>
-          <button 
-            onClick={() => router.push('/')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <FiHome className="w-5 h-5 text-gray-600" />
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      {showMobileMenu && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setShowMobileMenu(false)}>
-          <div className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-xl transform transition-transform duration-300">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{user?.name || 'User'}</h3>
-                  <p className="text-sm text-gray-600">{user?.email}</p>
-                  {user?.role === 'seller' && user?.username && (
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full mt-1 inline-block">
-                      {ensureJustbechoFormat(user.username)}
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              <nav className="space-y-2">
-                {menuItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveSection(item.id);
-                      setShowMobileMenu(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg text-left ${
-                      activeSection === item.id
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={item.color.replace('text-', '').split(' ')[0] + ' p-2 rounded-lg'}>
-                        {item.icon}
-                      </span>
-                      <span className="font-medium">{item.label}</span>
-                    </div>
-                    <FiChevronRight className="w-5 h-5" />
-                  </button>
-                ))}
-              </nav>
-              
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <div className="grid grid-cols-2 gap-3">
-                  {quickActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={action.onClick}
-                      className="p-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-center transition-colors"
-                    >
-                      {action.icon}
-                      <p className="text-xs font-medium mt-1">{action.label}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-
-  // ✅ RENDER MOBILE STATS
-  const renderMobileStats = () => (
-    <div className="px-4 mb-6">
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-          <div className="text-lg font-semibold text-gray-900 mb-1">{stats.totalListings}</div>
-          <div className="text-xs text-gray-600 uppercase">Listings</div>
-        </div>
-        
-        <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-          <div className="text-lg font-semibold text-green-600 mb-1">{stats.activeListings}</div>
-          <div className="text-xs text-gray-600 uppercase">Active</div>
-        </div>
-        
-        <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-          <div className="text-lg font-semibold text-purple-600 mb-1">{stats.totalOrders}</div>
-          <div className="text-xs text-gray-600 uppercase">Orders</div>
-        </div>
-      </div>
-    </div>
-  )
-
-  // ✅ RENDER MOBILE NAVIGATION TABS
-  const renderMobileNavTabs = () => (
-    <div className="sticky top-[64px] z-40 bg-white border-b border-gray-200">
-      <div className="flex overflow-x-auto scrollbar-hide px-4">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveSection(item.id)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
-              activeSection === item.id
-                ? 'text-gray-900 border-gray-900'
-                : 'text-gray-500 border-transparent hover:text-gray-700'
-            }`}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-
-  // ✅ RENDER MOBILE ORDER STATS
-  const renderMobileOrderStats = () => {
-    if (activeSection !== 'orders') return null;
-    
+  // ✅ MOBILE VERSION - Completely redesigned for your header
+  if (isMobile) {
     return (
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-            <div className="text-lg font-semibold text-blue-600 mb-1">{orderStats.total}</div>
-            <div className="text-xs text-gray-600 uppercase">Total</div>
+      <>
+        <Header />
+        {/* ✅ Fixed spacing: pt-20 for header, pb-16 for bottom nav */}
+        <main className="min-h-screen bg-gray-50 pt-20 pb-16 safe-top safe-bottom">
+          
+          {/* Welcome Banner */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
+                  <p className="text-sm text-gray-600">Welcome back, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user?.role === 'seller' 
+                      ? user?.sellerVerified 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {user?.role === 'seller' 
+                      ? user?.sellerVerified ? 'Seller' : 'Pending'
+                      : 'Buyer'
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-            <div className="text-lg font-semibold text-green-600 mb-1">{orderStats.delivered}</div>
-            <div className="text-xs text-gray-600 uppercase">Delivered</div>
+          {/* Seller Status Banner */}
+          {renderSellerStatusBanner()}
+          
+          {/* Quick Stats */}
+          <div className="px-4 py-4">
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-gray-900 mb-1">{stats.totalListings}</div>
+                <div className="text-xs text-gray-600 uppercase">Listings</div>
+              </div>
+              
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-green-600 mb-1">{stats.activeListings}</div>
+                <div className="text-xs text-gray-600 uppercase">Active</div>
+              </div>
+              
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-purple-600 mb-1">{stats.totalOrders}</div>
+                <div className="text-xs text-gray-600 uppercase">Orders</div>
+              </div>
+            </div>
+            
+            {/* Navigation Tabs */}
+            <div className="flex overflow-x-auto scrollbar-hide bg-white rounded-xl border border-gray-200 p-1 mb-4">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  className={`flex-1 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors min-w-0 whitespace-nowrap ${
+                    activeSection === item.id
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    {item.icon}
+                    <span className="text-xs">{item.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            {/* Active Section Content */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              {renderMobileActiveSection()}
+            </div>
           </div>
-        </div>
-      </div>
-    );
-  };
+          
+          {/* Bottom Navigation for Quick Actions */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-40 safe-bottom">
+            <div className="flex justify-around">
+              <button 
+                onClick={() => router.push('/')}
+                className="flex flex-col items-center p-2"
+              >
+                <FiHome className="w-5 h-5 text-gray-600 mb-1" />
+                <span className="text-xs text-gray-600">Home</span>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/sell-now')}
+                className="flex flex-col items-center p-2"
+              >
+                <span className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center mb-1 font-bold">$</span>
+                <span className="text-xs text-gray-600">Sell</span>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/dashboard?section=wishlist')}
+                className="flex flex-col items-center p-2"
+              >
+                <FiHeart className="w-5 h-5 text-gray-600 mb-1" />
+                <span className="text-xs text-gray-600">Wishlist</span>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/cart')}
+                className="flex flex-col items-center p-2 relative"
+              >
+                <FiShoppingBag className="w-5 h-5 text-gray-600 mb-1" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+                <span className="text-xs text-gray-600">Cart</span>
+              </button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
+  }
 
-  // ✅ RENDER ACTIVE SECTION - UPDATED WITH BETTER PROFILE UI
-  const renderActiveSection = () => {
+  // ✅ RENDER MOBILE ACTIVE SECTION
+  const renderMobileActiveSection = () => {
     switch (activeSection) {
       case 'profile':
         return (
-          <div className="px-4 py-6">
-            <div className="flex justify-between items-center mb-6">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Profile</h2>
-                <p className="text-gray-600 text-sm">Manage your personal information</p>
+                <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
+                <p className="text-gray-600 text-xs">Manage your personal information</p>
               </div>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1"
               >
-                {isEditing ? (
-                  <>
-                    <FiX className="w-4 h-4" /> Cancel
-                  </>
-                ) : (
-                  <>
-                    <FiEdit className="w-4 h-4" /> Edit
-                  </>
-                )}
+                {isEditing ? <FiX className="w-3 h-3" /> : <FiEdit className="w-3 h-3" />}
+                {isEditing ? 'Cancel' : 'Edit'}
               </button>
             </div>
 
-            {/* Success/Error Messages */}
             {updateSuccess && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <FiCheckCircle className="w-5 h-5 text-green-600" />
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <FiCheckCircle className="w-4 h-4 text-green-600" />
                   <div>
-                    <p className="text-green-800 font-medium">Profile updated successfully!</p>
-                    <p className="text-green-700 text-sm">Your changes have been saved.</p>
+                    <p className="text-green-800 text-sm font-medium">Profile updated successfully!</p>
                   </div>
                 </div>
               </div>
             )}
 
             {updateError && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <FiAlertCircle className="w-5 h-5 text-red-600" />
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <FiAlertCircle className="w-4 h-4 text-red-600" />
                   <div>
-                    <p className="text-red-800 font-medium">Update failed</p>
-                    <p className="text-red-700 text-sm">{updateError}</p>
+                    <p className="text-red-800 text-sm font-medium">Update failed</p>
+                    <p className="text-red-700 text-xs">{updateError}</p>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="font-medium text-gray-900 mb-4">Basic Information</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Full Name</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Enter your full name"
-                      />
-                    ) : (
-                      <p className="text-gray-900 font-medium">{user?.name || 'Not provided'}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Email</label>
-                    <p className="text-gray-900 font-medium">{user?.email}</p>
-                    <p className="text-gray-500 text-xs mt-1">Email cannot be changed</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Phone Number</label>
-                    {isEditing ? (
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Enter phone number"
-                      />
-                    ) : (
-                      <p className="text-gray-900 font-medium">{user?.phone || 'Not provided'}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Address</label>
-                    {isEditing ? (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          value={formData.address.street}
-                          onChange={(e) => handleAddressChange('street', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                          placeholder="Street address"
-                        />
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="text"
-                            value={formData.address.city}
-                            onChange={(e) => handleAddressChange('city', e.target.value)}
-                            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                            placeholder="City"
-                          />
-                          <input
-                            type="text"
-                            value={formData.address.state}
-                            onChange={(e) => handleAddressChange('state', e.target.value)}
-                            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                            placeholder="State"
-                          />
-                        </div>
-                        <input
-                          type="text"
-                          value={formData.address.pincode}
-                          onChange={(e) => handleAddressChange('pincode', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                          placeholder="Pincode"
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-gray-900 font-medium">
-                        {formatAddress(user?.address) || 'Not provided'}
-                      </p>
-                    )}
-                  </div>
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Full Name</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-transparent text-sm"
+                      placeholder="Enter your full name"
+                    />
+                  ) : (
+                    <p className="text-gray-900 font-medium text-sm">{user?.name || 'Not provided'}</p>
+                  )}
                 </div>
 
-                {isEditing && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <button
-                      onClick={handleSaveProfile}
-                      disabled={isUpdatingProfile}
-                      className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isUpdatingProfile ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <FiSave className="w-4 h-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </button>
-                    <p className="text-gray-500 text-xs text-center mt-3">
-                      Make sure all information is correct before saving
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Email</label>
+                  <p className="text-gray-900 font-medium text-sm">{user?.email}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">Email cannot be changed</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Phone Number</label>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-transparent text-sm"
+                      placeholder="Enter phone number"
+                    />
+                  ) : (
+                    <p className="text-gray-900 font-medium text-sm">{user?.phone || 'Not provided'}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Address</label>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={formData.address.street}
+                        onChange={(e) => handleAddressChange('street', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-transparent text-sm"
+                        placeholder="Street address"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={formData.address.city}
+                          onChange={(e) => handleAddressChange('city', e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-transparent text-sm"
+                          placeholder="City"
+                        />
+                        <input
+                          type="text"
+                          value={formData.address.state}
+                          onChange={(e) => handleAddressChange('state', e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-transparent text-sm"
+                          placeholder="State"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.address.pincode}
+                        onChange={(e) => handleAddressChange('pincode', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-900 focus:border-transparent text-sm"
+                        placeholder="Pincode"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-gray-900 font-medium text-sm">
+                      {formatAddress(user?.address) || 'Not provided'}
                     </p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="font-medium text-gray-900 mb-4">Account Status</h3>
-                <div className="space-y-3">
+              {isEditing && (
+                <div className="pt-4 border-t border-gray-200">
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={isUpdatingProfile}
+                    className="w-full py-2.5 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isUpdatingProfile ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FiSave className="w-3 h-3" />
+                        Save Changes
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Account Info */}
+              <div className="pt-4 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">Account Info</h3>
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Role</span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    <span className="text-xs text-gray-600">Role</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       user?.role === 'seller' ? 'bg-blue-100 text-blue-800' :
                       user?.role === 'influencer' ? 'bg-purple-100 text-purple-800' :
                       'bg-gray-100 text-gray-800'
@@ -1447,23 +1238,21 @@ export default function Dashboard() {
                     </span>
                   </div>
                   
-                  {user?.role === 'seller' && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Verification</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        sellerStatus.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {sellerStatus.verified ? 'Verified' : 'Pending'}
-                      </span>
-                    </div>
-                  )}
-                  
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Member Since</span>
-                    <span className="text-gray-900 font-medium">
+                    <span className="text-xs text-gray-600">Member Since</span>
+                    <span className="text-gray-900 text-xs font-medium">
                       {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
                     </span>
                   </div>
+                  
+                  {user?.role === 'seller' && user?.username && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600">Username</span>
+                      <span className="text-gray-900 text-xs font-medium">
+                        {ensureJustbechoFormat(user.username)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1472,32 +1261,32 @@ export default function Dashboard() {
 
       case 'listings':
         return (
-          <div className="px-4 py-6">
-            <div className="flex justify-between items-center mb-6">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">My Listings</h2>
-                <p className="text-gray-600 text-sm">
+                <h2 className="text-lg font-semibold text-gray-900">My Listings</h2>
+                <p className="text-gray-600 text-xs">
                   {listings.length} item{listings.length !== 1 ? 's' : ''}
                 </p>
               </div>
               {user?.sellerVerified && (
                 <button
                   onClick={() => router.push('/sell-now')}
-                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm rounded-lg hover:from-green-700 hover:to-green-800 transition-colors font-medium flex items-center gap-2"
+                  className="px-3 py-1.5 bg-gradient-to-r from-green-600 to-green-700 text-white text-xs rounded-lg hover:from-green-700 hover:to-green-800 transition-colors font-medium flex items-center gap-1"
                 >
-                  <FiPackage className="w-4 h-4" />
+                  <FiPackage className="w-3 h-3" />
                   + Add Item
                 </button>
               )}
             </div>
 
-            {/* Mobile Filter Tabs */}
-            <div className="flex overflow-x-auto scrollbar-hide gap-2 mb-6">
+            {/* Filter Tabs */}
+            <div className="flex overflow-x-auto scrollbar-hide gap-2 mb-4 pb-1">
               {['all', 'active', 'sold', 'shipped', 'delivered'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setListingFilter(filter)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                     listingFilter === filter
                       ? filter === 'all' ? 'bg-gray-900 text-white' :
                         filter === 'active' ? 'bg-green-600 text-white' :
@@ -1516,12 +1305,12 @@ export default function Dashboard() {
             </div>
 
             {filteredListings.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiPackage className="w-8 h-8 text-gray-400" />
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <FiPackage className="w-6 h-6 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings found</h3>
-                <p className="text-gray-600 text-sm mb-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-1">No listings found</h3>
+                <p className="text-gray-600 text-xs mb-4">
                   {listingFilter === 'all' ? 'Start selling your items!' :
                    listingFilter === 'active' ? 'No active listings' :
                    listingFilter === 'sold' ? 'No sold items' :
@@ -1530,26 +1319,26 @@ export default function Dashboard() {
                 {user?.sellerVerified ? (
                   <button
                     onClick={() => router.push('/sell-now')}
-                    className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
+                    className="w-full py-2.5 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium text-sm"
                   >
                     Create Your First Listing
                   </button>
                 ) : (
                   <button 
                     onClick={() => router.push('/complete-profile?section=seller')}
-                    className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium"
+                    className="w-full py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium text-sm"
                   >
                     Become a Seller
                   </button>
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {filteredListings.map((item) => (
                   <div
                     key={item._id}
                     onClick={() => handleProductClick(item._id)}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-sm transition-shadow cursor-pointer"
                   >
                     <div className="relative aspect-square">
                       <img
@@ -1562,8 +1351,8 @@ export default function Dashboard() {
                       />
                       
                       {/* Status Badge */}
-                      <div className="absolute top-2 right-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      <div className="absolute top-1 right-1">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
                           item.status === 'active' 
                             ? 'bg-green-100 text-green-800' :
                           item.status === 'sold' && item.shippingStatus === 'shipped'
@@ -1578,20 +1367,20 @@ export default function Dashboard() {
                             ? 'Shipped' :
                            item.status === 'sold' && item.shippingStatus === 'delivered'
                             ? 'Delivered' :
-                           item.status?.toUpperCase()}
+                           item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
                         </span>
                       </div>
                     </div>
                     
-                    <div className="p-3">
-                      <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                    <div className="p-2">
+                      <h3 className="text-xs font-medium text-gray-900 mb-1 line-clamp-2 h-6">
                         {item.productName}
                       </h3>
-                      <p className="text-gray-900 font-semibold mb-2">
+                      <p className="text-gray-900 font-semibold text-sm mb-2">
                         ₹{item.finalPrice?.toLocaleString()}
                       </p>
                       
-                      <div className="flex gap-2">
+                      <div className="flex gap-1">
                         {item.status === 'active' && (
                           <>
                             <button 
@@ -1599,9 +1388,9 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 router.push(`/edit-listing/${item._id}`);
                               }}
-                              className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
+                              className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
                             >
-                              <FiEdit className="w-3 h-3" />
+                              <FiEdit className="w-2.5 h-2.5" />
                               Edit
                             </button>
                             <button 
@@ -1609,29 +1398,26 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 deleteListing(item._id);
                               }}
-                              className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
+                              className="flex-1 px-1.5 py-1 bg-red-600 text-white text-[10px] rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-0.5"
                             >
-                              <FiTrash2 className="w-3 h-3" />
+                              <FiTrash2 className="w-2.5 h-2.5" />
                               Delete
                             </button>
                           </>
                         )}
                         
-                        {/* ✅ FIXED: Only show tracking button for shipped items */}
                         {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
                               openLiveTracking(item.shippingDetails.awbNumber);
                             }}
-                            className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
+                            className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
                           >
-                            <FiTruck className="w-3 h-3" />
+                            <FiTruck className="w-2.5 h-2.5" />
                             Track
                           </button>
                         )}
-                        
-                        {/* ✅ REMOVED: Mark as Shipped and Mark as Delivered buttons - Nimbus handles it */}
                       </div>
                     </div>
                   </div>
@@ -1643,107 +1429,105 @@ export default function Dashboard() {
 
       case 'orders':
         return (
-          <div className="px-4 py-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">My Orders</h2>
-              <p className="text-gray-600 text-sm">
+          <div className="p-4">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">My Orders</h2>
+              <p className="text-gray-600 text-xs">
                 {orders.length} order{orders.length !== 1 ? 's' : ''} • Track your purchases
               </p>
             </div>
 
-            {/* Order Stats for Mobile */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-blue-600 mb-1">{orderStats.total}</div>
-                <div className="text-xs text-gray-600 uppercase">Total</div>
+            {/* Order Stats */}
+            <div className="grid grid-cols-4 gap-2 mb-4">
+              <div className="bg-gray-50 rounded-lg p-2 text-center">
+                <div className="text-sm font-semibold text-blue-600 mb-0.5">{orderStats.total}</div>
+                <div className="text-[10px] text-gray-600 uppercase">Total</div>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-yellow-600 mb-1">{orderStats.pending}</div>
-                <div className="text-xs text-gray-600 uppercase">Processing</div>
+              <div className="bg-gray-50 rounded-lg p-2 text-center">
+                <div className="text-sm font-semibold text-yellow-600 mb-0.5">{orderStats.pending}</div>
+                <div className="text-[10px] text-gray-600 uppercase">Processing</div>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-purple-600 mb-1">{orderStats.shipped}</div>
-                <div className="text-xs text-gray-600 uppercase">Shipped</div>
+              <div className="bg-gray-50 rounded-lg p-2 text-center">
+                <div className="text-sm font-semibold text-purple-600 mb-0.5">{orderStats.shipped}</div>
+                <div className="text-[10px] text-gray-600 uppercase">Shipped</div>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-green-600 mb-1">{orderStats.delivered}</div>
-                <div className="text-xs text-gray-600 uppercase">Delivered</div>
+              <div className="bg-gray-50 rounded-lg p-2 text-center">
+                <div className="text-sm font-semibold text-green-600 mb-0.5">{orderStats.delivered}</div>
+                <div className="text-[10px] text-gray-600 uppercase">Delivered</div>
               </div>
             </div>
 
             {orders.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiShoppingBag className="w-8 h-8 text-gray-400" />
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <FiShoppingBag className="w-6 h-6 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
-                <p className="text-gray-600 text-sm mb-6">Your order history will appear here</p>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">No orders yet</h3>
+                <p className="text-gray-600 text-xs mb-4">Your order history will appear here</p>
                 <Link
                   href="/products"
-                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium block text-center"
+                  className="w-full py-2.5 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium text-sm block text-center"
                 >
                   Start Shopping
                 </Link>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {orders.map((order) => {
                   const orderTracking = shippingTracking[order._id];
                   const shipments = orderTracking?.nimbuspostShipments || order.nimbuspostShipments || [];
                   const statusBadge = getOrderStatusBadge(order.status);
                   
                   return (
-                    <div key={order._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                    <div key={order._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                       {/* Order Header */}
-                      <div className="p-4 border-b border-gray-200">
+                      <div className="p-3 border-b border-gray-100">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <FiShoppingBag className="w-4 h-4 text-gray-400" />
-                              <p className="text-sm font-medium text-gray-900">
-                                Order #{order._id?.toString().substring(0, 8).toUpperCase() || 'N/A'}
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <FiShoppingBag className="w-3.5 h-3.5 text-gray-400" />
+                              <p className="text-xs font-medium text-gray-900">
+                                Order #{order._id?.toString().substring(0, 6).toUpperCase() || 'N/A'}
                               </p>
                             </div>
-                            <p className="text-xs text-gray-500">
-                              {formatDateTime(order.createdAt)}
+                            <p className="text-[10px] text-gray-500">
+                              {formatDate(order.createdAt)}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             {statusBadge.icon}
-                            <span className={`px-2 py-1 text-xs rounded-full ${statusBadge.color}`}>
+                            <span className={`px-1.5 py-0.5 text-[10px] rounded-full ${statusBadge.color}`}>
                               {statusBadge.label}
                             </span>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-center mt-3">
+                        <div className="flex justify-between items-center mt-2">
                           <div>
-                            <p className="text-lg font-semibold text-gray-900">
+                            <p className="text-sm font-semibold text-gray-900">
                               ₹{order.totalAmount?.toLocaleString() || '0'}
                             </p>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-[10px] text-gray-600">
                               {order.items?.length || 0} item{order.items?.length !== 1 ? 's' : ''}
                             </p>
                           </div>
-                          <FiArrowRight className="w-5 h-5 text-gray-400" />
                         </div>
                       </div>
                       
-                      {/* ✅ IMPROVED: Tracking Section */}
+                      {/* Tracking Section */}
                       {shipments.length > 0 && (
-                        <div className="p-4 border-b border-gray-200 bg-gray-50">
-                          <div className="flex items-center justify-between mb-3">
-                            <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                              <FiTruck className="w-4 h-4 text-blue-600" /> 
+                        <div className="p-3 border-b border-gray-100 bg-gray-50">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium text-gray-900 text-xs flex items-center gap-1.5">
+                              <FiTruck className="w-3.5 h-3.5 text-blue-600" /> 
                               <span>Shipment Tracking</span>
                             </h4>
                             <button 
                               onClick={() => fetchShippingTracking(order._id, true)}
-                              className="p-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                              className="p-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                               disabled={trackingLoading[order._id]}
-                              title="Refresh tracking"
                             >
-                              <FiRefreshCw className={`w-3.5 h-3.5 ${trackingLoading[order._id] ? 'animate-spin' : ''}`} />
+                              <FiRefreshCw className={`w-3 h-3 ${trackingLoading[order._id] ? 'animate-spin' : ''}`} />
                             </button>
                           </div>
                           
@@ -1751,52 +1535,36 @@ export default function Dashboard() {
                             {shipments.map((shipment, idx) => {
                               const status = getShipmentStatusBadge(shipment.status);
                               return (
-                                <div key={idx} className="bg-white border border-gray-200 rounded-lg p-3">
+                                <div key={idx} className="bg-white border border-gray-200 rounded p-2">
                                   <div className="flex justify-between items-start">
                                     <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <span className={`px-2 py-1 rounded text-xs font-medium ${status.color}`}>
+                                      <div className="flex items-center gap-1.5 mb-1.5">
+                                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${status.color}`}>
                                           {status.label}
                                         </span>
                                         {shipment.courierName && (
-                                          <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                          <span className="text-[10px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
                                             {shipment.courierName}
                                           </span>
                                         )}
                                       </div>
                                       
-                                      <div className="space-y-1">
-                                        <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                                          <span className="text-gray-600">AWB:</span>
-                                          <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">
-                                            {shipment.awbNumber}
+                                      <div className="space-y-0.5">
+                                        <p className="text-xs font-medium text-gray-900 flex items-center gap-1.5">
+                                          <span className="text-gray-600 text-[10px]">AWB:</span>
+                                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px]">
+                                            {shipment.awbNumber?.substring(0, 12)}...
                                           </code>
-                                        </p>
-                                        
-                                        <p className="text-xs text-gray-600">
-                                          {shipment.shipmentType === 'seller_to_warehouse' ? (
-                                            <span className="flex items-center gap-1">
-                                              <FiPackageIcon className="w-3 h-3" /> Seller → Warehouse
-                                            </span>
-                                          ) : shipment.shipmentType === 'warehouse_to_buyer' ? (
-                                            <span className="flex items-center gap-1">
-                                              <FiTruckIcon className="w-3 h-3" /> Warehouse → You
-                                            </span>
-                                          ) : (
-                                            <span className="flex items-center gap-1">
-                                              <FiTruck className="w-3 h-3" /> Direct Delivery
-                                            </span>
-                                          )}
                                         </p>
                                       </div>
                                     </div>
                                     
                                     <button
                                       onClick={() => openLiveTracking(shipment.awbNumber)}
-                                      className="ml-3 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                                      className="ml-2 px-2 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
                                       disabled={trackingLoading[order._id]}
                                     >
-                                      <FiExternalLink className="w-3 h-3" /> Live Track
+                                      <FiExternalLink className="w-2.5 h-2.5" /> Track
                                     </button>
                                   </div>
                                 </div>
@@ -1807,14 +1575,14 @@ export default function Dashboard() {
                       )}
                       
                       {/* Order Actions */}
-                      <div className="p-4">
+                      <div className="p-3">
                         <div className="flex gap-2">
                           <button 
                             onClick={() => router.push(`/orders/${order._id}`)}
-                            className="flex-1 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+                            className="flex-1 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors font-medium text-xs flex items-center justify-center gap-1.5"
                           >
-                            <FiEye className="w-4 h-4" />
-                            View Details
+                            <FiEye className="w-3 h-3" />
+                            Details
                           </button>
                           
                           {shipments.length > 0 && (
@@ -1825,32 +1593,13 @@ export default function Dashboard() {
                                   openLiveTracking(awbNumber);
                                 }
                               }}
-                              className="flex-1 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+                              className="flex-1 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors font-medium text-xs flex items-center justify-center gap-1.5"
                             >
-                              <FiTruck className="w-4 h-4" />
-                              Track Order
+                              <FiTruck className="w-3 h-3" />
+                              Track
                             </button>
                           )}
                         </div>
-                        
-                        {/* Quick Order Info */}
-                        {order.items?.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <p className="text-xs text-gray-600 mb-1">Items:</p>
-                            <div className="flex flex-wrap gap-1">
-                              {order.items.slice(0, 3).map((item, idx) => (
-                                <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                  {item.productName || `Item ${idx + 1}`}
-                                </span>
-                              ))}
-                              {order.items.length > 3 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                  +{order.items.length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   );
@@ -1862,30 +1611,30 @@ export default function Dashboard() {
 
       case 'wishlist':
         return (
-          <div className="px-4 py-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">My Wishlist</h2>
-              <p className="text-gray-600 text-sm">
+          <div className="p-4">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">My Wishlist</h2>
+              <p className="text-gray-600 text-xs">
                 {wishlist.length} item{wishlist.length !== 1 ? 's' : ''} saved
               </p>
             </div>
 
             {wishlist.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiHeart className="w-8 h-8 text-gray-400" />
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <FiHeart className="w-6 h-6 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
-                <p className="text-gray-600 text-sm mb-6">Start adding items you love to your wishlist!</p>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Your wishlist is empty</h3>
+                <p className="text-gray-600 text-xs mb-4">Start adding items you love to your wishlist!</p>
                 <Link
                   href="/products"
-                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium block text-center"
+                  className="w-full py-2.5 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium text-sm block text-center"
                 >
                   Browse Products
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {wishlist.map((item) => {
                   const product = item.product || item;
                   const productId = product._id || item._id;
@@ -1896,7 +1645,7 @@ export default function Dashboard() {
                   return (
                     <div
                       key={productId}
-                      className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                      className="bg-white rounded-lg border border-gray-200 overflow-hidden"
                     >
                       <div 
                         onClick={() => handleProductClick(productId)}
@@ -1916,33 +1665,31 @@ export default function Dashboard() {
                             e.stopPropagation();
                             removeFromWishlist(productId);
                           }}
-                          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-500 shadow-lg hover:bg-red-50 transition-colors"
+                          className="absolute top-1 right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center text-red-500 shadow hover:bg-red-50 transition-colors"
                           title="Remove from wishlist"
                         >
-                          <FiHeart className="w-4 h-4 fill-current" />
+                          <FiHeart className="w-3 h-3 fill-current" />
                         </button>
                       </div>
                       
-                      <div className="p-3">
+                      <div className="p-2">
                         <h3 
                           onClick={() => handleProductClick(productId)}
-                          className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 cursor-pointer hover:text-gray-700"
+                          className="text-xs font-medium text-gray-900 mb-1 line-clamp-2 h-6 cursor-pointer hover:text-gray-700"
                         >
                           {productName}
                         </h3>
-                        <p className="text-gray-900 font-semibold mb-3">
+                        <p className="text-gray-900 font-semibold text-sm mb-2">
                           ₹{productPrice?.toLocaleString()}
                         </p>
                         
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={() => handleProductClick(productId)}
-                            className="flex-1 px-2 py-1 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors flex items-center justify-center gap-1"
-                          >
-                            <FiShoppingBag className="w-3 h-3" />
-                            Buy Now
-                          </button>
-                        </div>
+                        <button 
+                          onClick={() => handleProductClick(productId)}
+                          className="w-full py-1.5 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors flex items-center justify-center gap-1"
+                        >
+                          <FiShoppingBag className="w-2.5 h-2.5" />
+                          Buy Now
+                        </button>
                       </div>
                     </div>
                   );
@@ -1954,44 +1701,26 @@ export default function Dashboard() {
 
       default:
         return (
-          <div className="px-4 py-6">
-            <div className="text-center py-12">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a section</h3>
-              <p className="text-gray-600 text-sm">Choose a section to view your dashboard content</p>
+          <div className="p-4">
+            <div className="text-center py-8">
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Select a section</h3>
+              <p className="text-gray-600 text-xs">Choose a section to view your dashboard content</p>
             </div>
           </div>
         );
     }
   }
 
-  // ✅ MAIN RETURN - MOBILE VERSION
-  if (isMobile) {
-    return (
-      <>
-        <Header />
-        {renderMobileHeader()}
-        {renderSellerStatusBanner()}
-        {renderMobileStats()}
-        {activeSection === 'orders' && renderMobileOrderStats()}
-        {renderMobileNavTabs()}
-        {renderActiveSection()}
-        <Footer />
-      </>
-    )
-  }
-
-  // ✅ DESKTOP VERSION
+  // ✅ DESKTOP VERSION - WIDER LAYOUT
   return (
     <>
       <Header />
       
       <main className="min-h-screen bg-gray-50 pt-32 pb-16">
-        {/* Seller Status Banner */}
         {renderSellerStatusBanner()}
         
-        {/* Desktop Header */}
         <section className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <div className="max-w-screen-2xl mx-auto px-8 py-8">
             <div className="text-center">
               <h1 className="text-3xl sm:text-4xl font-light tracking-widest uppercase text-gray-900 mb-3">
                 My Dashboard
@@ -2003,45 +1732,43 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Desktop Stats */}
         <section className="bg-gray-50 border-b border-gray-200 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-gray-900 mb-1">{stats.totalListings}</div>
+          <div className="max-w-screen-2xl mx-auto px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                <div className="text-2xl font-light text-gray-900 mb-2">{stats.totalListings}</div>
                 <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Total Listings</div>
               </div>
               
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-green-600 mb-1">{stats.activeListings}</div>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                <div className="text-2xl font-light text-green-600 mb-2">{stats.activeListings}</div>
                 <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Active Listings</div>
               </div>
               
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-red-600 mb-1">{stats.soldListings}</div>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                <div className="text-2xl font-light text-red-600 mb-2">{stats.soldListings}</div>
                 <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Sold Listings</div>
               </div>
               
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-yellow-600 mb-1">{stats.readyForShipment}</div>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                <div className="text-2xl font-light text-yellow-600 mb-2">{stats.readyForShipment}</div>
                 <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Ready to Ship</div>
               </div>
               
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-xl font-light text-blue-600 mb-1">{stats.totalOrders}</div>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                <div className="text-2xl font-light text-blue-600 mb-2">{stats.totalOrders}</div>
                 <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Orders</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Desktop Content */}
         <section className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex flex-col lg:flex-row gap-6">
+          <div className="max-w-screen-2xl mx-auto px-8">
+            <div className="flex flex-col lg:flex-row gap-8">
               {/* Sidebar */}
               <div className="lg:w-1/4">
-                <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-40">
+                <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-40 shadow-sm">
                   <div className="flex items-center space-x-3 mb-6 pb-6 border-b border-gray-200">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-lg">
                       {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
@@ -2069,7 +1796,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <nav className="space-y-2">
+                  <nav className="space-y-3">
                     {menuItems.map((item) => (
                       <button
                         key={item.id}
@@ -2125,10 +1852,10 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Main Content */}
-              <div className="lg:w-3/4">
-                <div className="bg-white rounded-xl border border-gray-200 min-h-[600px]">
-                  <div className="p-6">
+              {/* Main Content - Wider */}
+              <div className="lg:w-[85%]">
+                <div className="bg-white rounded-xl border border-gray-200 min-h-[600px] w-full shadow-sm">
+                  <div className="p-8">
                     {/* Success/Error Messages for Desktop */}
                     {updateSuccess && (
                       <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -2155,7 +1882,7 @@ export default function Dashboard() {
                     )}
                     
                     {/* Desktop render active section */}
-                    {renderActiveSection()}
+                    {renderDesktopActiveSection()}
                   </div>
                 </div>
               </div>
@@ -2168,3 +1895,6 @@ export default function Dashboard() {
     </>
   )
 }
+
+// ✅ Add this helper function for cart count
+const cartCount = 0; // You need to implement this based on your cart logic
