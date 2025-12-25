@@ -42,8 +42,21 @@ export default function CartPage() {
   useEffect(() => {
     if (cart && cart.items && cart.items.length > 0) {
       fetchCheckoutTotals()
+    } else {
+      // Agar cart empty hai toh checkout totals reset karo
+      setCheckoutTotals(null)
     }
   }, [cart])
+
+  // Debug useEffect - GST value check karne ke liye
+  useEffect(() => {
+    console.log("🛒 Cart data:", cart)
+    console.log("💰 Checkout totals from backend:", checkoutTotals)
+    if (checkoutTotals) {
+      console.log("🧮 GST value in totals:", checkoutTotals.gst)
+      console.log("🧾 Complete totals object:", checkoutTotals)
+    }
+  }, [cart, checkoutTotals])
 
   const fetchUserData = async () => {
     try {
@@ -103,6 +116,8 @@ export default function CartPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
+      console.log("📊 Fetching checkout totals from backend...")
+      
       const response = await fetch('https://just-becho-backend.vercel.app/api/cart/checkout-totals', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -111,11 +126,20 @@ export default function CartPage() {
       })
 
       const data = await response.json()
+      console.log("📦 Backend totals response:", data)
+      
       if (data.success) {
+        console.log("✅ Checkout totals fetched successfully")
+        console.log("- GST value:", data.totals?.gst)
+        console.log("- Complete totals:", data.totals)
         setCheckoutTotals(data.totals)
+      } else {
+        console.error('❌ Failed to fetch checkout totals:', data.message)
+        setCheckoutTotals(null)
       }
     } catch (error) {
       console.error('Error fetching checkout totals:', error)
+      setCheckoutTotals(null)
     }
   }
 
@@ -232,18 +256,20 @@ export default function CartPage() {
 
   // Calculate frontend totals (matching backend logic)
   const calculateFrontendTotals = () => {
-    if (!cart) return {
-      subtotal: 0,
-      bechoProtectTotal: 0,
-      gst: 0,
-      shipping: SHIPPING_CHARGE,
-      grandTotal: 0
+    if (!cart || cart.items.length === 0) {
+      return {
+        subtotal: 0,
+        bechoProtectTotal: 0,
+        gst: 0,
+        shipping: SHIPPING_CHARGE,
+        grandTotal: SHIPPING_CHARGE
+      }
     }
 
     const subtotal = cart.subtotal || 0
     const bechoProtectTotal = cart.bechoProtectTotal || 0
     
-    // Hidden platform fee calculation
+    // Hidden platform fee calculation (exactly same as backend)
     let platformFeePercentage = 0
     if (subtotal <= 2000) {
       platformFeePercentage = 30
@@ -258,8 +284,15 @@ export default function CartPage() {
     }
     
     const platformFee = Math.round((subtotal * platformFeePercentage) / 100)
-    const gst = Math.round(platformFee * 0.18)
+    const gst = Math.round(platformFee * 0.18) // 18% GST on platform fee
     const grandTotal = subtotal + bechoProtectTotal + gst + SHIPPING_CHARGE
+    
+    console.log("🧮 Frontend calculation:")
+    console.log("- Subtotal:", subtotal)
+    console.log("- Platform Fee %:", platformFeePercentage)
+    console.log("- Platform Fee:", platformFee)
+    console.log("- GST:", gst)
+    console.log("- Grand Total:", grandTotal)
     
     return {
       subtotal,
@@ -271,9 +304,19 @@ export default function CartPage() {
   }
 
   // Use backend totals if available, otherwise use frontend calculation
-  const displayTotals = checkoutTotals || calculateFrontendTotals()
+  const getDisplayTotals = () => {
+    if (checkoutTotals) {
+      console.log("📊 Using backend totals for display")
+      return checkoutTotals
+    } else {
+      console.log("📊 Using frontend calculated totals")
+      return calculateFrontendTotals()
+    }
+  }
 
-  // ✅ RAZORPAY CHECKOUT FUNCTION - UPDATED REDIRECT
+  const displayTotals = getDisplayTotals()
+
+  // ✅ RAZORPAY CHECKOUT FUNCTION
   const handleCheckout = async () => {
     if (!user) {
       alert('Please login to checkout')
@@ -307,6 +350,7 @@ export default function CartPage() {
 
       console.log('🚀 Starting checkout process...')
       console.log('📊 Total amount:', totals.grandTotal)
+      console.log('💳 GST included:', totals.gst)
 
       // Step 1: Create order in backend
       const orderResponse = await fetch('https://just-becho-backend.vercel.app/api/razorpay/create-order', {
@@ -712,7 +756,7 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* ✅ RIGHT SECTION - CHECKOUT (UPDATED - NO PLATFORM FEE DISPLAY) */}
+              {/* ✅ RIGHT SECTION - CHECKOUT (FIXED GST DISPLAY) */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-32">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
@@ -741,17 +785,19 @@ export default function CartPage() {
                         <FiTruck className="w-3 h-3 text-gray-500" />
                         <span className="text-gray-600">Shipping</span>
                       </div>
-                      <span className="text-gray-900"> ₹{SHIPPING_CHARGE.toLocaleString()}</span>
+                      <span className="text-gray-900">₹{SHIPPING_CHARGE.toLocaleString()}</span>
                     </div>
                     
-                    {/* GST (18% on hidden platform fee) */}
+                    {/* ✅ FIXED: GST Display */}
                     <div className="flex justify-between text-sm">
                       <div className="flex items-center gap-1">
                         <FiCreditCard className="w-3 h-3 text-gray-500" />
                         <span className="text-gray-600">GST</span>
                         <span className="text-xs text-gray-500">(18%)</span>
                       </div>
-                      <span className="text-gray-900"> ₹{displayTotals.gst.toLocaleString()}</span>
+                      <span className="text-gray-900">
+                        ₹{displayTotals?.gst?.toLocaleString() || '0'}
+                      </span>
                     </div>
                     
                     {/* Divider */}
@@ -759,7 +805,7 @@ export default function CartPage() {
                       <div className="flex justify-between text-lg font-bold">
                         <span className="text-gray-900">Total Amount</span>
                         <span className="text-gray-900">
-                          ₹{displayTotals.grandTotal.toLocaleString()}
+                          ₹{displayTotals?.grandTotal?.toLocaleString() || '0'}
                         </span>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
@@ -768,7 +814,7 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  {/* ✅ CHECKOT BUTTON */}
+                  {/* ✅ CHECKOUT BUTTON */}
                   <button
                     onClick={handleCheckout}
                     disabled={checkoutLoading || !user?.profileCompleted || !user?.address || !user?.phone}
