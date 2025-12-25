@@ -12,7 +12,7 @@ export async function generateStaticParams() {
     { category: 'perfumes' },
     { category: 'toys' },
     { category: 'kids-fashion' },
-    { category: 'Influencer' }
+    { category: 'influencer' } // ✅ CHANGED TO LOWERCASE
   ]
 }
 
@@ -267,23 +267,23 @@ function getCategoryConfig(categorySlug) {
       apiSlug: 'Kids',
       seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
     },
-    'Influencer': {
+    'influencer': { // ✅ CHANGED TO LOWERCASE
       title: "INFLUENCER ONLY",
-      subtitle: 'Adorable luxury Influencer fashion',
+      subtitle: 'Exclusive influencer collections and collaborations',
       banner: '/banners/influencer.jpeg',
       metaTitle: 'Influencer Fashion | Designer Influencer Clothes',
       metaDescription: 'Authentic pre-loved luxury fashion for influencers. Premium brands for influencers.',
       whyTitle: "WHY SHOP INFLUENCER'S ONLY AT JUST BECHO",
       features: [ 
         {
-          icon: '🛡️',
-          title: 'SAFETY GUARANTEED',
-          description: 'Every kids item verified for safety and quality standards'
+          icon: '⭐',
+          title: 'EXCLUSIVE COLLECTIONS',
+          description: 'Limited edition pieces from top influencers'
         },
         {
           icon: '💎',
-          title: 'GENTLY USED',
-          description: 'Only gently used kids fashion items in perfect condition'
+          title: 'AUTHENTICITY GUARANTEED',
+          description: 'Every item verified for quality and authenticity'
         },
         {
           icon: '🚚',
@@ -296,7 +296,8 @@ function getCategoryConfig(categorySlug) {
     }
   }
 
-  return configs[categorySlug] || getDefaultConfig(categorySlug)
+  // ✅ APPLY THE CRITICAL FIX HERE TOO
+  return configs[categorySlug.toLowerCase()] || getDefaultConfig(categorySlug)
 }
 
 // ✅ Default config for unknown categories
@@ -339,7 +340,7 @@ function getDefaultConfig(categorySlug) {
 async function fetchCategoryProducts(apiSlug, sortBy = 'newest') {
   try {
     // ✅ CORRECT API ENDPOINT: Use /api/products with category parameter
-const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(apiSlug)}&sort=${sortBy}&limit=50`
+    const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(apiSlug)}&sort=${sortBy}&limit=50`
     
     console.log('📡 [SERVER] Fetching products from:', apiUrl)
     

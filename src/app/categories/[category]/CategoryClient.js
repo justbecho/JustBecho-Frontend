@@ -227,36 +227,37 @@ const getCategoryConfig = (categorySlug) => {
             apiSlug: 'Kids',
             seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
         },
-    'Influencer': {
-      title: "INFLUENCER ONLY",
-      subtitle: 'Adorable luxury Influencer fashion',
-      banner: '/banners/influencer.jpeg',
-      metaTitle: 'Influencer Fashion | Designer Influencer Clothes',
-      metaDescription: 'Authentic pre-loved luxury fashion for influencers. Premium brands for influencers.',
-      whyTitle: "WHY SHOP INFLUENCER'S ONLY AT JUST BECHO",
-      features: [ 
-        {
-          icon: '🛡️',
-          title: 'SAFETY GUARANTEED',
-          description: 'Every kids item verified for safety and quality standards'
-        },
-        {
-          icon: '💎',
-          title: 'GENTLY USED',
-          description: 'Only gently used kids fashion items in perfect condition'
-        },
-        {
-          icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1499'
+        'influencer': { // ✅ CHANGED TO LOWERCASE
+            title: "INFLUENCER ONLY",
+            subtitle: 'Exclusive influencer collections and collaborations',
+            banner: '/banners/influencer.jpeg',
+            metaTitle: 'Influencer Fashion | Designer Influencer Clothes',
+            metaDescription: 'Authentic pre-loved luxury fashion for influencers. Premium brands for influencers.',
+            whyTitle: "WHY SHOP INFLUENCER'S ONLY AT JUST BECHO",
+            features: [ 
+                {
+                    icon: '⭐',
+                    title: 'EXCLUSIVE COLLECTIONS',
+                    description: 'Limited edition pieces from top influencers'
+                },
+                {
+                    icon: '💎',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every item verified for quality and authenticity'
+                },
+                {
+                    icon: '🚚',
+                    title: 'FREE SHIPPING',
+                    description: 'Free shipping on all orders above ₹1499'
+                }
+            ],
+            apiSlug: 'influencer',
+            seoKeywords: ['influencer fashion', 'influencer', 'designer influencer', 'pre-loved influencer']
         }
-      ],
-      apiSlug: 'influencer',
-      seoKeywords: ['influencer fashion', 'influencer', 'designer influencer', 'pre-loved influencer']
-    }
     }
 
-    return configs[categorySlug] || getDefaultConfig(categorySlug)
+    // ✅ Apply lowercase normalization
+    return configs[categorySlug.toLowerCase()] || getDefaultConfig(categorySlug)
 }
 
 // ✅ Default Config Function
