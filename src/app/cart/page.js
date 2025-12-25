@@ -538,7 +538,7 @@ export default function CartPage() {
                         </p>
                       </div>
                       <Link 
-                        href="/profile" 
+                        href="/dashboard?section=profile" 
                         className="ml-auto text-sm text-blue-600 hover:text-blue-800"
                       >
                         Update Profile
