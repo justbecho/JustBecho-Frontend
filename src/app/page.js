@@ -174,11 +174,14 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ UPDATED: PROPER INFINITE MARQUEE WITHOUT GLITCH
+  // ✅ BRAND MARQUEE CONFIGURATION
+  const BRAND_MARQUEE_SPEED = 50; // Slow speed (previously faster)
+  const [isMarqueePaused, setIsMarqueePaused] = useState(false);
+
+  // ✅ Create marquee brands with proper animation
   const createInfiniteMarquee = (brands) => {
     if (!brands || brands.length === 0) return [];
-    // Create enough duplicates for seamless transition
-    return [...brands, ...brands, ...brands, ...brands];
+    return [...brands, ...brands, ...brands];
   };
 
   // ✅ Carousel slides from categories
@@ -623,7 +626,7 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ UPDATED: Brand logo component - SINGLE MARQUEE ONLY
+  // ✅ UPDATED: Brand logo component
   const BrandLogo = ({ brand, index, categoryName }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
@@ -664,13 +667,76 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: SINGLE INFINITE Brand Marquee Component (NO DUPLICATES)
+  // ✅ UPDATED: Brand Marquee Component with SLOW SPEED and HOVER PAUSE
   const InfiniteBrandMarquee = ({ brands, categoryName }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
     
     return (
-      <div className="marquee-container w-full overflow-hidden py-4 sm:py-6">
-        <div className="marquee-desktop whitespace-nowrap">
+      <div 
+        className="marquee-container w-full overflow-hidden py-4 sm:py-6"
+        onMouseEnter={() => setIsMarqueePaused(true)}
+        onMouseLeave={() => setIsMarqueePaused(false)}
+      >
+        <style jsx>{`
+          @keyframes marquee {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-33.33%);
+            }
+          }
+          
+          .marquee-seamless {
+            display: flex;
+            animation: marquee ${BRAND_MARQUEE_SPEED}s linear infinite;
+            animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
+            will-change: transform;
+          }
+          
+          .marquee-seamless:hover {
+            animation-play-state: paused;
+          }
+          
+          @keyframes marquee-mobile {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
+          }
+          
+          .marquee-seamless-mobile {
+            display: flex;
+            animation: marquee-mobile ${BRAND_MARQUEE_SPEED * 0.8}s linear infinite;
+            animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
+            will-change: transform;
+          }
+          
+          .marquee-seamless-mobile:hover {
+            animation-play-state: paused;
+          }
+          
+          .marquee-desktop {
+            display: none;
+          }
+          
+          .marquee-mobile {
+            display: block;
+          }
+          
+          @media (min-width: 768px) {
+            .marquee-desktop {
+              display: block;
+            }
+            .marquee-mobile {
+              display: none;
+            }
+          }
+        `}</style>
+        
+        <div className="marquee-desktop">
           <div className="marquee-seamless">
             {infiniteBrands.map((brand, index) => (
               <BrandLogo 
@@ -683,7 +749,7 @@ function HomeContent() {
           </div>
         </div>
         
-        <div className="marquee-mobile whitespace-nowrap">
+        <div className="marquee-mobile">
           <div className="marquee-seamless-mobile">
             {infiniteBrands.map((brand, index) => (
               <BrandLogo 

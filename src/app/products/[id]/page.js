@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - MOBILE RESPONSIVE VERSION
+// app/products/[id]/page.js - COMPLETE UPDATED VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -410,10 +410,10 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-white pt-20 md:pt-40">
+        <main className="min-h-screen bg-white pt-40">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
             <div className="animate-pulse">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <div className="space-y-4">
                   <div className="bg-gray-200 aspect-square rounded-lg"></div>
                 </div>
@@ -434,7 +434,7 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-white pt-20 md:pt-40">
+        <main className="min-h-screen bg-white pt-40">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-12 text-center">
             <h1 className="text-xl font-light text-gray-900">Product not found</h1>
             <p className="text-gray-600 mb-4">The product you're looking for doesn't exist or may have been removed.</p>
@@ -456,11 +456,11 @@ export default function ProductPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white pt-20 md:pt-40">
-        {/* Breadcrumb - Mobile Optimized */}
+      <main className="min-h-screen bg-white pt-40">
+        {/* Breadcrumb */}
         <section className="border-b border-gray-200">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-3 overflow-x-auto">
-            <nav className="flex space-x-2 text-xs font-light text-gray-600 whitespace-nowrap min-w-max">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-3">
+            <nav className="flex space-x-2 text-xs font-light text-gray-600">
               <Link href="/" className="hover:text-gray-900">Home</Link>
               <span>/</span>
               <Link href={`/categories/${product.category?.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-gray-900 capitalize">
@@ -471,21 +471,21 @@ export default function ProductPage() {
                 {product.brand}
               </Link>
               <span>/</span>
-              <span className="text-gray-900 truncate max-w-[100px] md:max-w-none">{product.productName}</span>
+              <span className="text-gray-900">{product.productName}</span>
             </nav>
           </div>
         </section>
 
         {/* Product Section */}
-        <section className="py-6 md:py-8">
+        <section className="py-8">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-8 md:gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-12">
               
               {/* Product Images - Left side */}
-              <div className="space-y-4 md:space-y-6">
+              <div className="space-y-6">
                 {/* Main Image */}
                 <div className="flex-1">
-                  <div className="aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center max-w-full md:max-w-[650px] mx-auto">
+                  <div className="aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center max-w-[650px] mx-auto">
                     {product.images && product.images[selectedImage]?.url ? (
                       <img
                         src={product.images[selectedImage].url}
@@ -498,13 +498,13 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                {/* Thumbnails - Mobile Horizontal Scroll */}
-                <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+                {/* Thumbnails */}
+                <div className="flex justify-center gap-4">
                   {product.images && product.images.slice(0, 4).map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg border-2 transition-all duration-200 ${
+                      className={`w-20 h-20 rounded-lg border-2 transition-all duration-200 ${
                         selectedImage === index ? 'border-gray-900' : 'border-gray-300'
                       } bg-gray-50 flex items-center justify-center hover:border-gray-600`}
                     >
@@ -523,38 +523,38 @@ export default function ProductPage() {
               </div>
 
               {/* Product Info - Right side */}
-              <div className="space-y-4 md:space-y-6 max-w-full md:max-w-[550px]">
+              <div className="space-y-6 max-w-[550px]">
                 {/* Product Name */}
                 <div className="space-y-1">
-                  <h1 className="text-gray-900 text-base md:text-lg font-light tracking-widest uppercase leading-tight">
+                  <h1 className="text-gray-900 text-lg font-light tracking-widest uppercase leading-tight">
                     {product.productName}
                   </h1>
-                  <p className="text-gray-600 text-xs md:text-sm font-light uppercase">
+                  <p className="text-gray-600 text-sm font-light uppercase">
                     {product.brand}
                   </p>
                 </div>
 
                 {/* Price */}
                 <div className="space-y-1">
-                  <span className="text-gray-900 text-lg md:text-xl font-light">₹{product.finalPrice?.toLocaleString()}</span>
+                  <span className="text-gray-900 text-xl font-light">₹{product.finalPrice?.toLocaleString()}</span>
                   {product.originalPrice && product.originalPrice > product.finalPrice && (
-                    <p className="text-gray-500 text-xs md:text-sm line-through">
+                    <p className="text-gray-500 text-sm line-through">
                       ₹{product.originalPrice.toLocaleString()}
                     </p>
                   )}
                   <p className="text-gray-600 text-xs">Seller's Price | GST calculated at checkout</p>
                 </div>
 
-                {/* ✅ BECHO PROTECT SECTION - Mobile Optimized */}
+                {/* ✅ BECHO PROTECT SECTION */}
                 <div className="relative">
-                  <div className={`border ${isBechoProtectSelected ? 'border-black' : 'border-gray-300'} rounded-lg p-3 md:p-4 bg-white`}>
+                  <div className={`border ${isBechoProtectSelected ? 'border-black' : 'border-gray-300'} rounded-lg p-4 bg-white`}>
                     {/* First Row: Checkbox + Main Title + Price */}
-                    <div className="flex items-start md:items-center justify-between mb-2 md:mb-3">
+                    <div className="flex items-center justify-between mb-3">
                       {/* Left side: Checkbox and Title */}
-                      <div className="flex items-start md:items-center gap-2 md:gap-3 flex-1 mr-2">
-                        <label className="relative cursor-pointer flex items-start md:items-center gap-2 md:gap-3">
+                      <div className="flex items-center gap-3">
+                        <label className="relative cursor-pointer flex items-center gap-3">
                           {/* Custom Checkbox */}
-                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all duration-200 mt-0.5 md:mt-0
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all duration-200
                             ${isBechoProtectSelected 
                               ? 'border-black bg-black' 
                               : 'border-gray-400 bg-white hover:border-gray-600'
@@ -575,8 +575,8 @@ export default function ProductPage() {
                           />
                           
                           {/* Title Text */}
-                          <div className="flex-1">
-                            <span className="text-gray-900 font-bold text-xs md:text-sm">
+                          <div>
+                            <span className="text-gray-900 font-bold text-sm">
                               Authenticity Guaranteed with Becho Protect
                             </span>
                           </div>
@@ -584,8 +584,8 @@ export default function ProductPage() {
                       </div>
                       
                       {/* Right side: Price */}
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-gray-900 font-bold text-lg md:text-xl">₹{bechoProtectPrice}</p>
+                      <div className="text-right">
+                        <p className="text-gray-900 font-bold text-xl">₹{bechoProtectPrice}</p>
                       </div>
                     </div>
                     
@@ -603,14 +603,14 @@ export default function ProductPage() {
                     
                     {/* Warning message if unchecked */}
                     {showWarning && (
-                      <div className="mt-2 md:mt-3 p-2 md:p-3 bg-red-50 border border-red-200 rounded">
+                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
                         <div className="flex items-start gap-2">
-                          <span className="text-red-600 mt-0.5">⚠️</span>
+                          <span className="text-red-600">⚠️</span>
                           <div>
                             <p className="text-red-700 font-medium text-xs">
                               You are opting out of Authenticity Guarantee
                             </p>
-                            <p className="text-red-600 text-xs mt-0.5 md:mt-1">
+                            <p className="text-red-600 text-xs mt-1">
                               Without Becho Protect, we will directly deliver the product without authentication check and no certificate will be provided.
                             </p>
                           </div>
@@ -620,22 +620,22 @@ export default function ProductPage() {
                   </div>
                   
                   {isBechoProtectSelected && (
-                    <div className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2">
-                      <div className="bg-black text-white text-xs font-bold px-1.5 py-0.5 md:px-2 rounded-full">
+                    <div className="absolute -top-2 -right-2">
+                      <div className="bg-black text-white text-xs font-bold px-2 py-0.5 rounded-full">
                         SELECTED
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Condition - Mobile Optimized */}
+                {/* Condition */}
                 <div className="space-y-2">
                   <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase">CONDITION</h3>
-                  <div className="flex gap-1 bg-gray-100 p-1 rounded overflow-x-auto scrollbar-hide">
+                  <div className="flex gap-1 bg-gray-100 p-1 rounded">
                     {conditionOptions.map((condition) => (
                       <button
                         key={condition}
-                        className={`flex-shrink-0 min-w-max px-2 py-1.5 rounded text-xs font-light transition-all duration-200 ${
+                        className={`flex-1 px-2 py-1.5 rounded text-xs font-light transition-all duration-200 ${
                           product.condition === condition 
                             ? 'bg-white text-gray-900 shadow-sm border border-gray-300' 
                             : 'text-gray-600 hover:text-gray-900'
@@ -713,7 +713,7 @@ export default function ProductPage() {
                       disabled={addingToCart}
                       className="flex-1 border-2 border-black text-gray-900 py-3 text-xs font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {addingToCart ? 'ADDING...' : 'ADD TO CART'}
+                      {addingToCart ? 'ADDING TO CART...' : 'ADD TO CART'}
                     </button>
                     <button
                       onClick={handleAddToWishlist}
@@ -748,19 +748,19 @@ export default function ProductPage() {
         </section>
 
         {/* Product Details */}
-        <section className="py-8 md:py-16 bg-white border-t border-gray-200">
+        <section className="py-16 bg-white border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-8 md:mb-12">
-              <h2 className="text-gray-900 text-lg md:text-xl sm:text-3xl font-light tracking-widest uppercase">
+            <div className="text-center mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-3xl font-light tracking-widest uppercase">
                 PRODUCT DETAILS
               </h2>
-              <p className="text-gray-900 text-sm md:text-base font-light tracking-widest uppercase mt-2 md:mt-3">
+              <p className="text-gray-900 text-base font-light tracking-widest uppercase mt-3">
                 PRODUCT DESCRIPTION
               </p>
             </div>
             
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200 shadow-sm">
+              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                 <div className="prose max-w-none">
                   <p className="text-gray-700 text-sm leading-relaxed">
                     {product.description}
@@ -773,34 +773,34 @@ export default function ProductPage() {
 
         {/* ✅ UPDATED: RELATED PRODUCTS FROM SAME CATEGORY ONLY */}
         {relatedProducts.length > 0 && (
-          <section className="py-8 md:py-16 bg-gray-50">
+          <section className="py-16 bg-gray-50">
             <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-              <div className="text-center mb-8 md:mb-12">
-                <h2 className="text-gray-900 text-lg md:text-xl sm:text-3xl font-light tracking-widest uppercase">
+              <div className="text-center mb-12">
+                <h2 className="text-gray-900 text-xl sm:text-3xl font-light tracking-widest uppercase">
                   MORE FROM {product.category?.toUpperCase()}
                 </h2>
-                <p className="text-gray-900 text-sm md:text-base font-light tracking-widest uppercase mt-2 md:mt-3">
-                  EXPLORE SIMILAR PRODUCTS
+                <p className="text-gray-900 text-base font-light tracking-widest uppercase mt-3">
+                  EXPLORE SIMILAR PRODUCTS IN THIS CATEGORY
                 </p>
                 
                 {/* Category Info */}
-                <div className="mt-2 md:mt-4">
-                  <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 md:px-4 md:py-2 rounded-full">
-                    <span className="text-gray-600 text-xs md:text-sm">
+                <div className="mt-4">
+                  <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+                    <span className="text-gray-600 text-sm">
                       Showing {relatedProducts.length} related products
                     </span>
                   </div>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
                 {relatedProducts.map((relatedProduct) => (
                   <Link
                     key={relatedProduct._id}
                     href={`/products/${relatedProduct._id}`}
                     className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300"
                   >
-                    <div className="relative w-full aspect-square overflow-hidden mb-2 md:mb-3 rounded-lg shadow-sm md:shadow-md group-hover:shadow-md md:group-hover:shadow-lg transition-all duration-300">
+                    <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
                       {relatedProduct.images?.[0]?.url ? (
                         <img
                           src={relatedProduct.images[0].url}
@@ -813,29 +813,29 @@ export default function ProductPage() {
                         </div>
                       )}
                       {relatedProduct.condition && (
-                        <div className="absolute top-1.5 left-1.5 md:top-2 md:left-2">
-                          <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-1.5 py-0.5 md:px-2 md:py-1 rounded-full">
+                        <div className="absolute top-2 left-2">
+                          <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
                             {relatedProduct.condition.toUpperCase()}
                           </span>
                         </div>
                       )}
                     </div>
-                    <div className="text-left px-0.5 md:px-1">
-                      <h3 className="text-gray-800 text-xs font-light tracking-widest uppercase mb-0.5 md:mb-1 line-clamp-2">
+                    <div className="text-left px-1">
+                      <h3 className="text-gray-800 text-xs font-light tracking-widest uppercase mb-1 line-clamp-2">
                         {relatedProduct.productName?.toUpperCase()}
                       </h3>
                       
                       {/* Product Type (if available) */}
                       {relatedProduct.productType && (
-                        <div className="mb-1 md:mb-2">
-                          <span className="text-gray-600 text-xs bg-gray-100 px-1.5 py-0.5 rounded">
+                        <div className="mb-2">
+                          <span className="text-gray-600 text-xs bg-gray-100 px-2 py-0.5 rounded">
                             {relatedProduct.productType}
                           </span>
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between mb-0.5 md:mb-1">
-                        <p className="text-gray-900 text-xs md:text-sm font-light tracking-widest uppercase">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-gray-900 text-sm font-light tracking-widest uppercase">
                           ₹{relatedProduct.finalPrice?.toLocaleString()}
                         </p>
                       </div>
@@ -851,12 +851,12 @@ export default function ProductPage() {
               </div>
 
               {/* Browse More Link */}
-              <div className="text-center mt-8 md:mt-12">
+              <div className="text-center mt-12">
                 <Link
                   href={`/categories/${product.category?.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="inline-flex items-center gap-2 text-gray-900 border border-gray-300 px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-gray-50 transition-colors text-xs md:text-sm font-medium"
+                  className="inline-flex items-center gap-2 text-gray-900 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
                 >
-                  <span>Browse All in {product.category}</span>
+                  <span>Browse All Products in {product.category}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                   </svg>
