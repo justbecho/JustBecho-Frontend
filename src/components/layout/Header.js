@@ -48,20 +48,95 @@ export default function Header() {
     return `${clean}@justbecho`;
   }, [])
 
+  // ✅ FIXED: Handle Google OAuth redirect from URL
   useEffect(() => {
+    const handleGoogleAuthRedirect = () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const source = urlParams.get('source');
+        const isNewUser = urlParams.get('isNewUser') === 'true';
+        const profileCompleted = urlParams.get('profileCompleted') === 'true';
+        const authError = urlParams.get('auth_error');
+        
+        // Handle authentication errors
+        if (authError) {
+          console.error('❌ Google OAuth error from URL:', authError);
+          // Clear URL parameters
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+          return;
+        }
+        
+        // Handle successful Google OAuth
+        if (token && source === 'google') {
+          console.log('✅ Google OAuth token detected in URL');
+          
+          // Save token
+          localStorage.setItem('token', token);
+          localStorage.setItem('isGoogleSignup', 'true');
+          
+          // Clear URL parameters
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+          
+          // Fetch user data
+          fetchUserData(token, isNewUser, profileCompleted);
+        }
+      } catch (error) {
+        console.error('Error handling Google auth redirect:', error);
+      }
+    };
+    
+    const fetchUserData = async (token, isNewUser, profileCompleted) => {
+      try {
+        console.log('📡 Fetching user data from backend...');
+        const response = await fetch('https://just-becho-backend.vercel.app/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user) {
+            console.log('✅ User data fetched:', data.user.email);
+            
+            // Store user data
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Set user state
+            setUser(data.user);
+            
+            // Check what to do next
+            if (isNewUser || !data.user.profileCompleted) {
+              console.log('🔄 New user or profile not completed, redirecting to complete-profile');
+              router.push('/complete-profile');
+            } else {
+              console.log('🚀 Existing user with completed profile, redirecting to dashboard');
+              router.push('/dashboard');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
     const updateUserState = () => {
       try {
-        const token = localStorage.getItem('token')
-        const userData = localStorage.getItem('user')
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
         
         if (token && userData) {
-          const user = JSON.parse(userData)
+          const user = JSON.parse(userData);
           
           if (user.username) {
             user.username = ensureJustbechoFormat(user.username);
           }
           
-          setUser(user)
+          setUser(user);
           
           if (user.role === 'seller' && user.sellerVerificationStatus === 'approved') {
             if (!user.sellerVerified) {
@@ -74,18 +149,22 @@ export default function Header() {
             }
           }
           
-          fetchCartCount()
+          fetchCartCount();
         } else {
-          setUser(null)
-          setCartCount(0)
+          setUser(null);
+          setCartCount(0);
         }
       } catch (error) {
-        console.error('Error updating user state:', error)
-        setUser(null)
-        setCartCount(0)
+        console.error('Error updating user state:', error);
+        setUser(null);
+        setCartCount(0);
       }
-    }
+    };
 
+    // First check for Google OAuth redirect
+    handleGoogleAuthRedirect();
+    
+    // Then update user state
     updateUserState();
     
     const handleStorageChange = (e) => {
@@ -110,47 +189,47 @@ export default function Header() {
       window.removeEventListener('sellerStatusUpdated', handleSellerStatusUpdate);
       clearInterval(pollInterval);
     };
-  }, [ensureJustbechoFormat])
+  }, [ensureJustbechoFormat, router]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setLoading(true)
-        console.log('📡 Fetching categories from backend API...')
+        setLoading(true);
+        console.log('📡 Fetching categories from backend API...');
         
-        const response = await fetch('https://just-becho-backend.vercel.app/api/categories')
+        const response = await fetch('https://just-becho-backend.vercel.app/api/categories');
         
         if (!response.ok) {
-          throw new Error(`API responded with status: ${response.status}`)
+          throw new Error(`API responded with status: ${response.status}`);
         }
         
-        const data = await response.json()
-        console.log('📦 Backend API response:', data)
+        const data = await response.json();
+        console.log('📦 Backend API response:', data);
         
         if (data.success && data.categories && Array.isArray(data.categories)) {
-          console.log(`✅ Backend categories found: ${data.categories.length}`)
-          setCategories(data.categories)
+          console.log(`✅ Backend categories found: ${data.categories.length}`);
+          setCategories(data.categories);
         } else {
-          console.error('❌ Backend API response structure incorrect')
-          setCategories([])
+          console.error('❌ Backend API response structure incorrect');
+          setCategories([]);
         }
       } catch (error) {
-        console.error('💥 Error fetching categories from backend:', error)
-        setCategories([])
+        console.error('💥 Error fetching categories from backend:', error);
+        setCategories([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   const fetchCartCount = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('token');
       if (!token) {
-        setCartCount(0)
-        return
+        setCartCount(0);
+        return;
       }
 
       const response = await fetch('https://just-becho-backend.vercel.app/api/cart', {
@@ -159,7 +238,7 @@ export default function Header() {
           'Content-Type': 'application/json'
         },
         signal: AbortSignal.timeout(3000)
-      })
+      });
 
       if (!response.ok) {
         setCartApiAvailable(false);
@@ -167,7 +246,7 @@ export default function Header() {
         return;
       }
 
-      const data = await response.json()
+      const data = await response.json();
       
       if (data.success) {
         setCartCount(data.cart.totalItems || 0);
@@ -180,7 +259,7 @@ export default function Header() {
       setCartApiAvailable(false);
       setCartCount(0);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -189,13 +268,13 @@ export default function Header() {
       } else {
         setIsScrolled(window.scrollY > 50);
       }
-    }
+    };
     
     handleScroll();
     
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isCartPage])
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isCartPage]);
 
   const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
@@ -271,7 +350,7 @@ export default function Header() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        router.push('/login');
+        router.push('/');
         return;
       }
       
@@ -330,13 +409,13 @@ export default function Header() {
       console.error('Error in convertToSeller:', error);
       alert(`Error: ${error.message}`);
     }
-  }, [router, ensureJustbechoFormat])
+  }, [router, ensureJustbechoFormat]);
 
   const transformedCategories = useMemo(() => {
-    console.log('🔄 Transforming backend categories:', categories)
+    console.log('🔄 Transforming backend categories:', categories);
     
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
-      console.log('⚠️ No categories from backend')
+      console.log('⚠️ No categories from backend');
       return [];
     }
     
@@ -366,12 +445,12 @@ export default function Header() {
       };
     });
     
-    console.log('✅ Transformed categories:', transformed)
+    console.log('✅ Transformed categories:', transformed);
     return transformed;
   }, [categories]);
 
   const handleSellNowClick = useCallback((e) => {
-    e.preventDefault()
+    e.preventDefault();
     
     if (user) {
       const currentUserData = localStorage.getItem('user');
@@ -381,11 +460,11 @@ export default function Header() {
       
       if (latestUser.role === 'seller') {
         if (latestUser.sellerVerified) {
-          router.push('/sell-now')
+          router.push('/sell-now');
         } else {
           if (latestUser.sellerVerificationStatus === 'pending') {
-            alert('Your seller account is pending approval.')
-            router.push('/dashboard?section=listings')
+            alert('Your seller account is pending approval.');
+            router.push('/dashboard?section=listings');
           } else if (latestUser.sellerVerificationStatus === 'approved') {
             const updatedUser = {
               ...latestUser,
@@ -395,9 +474,9 @@ export default function Header() {
             setUser(updatedUser);
             
             window.dispatchEvent(new Event('sellerStatusUpdated'));
-            router.push('/sell-now')
+            router.push('/sell-now');
           } else {
-            router.push('/sell-now')
+            router.push('/sell-now');
           }
         }
       } else {
@@ -407,9 +486,9 @@ export default function Header() {
         }
       }
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-  }, [user, router, convertToSeller])
+  }, [user, router, convertToSeller]);
 
   const handleMobileSellNowClick = useCallback(() => {
     if (user) {
@@ -420,11 +499,11 @@ export default function Header() {
       
       if (latestUser.role === 'seller') {
         if (latestUser.sellerVerified) {
-          router.push('/sell-now')
+          router.push('/sell-now');
         } else {
           if (latestUser.sellerVerificationStatus === 'pending') {
-            alert('Your seller account is pending approval.')
-            router.push('/dashboard?section=listings')
+            alert('Your seller account is pending approval.');
+            router.push('/dashboard?section=listings');
           } else if (latestUser.sellerVerificationStatus === 'approved') {
             const updatedUser = {
               ...latestUser,
@@ -434,9 +513,9 @@ export default function Header() {
             setUser(updatedUser);
             
             window.dispatchEvent(new Event('sellerStatusUpdated'));
-            router.push('/sell-now')
+            router.push('/sell-now');
           } else {
-            router.push('/sell-now')
+            router.push('/sell-now');
           }
         }
       } else {
@@ -446,144 +525,144 @@ export default function Header() {
         }
       }
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-    setIsMenuOpen(false)
-  }, [user, router, convertToSeller])
+    setIsMenuOpen(false);
+  }, [user, router, convertToSeller]);
 
   const handleProfileClick = useCallback((e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (user) {
-      setShowUserDropdown(!showUserDropdown)
+      setShowUserDropdown(!showUserDropdown);
     } else {
-      setIsAuthModalOpen(true)
-      setShowUserDropdown(false)
+      setIsAuthModalOpen(true);
+      setShowUserDropdown(false);
     }
-  }, [user, showUserDropdown])
+  }, [user, showUserDropdown]);
 
   const handleWishlistClick = useCallback(() => {
     if (user) {
-      router.push('/dashboard?section=wishlist')
-      setShowUserDropdown(false)
+      router.push('/dashboard?section=wishlist');
+      setShowUserDropdown(false);
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-  }, [user, router])
+  }, [user, router]);
 
   const handleMobileWishlistClick = useCallback(() => {
     if (user) {
-      router.push('/dashboard?section=wishlist')
+      router.push('/dashboard?section=wishlist');
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-    setIsMenuOpen(false)
-  }, [user, router])
+    setIsMenuOpen(false);
+  }, [user, router]);
 
   const handleCartClick = useCallback((e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (user) {
       if (cartApiAvailable) {
-        router.push('/cart')
+        router.push('/cart');
       } else {
         alert('Cart functionality is currently unavailable.');
       }
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-  }, [user, router, cartApiAvailable])
+  }, [user, router, cartApiAvailable]);
 
   const handleMobileCartClick = useCallback(() => {
     if (user) {
       if (cartApiAvailable) {
-        router.push('/cart')
+        router.push('/cart');
       } else {
         alert('Cart functionality is currently unavailable.');
       }
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-    setIsMenuOpen(false)
-  }, [user, router, cartApiAvailable])
+    setIsMenuOpen(false);
+  }, [user, router, cartApiAvailable]);
 
   const handleLogout = useCallback(() => {
     try {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      localStorage.removeItem('isGoogleSignup')
-      localStorage.removeItem('verificationId')
-      localStorage.removeItem('changingRoleToSeller')
-      localStorage.removeItem('isGoogleUser')
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isGoogleSignup');
+      localStorage.removeItem('verificationId');
+      localStorage.removeItem('changingRoleToSeller');
+      localStorage.removeItem('isGoogleUser');
       
-      sessionStorage.clear()
+      sessionStorage.clear();
       
-      setUser(null)
-      setCartCount(0)
-      setShowUserDropdown(false)
+      setUser(null);
+      setCartCount(0);
+      setShowUserDropdown(false);
       
-      const cookies = document.cookie.split(";")
+      const cookies = document.cookie.split(";");
       for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i]
-        const eqPos = cookie.indexOf("=")
-        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       }
       
-      window.dispatchEvent(new Event('authChange'))
-      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new Event('authChange'));
+      window.dispatchEvent(new Event('storage'));
       
-      window.location.href = '/'
+      window.location.href = '/';
       
     } catch (error) {
-      console.error('Logout error:', error)
-      window.location.href = '/'
+      console.error('Logout error:', error);
+      window.location.href = '/';
     }
-  }, [])
+  }, []);
 
   const handleMobileLogout = useCallback(() => {
-    setIsMenuOpen(false)
+    setIsMenuOpen(false);
     
     setTimeout(() => {
       try {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('isGoogleSignup')
-        localStorage.removeItem('verificationId')
-        localStorage.removeItem('changingRoleToSeller')
-        localStorage.removeItem('isGoogleUser')
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('isGoogleSignup');
+        localStorage.removeItem('verificationId');
+        localStorage.removeItem('changingRoleToSeller');
+        localStorage.removeItem('isGoogleUser');
         
-        sessionStorage.clear()
+        sessionStorage.clear();
         
-        setUser(null)
-        setCartCount(0)
+        setUser(null);
+        setCartCount(0);
         
-        const cookies = document.cookie.split(";")
+        const cookies = document.cookie.split(";");
         for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i]
-          const eqPos = cookie.indexOf("=")
-          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
-          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
+          const cookie = cookies[i];
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
         }
         
-        window.dispatchEvent(new Event('authChange'))
-        window.dispatchEvent(new Event('storage'))
+        window.dispatchEvent(new Event('authChange'));
+        window.dispatchEvent(new Event('storage'));
         
-        window.location.href = '/'
+        window.location.href = '/';
         
       } catch (error) {
-        console.error('Mobile logout error:', error)
-        window.location.href = '/'
+        console.error('Mobile logout error:', error);
+        window.location.href = '/';
       }
-    }, 300)
-  }, [])
+    }, 300);
+  }, []);
 
   const handleMobileProfileClick = useCallback(() => {
     if (user) {
-      router.push('/dashboard')
+      router.push('/dashboard');
     } else {
-      setIsAuthModalOpen(true)
+      setIsAuthModalOpen(true);
     }
-    setIsMenuOpen(false)
-  }, [user, router])
+    setIsMenuOpen(false);
+  }, [user, router]);
 
   return (
     <>
@@ -1062,7 +1141,7 @@ export default function Header() {
               {/* Footer */}
               <div className="p-6 border-t border-gray-200 mt-auto">
                 <p className="text-xs text-gray-500 text-center">
-                  © 2024 Just Becho. All rights reserved.
+                  © 2025 Just Becho. All rights reserved.
                 </p>
               </div>
             </nav>

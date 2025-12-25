@@ -69,7 +69,7 @@ function CompleteProfileContent() {
         
         if (!currentToken) {
           console.log('❌ No token found anywhere')
-          router.push('/login')
+          router.push('/')
           return
         }
 
@@ -166,7 +166,7 @@ function CompleteProfileContent() {
         
       } catch (error) {
         console.error('❌ Error in profile initialization:', error)
-        router.push('/login')
+        router.push('/')
       } finally {
         setLoading(false)
       }
