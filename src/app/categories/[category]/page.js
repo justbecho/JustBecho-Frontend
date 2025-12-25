@@ -11,7 +11,8 @@ export async function generateStaticParams() {
     { category: 'watches' },
     { category: 'perfumes' },
     { category: 'toys' },
-    { category: 'kids-fashion' }
+    { category: 'kids-fashion' },
+    { category: 'Influencer-only' }
   ]
 }
 
