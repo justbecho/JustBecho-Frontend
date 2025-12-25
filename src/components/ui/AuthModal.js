@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import RoleSelectionModal from './RoleSelectionModal' // Make sure this exists
+import RoleSelectionModal from './RoleSelectionModal'
 
 export default function AuthModal({ isOpen, onClose }) {
   const router = useRouter()
@@ -15,11 +15,11 @@ export default function AuthModal({ isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
   
-  // ✅ NEW: Role selection modal state
+  // ✅ Role selection modal state
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [googleUserData, setGoogleUserData] = useState(null)
 
-  // ✅ UPDATED: Handle Google OAuth redirect
+  // ✅ UPDATED: Handle Google OAuth redirect with proper new user detection
   useEffect(() => {
     if (isOpen) {
       const checkGoogleAuth = () => {
@@ -41,8 +41,8 @@ export default function AuthModal({ isOpen, onClose }) {
           localStorage.setItem('token', token)
           localStorage.setItem('isGoogleSignup', 'true')
           
-          // Decode token to get user info
           try {
+            // Decode token to get user info
             const payload = JSON.parse(atob(token.split('.')[1]))
             console.log('🔍 Token payload:', payload)
             
@@ -53,14 +53,16 @@ export default function AuthModal({ isOpen, onClose }) {
               profileCompleted: payload.profileCompleted || false,
               role: payload.role || 'user',
               isGoogleUser: true,
+              // ✅ Use both URL param and token payload
               isNewUser: payload.isNewUser || newUser
             }
             
             localStorage.setItem('user', JSON.stringify(tempUser))
             window.dispatchEvent(new Event('authChange'))
             
-            // ✅ CRITICAL: Check if new user
+            // ✅ CRITICAL LOGIC: Different behavior for new vs existing users
             if (tempUser.isNewUser) {
+              // New Google user - show role selection modal
               console.log('👶 New Google user detected, showing role selection')
               setGoogleUserData({
                 token: token,
@@ -71,16 +73,27 @@ export default function AuthModal({ isOpen, onClose }) {
               setShowRoleModal(true)
               // Don't close auth modal yet
             } else {
-              // Existing user
+              // Existing Google user
               if (tempUser.profileCompleted) {
-                console.log('🚀 Existing user with completed profile, redirecting home')
+                // Profile already completed - go to dashboard
+                console.log('🚀 Existing user with completed profile, redirecting to dashboard')
                 onClose()
-                router.push('/')
+                router.push('/dashboard')
               } else {
+                // Profile not completed - go to complete-profile page
                 console.log('🔄 Existing user needs profile completion')
                 onClose()
                 router.push('/complete-profile')
               }
+            }
+            
+            // Clear URL parameters
+            const cleanUrl = window.location.pathname
+            window.history.replaceState({}, document.title, cleanUrl)
+            
+            // Only close modal if not showing role selection
+            if (!tempUser.isNewUser) {
+              onClose()
             }
             
           } catch (error) {
@@ -89,19 +102,14 @@ export default function AuthModal({ isOpen, onClose }) {
             onClose()
             router.push('/complete-profile')
           }
-          
-          // Clear URL parameters
-          const cleanUrl = window.location.pathname
-          window.history.replaceState({}, document.title, cleanUrl)
-          
-          // Only close modal if not showing role selection
-          if (!newUser) {
-            onClose()
-          }
         }
       }
 
+      // Run check immediately
       checkGoogleAuth()
+      
+      // Also check after a small delay for safety
+      setTimeout(checkGoogleAuth, 500)
     }
   }, [isOpen, onClose, router])
 
@@ -109,7 +117,32 @@ export default function AuthModal({ isOpen, onClose }) {
   const handleRoleModalClose = () => {
     setShowRoleModal(false)
     setGoogleUserData(null)
-    onClose() // Close auth modal
+    
+    // Check user status before redirecting
+    try {
+      const userStr = localStorage.getItem('user')
+      const user = userStr ? JSON.parse(userStr) : {}
+      
+      if (user.isNewUser && !user.profileCompleted) {
+        // New user cancelled - send to home
+        console.log('🏠 New user cancelled, redirecting home')
+        onClose()
+        router.push('/')
+      } else if (user.profileCompleted) {
+        // Existing user - go to dashboard
+        console.log('🚀 Existing user, redirecting to dashboard')
+        onClose()
+        router.push('/dashboard')
+      } else {
+        // Fallback
+        onClose()
+        router.push('/')
+      }
+    } catch (error) {
+      console.error('Error in modal close:', error)
+      onClose()
+      router.push('/')
+    }
   }
 
   if (!isOpen) return null
@@ -260,7 +293,7 @@ export default function AuthModal({ isOpen, onClose }) {
     }
   }
 
-  // ✅ UPDATED: Google Auth function
+  // ✅ Google Auth function
   const handleGoogleAuth = () => {
     try {
       console.log('🚀 Initiating Google OAuth...')
