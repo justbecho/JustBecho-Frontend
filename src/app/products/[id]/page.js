@@ -693,13 +693,7 @@ export default function ProductPage() {
                             <p className="text-gray-600 text-xs mt-0.5">Premium Seller</p>
                           </div>
                         </div>
-                        <div className="text-center bg-gray-100 rounded px-2 py-1">
-                          <div className="flex items-center gap-1">
-                            <span className="text-yellow-500 text-xs">⭐</span>
-                            <p className="text-gray-900 font-bold text-xs">4.8</p>
-                          </div>
-                          <p className="text-gray-600 text-xs">50+ reviews</p>
-                        </div>
+                        
                       </div>
                     </div>
                   </div>
