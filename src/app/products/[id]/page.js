@@ -401,8 +401,9 @@ export default function ProductPage() {
     "Brand New Without Tag", 
     "Like New",
     "Excellent",
-    "Good",
-    "Fairly Used"
+    "Fairly Used",
+    "Good"
+    
   ]
 
   if (loading) {

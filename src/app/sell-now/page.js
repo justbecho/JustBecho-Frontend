@@ -333,8 +333,8 @@ export default function SellNowPage() {
     'Brand New With Tag',
     'Brand New Without Tag',
     'Like New',
-    'Fairly Used',
     'Excellent',
+    'Fairly Used',
     'Good'
   ]
 
