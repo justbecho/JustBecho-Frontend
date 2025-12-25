@@ -1,4 +1,4 @@
-// pages/dashboard.js - COMPLETE MOBILE RESPONSIVE VERSION
+// pages/dashboard.js - COMPLETE FIXED VERSION
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -86,6 +86,8 @@ export default function Dashboard() {
     delivered: 0,
     cancelled: 0
   })
+
+  const [cartCount, setCartCount] = useState(0) // ✅ Added cartCount state
 
   // ✅ Check for mobile device with updated breakpoints
   useEffect(() => {
@@ -192,6 +194,39 @@ export default function Dashboard() {
       pincode: ''
     };
   };
+
+  // ✅ Function to fetch cart count
+  const fetchCartCount = useCallback(async () => {
+    try {
+      const token = getLocalStorage('token');
+      if (!token) {
+        setCartCount(0);
+        return;
+      }
+
+      const response = await fetch('https://just-becho-backend.vercel.app/api/cart', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        setCartCount(0);
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setCartCount(data.cart.totalItems || 0);
+      } else {
+        setCartCount(0);
+      }
+    } catch (error) {
+      setCartCount(0);
+    }
+  }, [getLocalStorage]);
 
   const fetchShippingTracking = async (orderId, forceRefresh = false) => {
     try {
@@ -492,7 +527,8 @@ export default function Dashboard() {
         await Promise.allSettled([
           fetchMyProducts(),
           fetchWishlist(),
-          fetchOrders()
+          fetchOrders(),
+          fetchCartCount() // ✅ Fetch cart count
         ]);
         
         setAuthChecked(true);
@@ -902,7 +938,7 @@ export default function Dashboard() {
       <>
         <Header />
         {/* ✅ Fixed spacing for header (80px) + safe area */}
-        <div className="min-h-screen bg-gray-50 pt-20 pb-16 safe-top safe-bottom flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 pt-20 pb-16 flex flex-col items-center justify-center p-4">
           <div className="text-center">
             <div className="relative w-16 h-16 mx-auto mb-4">
               <div className="animate-spin rounded-full h-full w-full border-4 border-gray-200 border-t-gray-900"></div>
@@ -928,7 +964,7 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-20 pb-16 safe-top safe-bottom flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 pt-20 pb-16 flex items-center justify-center p-4">
           <div className="text-center max-w-sm">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiAlertCircle className="w-8 h-8 text-red-600" />
@@ -948,136 +984,7 @@ export default function Dashboard() {
     )
   }
 
-  // ✅ MOBILE VERSION - Completely redesigned for your header
-  if (isMobile) {
-    return (
-      <>
-        <Header />
-        {/* ✅ Fixed spacing: pt-20 for header, pb-16 for bottom nav */}
-        <main className="min-h-screen bg-gray-50 pt-20 pb-16 safe-top safe-bottom">
-          
-          {/* Welcome Banner */}
-          <div className="bg-white border-b border-gray-200">
-            <div className="px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
-                  <p className="text-sm text-gray-600">Welcome back, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    user?.role === 'seller' 
-                      ? user?.sellerVerified 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {user?.role === 'seller' 
-                      ? user?.sellerVerified ? 'Seller' : 'Pending'
-                      : 'Buyer'
-                    }
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Seller Status Banner */}
-          {renderSellerStatusBanner()}
-          
-          {/* Quick Stats */}
-          <div className="px-4 py-4">
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-gray-900 mb-1">{stats.totalListings}</div>
-                <div className="text-xs text-gray-600 uppercase">Listings</div>
-              </div>
-              
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-green-600 mb-1">{stats.activeListings}</div>
-                <div className="text-xs text-gray-600 uppercase">Active</div>
-              </div>
-              
-              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
-                <div className="text-lg font-semibold text-purple-600 mb-1">{stats.totalOrders}</div>
-                <div className="text-xs text-gray-600 uppercase">Orders</div>
-              </div>
-            </div>
-            
-            {/* Navigation Tabs */}
-            <div className="flex overflow-x-auto scrollbar-hide bg-white rounded-xl border border-gray-200 p-1 mb-4">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={`flex-1 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors min-w-0 whitespace-nowrap ${
-                    activeSection === item.id
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="flex flex-col items-center gap-1">
-                    {item.icon}
-                    <span className="text-xs">{item.label}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-            
-            {/* Active Section Content */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              {renderMobileActiveSection()}
-            </div>
-          </div>
-          
-          {/* Bottom Navigation for Quick Actions */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-40 safe-bottom">
-            <div className="flex justify-around">
-              <button 
-                onClick={() => router.push('/')}
-                className="flex flex-col items-center p-2"
-              >
-                <FiHome className="w-5 h-5 text-gray-600 mb-1" />
-                <span className="text-xs text-gray-600">Home</span>
-              </button>
-              
-              <button 
-                onClick={() => router.push('/sell-now')}
-                className="flex flex-col items-center p-2"
-              >
-                <span className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center mb-1 font-bold">$</span>
-                <span className="text-xs text-gray-600">Sell</span>
-              </button>
-              
-              <button 
-                onClick={() => router.push('/dashboard?section=wishlist')}
-                className="flex flex-col items-center p-2"
-              >
-                <FiHeart className="w-5 h-5 text-gray-600 mb-1" />
-                <span className="text-xs text-gray-600">Wishlist</span>
-              </button>
-              
-              <button 
-                onClick={() => router.push('/cart')}
-                className="flex flex-col items-center p-2 relative"
-              >
-                <FiShoppingBag className="w-5 h-5 text-gray-600 mb-1" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount > 99 ? '99+' : cartCount}
-                  </span>
-                )}
-                <span className="text-xs text-gray-600">Cart</span>
-              </button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    )
-  }
-
-  // ✅ RENDER MOBILE ACTIVE SECTION
+  // ✅ RENDER MOBILE ACTIVE SECTION FUNCTION
   const renderMobileActiveSection = () => {
     switch (activeSection) {
       case 'profile':
@@ -1413,7 +1320,7 @@ export default function Dashboard() {
                               openLiveTracking(item.shippingDetails.awbNumber);
                             }}
                             className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
-                          >
+                            >
                             <FiTruck className="w-2.5 h-2.5" />
                             Track
                           </button>
@@ -1711,7 +1618,797 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ DESKTOP VERSION - WIDER LAYOUT
+  // ✅ RENDER DESKTOP ACTIVE SECTION FUNCTION
+  const renderDesktopActiveSection = () => {
+    switch (activeSection) {
+      case 'profile':
+        return (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900">Profile</h2>
+                <p className="text-gray-600">Manage your personal information</p>
+              </div>
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+              >
+                {isEditing ? (
+                  <>
+                    <FiX className="w-4 h-4" /> Cancel
+                  </>
+                ) : (
+                  <>
+                    <FiEdit className="w-4 h-4" /> Edit
+                  </>
+                )}
+              </button>
+            </div>
+
+            {updateSuccess && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiCheckCircle className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="text-green-800 font-medium">Profile updated successfully!</p>
+                    <p className="text-green-700 text-sm">Your changes have been saved.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {updateError && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiAlertCircle className="w-5 h-5 text-red-600" />
+                  <div>
+                    <p className="text-red-800 font-medium">Update failed</p>
+                    <p className="text-red-700 text-sm">{updateError}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 className="font-medium text-gray-900 mb-4">Basic Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-2">Full Name</label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Enter your full name"
+                      />
+                    ) : (
+                      <p className="text-gray-900 font-medium text-lg">{user?.name || 'Not provided'}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-2">Email</label>
+                    <p className="text-gray-900 font-medium text-lg">{user?.email}</p>
+                    <p className="text-gray-500 text-sm mt-1">Email cannot be changed</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-2">Phone Number</label>
+                    {isEditing ? (
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Enter phone number"
+                      />
+                    ) : (
+                      <p className="text-gray-900 font-medium text-lg">{user?.phone || 'Not provided'}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 className="font-medium text-gray-900 mb-4">Address</h3>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">Full Address</label>
+                  {isEditing ? (
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={formData.address.street}
+                        onChange={(e) => handleAddressChange('street', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Street address"
+                      />
+                      <div className="grid grid-cols-2 gap-3">
+                        <input
+                          type="text"
+                          value={formData.address.city}
+                          onChange={(e) => handleAddressChange('city', e.target.value)}
+                          className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          placeholder="City"
+                        />
+                        <input
+                          type="text"
+                          value={formData.address.state}
+                          onChange={(e) => handleAddressChange('state', e.target.value)}
+                          className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          placeholder="State"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.address.pincode}
+                        onChange={(e) => handleAddressChange('pincode', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Pincode"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-gray-900 font-medium text-lg">
+                      {formatAddress(user?.address) || 'Not provided'}
+                    </p>
+                  )}
+                </div>
+
+                {isEditing && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={isUpdatingProfile}
+                      className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpdatingProfile ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <FiSave className="w-4 h-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-6 col-span-2">
+                <h3 className="font-medium text-gray-900 mb-4">Account Status</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-600 mb-2">Role</div>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium inline-block ${
+                      user?.role === 'seller' ? 'bg-blue-100 text-blue-800' :
+                      user?.role === 'influencer' ? 'bg-purple-100 text-purple-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user?.role?.toUpperCase() || 'BUYER'}
+                    </div>
+                  </div>
+                  
+                  {user?.role === 'seller' && (
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-sm text-gray-600 mb-2">Verification</div>
+                      <div className={`px-3 py-1 rounded-full text-sm font-medium inline-block ${
+                        sellerStatus.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {sellerStatus.verified ? 'Verified' : 'Pending'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-600 mb-2">Member Since</div>
+                    <div className="text-gray-900 font-medium">
+                      {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'listings':
+        return (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900">My Listings</h2>
+                <p className="text-gray-600">
+                  {listings.length} item{listings.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+              {user?.sellerVerified && (
+                <button
+                  onClick={() => router.push('/sell-now')}
+                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-colors font-medium flex items-center gap-2"
+                >
+                  <FiPackage className="w-4 h-4" />
+                  + Add Item
+                </button>
+              )}
+            </div>
+
+            {/* Desktop Filter Tabs */}
+            <div className="flex gap-2 mb-6">
+              {['all', 'active', 'sold', 'shipped', 'delivered'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setListingFilter(filter)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    listingFilter === filter
+                      ? filter === 'all' ? 'bg-gray-900 text-white' :
+                        filter === 'active' ? 'bg-green-600 text-white' :
+                        filter === 'sold' ? 'bg-red-600 text-white' :
+                        filter === 'shipped' ? 'bg-blue-600 text-white' :
+                        'bg-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {filter === 'all' ? 'All' :
+                   filter === 'active' ? 'Active' :
+                   filter === 'sold' ? 'Sold' :
+                   filter === 'shipped' ? 'Shipped' : 'Delivered'}
+                </button>
+              ))}
+            </div>
+
+            {filteredListings.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiPackage className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings found</h3>
+                <p className="text-gray-600 mb-6">
+                  {listingFilter === 'all' ? 'Start selling your items!' :
+                   listingFilter === 'active' ? 'No active listings' :
+                   listingFilter === 'sold' ? 'No sold items' :
+                   'No items in this category'}
+                </p>
+                {user?.sellerVerified ? (
+                  <button
+                    onClick={() => router.push('/sell-now')}
+                    className="px-6 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
+                  >
+                    Create Your First Listing
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => router.push('/complete-profile?section=seller')}
+                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium"
+                  >
+                    Become a Seller
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-6">
+                {filteredListings.map((item) => (
+                  <div
+                    key={item._id}
+                    onClick={() => handleProductClick(item._id)}
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  >
+                    <div className="relative aspect-square">
+                      <img
+                        src={item.images?.[0]?.url || '/placeholder-image.jpg'}
+                        alt={item.productName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = '/placeholder-image.jpg';
+                        }}
+                      />
+                      
+                      {/* Status Badge */}
+                      <div className="absolute top-2 right-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          item.status === 'active' 
+                            ? 'bg-green-100 text-green-800' :
+                          item.status === 'sold' && item.shippingStatus === 'shipped'
+                            ? 'bg-blue-100 text-blue-800' :
+                          item.status === 'sold' && item.shippingStatus === 'delivered'
+                            ? 'bg-purple-100 text-purple-800' :
+                          item.status === 'sold'
+                            ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                        }`}>
+                          {item.status === 'sold' && item.shippingStatus === 'shipped'
+                            ? 'Shipped' :
+                           item.status === 'sold' && item.shippingStatus === 'delivered'
+                            ? 'Delivered' :
+                           item.status?.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4">
+                      <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
+                        {item.productName}
+                      </h3>
+                      <p className="text-gray-900 font-semibold text-lg mb-3">
+                        ₹{item.finalPrice?.toLocaleString()}
+                      </p>
+                      
+                      <div className="flex gap-2">
+                        {item.status === 'active' && (
+                          <>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/edit-listing/${item._id}`);
+                              }}
+                              className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <FiEdit className="w-3 h-3" />
+                              Edit
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteListing(item._id);
+                              }}
+                              className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <FiTrash2 className="w-3 h-3" />
+                              Delete
+                            </button>
+                          </>
+                        )}
+                        
+                        {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openLiveTracking(item.shippingDetails.awbNumber);
+                            }}
+                            className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <FiTruck className="w-3 h-3" />
+                            Track
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+
+      case 'orders':
+        return (
+          <div>
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">My Orders</h2>
+              <p className="text-gray-600">
+                {orders.length} order{orders.length !== 1 ? 's' : ''} • Track your purchases
+              </p>
+            </div>
+
+            {/* Order Stats */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                <div className="text-2xl font-semibold text-blue-600 mb-1">{orderStats.total}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Total</div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                <div className="text-2xl font-semibold text-yellow-600 mb-1">{orderStats.pending}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Processing</div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                <div className="text-2xl font-semibold text-purple-600 mb-1">{orderStats.shipped}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Shipped</div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                <div className="text-2xl font-semibold text-green-600 mb-1">{orderStats.delivered}</div>
+                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Delivered</div>
+              </div>
+            </div>
+
+            {orders.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiShoppingBag className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
+                <p className="text-gray-600 mb-6">Your order history will appear here</p>
+                <Link
+                  href="/products"
+                  className="inline-block px-6 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
+                >
+                  Start Shopping
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {orders.map((order) => {
+                  const orderTracking = shippingTracking[order._id];
+                  const shipments = orderTracking?.nimbuspostShipments || order.nimbuspostShipments || [];
+                  const statusBadge = getOrderStatusBadge(order.status);
+                  
+                  return (
+                    <div key={order._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                      <div className="p-6 border-b border-gray-200">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                              <p className="text-lg font-medium text-gray-900">
+                                Order #{order._id?.toString().substring(0, 8).toUpperCase() || 'N/A'}
+                              </p>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              {formatDateTime(order.createdAt)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {statusBadge.icon}
+                            <span className={`px-3 py-1 rounded-full text-sm ${statusBadge.color}`}>
+                              {statusBadge.label}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-4">
+                          <div>
+                            <p className="text-2xl font-semibold text-gray-900">
+                              ₹{order.totalAmount?.toLocaleString() || '0'}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {order.items?.length || 0} item{order.items?.length !== 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {shipments.length > 0 && (
+                        <div className="p-6 border-b border-gray-200 bg-gray-50">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                              <FiTruck className="w-5 h-5 text-blue-600" /> 
+                              <span>Shipment Tracking</span>
+                            </h4>
+                            <button 
+                              onClick={() => fetchShippingTracking(order._id, true)}
+                              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                              disabled={trackingLoading[order._id]}
+                              title="Refresh tracking"
+                            >
+                              <FiRefreshCw className={`w-4 h-4 ${trackingLoading[order._id] ? 'animate-spin' : ''}`} />
+                            </button>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            {shipments.map((shipment, idx) => {
+                              const status = getShipmentStatusBadge(shipment.status);
+                              return (
+                                <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <span className={`px-3 py-1 rounded text-sm font-medium ${status.color}`}>
+                                          {status.label}
+                                        </span>
+                                        {shipment.courierName && (
+                                          <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded">
+                                            {shipment.courierName}
+                                          </span>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="space-y-2">
+                                        <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                                          <span className="text-gray-600">AWB:</span>
+                                          <code className="bg-gray-100 px-3 py-1 rounded text-sm">
+                                            {shipment.awbNumber}
+                                          </code>
+                                        </p>
+                                        
+                                        <p className="text-sm text-gray-600">
+                                          {shipment.shipmentType === 'seller_to_warehouse' ? (
+                                            <span className="flex items-center gap-2">
+                                              <FiPackageIcon className="w-4 h-4" /> Seller → Warehouse
+                                            </span>
+                                          ) : shipment.shipmentType === 'warehouse_to_buyer' ? (
+                                            <span className="flex items-center gap-2">
+                                              <FiTruckIcon className="w-4 h-4" /> Warehouse → You
+                                            </span>
+                                          ) : (
+                                            <span className="flex items-center gap-2">
+                                              <FiTruck className="w-4 h-4" /> Direct Delivery
+                                            </span>
+                                          )}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    
+                                    <button
+                                      onClick={() => openLiveTracking(shipment.awbNumber)}
+                                      className="ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                                      disabled={trackingLoading[order._id]}
+                                    >
+                                      <FiExternalLink className="w-4 h-4" /> Live Track
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="p-6">
+                        <div className="flex gap-3">
+                          <button 
+                            onClick={() => router.push(`/orders/${order._id}`)}
+                            className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
+                          >
+                            <FiEye className="w-5 h-5" />
+                            View Details
+                          </button>
+                          
+                          {shipments.length > 0 && (
+                            <button 
+                              onClick={() => {
+                                const awbNumber = shipments[0]?.awbNumber;
+                                if (awbNumber) {
+                                  openLiveTracking(awbNumber);
+                                }
+                              }}
+                              className="flex-1 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center justify-center gap-2"
+                            >
+                              <FiTruck className="w-5 h-5" />
+                              Track Order
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+
+      case 'wishlist':
+        return (
+          <div>
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">My Wishlist</h2>
+              <p className="text-gray-600">
+                {wishlist.length} item{wishlist.length !== 1 ? 's' : ''} saved
+              </p>
+            </div>
+
+            {wishlist.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiHeart className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
+                <p className="text-gray-600 mb-6">Start adding items you love to your wishlist!</p>
+                <Link
+                  href="/products"
+                  className="inline-block px-6 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
+                >
+                  Browse Products
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-6">
+                {wishlist.map((item) => {
+                  const product = item.product || item;
+                  const productId = product._id || item._id;
+                  const productName = product.productName || product.name;
+                  const productPrice = product.finalPrice || product.price;
+                  const productImage = product.images?.[0]?.url || product.image;
+                  
+                  return (
+                    <div
+                      key={productId}
+                      className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      <div 
+                        onClick={() => handleProductClick(productId)}
+                        className="relative aspect-square cursor-pointer"
+                      >
+                        <img
+                          src={productImage || '/placeholder-image.jpg'}
+                          alt={productName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-image.jpg';
+                          }}
+                        />
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFromWishlist(productId);
+                          }}
+                          className="absolute top-2 right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-500 shadow-lg hover:bg-red-50 transition-colors"
+                          title="Remove from wishlist"
+                        >
+                          <FiHeart className="w-5 h-5 fill-current" />
+                        </button>
+                      </div>
+                      
+                      <div className="p-4">
+                        <h3 
+                          onClick={() => handleProductClick(productId)}
+                          className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:text-gray-700"
+                        >
+                          {productName}
+                        </h3>
+                        <p className="text-gray-900 font-semibold text-lg mb-3">
+                          ₹{productPrice?.toLocaleString()}
+                        </p>
+                        
+                        <button 
+                          onClick={() => handleProductClick(productId)}
+                          className="w-full py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center justify-center gap-2"
+                        >
+                          <FiShoppingBag className="w-4 h-4" />
+                          Buy Now
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+
+      default:
+        return (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a section</h3>
+            <p className="text-gray-600">Choose a section to view your dashboard content</p>
+          </div>
+        );
+    }
+  };
+
+  // ✅ MOBILE VERSION
+  if (isMobile) {
+    return (
+      <>
+        <Header />
+        {/* ✅ Fixed spacing: pt-20 for header, pb-16 for bottom nav */}
+        <main className="min-h-screen bg-gray-50 pt-20 pb-16">
+          
+          {/* Welcome Banner */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
+                  <p className="text-sm text-gray-600">Welcome back, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user?.role === 'seller' 
+                      ? user?.sellerVerified 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {user?.role === 'seller' 
+                      ? user?.sellerVerified ? 'Seller' : 'Pending'
+                      : 'Buyer'
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Seller Status Banner */}
+          {renderSellerStatusBanner()}
+          
+          {/* Quick Stats */}
+          <div className="px-4 py-4">
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-gray-900 mb-1">{stats.totalListings}</div>
+                <div className="text-xs text-gray-600 uppercase">Listings</div>
+              </div>
+              
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-green-600 mb-1">{stats.activeListings}</div>
+                <div className="text-xs text-gray-600 uppercase">Active</div>
+              </div>
+              
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-purple-600 mb-1">{stats.totalOrders}</div>
+                <div className="text-xs text-gray-600 uppercase">Orders</div>
+              </div>
+            </div>
+            
+            {/* Navigation Tabs */}
+            <div className="flex overflow-x-auto scrollbar-hide bg-white rounded-xl border border-gray-200 p-1 mb-4">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  className={`flex-1 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors min-w-0 whitespace-nowrap ${
+                    activeSection === item.id
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    {item.icon}
+                    <span className="text-xs">{item.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            {/* Active Section Content */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              {renderMobileActiveSection()}
+            </div>
+          </div>
+          
+          {/* Bottom Navigation for Quick Actions */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-40">
+            <div className="flex justify-around">
+              <button 
+                onClick={() => router.push('/')}
+                className="flex flex-col items-center p-2"
+              >
+                <FiHome className="w-5 h-5 text-gray-600 mb-1" />
+                <span className="text-xs text-gray-600">Home</span>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/sell-now')}
+                className="flex flex-col items-center p-2"
+              >
+                <span className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center mb-1 font-bold">$</span>
+                <span className="text-xs text-gray-600">Sell</span>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/dashboard?section=wishlist')}
+                className="flex flex-col items-center p-2"
+              >
+                <FiHeart className="w-5 h-5 text-gray-600 mb-1" />
+                <span className="text-xs text-gray-600">Wishlist</span>
+              </button>
+              
+              <button 
+                onClick={() => router.push('/cart')}
+                className="flex flex-col items-center p-2 relative"
+              >
+                <FiShoppingBag className="w-5 h-5 text-gray-600 mb-1" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+                <span className="text-xs text-gray-600">Cart</span>
+              </button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
+  }
+
+  // ✅ DESKTOP VERSION
   return (
     <>
       <Header />
@@ -1856,7 +2553,6 @@ export default function Dashboard() {
               <div className="lg:w-[85%]">
                 <div className="bg-white rounded-xl border border-gray-200 min-h-[600px] w-full shadow-sm">
                   <div className="p-8">
-                    {/* Success/Error Messages for Desktop */}
                     {updateSuccess && (
                       <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-3">
@@ -1895,6 +2591,3 @@ export default function Dashboard() {
     </>
   )
 }
-
-// ✅ Add this helper function for cart count
-const cartCount = 0; // You need to implement this based on your cart logic
