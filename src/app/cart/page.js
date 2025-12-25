@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Script from 'next/script'
+import Image from 'next/image'
 import { 
   FiShoppingBag, FiTrash2, FiPlus, FiMinus, FiArrowLeft, 
   FiShoppingCart, FiShield, FiCheck, FiX, FiUser,
@@ -16,7 +17,6 @@ import Header from '@/components/layout/Header'
 export default function CartPage() {
   const [cart, setCart] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [updating, setUpdating] = useState(null)
   const [togglingBechoProtect, setTogglingBechoProtect] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [user, setUser] = useState(null)
@@ -129,36 +129,6 @@ export default function CartPage() {
       }
     } catch (error) {
       console.error('Error fetching checkout totals:', error)
-    }
-  }
-
-  const updateQuantity = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return
-
-    setUpdating(itemId)
-    try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`https://just-becho-backend.vercel.app/api/cart/update/${itemId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ quantity: newQuantity })
-      })
-
-      const data = await response.json()
-
-      if (data.success) {
-        setCart(data.cart)
-      } else {
-        alert(data.message || 'Failed to update quantity')
-      }
-    } catch (error) {
-      console.error('Error updating quantity:', error)
-      alert('Error updating quantity')
-    } finally {
-      setUpdating(null)
     }
   }
 
@@ -520,7 +490,7 @@ export default function CartPage() {
                   Your Cart
                 </h1>
                 <p className="text-gray-600 text-xs sm:text-sm font-light tracking-widest uppercase">
-                  {cart?.items?.length || 0} ITEMS
+                  {cart?.totalItems || 0} ITEM{cart?.totalItems !== 1 ? 'S' : ''}
                 </p>
               </div>
               
@@ -626,13 +596,14 @@ export default function CartPage() {
                           <div className="flex items-start gap-3 md:gap-4">
                             <Link 
                               href={`/products/${item.product?._id}`}
-                              className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-lg overflow-hidden"
+                              className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-lg overflow-hidden relative"
                             >
                               {item.product?.images?.[0]?.url ? (
-                                <img
+                                <Image
                                   src={item.product.images[0].url}
                                   alt={item.product.productName}
-                                  className="w-full h-full object-cover"
+                                  fill
+                                  className="object-cover"
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-gray-200">
@@ -680,6 +651,11 @@ export default function CartPage() {
                                 <p className="text-base font-bold text-gray-900">
                                   ₹{item.price?.toLocaleString()}
                                 </p>
+                                {item.bechoProtect?.selected && (
+                                  <p className="text-xs text-green-600 mt-1">
+                                    + Becho Protect: ₹{item.bechoProtect.price?.toLocaleString()}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -691,32 +667,18 @@ export default function CartPage() {
                               <p className="text-lg font-medium text-gray-900">
                                 ₹{item.price?.toLocaleString()}
                               </p>
-                              <p className="text-xs text-gray-500">
-                                per item
-                              </p>
+                              {item.bechoProtect?.selected && (
+                                <p className="text-xs text-green-600 mt-1">
+                                  + Becho Protect: ₹{item.bechoProtect.price?.toLocaleString()}
+                                </p>
+                              )}
                             </div>
 
-                            {/* Quantity Controls */}
-                            <div className="flex items-center justify-end space-x-3">
-                              <button
-                                onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                                disabled={updating === item._id || item.quantity <= 1}
-                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                              >
-                                <FiMinus className="w-3 h-3" />
-                              </button>
-                              
-                              <span className="w-8 text-center font-medium">
-                                {updating === item._id ? '...' : item.quantity}
-                              </span>
-                              
-                              <button
-                                onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                                disabled={updating === item._id || item.quantity >= (item.product?.stock || 1)}
-                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                              >
-                                <FiPlus className="w-3 h-3" />
-                              </button>
+                            {/* SINGLE ITEM - NO QUANTITY CONTROLS */}
+                            <div className="text-right">
+                              <p className="text-sm text-gray-500">
+                                Single Item
+                              </p>
                             </div>
 
                             {/* Item Total */}
@@ -743,30 +705,10 @@ export default function CartPage() {
 
                         {/* Mobile Bottom Section */}
                         <div className="md:hidden border-t border-gray-100 p-3 space-y-3">
-                          {/* Quantity Controls */}
+                          {/* SINGLE ITEM - NO QUANTITY CONTROLS */}
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">Quantity:</span>
-                            <div className="flex items-center space-x-3">
-                              <button
-                                onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                                disabled={updating === item._id || item.quantity <= 1}
-                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                              >
-                                <FiMinus className="w-3 h-3" />
-                              </button>
-                              
-                              <span className="w-8 text-center font-medium">
-                                {updating === item._id ? '...' : item.quantity}
-                              </span>
-                              
-                              <button
-                                onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                                disabled={updating === item._id || item.quantity >= (item.product?.stock || 1)}
-                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                              >
-                                <FiPlus className="w-3 h-3" />
-                              </button>
-                            </div>
+                            <span className="font-medium">1</span>
                           </div>
 
                           {/* Becho Protect Toggle */}
@@ -778,6 +720,11 @@ export default function CartPage() {
                               <span className="text-xs font-medium text-gray-700">
                                 Becho Protect
                               </span>
+                              {item.bechoProtect?.price > 0 && (
+                                <span className="text-xs text-gray-500">
+                                  (₹{item.bechoProtect.price})
+                                </span>
+                              )}
                             </div>
                             
                             <button
