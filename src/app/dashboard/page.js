@@ -1,4 +1,4 @@
-// pages/dashboard.js - COMPLETE 1600+ LINES WITH TRACKING FIXED
+// pages/dashboard.js - COMPLETE WITH ALL FIXES
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -35,7 +35,17 @@ import {
   FiTrash2,
   FiEye,
   FiShoppingCart,
-  FiRefreshCw
+  FiRefreshCw,
+  FiSave,
+  FiBox,
+  FiCreditCard,
+  FiPackage as FiPackageIcon,
+  FiTruck as FiTruckIcon,
+  FiCheckSquare,
+  FiArrowRight,
+  FiPercent,
+  FiDollarSign as FiDollarSignIcon,
+  FiShoppingCart as FiShoppingCartIcon
 } from 'react-icons/fi'
 
 export default function Dashboard() {
@@ -66,6 +76,20 @@ export default function Dashboard() {
 
   // ✅ ADDED: Listing filter state
   const [listingFilter, setListingFilter] = useState('all')
+
+  // ✅ NEW: Profile update state
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
+  const [updateSuccess, setUpdateSuccess] = useState(false)
+  const [updateError, setUpdateError] = useState('')
+
+  // ✅ NEW: Order stats
+  const [orderStats, setOrderStats] = useState({
+    total: 0,
+    pending: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0
+  })
 
   // ✅ Check for mobile device
   useEffect(() => {
@@ -123,7 +147,7 @@ export default function Dashboard() {
     return `${clean}@justbecho`;
   }, [])
 
-  // ✅ Format address function
+  // ✅ FIXED: Format address function - handles both string and object
   const formatAddress = useCallback((address) => {
     if (!address) return 'Not provided'
     
@@ -143,6 +167,45 @@ export default function Dashboard() {
     
     return 'Not provided'
   }, [])
+
+  // ✅ NEW FUNCTION: Parse address for editing
+  const parseAddressForEdit = (address) => {
+    if (!address) {
+      return {
+        street: '',
+        city: '',
+        state: '',
+        pincode: ''
+      };
+    }
+    
+    if (typeof address === 'string') {
+      // Try to parse string address
+      const parts = address.split(',');
+      return {
+        street: parts[0]?.trim() || '',
+        city: parts[1]?.trim() || '',
+        state: parts[2]?.trim() || '',
+        pincode: parts[3]?.trim() || ''
+      };
+    }
+    
+    if (typeof address === 'object') {
+      return {
+        street: address.street || '',
+        city: address.city || '',
+        state: address.state || '',
+        pincode: address.pincode || ''
+      };
+    }
+    
+    return {
+      street: '',
+      city: '',
+      state: '',
+      pincode: ''
+    };
+  };
 
   // ✅ NEW FUNCTION: Fetch Shipping Tracking
   const fetchShippingTracking = async (orderId, forceRefresh = false) => {
@@ -217,19 +280,24 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ NEW FUNCTION: Get Shipping Leg Status
-  const getShippingLegStatus = (legs) => {
-    if (!legs || legs.length === 0) {
-      return { current: 'pending', text: 'Awaiting shipment' };
+  // ✅ NEW FUNCTION: Get Order Status Badge
+  const getOrderStatusBadge = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'pending':
+      case 'processing':
+        return { label: 'Processing', color: 'bg-yellow-100 text-yellow-800', icon: <FiClock className="w-4 h-4" /> };
+      case 'confirmed':
+      case 'paid':
+        return { label: 'Confirmed', color: 'bg-blue-100 text-blue-800', icon: <FiCheckCircle className="w-4 h-4" /> };
+      case 'shipped':
+        return { label: 'Shipped', color: 'bg-purple-100 text-purple-800', icon: <FiTruck className="w-4 h-4" /> };
+      case 'delivered':
+        return { label: 'Delivered', color: 'bg-green-100 text-green-800', icon: <FiCheckSquare className="w-4 h-4" /> };
+      case 'cancelled':
+        return { label: 'Cancelled', color: 'bg-red-100 text-red-800', icon: <FiX className="w-4 h-4" /> };
+      default:
+        return { label: 'Pending', color: 'bg-gray-100 text-gray-800', icon: <FiClock className="w-4 h-4" /> };
     }
-    
-    const lastLeg = legs[legs.length - 1];
-    return {
-      current: lastLeg.status,
-      text: `${lastLeg.leg.replace('_', ' ')} - ${lastLeg.status}`,
-      startedAt: lastLeg.startedAt,
-      completedAt: lastLeg.completedAt
-    };
   };
 
   // ✅ SELLER STATUS CHECK FUNCTION
@@ -275,80 +343,6 @@ export default function Dashboard() {
       console.error('Error checking seller status:', error);
     }
   }, [user, getLocalStorage, ensureJustbechoFormat])
-
-  // ✅ UPDATED: HANDLE BECOME A SELLER/BECOME SELLER BUTTON CLICK - FIXED
-  const handleBecomeSeller = async () => {
-    try {
-      const token = getLocalStorage('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-      
-      console.log('🔄 Converting buyer to seller...');
-      
-      // Show confirmation
-      const confirmUpdate = confirm('Are you sure you want to become a seller? This will require you to complete seller profile details (bank information, etc.) and admin approval.');
-      if (!confirmUpdate) return;
-      
-      // Call backend API to convert to seller
-      const response = await fetch('https://just-becho-backend.vercel.app/api/auth/convert-to-seller', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to convert to seller');
-      }
-      
-      if (data.success) {
-        console.log('✅ Converted to seller, redirecting to complete profile');
-        
-        // ✅ FIXED: Ensure username is in "name@justbecho" format
-        const formattedUsername = ensureJustbechoFormat(data.user?.username);
-        
-        // ✅ IMPORTANT: Set flag for seller conversion
-        localStorage.setItem('changingRoleToSeller', 'true');
-        localStorage.setItem('sellerConversionInProgress', 'true');
-        
-        // ✅ Don't clear user data immediately, let complete-profile handle it
-        
-        // Save new token if provided
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-        
-        // Save user data if provided
-        if (data.user) {
-          const updatedUser = {
-            ...data.user,
-            username: formattedUsername
-          };
-          localStorage.setItem('user', JSON.stringify(updatedUser));
-        }
-        
-        // Show success message
-        alert('✅ You are now registered as a seller! Please complete your seller profile details including bank information.');
-        
-        // ✅ FIXED: Redirect to complete-profile with proper parameters
-        setTimeout(() => {
-          router.push('/complete-profile?convertingToSeller=true');
-        }, 1000);
-        
-      } else {
-        throw new Error(data.message || 'Conversion failed');
-      }
-      
-    } catch (error) {
-      console.error('Error in handleBecomeSeller:', error);
-      alert(`Error: ${error.message}`);
-    }
-  };
 
   // ✅ FETCH USER'S PRODUCTS - WORKING VERSION
   const fetchMyProducts = async () => {
@@ -444,7 +438,7 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ FETCH ORDERS - UPDATED FOR TRACKING
+  // ✅ FETCH ORDERS - UPDATED WITH ORDER STATS
   const fetchOrders = async () => {
     try {
       const token = getLocalStorage('token');
@@ -467,6 +461,24 @@ export default function Dashboard() {
           const fetchedOrders = ordersData.orders || [];
           setOrders(fetchedOrders);
           
+          // Calculate order stats
+          const stats = {
+            total: fetchedOrders.length,
+            pending: fetchedOrders.filter(o => 
+              ['pending', 'processing', 'confirmed', 'paid'].includes(o.status?.toLowerCase())
+            ).length,
+            shipped: fetchedOrders.filter(o => 
+              o.status?.toLowerCase() === 'shipped'
+            ).length,
+            delivered: fetchedOrders.filter(o => 
+              o.status?.toLowerCase() === 'delivered'
+            ).length,
+            cancelled: fetchedOrders.filter(o => 
+              o.status?.toLowerCase() === 'cancelled'
+            ).length
+          };
+          setOrderStats(stats);
+          
           // Fetch shipping tracking for each order with shipments
           fetchedOrders.forEach(order => {
             if (order.nimbuspostShipments && order.nimbuspostShipments.length > 0) {
@@ -481,57 +493,6 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error fetching orders:', error);
       setOrders([]);
-    }
-  }
-
-  // ✅ FETCH USER DATA
-  const fetchUserData = async (token) => {
-    try {
-      console.log('📡 Fetching user data from backend...');
-      
-      let userResponse = await fetch('https://just-becho-backend.vercel.app/api/auth/google/user', {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!userResponse.ok) {
-        console.log('🔄 Trying regular user endpoint...');
-        userResponse = await fetch('https://just-becho-backend.vercel.app/api/auth/me', {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-      }
-
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        console.log('✅ User data received:', userData);
-        
-        if (userData.success && userData.user) {
-          // ✅ FIXED: Ensure username is in "name@justbecho" format
-          const cleanedUser = {
-            ...userData.user,
-            username: ensureJustbechoFormat(userData.user.username)
-          };
-          return cleanedUser;
-        } else if (userData.id || userData.email) {
-          const cleanedUser = {
-            ...userData,
-            username: ensureJustbechoFormat(userData.username)
-          };
-          return cleanedUser;
-        } else {
-          throw new Error('Invalid user data structure');
-        }
-      } else {
-        throw new Error(`Failed to fetch user data: ${userResponse.status}`);
-      }
-    } catch (error) {
-      console.error('❌ Error fetching user data:', error);
-      throw error;
     }
   }
 
@@ -734,8 +695,15 @@ export default function Dashboard() {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-IN', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true
     });
+  }
+
+  // ✅ FORMAT DATE TIME
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '';
+    return `${formatDate(dateString)} at ${formatTime(dateString)}`;
   }
 
   // ✅ REMOVE FROM WISHLIST
@@ -829,7 +797,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'pending') {
       return (
-        <div className="bg-yellow-50 border-yellow-200 p-4 mb-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 mx-4 mt-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiClock className="w-5 h-5 text-yellow-600" />
@@ -847,7 +815,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'approved') {
       return (
-        <div className="bg-green-50 border-green-200 p-4 mb-4">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 mx-4 mt-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiCheckCircle className="w-5 h-5 text-green-600" />
@@ -857,8 +825,8 @@ export default function Dashboard() {
               <p className="text-green-700 text-sm mt-1">
                 Your seller account is now active.
                 {formattedUsername && (
-                  <span className="block font-medium mt-1">
-                    Username: {formattedUsername}
+                  <span className="block font-medium mt-2">
+                    Your @justbecho username: <span className="text-green-900">{formattedUsername}</span>
                   </span>
                 )}
               </p>
@@ -870,7 +838,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'rejected') {
       return (
-        <div className="bg-red-50 border-red-200 p-4 mb-4">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 mx-4 mt-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiAlertCircle className="w-5 h-5 text-red-600" />
@@ -924,43 +892,47 @@ export default function Dashboard() {
     totalSales: user?.totalSales || 0
   }
 
-  // ✅ PROFILE EDIT STATE
+  // ✅ PROFILE EDIT STATE - FIXED FOR ADDRESS OBJECT
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: ''
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      pincode: ''
+    }
   })
 
-  // ✅ SET FORM DATA WHEN USER CHANGES
+  // ✅ SET FORM DATA WHEN USER CHANGES - FIXED FOR ADDRESS OBJECT
   useEffect(() => {
     if (user) {
-      let addressValue = '';
-      
-      if (user.address) {
-        if (typeof user.address === 'string') {
-          addressValue = user.address;
-        } else if (typeof user.address === 'object') {
-          const parts = [];
-          if (user.address.street) parts.push(user.address.street);
-          if (user.address.city) parts.push(user.address.city);
-          if (user.address.state) parts.push(user.address.state);
-          if (user.address.pincode) parts.push(user.address.pincode);
-          addressValue = parts.join(', ');
-        }
-      }
+      // Parse address from user data (could be string or object)
+      const addressData = parseAddressForEdit(user.address);
       
       setFormData({
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        address: addressValue || ''
+        address: addressData
       })
     }
   }, [user])
 
-  // ✅ SAVE PROFILE
+  // ✅ Handle address input changes
+  const handleAddressChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        [field]: value
+      }
+    }));
+  };
+
+  // ✅ FIXED: SAVE PROFILE FUNCTION - NOW HANDLES ADDRESS AS OBJECT
   const handleSaveProfile = async () => {
     try {
       const token = getLocalStorage('token')
@@ -969,30 +941,98 @@ export default function Dashboard() {
         return;
       }
       
-      const formattedData = {
-        ...formData,
-        address: formData.address
+      // Reset error/success states
+      setUpdateError('');
+      setUpdateSuccess(false);
+      setIsUpdatingProfile(true);
+      
+      console.log('📤 Sending profile update:', formData);
+      
+      // Prepare the data for API - Address as object
+      const updateData = {
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        address: {
+          street: formData.address.street.trim(),
+          city: formData.address.city.trim(),
+          state: formData.address.state.trim(),
+          pincode: formData.address.pincode.trim()
+        }
+      };
+      
+      console.log('📦 Update payload:', JSON.stringify(updateData, null, 2));
+      
+      // Try multiple API endpoints
+      const endpoints = [
+        'https://just-becho-backend.vercel.app/api/users/profile',
+        'https://just-becho-backend.vercel.app/api/auth/profile',
+        'https://just-becho-backend.vercel.app/api/users/update-profile'
+      ];
+      
+      let response = null;
+      let success = false;
+      
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`🔄 Trying endpoint: ${endpoint}`);
+          response = await fetch(endpoint, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData)
+          });
+          
+          console.log(`📊 Response status for ${endpoint}:`, response.status);
+          
+          if (response.ok) {
+            success = true;
+            break;
+          }
+        } catch (endpointError) {
+          console.error(`❌ Error with endpoint ${endpoint}:`, endpointError);
+          continue;
+        }
       }
       
-      const response = await fetch('https://just-becho-backend.vercel.app/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formattedData)
-      })
-
-      if (response.ok) {
-        const updatedUser = await response.json()
-        localStorage.setItem('user', JSON.stringify(updatedUser.user))
-        setUser(updatedUser.user)
-        setIsEditing(false)
-        alert('Profile updated successfully!')
+      if (!success || !response) {
+        throw new Error('All update endpoints failed');
       }
+      
+      const result = await response.json();
+      console.log('✅ Update response:', result);
+      
+      if (result.success) {
+        // Update local storage with new user data
+        const updatedUser = {
+          ...user,
+          name: updateData.name,
+          phone: updateData.phone,
+          address: updateData.address
+        };
+        
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        
+        setIsEditing(false);
+        setUpdateSuccess(true);
+        
+        // Show success message
+        setTimeout(() => {
+          setUpdateSuccess(false);
+        }, 3000);
+        
+        console.log('✅ Profile updated successfully!');
+      } else {
+        throw new Error(result.message || 'Update failed');
+      }
+      
     } catch (error) {
-      console.error('Error updating profile:', error)
-      alert('Error updating profile')
+      console.error('❌ Error updating profile:', error);
+      setUpdateError(error.message || 'Failed to update profile. Please try again.');
+    } finally {
+      setIsUpdatingProfile(false);
     }
   }
 
@@ -1113,6 +1153,11 @@ export default function Dashboard() {
                 <div>
                   <h3 className="font-semibold text-gray-900">{user?.name || 'User'}</h3>
                   <p className="text-sm text-gray-600">{user?.email}</p>
+                  {user?.role === 'seller' && user?.username && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full mt-1 inline-block">
+                      {ensureJustbechoFormat(user.username)}
+                    </span>
+                  )}
                 </div>
               </div>
               
@@ -1206,7 +1251,28 @@ export default function Dashboard() {
     </div>
   )
 
-  // ✅ RENDER ACTIVE SECTION
+  // ✅ RENDER MOBILE ORDER STATS
+  const renderMobileOrderStats = () => {
+    if (activeSection !== 'orders') return null;
+    
+    return (
+      <div className="px-4 mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+            <div className="text-lg font-semibold text-blue-600 mb-1">{orderStats.total}</div>
+            <div className="text-xs text-gray-600 uppercase">Total</div>
+          </div>
+          
+          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+            <div className="text-lg font-semibold text-green-600 mb-1">{orderStats.delivered}</div>
+            <div className="text-xs text-gray-600 uppercase">Delivered</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ✅ RENDER ACTIVE SECTION - UPDATED WITH BETTER PROFILE UI
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'profile':
@@ -1219,11 +1285,44 @@ export default function Dashboard() {
               </div>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
+                className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
               >
-                {isEditing ? 'Cancel' : 'Edit'}
+                {isEditing ? (
+                  <>
+                    <FiX className="w-4 h-4" /> Cancel
+                  </>
+                ) : (
+                  <>
+                    <FiEdit className="w-4 h-4" /> Edit
+                  </>
+                )}
               </button>
             </div>
+
+            {/* Success/Error Messages */}
+            {updateSuccess && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiCheckCircle className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="text-green-800 font-medium">Profile updated successfully!</p>
+                    <p className="text-green-700 text-sm">Your changes have been saved.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {updateError && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiAlertCircle className="w-5 h-5 text-red-600" />
+                  <div>
+                    <p className="text-red-800 font-medium">Update failed</p>
+                    <p className="text-red-700 text-sm">{updateError}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-6">
               <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -1237,6 +1336,7 @@ export default function Dashboard() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Enter your full name"
                       />
                     ) : (
                       <p className="text-gray-900 font-medium">{user?.name || 'Not provided'}</p>
@@ -1246,10 +1346,11 @@ export default function Dashboard() {
                   <div>
                     <label className="block text-sm text-gray-600 mb-2">Email</label>
                     <p className="text-gray-900 font-medium">{user?.email}</p>
+                    <p className="text-gray-500 text-xs mt-1">Email cannot be changed</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-600 mb-2">Phone</label>
+                    <label className="block text-sm text-gray-600 mb-2">Phone Number</label>
                     {isEditing ? (
                       <input
                         type="tel"
@@ -1266,28 +1367,69 @@ export default function Dashboard() {
                   <div>
                     <label className="block text-sm text-gray-600 mb-2">Address</label>
                     {isEditing ? (
-                      <textarea
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
-                        placeholder="Enter your complete address"
-                      />
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={formData.address.street}
+                          onChange={(e) => handleAddressChange('street', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          placeholder="Street address"
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          <input
+                            type="text"
+                            value={formData.address.city}
+                            onChange={(e) => handleAddressChange('city', e.target.value)}
+                            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="City"
+                          />
+                          <input
+                            type="text"
+                            value={formData.address.state}
+                            onChange={(e) => handleAddressChange('state', e.target.value)}
+                            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="State"
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          value={formData.address.pincode}
+                          onChange={(e) => handleAddressChange('pincode', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          placeholder="Pincode"
+                        />
+                      </div>
                     ) : (
                       <p className="text-gray-900 font-medium">
-                        {formatAddress(user?.address)}
+                        {formatAddress(user?.address) || 'Not provided'}
                       </p>
                     )}
                   </div>
                 </div>
 
                 {isEditing && (
-                  <button
-                    onClick={handleSaveProfile}
-                    className="w-full mt-6 py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium"
-                  >
-                    Save Changes
-                  </button>
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={isUpdatingProfile}
+                      className="w-full py-3 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpdatingProfile ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <FiSave className="w-4 h-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </button>
+                    <p className="text-gray-500 text-xs text-center mt-3">
+                      Make sure all information is correct before saving
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -1341,8 +1483,9 @@ export default function Dashboard() {
               {user?.sellerVerified && (
                 <button
                   onClick={() => router.push('/sell-now')}
-                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm rounded-lg hover:from-green-700 hover:to-green-800 transition-colors font-medium"
+                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm rounded-lg hover:from-green-700 hover:to-green-800 transition-colors font-medium flex items-center gap-2"
                 >
+                  <FiPackage className="w-4 h-4" />
                   + Add Item
                 </button>
               )}
@@ -1393,7 +1536,7 @@ export default function Dashboard() {
                   </button>
                 ) : (
                   <button 
-                    onClick={handleBecomeSeller}
+                    onClick={() => router.push('/complete-profile?section=seller')}
                     className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium"
                   >
                     Become a Seller
@@ -1406,7 +1549,7 @@ export default function Dashboard() {
                   <div
                     key={item._id}
                     onClick={() => handleProductClick(item._id)}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     <div className="relative aspect-square">
                       <img
@@ -1456,8 +1599,9 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 router.push(`/edit-listing/${item._id}`);
                               }}
-                              className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                              className="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
                             >
+                              <FiEdit className="w-3 h-3" />
                               Edit
                             </button>
                             <button 
@@ -1465,14 +1609,15 @@ export default function Dashboard() {
                                 e.stopPropagation();
                                 deleteListing(item._id);
                               }}
-                              className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                              className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
                             >
+                              <FiTrash2 className="w-3 h-3" />
                               Delete
                             </button>
                           </>
                         )}
                         
-                        {/* ✅ ADDED: Tracking button for shipped items */}
+                        {/* ✅ FIXED: Only show tracking button for shipped items */}
                         {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                           <button 
                             onClick={(e) => {
@@ -1485,6 +1630,8 @@ export default function Dashboard() {
                             Track
                           </button>
                         )}
+                        
+                        {/* ✅ REMOVED: Mark as Shipped and Mark as Delivered buttons - Nimbus handles it */}
                       </div>
                     </div>
                   </div>
@@ -1502,6 +1649,26 @@ export default function Dashboard() {
               <p className="text-gray-600 text-sm">
                 {orders.length} order{orders.length !== 1 ? 's' : ''} • Track your purchases
               </p>
+            </div>
+
+            {/* Order Stats for Mobile */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-blue-600 mb-1">{orderStats.total}</div>
+                <div className="text-xs text-gray-600 uppercase">Total</div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-yellow-600 mb-1">{orderStats.pending}</div>
+                <div className="text-xs text-gray-600 uppercase">Processing</div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-purple-600 mb-1">{orderStats.shipped}</div>
+                <div className="text-xs text-gray-600 uppercase">Shipped</div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="text-lg font-semibold text-green-600 mb-1">{orderStats.delivered}</div>
+                <div className="text-xs text-gray-600 uppercase">Delivered</div>
+              </div>
             </div>
 
             {orders.length === 0 ? (
@@ -1523,47 +1690,60 @@ export default function Dashboard() {
                 {orders.map((order) => {
                   const orderTracking = shippingTracking[order._id];
                   const shipments = orderTracking?.nimbuspostShipments || order.nimbuspostShipments || [];
+                  const statusBadge = getOrderStatusBadge(order.status);
                   
                   return (
-                    <div key={order._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div key={order._id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                      {/* Order Header */}
                       <div className="p-4 border-b border-gray-200">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              Order #{order._id.toString().substring(0, 8).toUpperCase()}
-                            </p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <FiShoppingBag className="w-4 h-4 text-gray-400" />
+                              <p className="text-sm font-medium text-gray-900">
+                                Order #{order._id?.toString().substring(0, 8).toUpperCase() || 'N/A'}
+                              </p>
+                            </div>
                             <p className="text-xs text-gray-500">
-                              {formatDate(order.createdAt)} • {formatTime(order.createdAt)}
+                              {formatDateTime(order.createdAt)}
                             </p>
                           </div>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
-                            order.status === 'shipped' ? 'bg-green-100 text-green-800' :
-                            order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {order.status?.toUpperCase()}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {statusBadge.icon}
+                            <span className={`px-2 py-1 text-xs rounded-full ${statusBadge.color}`}>
+                              {statusBadge.label}
+                            </span>
+                          </div>
                         </div>
                         
-                        <p className="text-lg font-semibold text-gray-900">
-                          ₹{order.totalAmount?.toLocaleString()}
-                        </p>
+                        <div className="flex justify-between items-center mt-3">
+                          <div>
+                            <p className="text-lg font-semibold text-gray-900">
+                              ₹{order.totalAmount?.toLocaleString() || '0'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              {order.items?.length || 0} item{order.items?.length !== 1 ? 's' : ''}
+                            </p>
+                          </div>
+                          <FiArrowRight className="w-5 h-5 text-gray-400" />
+                        </div>
                       </div>
                       
-                      {/* ✅ ADDED: Tracking Section */}
+                      {/* ✅ IMPROVED: Tracking Section */}
                       {shipments.length > 0 && (
-                        <div className="p-4 border-b border-gray-200">
-                          <div className="flex items-center justify-between mb-2">
+                        <div className="p-4 border-b border-gray-200 bg-gray-50">
+                          <div className="flex items-center justify-between mb-3">
                             <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                              <FiTruck className="w-4 h-4" /> Shipment Tracking
+                              <FiTruck className="w-4 h-4 text-blue-600" /> 
+                              <span>Shipment Tracking</span>
                             </h4>
                             <button 
                               onClick={() => fetchShippingTracking(order._id, true)}
-                              className="p-1 hover:bg-gray-100 rounded"
+                              className="p-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                               disabled={trackingLoading[order._id]}
+                              title="Refresh tracking"
                             >
-                              <FiRefreshCw className={`w-4 h-4 ${trackingLoading[order._id] ? 'animate-spin' : ''}`} />
+                              <FiRefreshCw className={`w-3.5 h-3.5 ${trackingLoading[order._id] ? 'animate-spin' : ''}`} />
                             </button>
                           </div>
                           
@@ -1571,34 +1751,52 @@ export default function Dashboard() {
                             {shipments.map((shipment, idx) => {
                               const status = getShipmentStatusBadge(shipment.status);
                               return (
-                                <div key={idx} className="border border-gray-200 rounded-lg p-3">
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className={`px-2 py-1 rounded text-xs ${status.color}`}>
+                                <div key={idx} className="bg-white border border-gray-200 rounded-lg p-3">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className={`px-2 py-1 rounded text-xs font-medium ${status.color}`}>
                                           {status.label}
                                         </span>
                                         {shipment.courierName && (
-                                          <span className="text-xs text-gray-600">
-                                            • {shipment.courierName}
+                                          <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                            {shipment.courierName}
                                           </span>
                                         )}
                                       </div>
-                                      <p className="text-sm font-medium text-gray-900">
-                                        AWB: {shipment.awbNumber}
-                                      </p>
-                                      <p className="text-xs text-gray-600">
-                                        {shipment.shipmentType === 'seller_to_warehouse' ? 'Seller → Warehouse' :
-                                         shipment.shipmentType === 'warehouse_to_buyer' ? 'Warehouse → You' :
-                                         shipment.shipmentType || 'Direct Delivery'}
-                                      </p>
+                                      
+                                      <div className="space-y-1">
+                                        <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                                          <span className="text-gray-600">AWB:</span>
+                                          <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">
+                                            {shipment.awbNumber}
+                                          </code>
+                                        </p>
+                                        
+                                        <p className="text-xs text-gray-600">
+                                          {shipment.shipmentType === 'seller_to_warehouse' ? (
+                                            <span className="flex items-center gap-1">
+                                              <FiPackageIcon className="w-3 h-3" /> Seller → Warehouse
+                                            </span>
+                                          ) : shipment.shipmentType === 'warehouse_to_buyer' ? (
+                                            <span className="flex items-center gap-1">
+                                              <FiTruckIcon className="w-3 h-3" /> Warehouse → You
+                                            </span>
+                                          ) : (
+                                            <span className="flex items-center gap-1">
+                                              <FiTruck className="w-3 h-3" /> Direct Delivery
+                                            </span>
+                                          )}
+                                        </p>
+                                      </div>
                                     </div>
+                                    
                                     <button
                                       onClick={() => openLiveTracking(shipment.awbNumber)}
-                                      className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 flex items-center gap-1"
+                                      className="ml-3 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5 whitespace-nowrap"
                                       disabled={trackingLoading[order._id]}
                                     >
-                                      <FiExternalLink className="w-3 h-3" /> Track
+                                      <FiExternalLink className="w-3 h-3" /> Live Track
                                     </button>
                                   </div>
                                 </div>
@@ -1608,29 +1806,51 @@ export default function Dashboard() {
                         </div>
                       )}
                       
+                      {/* Order Actions */}
                       <div className="p-4">
                         <div className="flex gap-2">
                           <button 
                             onClick={() => router.push(`/orders/${order._id}`)}
-                            className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+                            className="flex-1 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm flex items-center justify-center gap-2"
                           >
+                            <FiEye className="w-4 h-4" />
                             View Details
                           </button>
+                          
                           {shipments.length > 0 && (
                             <button 
                               onClick={() => {
-                                shipments.forEach(shipment => {
-                                  if (shipment.awbNumber) {
-                                    openLiveTracking(shipment.awbNumber);
-                                  }
-                                });
+                                const awbNumber = shipments[0]?.awbNumber;
+                                if (awbNumber) {
+                                  openLiveTracking(awbNumber);
+                                }
                               }}
-                              className="flex-1 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+                              className="flex-1 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center justify-center gap-2"
                             >
-                              <FiTruck className="w-4 h-4" /> Track All
+                              <FiTruck className="w-4 h-4" />
+                              Track Order
                             </button>
                           )}
                         </div>
+                        
+                        {/* Quick Order Info */}
+                        {order.items?.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <p className="text-xs text-gray-600 mb-1">Items:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {order.items.slice(0, 3).map((item, idx) => (
+                                <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                                  {item.productName || `Item ${idx + 1}`}
+                                </span>
+                              ))}
+                              {order.items.length > 3 && (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                                  +{order.items.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -1676,7 +1896,7 @@ export default function Dashboard() {
                   return (
                     <div
                       key={productId}
-                      className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                      className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
                     >
                       <div 
                         onClick={() => handleProductClick(productId)}
@@ -1696,7 +1916,8 @@ export default function Dashboard() {
                             e.stopPropagation();
                             removeFromWishlist(productId);
                           }}
-                          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-500 shadow-lg"
+                          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-500 shadow-lg hover:bg-red-50 transition-colors"
+                          title="Remove from wishlist"
                         >
                           <FiHeart className="w-4 h-4 fill-current" />
                         </button>
@@ -1705,7 +1926,7 @@ export default function Dashboard() {
                       <div className="p-3">
                         <h3 
                           onClick={() => handleProductClick(productId)}
-                          className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 cursor-pointer"
+                          className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 cursor-pointer hover:text-gray-700"
                         >
                           {productName}
                         </h3>
@@ -1716,8 +1937,9 @@ export default function Dashboard() {
                         <div className="flex gap-2">
                           <button 
                             onClick={() => handleProductClick(productId)}
-                            className="flex-1 px-2 py-1 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors"
+                            className="flex-1 px-2 py-1 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors flex items-center justify-center gap-1"
                           >
+                            <FiShoppingBag className="w-3 h-3" />
                             Buy Now
                           </button>
                         </div>
@@ -1750,6 +1972,7 @@ export default function Dashboard() {
         {renderMobileHeader()}
         {renderSellerStatusBanner()}
         {renderMobileStats()}
+        {activeSection === 'orders' && renderMobileOrderStats()}
         {renderMobileNavTabs()}
         {renderActiveSection()}
         <Footer />
@@ -1871,26 +2094,30 @@ export default function Dashboard() {
                       {user?.role === 'seller' && user?.sellerVerified ? (
                         <button 
                           onClick={() => router.push('/sell-now')}
-                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs"
+                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
                         >
+                          <FiPackage className="w-3 h-3" />
                           + Sell New Item
                         </button>
                       ) : user?.role === 'seller' ? (
                         <button 
                           onClick={checkSellerStatus}
-                          className="block w-full px-3 py-2 bg-yellow-600 text-white text-center rounded-lg hover:bg-yellow-700 transition-colors font-medium text-xs"
+                          className="block w-full px-3 py-2 bg-yellow-600 text-white text-center rounded-lg hover:bg-yellow-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
                         >
+                          <FiCheckCircle className="w-3 h-3" />
                           Check Approval Status
                         </button>
                       ) : (
                         <button 
-                          onClick={handleBecomeSeller}
-                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs"
+                          onClick={() => router.push('/complete-profile?section=seller')}
+                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
                         >
+                          <FiUser className="w-3 h-3" />
                           Become a Seller
                         </button>
                       )}
-                      <Link href="/products" className="block w-full px-3 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50 transition-colors font-medium text-xs">
+                      <Link href="/products" className="block w-full px-3 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50 transition-colors font-medium text-xs flex items-center justify-center gap-2">
+                        <FiShoppingBag className="w-3 h-3" />
                         Browse Products
                       </Link>
                     </div>
@@ -1902,6 +2129,31 @@ export default function Dashboard() {
               <div className="lg:w-3/4">
                 <div className="bg-white rounded-xl border border-gray-200 min-h-[600px]">
                   <div className="p-6">
+                    {/* Success/Error Messages for Desktop */}
+                    {updateSuccess && (
+                      <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FiCheckCircle className="w-5 h-5 text-green-600" />
+                          <div>
+                            <p className="text-green-800 font-medium">Profile updated successfully!</p>
+                            <p className="text-green-700 text-sm">Your changes have been saved.</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {updateError && (
+                      <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FiAlertCircle className="w-5 h-5 text-red-600" />
+                          <div>
+                            <p className="text-red-800 font-medium">Update failed</p>
+                            <p className="text-red-700 text-sm">{updateError}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* Desktop render active section */}
                     {renderActiveSection()}
                   </div>

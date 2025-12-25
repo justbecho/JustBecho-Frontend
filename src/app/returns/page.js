@@ -515,7 +515,7 @@ export default function RefundReturnPolicyPage() {
                               </div>
                               <div>
                                 <p className="font-bold text-blue-800 text-sm md:text-base mb-0.5 md:mb-1">Detailed Investigation</p>
-                                <p className="text-blue-700 text-xs md:text-sm">5-7 business days for thorough analysis</p>
+                                <p className="text-blue-700 text-xs md:text-sm">2-3 business days for thorough analysis</p>
                               </div>
                             </div>
                             <div className="flex items-start gap-2 md:gap-3">
@@ -524,7 +524,7 @@ export default function RefundReturnPolicyPage() {
                               </div>
                               <div>
                                 <p className="font-bold text-blue-800 text-sm md:text-base mb-0.5 md:mb-1">Decision Communication</p>
-                                <p className="text-blue-700 text-xs md:text-sm">Within 10 business days of submission</p>
+                                <p className="text-blue-700 text-xs md:text-sm">Within 3-4 days of submission</p>
                               </div>
                             </div>
                             <div className="flex items-start gap-2 md:gap-3">
@@ -541,7 +541,7 @@ export default function RefundReturnPolicyPage() {
                           <div className="grid grid-cols-2 gap-4 md:gap-6 mt-6 md:mt-8">
                             <div className="bg-green-50 p-3 md:p-4 rounded-lg">
                               <div className="text-center">
-                                <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-600 mb-1 md:mb-2">10-20</div>
+                                <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-600 mb-1 md:mb-2">7-10</div>
                                 <p className="font-bold text-green-800 text-sm md:text-base">Total Business Days</p>
                                 <p className="text-green-700 text-xs md:text-sm mt-0.5 md:mt-1">From submission to refund</p>
                               </div>
@@ -743,7 +743,7 @@ export default function RefundReturnPolicyPage() {
                                 <span className="text-red-600 text-lg md:text-xl">📧</span>
                               </div>
                               <p className="font-bold text-red-800 text-sm md:text-base mb-1">Refund Inquiries</p>
-                              <p className="text-red-600 text-base md:text-lg">refunds@justbecho.com</p>
+                              <p className="text-red-600 text-base md:text-lg">support@justbecho.com</p>
                             </div>
                             <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 md:p-6 rounded-lg">
                               <div className="w-10 h-10 md:w-12 md:h-12 bg-red-200 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
