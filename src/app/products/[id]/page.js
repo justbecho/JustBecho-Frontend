@@ -674,26 +674,93 @@ export default function ProductPage() {
                       </div>
                     </div>
 
-                    {/* Seller Info */}
-                    <div className="bg-white rounded-lg p-3 border border-gray-300 shadow-sm">
+                    {/* ✅ UPDATED: Seller Info - COMPLETE BOX FILL DESIGN */}
+                    <div className="bg-white rounded-lg p-4 border border-gray-300 shadow-sm">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-white font-medium text-xs">
+                        {/* Left Section - Seller Avatar and Info */}
+                        <div className="flex items-center gap-3 flex-1">
+                          {/* Seller Avatar */}
+                          <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-medium text-base">
                               {product.seller?.name?.charAt(0) || 'U'}
                             </span>
                           </div>
-                          <div>
-                            <div className="flex items-center gap-1">
-                              <p className="text-gray-900 font-bold text-xs">
+                          
+                          {/* Seller Details */}
+                          <div className="flex-1 min-w-0">
+                            {/* First Row: Name and Verified Badge */}
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="text-gray-900 font-bold text-sm truncate">
                                 {product.seller?.name || 'Seller'}
                               </p>
-                              <span className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-full">Verified</span>
+                              <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
+                                Verified
+                              </span>
                             </div>
-                            <p className="text-gray-600 text-xs mt-0.5">Premium Seller</p>
+                            
+                            {/* Second Row: Seller Type and Additional Info */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-600 text-xs bg-gray-100 px-2 py-0.5 rounded">
+                                Premium Seller
+                              </span>
+                              <span className="text-gray-500 text-xs">
+                                • 98% Positive Reviews
+                              </span>
+                            </div>
+                            
+                            {/* Third Row: Quick Stats */}
+                            <div className="flex items-center gap-4 mt-2">
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-400 text-xs">🛒</span>
+                                <span className="text-gray-600 text-xs">500+ Sold</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-400 text-xs">⏰</span>
+                                <span className="text-gray-600 text-xs">Fast Shipping</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         
+                        {/* Right Section - Rating in proper space */}
+                        <div className="ml-4 flex-shrink-0">
+                          <div className="text-center bg-gray-100 rounded-lg px-3 py-2 min-w-[90px]">
+                            {(() => {
+                              const reviewCount = product.seller?.reviewsCount || 0;
+                              const rating = product.seller?.rating || 4.8;
+                              
+                              if (reviewCount > 1) {
+                                return (
+                                  <>
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                      <span className="text-yellow-500 text-sm">⭐</span>
+                                      <p className="text-gray-900 font-bold text-sm">
+                                        {rating.toFixed(1)}
+                                      </p>
+                                    </div>
+                                    <p className="text-gray-600 text-xs">
+                                      {reviewCount}+ reviews
+                                    </p>
+                                  </>
+                                );
+                              } else {
+                                return (
+                                  <>
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                      <span className="text-gray-400 text-sm">⭐</span>
+                                      <p className="text-gray-900 font-bold text-sm">
+                                        New
+                                      </p>
+                                    </div>
+                                    <p className="text-gray-500 text-xs">
+                                      Seller
+                                    </p>
+                                  </>
+                                );
+                              }
+                            })()}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

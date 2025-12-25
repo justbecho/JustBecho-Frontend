@@ -174,8 +174,8 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ BRAND MARQUEE CONFIGURATION
-  const BRAND_MARQUEE_SPEED = 50; // Slow speed (previously faster)
+  // ✅ BRAND MARQUEE CONFIGURATION - SLOW SPEED
+  const BRAND_MARQUEE_SPEED = 80; // Much slower speed (increased from 50 to 80)
   const [isMarqueePaused, setIsMarqueePaused] = useState(false);
 
   // ✅ Create marquee brands with proper animation
@@ -667,7 +667,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: Brand Marquee Component with SLOW SPEED and HOVER PAUSE
+  // ✅ UPDATED: Brand Marquee Component with SLOW SPEED and PROPER HOVER PAUSE
   const InfiniteBrandMarquee = ({ brands, categoryName }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
     
@@ -676,6 +676,8 @@ function HomeContent() {
         className="marquee-container w-full overflow-hidden py-4 sm:py-6"
         onMouseEnter={() => setIsMarqueePaused(true)}
         onMouseLeave={() => setIsMarqueePaused(false)}
+        onTouchStart={() => setIsMarqueePaused(true)}
+        onTouchEnd={() => setIsMarqueePaused(false)}
       >
         <style jsx>{`
           @keyframes marquee {
@@ -687,15 +689,11 @@ function HomeContent() {
             }
           }
           
-          .marquee-seamless {
+          .marquee-seamless-desktop {
             display: flex;
             animation: marquee ${BRAND_MARQUEE_SPEED}s linear infinite;
             animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
             will-change: transform;
-          }
-          
-          .marquee-seamless:hover {
-            animation-play-state: paused;
           }
           
           @keyframes marquee-mobile {
@@ -712,10 +710,6 @@ function HomeContent() {
             animation: marquee-mobile ${BRAND_MARQUEE_SPEED * 0.8}s linear infinite;
             animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
             will-change: transform;
-          }
-          
-          .marquee-seamless-mobile:hover {
-            animation-play-state: paused;
           }
           
           .marquee-desktop {
@@ -737,7 +731,7 @@ function HomeContent() {
         `}</style>
         
         <div className="marquee-desktop">
-          <div className="marquee-seamless">
+          <div className="marquee-seamless-desktop">
             {infiniteBrands.map((brand, index) => (
               <BrandLogo 
                 key={`desktop-${brand.name}-${index}`} 
