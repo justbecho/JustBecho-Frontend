@@ -23,7 +23,7 @@ export default function CartPage() {
   const router = useRouter()
 
   // Constants
-  const SHIPPING_CHARGE = 1
+  const SHIPPING_CHARGE = 299
 
   // Fetch cart and user data
   useEffect(() => {
@@ -289,7 +289,7 @@ export default function CartPage() {
 
     if (!user.address || !user.address.street || !user.address.city || !user.address.state || !user.address.pincode) {
       alert('Please add your shipping address in profile settings')
-      router.push('/profile')
+      router.push('/dashboard?section=profile')
       return
     }
 
