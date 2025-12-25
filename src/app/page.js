@@ -174,8 +174,8 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ BRAND MARQUEE CONFIGURATION - SLOW SPEED
-  const BRAND_MARQUEE_SPEED = 80; // Much slower speed (increased from 50 to 80)
+  // ✅ BRAND MARQUEE CONFIGURATION - EXTREMELY SLOW SPEED
+  const BRAND_MARQUEE_SPEED = 120; // Very slow speed (120 seconds)
   const [isMarqueePaused, setIsMarqueePaused] = useState(false);
 
   // ✅ Create marquee brands with proper animation
@@ -667,7 +667,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: Brand Marquee Component with SLOW SPEED and PROPER HOVER PAUSE
+  // ✅ UPDATED: Brand Marquee Component with EXTREMELY SLOW SPEED and PROPER HOVER PAUSE
   const InfiniteBrandMarquee = ({ brands, categoryName }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
     
@@ -707,7 +707,7 @@ function HomeContent() {
           
           .marquee-seamless-mobile {
             display: flex;
-            animation: marquee-mobile ${BRAND_MARQUEE_SPEED * 0.8}s linear infinite;
+            animation: marquee-mobile ${BRAND_MARQUEE_SPEED * 0.6}s linear infinite;
             animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
             will-change: transform;
           }
