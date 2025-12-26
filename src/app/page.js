@@ -175,7 +175,7 @@ function HomeContent() {
   // ✅ BRAND MARQUEE CONFIGURATION - EXTREMELY SLOW SPEED
   const BRAND_MARQUEE_SPEED = 120;
   const [isMarqueePaused, setIsMarqueePaused] = useState(false);
-  const marqueeRefs = useRef({}); // ✅ Track marquee container positions
+  const marqueeContainerRefs = useRef({}); // ✅ Track marquee containers
 
   // ✅ Create marquee brands with proper animation
   const createInfiniteMarquee = (brands) => {
@@ -659,102 +659,56 @@ function HomeContent() {
     )
   }
 
-  // ✅ FIXED: Brand Marquee Component with SMOOTH HOVER
+  // ✅ FIXED: Brand Marquee Component with PROPER HOVER PAUSE
   const InfiniteBrandMarquee = ({ brands, categoryName, index }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
-    const marqueeContainerRef = useRef(null);
-    const marqueeContentRef = useRef(null);
-    const animationRef = useRef(null);
-    const startTimeRef = useRef(0);
-    const progressRef = useRef(0);
+    const [isContainerHovered, setIsContainerHovered] = useState(false);
     
-    // Store ref in our tracking object
+    // Set up ref for this container
     useEffect(() => {
-      marqueeRefs.current[index] = {
-        container: marqueeContainerRef,
-        content: marqueeContentRef,
-        animation: animationRef,
-        startTime: startTimeRef,
-        progress: progressRef
-      };
+      marqueeContainerRefs.current[index] = setIsContainerHovered;
       
       return () => {
-        delete marqueeRefs.current[index];
+        delete marqueeContainerRefs.current[index];
       };
     }, [index]);
     
-    const startMarquee = () => {
-      if (!marqueeContentRef.current || !marqueeContainerRef.current) return;
-      
-      const containerWidth = marqueeContainerRef.current.offsetWidth;
-      const contentWidth = marqueeContentRef.current.offsetWidth;
-      const segmentWidth = contentWidth / 3;
-      
-      // Reset transform
-      marqueeContentRef.current.style.transform = 'translateX(0)';
-      progressRef.current = 0;
-      startTimeRef.current = Date.now();
-      
-      const animate = () => {
-        if (!marqueeContentRef.current || isMarqueePaused) return;
-        
-        const elapsed = Date.now() - startTimeRef.current;
-        const progress = (elapsed / (BRAND_MARQUEE_SPEED * 1000)) % 1;
-        
-        // Calculate position based on segment width
-        const translateX = -progress * segmentWidth;
-        
-        marqueeContentRef.current.style.transform = `translateX(${translateX}px)`;
-        progressRef.current = progress;
-        
-        animationRef.current = requestAnimationFrame(animate);
-      };
-      
-      animationRef.current = requestAnimationFrame(animate);
+    const handleMouseEnter = () => {
+      setIsMarqueePaused(true);
+      setIsContainerHovered(true);
     };
     
-    // Start animation on mount
-    useEffect(() => {
-      startMarquee();
-      
-      return () => {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
-      };
-    }, [brands.length]);
-    
-    // Handle pause/resume
-    useEffect(() => {
-      if (isMarqueePaused) {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-          animationRef.current = null;
-        }
-      } else {
-        if (!animationRef.current && marqueeContentRef.current) {
-          startTimeRef.current = Date.now() - (progressRef.current * BRAND_MARQUEE_SPEED * 1000);
-          startMarquee();
-        }
-      }
-    }, [isMarqueePaused]);
+    const handleMouseLeave = () => {
+      setIsMarqueePaused(false);
+      setIsContainerHovered(false);
+    };
     
     return (
       <div 
         className="marquee-container w-full overflow-hidden py-4 sm:py-6"
-        ref={marqueeContainerRef}
-        onMouseEnter={() => setIsMarqueePaused(true)}
-        onMouseLeave={() => setIsMarqueePaused(false)}
-        onTouchStart={() => setIsMarqueePaused(true)}
-        onTouchEnd={() => setIsMarqueePaused(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleMouseEnter}
+        onTouchEnd={handleMouseLeave}
       >
-        <div 
-          className="marquee-seamless flex transition-transform duration-200 ease-linear"
-          ref={marqueeContentRef}
-          style={{ 
-            transition: isMarqueePaused ? 'transform 0.2s ease' : 'none'
-          }}
-        >
+        <style jsx>{`
+          @keyframes marquee-scroll {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-33.33%);
+            }
+          }
+          
+          .marquee-animation {
+            animation: marquee-scroll ${BRAND_MARQUEE_SPEED}s linear infinite;
+            animation-play-state: ${isContainerHovered ? 'paused' : 'running'};
+            will-change: transform;
+          }
+        `}</style>
+        
+        <div className="marquee-animation flex">
           {infiniteBrands.map((brand, idx) => (
             <BrandLogo 
               key={`${categoryName}-${brand.name}-${idx}`} 
@@ -767,6 +721,38 @@ function HomeContent() {
       </div>
     )
   }
+
+  // ✅ Global hover handlers for all marquees
+  useEffect(() => {
+    const handleGlobalMouseEnter = () => {
+      setIsMarqueePaused(true);
+      // Update all marquee containers
+      Object.values(marqueeContainerRefs.current).forEach(setHovered => {
+        if (typeof setHovered === 'function') {
+          setHovered(true);
+        }
+      });
+    };
+    
+    const handleGlobalMouseLeave = () => {
+      setIsMarqueePaused(false);
+      // Update all marquee containers
+      Object.values(marqueeContainerRefs.current).forEach(setHovered => {
+        if (typeof setHovered === 'function') {
+          setHovered(false);
+        }
+      });
+    };
+
+    // Add global listeners
+    document.addEventListener('mouseenter', handleGlobalMouseEnter, true);
+    document.addEventListener('mouseleave', handleGlobalMouseLeave, true);
+    
+    return () => {
+      document.removeEventListener('mouseenter', handleGlobalMouseEnter, true);
+      document.removeEventListener('mouseleave', handleGlobalMouseLeave, true);
+    };
+  }, []);
 
   // ✅ UPDATED: Product card render function
   const renderProductCard = (product) => {
