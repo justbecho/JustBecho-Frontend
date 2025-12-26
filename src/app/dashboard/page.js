@@ -937,8 +937,8 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        {/* ✅ Fixed spacing for header (80px) + safe area */}
-        <div className="min-h-screen bg-gray-50 pt-20 pb-16 flex flex-col items-center justify-center p-4">
+        {/* ✅ Fixed spacing for header */}
+        <div className="min-h-screen bg-gray-50 pt-[135px] md:pt-[140px] pb-16 flex flex-col items-center justify-center p-4">
           <div className="text-center">
             <div className="relative w-16 h-16 mx-auto mb-4">
               <div className="animate-spin rounded-full h-full w-full border-4 border-gray-200 border-t-gray-900"></div>
@@ -964,7 +964,7 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-20 pb-16 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 pt-[135px] md:pt-[140px] pb-16 flex items-center justify-center p-4">
           <div className="text-center max-w-sm">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiAlertCircle className="w-8 h-8 text-red-600" />
@@ -2284,8 +2284,8 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        {/* ✅ Fixed spacing: pt-20 for header, pb-16 for bottom nav */}
-        <main className="min-h-screen bg-gray-50 pt-20 pb-16">
+        {/* ✅ Fixed spacing: pt-[135px] for header + search, pb-16 for bottom nav */}
+        <main className="min-h-screen bg-gray-50 pt-[135px] pb-16">
           
           {/* Welcome Banner */}
           <div className="bg-white border-b border-gray-200">
@@ -2413,178 +2413,181 @@ export default function Dashboard() {
     <>
       <Header />
       
-      <main className="min-h-screen bg-gray-50 pt-32 pb-16">
-        {renderSellerStatusBanner()}
-        
-        <section className="bg-white border-b border-gray-200">
-          <div className="max-w-screen-2xl mx-auto px-8 py-8">
-            <div className="text-center">
-              <h1 className="text-3xl sm:text-4xl font-light tracking-widest uppercase text-gray-900 mb-3">
-                My Dashboard
-              </h1>
-              <p className="text-gray-600 text-lg font-light">
-                Welcome back, {user?.name || user?.email}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-gray-50 border-b border-gray-200 py-8">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-2xl font-light text-gray-900 mb-2">{stats.totalListings}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Total Listings</div>
-              </div>
-              
-              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-2xl font-light text-green-600 mb-2">{stats.activeListings}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Active Listings</div>
-              </div>
-              
-              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-2xl font-light text-red-600 mb-2">{stats.soldListings}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Sold Listings</div>
-              </div>
-              
-              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-2xl font-light text-yellow-600 mb-2">{stats.readyForShipment}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Ready to Ship</div>
-              </div>
-              
-              <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
-                <div className="text-2xl font-light text-blue-600 mb-2">{stats.totalOrders}</div>
-                <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Orders</div>
+      <main className="min-h-screen bg-gray-50">
+        {/* ✅ Fixed spacing: pt-[140px] for header + subheader */}
+        <div className="pt-[140px] pb-16">
+          {renderSellerStatusBanner()}
+          
+          <section className="bg-white border-b border-gray-200">
+            <div className="max-w-screen-2xl mx-auto px-8 py-8">
+              <div className="text-center">
+                <h1 className="text-3xl sm:text-4xl font-light tracking-widest uppercase text-gray-900 mb-3">
+                  My Dashboard
+                </h1>
+                <p className="text-gray-600 text-lg font-light">
+                  Welcome back, {user?.name || user?.email}
+                </p>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="py-12">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-              {/* Sidebar */}
-              <div className="lg:w-1/4">
-                <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-40 shadow-sm">
-                  <div className="flex items-center space-x-3 mb-6 pb-6 border-b border-gray-200">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-lg">
-                      {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-base">{user?.name || 'User'}</h3>
-                      {user?.role === 'seller' && user?.username && (
+          <section className="bg-gray-50 border-b border-gray-200 py-8">
+            <div className="max-w-screen-2xl mx-auto px-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                  <div className="text-2xl font-light text-gray-900 mb-2">{stats.totalListings}</div>
+                  <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Total Listings</div>
+                </div>
+                
+                <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                  <div className="text-2xl font-light text-green-600 mb-2">{stats.activeListings}</div>
+                  <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Active Listings</div>
+                </div>
+                
+                <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                  <div className="text-2xl font-light text-red-600 mb-2">{stats.soldListings}</div>
+                  <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Sold Listings</div>
+                </div>
+                
+                <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                  <div className="text-2xl font-light text-yellow-600 mb-2">{stats.readyForShipment}</div>
+                  <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Ready to Ship</div>
+                </div>
+                
+                <div className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-lg transition-all duration-300">
+                  <div className="text-2xl font-light text-blue-600 mb-2">{stats.totalOrders}</div>
+                  <div className="text-gray-600 uppercase tracking-wider text-xs font-medium">Orders</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="py-12">
+            <div className="max-w-screen-2xl mx-auto px-8">
+              <div className="flex flex-col lg:flex-row gap-8">
+                {/* Sidebar */}
+                <div className="lg:w-1/4">
+                  <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-40 shadow-sm">
+                    <div className="flex items-center space-x-3 mb-6 pb-6 border-b border-gray-200">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-lg">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-base">{user?.name || 'User'}</h3>
+                        {user?.role === 'seller' && user?.username && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                              {ensureJustbechoFormat(user.username)}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-1 mt-1">
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                            {ensureJustbechoFormat(user.username)}
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            user?.role === 'seller' 
+                              ? 'bg-blue-100 text-blue-800'
+                              : user?.role === 'influencer'
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {user?.role?.toUpperCase() || 'BUYER'}
                           </span>
                         </div>
-                      )}
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          user?.role === 'seller' 
-                            ? 'bg-blue-100 text-blue-800'
-                            : user?.role === 'influencer'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {user?.role?.toUpperCase() || 'BUYER'}
-                        </span>
                       </div>
                     </div>
-                  </div>
 
-                  <nav className="space-y-3">
-                    {menuItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => setActiveSection(item.id)}
-                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                          activeSection === item.id
-                            ? 'bg-gray-900 text-white shadow-lg transform -translate-y-0.5'
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-md'
-                        }`}
-                      >
-                        <span className={`${activeSection === item.id ? 'text-white' : 'text-gray-400'}`}>
-                          {item.icon}
-                        </span>
-                        <span className="font-medium text-sm">{item.label}</span>
-                      </button>
-                    ))}
-                  </nav>
+                    <nav className="space-y-3">
+                      {menuItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveSection(item.id)}
+                          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
+                            activeSection === item.id
+                              ? 'bg-gray-900 text-white shadow-lg transform -translate-y-0.5'
+                              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-md'
+                          }`}
+                        >
+                          <span className={`${activeSection === item.id ? 'text-white' : 'text-gray-400'}`}>
+                            {item.icon}
+                          </span>
+                          <span className="font-medium text-sm">{item.label}</span>
+                        </button>
+                      ))}
+                    </nav>
 
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h4 className="text-xs font-semibold text-gray-900 mb-3 uppercase tracking-wider">Quick Actions</h4>
-                    <div className="space-y-2">
-                      {user?.role === 'seller' && user?.sellerVerified ? (
-                        <button 
-                          onClick={() => router.push('/sell-now')}
-                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
-                        >
-                          <FiPackage className="w-3 h-3" />
-                          + Sell New Item
-                        </button>
-                      ) : user?.role === 'seller' ? (
-                        <button 
-                          onClick={checkSellerStatus}
-                          className="block w-full px-3 py-2 bg-yellow-600 text-white text-center rounded-lg hover:bg-yellow-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
-                        >
-                          <FiCheckCircle className="w-3 h-3" />
-                          Check Approval Status
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={() => router.push('/complete-profile?section=seller')}
-                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
-                        >
-                          <FiUser className="w-3 h-3" />
-                          Become a Seller
-                        </button>
-                      )}
-                      <Link href="/products" className="block w-full px-3 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50 transition-colors font-medium text-xs flex items-center justify-center gap-2">
-                        <FiShoppingBag className="w-3 h-3" />
-                        Browse Products
-                      </Link>
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h4 className="text-xs font-semibold text-gray-900 mb-3 uppercase tracking-wider">Quick Actions</h4>
+                      <div className="space-y-2">
+                        {user?.role === 'seller' && user?.sellerVerified ? (
+                          <button 
+                            onClick={() => router.push('/sell-now')}
+                            className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
+                          >
+                            <FiPackage className="w-3 h-3" />
+                            + Sell New Item
+                          </button>
+                        ) : user?.role === 'seller' ? (
+                          <button 
+                            onClick={checkSellerStatus}
+                            className="block w-full px-3 py-2 bg-yellow-600 text-white text-center rounded-lg hover:bg-yellow-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
+                          >
+                            <FiCheckCircle className="w-3 h-3" />
+                            Check Approval Status
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => router.push('/complete-profile?section=seller')}
+                            className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition-colors font-medium text-xs flex items-center justify-center gap-2"
+                          >
+                            <FiUser className="w-3 h-3" />
+                            Become a Seller
+                          </button>
+                        )}
+                        <Link href="/products" className="block w-full px-3 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50 transition-colors font-medium text-xs flex items-center justify-center gap-2">
+                          <FiShoppingBag className="w-3 h-3" />
+                          Browse Products
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Main Content - Wider */}
-              <div className="lg:w-[85%]">
-                <div className="bg-white rounded-xl border border-gray-200 min-h-[600px] w-full shadow-sm">
-                  <div className="p-8">
-                    {updateSuccess && (
-                      <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <FiCheckCircle className="w-5 h-5 text-green-600" />
-                          <div>
-                            <p className="text-green-800 font-medium">Profile updated successfully!</p>
-                            <p className="text-green-700 text-sm">Your changes have been saved.</p>
+                {/* Main Content - Wider */}
+                <div className="lg:w-[85%]">
+                  <div className="bg-white rounded-xl border border-gray-200 min-h-[600px] w-full shadow-sm">
+                    <div className="p-8">
+                      {updateSuccess && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <FiCheckCircle className="w-5 h-5 text-green-600" />
+                            <div>
+                              <p className="text-green-800 font-medium">Profile updated successfully!</p>
+                              <p className="text-green-700 text-sm">Your changes have been saved.</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {updateError && (
-                      <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <FiAlertCircle className="w-5 h-5 text-red-600" />
-                          <div>
-                            <p className="text-red-800 font-medium">Update failed</p>
-                            <p className="text-red-700 text-sm">{updateError}</p>
+                      {updateError && (
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <FiAlertCircle className="w-5 h-5 text-red-600" />
+                            <div>
+                              <p className="text-red-800 font-medium">Update failed</p>
+                              <p className="text-red-700 text-sm">{updateError}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    
-                    {/* Desktop render active section */}
-                    {renderDesktopActiveSection()}
+                      )}
+                      
+                      {/* Desktop render active section */}
+                      {renderDesktopActiveSection()}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
 
       <Footer />
