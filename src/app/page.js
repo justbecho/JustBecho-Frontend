@@ -172,10 +172,8 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ BRAND MARQUEE CONFIGURATION - EXTREMELY SLOW SPEED
+  // ✅ BRAND MARQUEE CONFIGURATION
   const BRAND_MARQUEE_SPEED = 120;
-  const [isMarqueePaused, setIsMarqueePaused] = useState(false);
-  const marqueeContainerRefs = useRef({}); // ✅ Track marquee containers
 
   // ✅ Create marquee brands with proper animation
   const createInfiniteMarquee = (brands) => {
@@ -659,56 +657,139 @@ function HomeContent() {
     )
   }
 
-  // ✅ FIXED: Brand Marquee Component with PROPER HOVER PAUSE
-  const InfiniteBrandMarquee = ({ brands, categoryName, index }) => {
+  // ✅ FIXED: Brand Marquee Component with SMOOTH JavaScript Animation
+  const InfiniteBrandMarquee = ({ brands, categoryName }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
-    const [isContainerHovered, setIsContainerHovered] = useState(false);
+    const containerRef = useRef(null);
+    const contentRef = useRef(null);
+    const animationRef = useRef(null);
+    const startTimeRef = useRef(null);
+    const progressRef = useRef(0);
+    const isPausedRef = useRef(false);
     
-    // Set up ref for this container
-    useEffect(() => {
-      marqueeContainerRefs.current[index] = setIsContainerHovered;
+    const animate = (timestamp) => {
+      if (!startTimeRef.current) {
+        startTimeRef.current = timestamp;
+      }
       
-      return () => {
-        delete marqueeContainerRefs.current[index];
-      };
-    }, [index]);
+      if (isPausedRef.current) {
+        // Pause hua hai, bas next frame request karo
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      
+      const elapsed = timestamp - startTimeRef.current;
+      const totalDuration = BRAND_MARQUEE_SPEED * 1000; // Convert to milliseconds
+      const segmentWidth = contentRef.current?.offsetWidth / 3 || 0;
+      
+      // Calculate progress (0 to 1)
+      const progress = (elapsed % totalDuration) / totalDuration;
+      progressRef.current = progress;
+      
+      // Calculate translation (one segment width ke across move karna hai)
+      const translateX = -progress * segmentWidth;
+      
+      if (contentRef.current) {
+        contentRef.current.style.transform = `translateX(${translateX}px)`;
+      }
+      
+      animationRef.current = requestAnimationFrame(animate);
+    };
     
+    const startAnimation = () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      
+      if (contentRef.current) {
+        contentRef.current.style.transition = 'none';
+        contentRef.current.style.transform = 'translateX(0)';
+      }
+      
+      startTimeRef.current = null;
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    const pauseAnimation = () => {
+      isPausedRef.current = true;
+      if (contentRef.current) {
+        contentRef.current.style.transition = 'transform 0.2s ease-out';
+      }
+    };
+    
+    const resumeAnimation = () => {
+      if (contentRef.current) {
+        contentRef.current.style.transition = 'none';
+      }
+      
+      // Adjust start time so that animation continues from where it left off
+      const currentProgress = progressRef.current;
+      const totalDuration = BRAND_MARQUEE_SPEED * 1000;
+      const elapsedTime = currentProgress * totalDuration;
+      
+      if (startTimeRef.current) {
+        // Subtract the elapsed time so animation continues from same point
+        startTimeRef.current = performance.now() - elapsedTime;
+      }
+      
+      isPausedRef.current = false;
+    };
+    
+    // Initialize animation
+    useEffect(() => {
+      if (infiniteBrands.length > 0) {
+        // Small delay to ensure DOM is ready
+        const timer = setTimeout(() => {
+          startAnimation();
+        }, 100);
+        
+        return () => {
+          clearTimeout(timer);
+          if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+          }
+        };
+      }
+    }, [infiniteBrands.length]);
+    
+    // Handle hover
     const handleMouseEnter = () => {
-      setIsMarqueePaused(true);
-      setIsContainerHovered(true);
+      pauseAnimation();
     };
     
     const handleMouseLeave = () => {
-      setIsMarqueePaused(false);
-      setIsContainerHovered(false);
+      resumeAnimation();
+    };
+    
+    // Handle touch for mobile
+    const handleTouchStart = () => {
+      pauseAnimation();
+    };
+    
+    const handleTouchEnd = () => {
+      // Small delay to prevent immediate resume on scroll
+      setTimeout(() => {
+        resumeAnimation();
+      }, 300);
     };
     
     return (
       <div 
         className="marquee-container w-full overflow-hidden py-4 sm:py-6"
+        ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onTouchStart={handleMouseEnter}
-        onTouchEnd={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
-        <style jsx>{`
-          @keyframes marquee-scroll {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-33.33%);
-            }
-          }
-          
-          .marquee-animation {
-            animation: marquee-scroll ${BRAND_MARQUEE_SPEED}s linear infinite;
-            animation-play-state: ${isContainerHovered ? 'paused' : 'running'};
-            will-change: transform;
-          }
-        `}</style>
-        
-        <div className="marquee-animation flex">
+        <div 
+          className="marquee-content flex"
+          ref={contentRef}
+          style={{ 
+            width: 'fit-content',
+            willChange: 'transform'
+          }}
+        >
           {infiniteBrands.map((brand, idx) => (
             <BrandLogo 
               key={`${categoryName}-${brand.name}-${idx}`} 
@@ -721,38 +802,6 @@ function HomeContent() {
       </div>
     )
   }
-
-  // ✅ Global hover handlers for all marquees
-  useEffect(() => {
-    const handleGlobalMouseEnter = () => {
-      setIsMarqueePaused(true);
-      // Update all marquee containers
-      Object.values(marqueeContainerRefs.current).forEach(setHovered => {
-        if (typeof setHovered === 'function') {
-          setHovered(true);
-        }
-      });
-    };
-    
-    const handleGlobalMouseLeave = () => {
-      setIsMarqueePaused(false);
-      // Update all marquee containers
-      Object.values(marqueeContainerRefs.current).forEach(setHovered => {
-        if (typeof setHovered === 'function') {
-          setHovered(false);
-        }
-      });
-    };
-
-    // Add global listeners
-    document.addEventListener('mouseenter', handleGlobalMouseEnter, true);
-    document.addEventListener('mouseleave', handleGlobalMouseLeave, true);
-    
-    return () => {
-      document.removeEventListener('mouseenter', handleGlobalMouseEnter, true);
-      document.removeEventListener('mouseleave', handleGlobalMouseLeave, true);
-    };
-  }, []);
 
   // ✅ UPDATED: Product card render function
   const renderProductCard = (product) => {
@@ -1121,7 +1170,6 @@ function HomeContent() {
                       <InfiniteBrandMarquee 
                         brands={categoryBrandsData} 
                         categoryName={category.name}
-                        index={index}
                       />
                       
                       <div className="text-center mt-4 sm:mt-6">
