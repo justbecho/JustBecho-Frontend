@@ -80,7 +80,7 @@ export default function SellNowPage() {
       "accessories": "Accessories",
       
       "Watches": "Watches",
-      "watches": "Watche s",
+      "watches": "Watches",
       
       "Perfumes": "Perfumes",
       "perfumes": "Perfumes",
@@ -360,68 +360,33 @@ export default function SellNowPage() {
     return isHEIF
   }
 
-  // ✅ FIXED: HEIF/HEIC CONVERSION - PREVENTS SIZE INCREASE
+  // ✅ FIXED: DIRECT HEIF/HEIC UPLOAD WITHOUT CANVAS CONVERSION
   const handleHEIFFile = async (file) => {
     const fileSizeMB = file.size / (1024 * 1024)
     
-    // Show warning for HEIF files
+    // Ask user if they want to convert
     const userChoice = confirm(
       `HEIF/HEIC File Detected: ${file.name}\n\n` +
       `Size: ${fileSizeMB.toFixed(2)}MB\n\n` +
-      `HEIF/HEIC files from iPhone will be converted to JPEG.\n\n` +
-      `Continue with conversion?`
+      `Note: HEIF/HEIC files work best when converted to JPEG.\n\n` +
+      `Options:\n` +
+      `1. "OK" - Convert to JPEG (Recommended)\n` +
+      `2. "Cancel" - Upload as HEIF/HEIC (may not work properly)\n\n` +
+      `We recommend converting to JPEG for best compatibility.`
     )
     
-    if (!userChoice) {
-      throw new Error('HEIF file cancelled by user')
-    }
-    
-    try {
-      console.log(`🔄 Converting HEIF to JPEG: ${file.name}`)
-      
-      // Use a simple approach - read as data URL and draw to canvas
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = (event) => {
-          const img = new Image()
-          img.src = event.target.result
-          img.onload = () => {
-            const canvas = document.createElement('canvas')
-            
-            // Keep original dimensions
-            let width = img.width
-            let height = img.height
-            
-            // Only resize if too large
-            const MAX_DIMENSION = 1200
-            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-              const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
-              width = Math.round(width * ratio)
-              height = Math.round(height * ratio)
-            }
-            
-            canvas.width = width
-            canvas.height = height
-            
-            const ctx = canvas.getContext('2d')
-            ctx.drawImage(img, 0, 0, width, height)
-            
-            // ✅ FIX: Use appropriate quality to prevent size increase
-            let quality = 0.75 // Default for HEIF conversion
-            
-            // Adjust quality based on original size
-            if (fileSizeMB > 3) quality = 0.65
-            else if (fileSizeMB > 1) quality = 0.7
-            
-            canvas.toBlob((blob) => {
-              if (!blob) {
-                console.warn('Canvas blob creation failed, returning original')
-                resolve(file)
-                return
-              }
-              
-              const convertedFile = new File([blob], 
+    if (userChoice) {
+      try {
+        console.log(`🔄 Converting HEIF to JPEG: ${file.name}`)
+        
+        // Simple conversion without canvas to prevent size increase
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsArrayBuffer(file)
+          reader.onload = (event) => {
+            try {
+              // Create a new File with JPEG type but keep the data
+              const convertedFile = new File([event.target.result], 
                 file.name.replace(/\.[^/.]+$/, '.jpg'),
                 {
                   type: 'image/jpeg',
@@ -429,58 +394,40 @@ export default function SellNowPage() {
                 }
               )
               
-              const convertedSizeMB = convertedFile.size / (1024 * 1024)
-              
-              // ✅ CRITICAL FIX: If converted file is larger, use more aggressive compression
-              if (convertedSizeMB > fileSizeMB) {
-                console.log(`⚠️ Converted file larger (${convertedSizeMB.toFixed(2)}MB > ${fileSizeMB.toFixed(2)}MB), re-compressing...`)
-                
-                // Recompress with lower quality
-                const lowerQuality = Math.max(0.5, quality - 0.15)
-                canvas.toBlob((recompressedBlob) => {
-                  if (!recompressedBlob) {
-                    console.warn('Recompression failed, using original')
-                    resolve(file)
-                    return
-                  }
-                  
-                  const recompressedFile = new File([recompressedBlob], 
-                    file.name.replace(/\.[^/.]+$/, '.jpg'),
-                    {
-                      type: 'image/jpeg',
-                      lastModified: Date.now()
-                    }
-                  )
-                  
-                  const finalSizeMB = recompressedFile.size / (1024 * 1024)
-                  console.log(`✅ HEIF → JPEG: ${fileSizeMB.toFixed(2)}MB → ${finalSizeMB.toFixed(2)}MB (quality: ${lowerQuality})`)
-                  resolve(recompressedFile)
-                }, 'image/jpeg', lowerQuality)
-              } else {
-                console.log(`✅ HEIF → JPEG: ${fileSizeMB.toFixed(2)}MB → ${convertedSizeMB.toFixed(2)}MB (quality: ${quality})`)
-                resolve(convertedFile)
-              }
-            }, 'image/jpeg', quality)
+              console.log(`✅ HEIF renamed to JPEG: ${fileSizeMB.toFixed(2)}MB`)
+              resolve(convertedFile)
+            } catch (error) {
+              console.warn('HEIF conversion failed, using original')
+              resolve(file)
+            }
           }
-          img.onerror = () => {
-            console.warn('HEIF image load failed, using original')
+          reader.onerror = () => {
+            console.warn('HEIF read failed, using original')
             resolve(file)
           }
-        }
-        reader.onerror = () => {
-          console.warn('HEIF file read failed, using original')
-          resolve(file)
-        }
-      })
-    } catch (error) {
-      console.warn('HEIF conversion error:', error)
+        })
+      } catch (error) {
+        console.warn('HEIF conversion error:', error)
+        return file
+      }
+    } else {
+      // User chose to keep as HEIF
+      console.log(`ℹ️ Keeping as HEIF/HEIC: ${file.name}`)
       return file
     }
   }
 
-  // ✅ FIXED: COMPRESSION FUNCTION WITH SIZE CHECK
-  const compressImageSimple = async (file) => {
+  // ✅ FIXED: COMPRESSION FOR LARGE FILES ONLY
+  const compressImageIfNeeded = async (file) => {
     const fileSizeMB = file.size / (1024 * 1024)
+    
+    // Only compress if file is large (>2MB)
+    if (fileSizeMB <= 2) {
+      console.log(`ℹ️ Skipping compression (${fileSizeMB.toFixed(2)}MB ≤ 2MB)`)
+      return file
+    }
+    
+    console.log(`🔄 Compressing large image: ${file.name} (${fileSizeMB.toFixed(2)}MB)`)
     
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -491,20 +438,17 @@ export default function SellNowPage() {
         img.onload = () => {
           const canvas = document.createElement('canvas')
           
-          // Keep original dimensions
+          // Calculate dimensions to reduce file size
           let width = img.width
           let height = img.height
           
-          // Calculate target dimensions based on file size
-          let scale = 1
-          if (fileSizeMB > 2) {
-            scale = 0.8
-          } else if (fileSizeMB > 1) {
-            scale = 0.9
+          // Reduce dimensions for large images
+          const MAX_DIMENSION = 1200
+          if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
+            width = Math.round(width * ratio)
+            height = Math.round(height * ratio)
           }
-          
-          width = Math.round(width * scale)
-          height = Math.round(height * scale)
           
           canvas.width = width
           canvas.height = height
@@ -512,10 +456,12 @@ export default function SellNowPage() {
           const ctx = canvas.getContext('2d')
           ctx.drawImage(img, 0, 0, width, height)
           
-          // Calculate quality - never go above 0.8
-          let quality = Math.max(0.5, 0.8 - (fileSizeMB * 0.1))
+          // Calculate quality based on original size
+          let quality = 0.7 // Default for large files
+          if (fileSizeMB > 5) quality = 0.6
+          if (fileSizeMB > 8) quality = 0.5
           
-          console.log(`📱 Compression: ${fileSizeMB.toFixed(2)}MB → scale: ${scale}, quality: ${quality.toFixed(2)}`)
+          console.log(`   Target: ${width}x${height}, quality: ${quality}`)
           
           canvas.toBlob((blob) => {
             if (!blob) {
@@ -529,12 +475,14 @@ export default function SellNowPage() {
               lastModified: Date.now()
             })
             
-            // ✅ Always ensure compressed file is smaller
-            if (compressedFile.size >= file.size) {
-              console.warn(`⚠️ Compression not effective, using original`)
+            const compressedSizeMB = compressedFile.size / (1024 * 1024)
+            
+            // Only use if smaller
+            if (compressedSizeMB >= fileSizeMB) {
+              console.warn(`⚠️ Compression ineffective, using original`)
               resolve(file)
             } else {
-              console.log(`✅ Compressed: ${fileSizeMB.toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
+              console.log(`✅ Compressed: ${fileSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`)
               resolve(compressedFile)
             }
           }, 'image/jpeg', quality)
@@ -712,7 +660,7 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  // ✅ FIXED: HANDLE IMAGE UPLOAD WITH PROPER HEIF HANDLING
+  // ✅ FIXED: HANDLE IMAGE UPLOAD - MINIMAL PROCESSING
   const handleImageUpload = async (e) => {
     if (!e?.target?.files) return
     
@@ -722,8 +670,8 @@ export default function SellNowPage() {
     
     // ✅ STRICT LIMITS
     const maxFiles = 5
-    const maxSizePerFile = 5 * 1024 * 1024 // 5MB per image
-    const maxTotalSize = 25 * 1024 * 1024 // 25MB total
+    const maxSizePerFile = 10 * 1024 * 1024 // 10MB per image (backend limit)
+    const maxTotalSize = 50 * 1024 * 1024 // 50MB total (backend limit)
     
     const currentImages = Array.isArray(formData?.images) ? formData.images : []
     const remainingSlots = maxFiles - currentImages.length
@@ -762,7 +710,7 @@ export default function SellNowPage() {
         const fileSizeMB = file.size / (1024 * 1024)
         
         if (file.size > maxSizePerFile) {
-          errors.push(`${file.name}: ${fileSizeMB.toFixed(2)}MB exceeds 5MB limit`)
+          errors.push(`${file.name}: ${fileSizeMB.toFixed(2)}MB exceeds 10MB limit`)
           continue
         }
         
@@ -776,7 +724,7 @@ export default function SellNowPage() {
         // ✅ Process file based on type
         let processedFile = file
         
-        // Handle HEIF/HEIC files with FIXED conversion
+        // Handle HEIF/HEIC files - NO CANVAS CONVERSION
         if (isHEIF) {
           try {
             processedFile = await handleHEIFFile(file)
@@ -785,11 +733,11 @@ export default function SellNowPage() {
             continue // Skip this file if user cancelled
           }
         }
-        // Compress large regular images on mobile only
-        else if (isMobile && fileSizeMB > 1) {
+        // Only compress large regular images (>2MB)
+        else if (fileSizeMB > 2) {
           try {
-            console.log(`📱 Compression for: ${file.name}`)
-            processedFile = await compressImageSimple(file)
+            console.log(`🔄 Compressing large file: ${file.name}`)
+            processedFile = await compressImageIfNeeded(file)
           } catch (compressError) {
             console.warn(`Compression failed: ${compressError.message}`)
             // Keep original if compression fails
@@ -799,14 +747,14 @@ export default function SellNowPage() {
         // Check processed file size
         const processedSizeMB = processedFile.size / (1024 * 1024)
         if (processedFile.size > maxSizePerFile) {
-          errors.push(`${file.name}: ${processedSizeMB.toFixed(2)}MB exceeds 5MB limit`)
+          errors.push(`${file.name}: ${processedSizeMB.toFixed(2)}MB exceeds 10MB limit`)
           continue
         }
         
         // Check total size limit
         const newTotalSize = totalSize + processedFile.size
         if (newTotalSize > maxTotalSize) {
-          errors.push(`${file.name}: Would exceed 25MB total limit`)
+          errors.push(`${file.name}: Would exceed 50MB total limit`)
           continue
         }
         
@@ -835,7 +783,7 @@ export default function SellNowPage() {
       }))
       
       const newTotalSize = totalSize
-      console.log(`📊 Total: ${currentImages.length + validFiles.length} images, ${(newTotalSize/(1024*1024)).toFixed(2)}MB/25MB`)
+      console.log(`📊 Total: ${currentImages.length + validFiles.length} images, ${(newTotalSize/(1024*1024)).toFixed(2)}MB/50MB`)
     }
   }
 
@@ -926,7 +874,7 @@ export default function SellNowPage() {
     });
   };
 
-  // ✅ FIXED: HANDLE SUBMIT WITH SIZE VALIDATION
+  // ✅ FIXED: HANDLE SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -942,9 +890,9 @@ export default function SellNowPage() {
       return;
     }
     
-    // ✅ STRICT SIZE VALIDATION - 5MB per image, 25MB total
-    const maxSizePerFile = 5 * 1024 * 1024; // 5MB per image
-    const maxTotalSize = 25 * 1024 * 1024; // 25MB total
+    // ✅ SIZE VALIDATION - 10MB per image, 50MB total (backend limits)
+    const maxSizePerFile = 10 * 1024 * 1024; // 10MB per image
+    const maxTotalSize = 50 * 1024 * 1024; // 50MB total
     
     let totalSize = 0;
     let hasOversizedImages = false;
@@ -955,7 +903,7 @@ export default function SellNowPage() {
       if (image?.size) {
         totalSize += image.size;
         
-        // Check if individual image exceeds 5MB
+        // Check if individual image exceeds 10MB
         if (image.size > maxSizePerFile) {
           hasOversizedImages = true;
           oversizedImages.push({
@@ -969,7 +917,7 @@ export default function SellNowPage() {
     
     // Show error for oversized images
     if (hasOversizedImages) {
-      const errorMessage = `❌ Some images exceed 5MB limit:\n\n` +
+      const errorMessage = `❌ Some images exceed 10MB limit:\n\n` +
         oversizedImages.map(img => 
           `• Image ${img.index}: ${img.name} (${img.sizeMB}MB)`
         ).join('\n') +
@@ -981,9 +929,9 @@ export default function SellNowPage() {
     
     // Check total size
     if (totalSize > maxTotalSize) {
-      alert(`❌ Total size exceeds 25MB limit!\n\n` +
+      alert(`❌ Total size exceeds 50MB limit!\n\n` +
         `Current: ${(totalSize / (1024 * 1024)).toFixed(2)}MB\n` +
-        `Limit: 25MB\n\n` +
+        `Limit: 50MB\n\n` +
         `Please remove some images or use smaller files.`);
       return;
     }
@@ -998,13 +946,13 @@ export default function SellNowPage() {
 ✅ DO:
 • Use Wi-Fi for uploads
 • Maximum 5 images total
-• Maximum 5MB per image
+• Maximum 10MB per image
 • Keep screen ON during upload
 • Don't switch apps
 
 📊 CURRENT STATUS:
 • Images: ${formData.images.length}/5
-• Total Size: ${(totalSize/(1024*1024)).toFixed(2)}MB/25MB
+• Total Size: ${(totalSize/(1024*1024)).toFixed(2)}MB/50MB
       `;
       
       const mobileConfirm = confirm(mobileTips + '\n\nContinue with upload?');
@@ -1105,7 +1053,7 @@ export default function SellNowPage() {
 
   // ✅ Calculate total size for display
   const totalSizeMB = formData.images.reduce((sum, img) => sum + img.size, 0) / (1024 * 1024);
-  const sizePercentage = Math.min(100, (totalSizeMB / 25) * 100);
+  const sizePercentage = Math.min(100, (totalSizeMB / 50) * 100);
 
   // ✅ Upload Progress Overlay
   const UploadProgressOverlay = () => {
@@ -1602,7 +1550,7 @@ export default function SellNowPage() {
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
                       Product Images * 
                       <span className="text-xs text-gray-500 ml-1">
-                        (Max 5 images, 5MB each, 25MB total)
+                        (Max 5 images, 10MB each, 50MB total)
                         {isMobile && ' 📱'}
                       </span>
                     </label>
@@ -1624,14 +1572,14 @@ export default function SellNowPage() {
                         </div>
                         <p className="text-gray-600 text-sm md:text-base lg:text-lg font-medium">Click to upload images</p>
                         <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">
-                          JPG, PNG, WebP, HEIF/HEIC up to 5MB each
+                          JPG, PNG, WebP, HEIF/HEIC up to 10MB each
                         </p>
                         <p className="text-gray-400 text-xs mt-0.5 md:mt-1">
-                          Maximum 5 images, total under 25MB
+                          Maximum 5 images, total under 50MB
                         </p>
                         {isMobile && (
                           <p className="text-blue-500 text-xs mt-0.5 md:mt-1">
-                            📱 HEIF/HEIC files automatically converted to JPEG
+                            📱 HEIF/HEIC files work best when converted to JPEG
                           </p>
                         )}
                       </label>
@@ -1680,7 +1628,7 @@ export default function SellNowPage() {
                         <div className="mt-3 md:mt-4 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-blue-800 text-xs md:text-sm font-medium">
-                              Total Size: {totalSizeMB.toFixed(2)}MB / 25MB
+                              Total Size: {totalSizeMB.toFixed(2)}MB / 50MB
                             </span>
                             <span className="text-xs text-blue-600">
                               {Math.round(sizePercentage)}% used
@@ -1697,7 +1645,7 @@ export default function SellNowPage() {
                           
                           <div className="flex justify-between text-xs text-blue-600 mt-1">
                             <span>0MB</span>
-                            <span>25MB limit</span>
+                            <span>50MB limit</span>
                           </div>
                         </div>
                       </div>
@@ -1711,11 +1659,11 @@ export default function SellNowPage() {
                         <div>
                           <p className="text-yellow-800 font-medium text-xs md:text-sm">Upload Tips {isMobile && 'for Mobile'}</p>
                           <ul className="text-yellow-700 text-xs md:text-sm mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
-                            <li>• Maximum 5 images, 5MB each, 25MB total</li>
+                            <li>• Maximum 5 images, 10MB each, 50MB total</li>
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
-                            <li>• HEIF/HEIC files (from iPhone) are converted to JPEG</li>
+                            <li>• HEIF/HEIC files work best when converted to JPEG</li>
                             {isMobile && <li>• Use Wi-Fi for best results on mobile</li>}
                             <li>• Competitive Pricing makes items sell faster</li>
                           </ul>
@@ -1822,7 +1770,7 @@ export default function SellNowPage() {
                           <div className="flex justify-between border-b pb-2 md:pb-3">
                             <span className="text-gray-600 text-sm md:text-base">Total Size:</span>
                             <span className="font-medium text-gray-900 text-sm md:text-base">
-                              {totalSizeMB.toFixed(2)}MB / 25MB
+                              {totalSizeMB.toFixed(2)}MB / 50MB
                             </span>
                           </div>
                         </div>
@@ -1885,7 +1833,7 @@ export default function SellNowPage() {
                         {isMobile && (
                           <p className="text-blue-600 text-xs mt-2">
                             📱 <span className="font-semibold">Mobile Upload:</span> 
-                            {formData.images.length} images ({totalSizeMB.toFixed(2)}MB/25MB)
+                            {formData.images.length} images ({totalSizeMB.toFixed(2)}MB/50MB)
                           </p>
                         )}
                       </div>
