@@ -50,7 +50,7 @@ export default function SellNowPage() {
     checkMobile()
   }, [])
 
-  // ✅ STRICT CATEGORY MAPPING - UPDATED
+  // ✅ STRICT CATEGORY MAPPING
   const strictCategoryMap = useCallback(() => {
     return {
       "Men's Fashion": "Men's Fashion",
@@ -98,7 +98,7 @@ export default function SellNowPage() {
     }
   }, [])
 
-  // ✅ FIXED: Safe localStorage access
+  // ✅ Safe localStorage access
   const getLocalStorage = (key) => {
     if (typeof window === 'undefined') return null
     try {
@@ -109,7 +109,7 @@ export default function SellNowPage() {
     }
   }
 
-  // ✅ FIXED: Safe JSON parsing
+  // ✅ Safe JSON parsing
   const parseUserData = (data) => {
     if (!data) return null
     try {
@@ -120,7 +120,7 @@ export default function SellNowPage() {
     }
   }
 
-  // ✅ Brand input handler - Capitalize first letter
+  // ✅ Brand input handler
   const handleBrandInput = (e) => {
     const { name, value } = e.target
     
@@ -291,7 +291,6 @@ export default function SellNowPage() {
 
   // ✅ TRANSFORM CATEGORIES FOR SELECT
   const transformCategoriesForSelect = useCallback((backendCategories) => {
-    // Get unique categories after mapping
     const uniqueCategories = []
     const seen = new Set()
     
@@ -344,7 +343,7 @@ export default function SellNowPage() {
     return uniqueItems
   }, [categories])
 
-  // ✅ MOBILE IMAGE COMPRESSION
+  // ✅ FIXED: PROPER MOBILE COMPRESSION FUNCTION
   const compressImageForMobile = async (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -354,40 +353,69 @@ export default function SellNowPage() {
         img.src = event.target.result
         img.onload = () => {
           const canvas = document.createElement('canvas')
-          const MAX_SIZE = 1024 // Max dimension for mobile
+          
+          // ✅ TARGET MAXIMUM DIMENSION
+          const MAX_DIMENSION = 1024
           
           let width = img.width
           let height = img.height
           
-          // Calculate new dimensions
+          // Calculate aspect ratio
+          const aspectRatio = width / height
+          
+          // Resize based on larger dimension
           if (width > height) {
-            if (width > MAX_SIZE) {
-              height *= MAX_SIZE / width
-              width = MAX_SIZE
+            if (width > MAX_DIMENSION) {
+              width = MAX_DIMENSION
+              height = Math.round(width / aspectRatio)
             }
           } else {
-            if (height > MAX_SIZE) {
-              width *= MAX_SIZE / height
-              height = MAX_SIZE
+            if (height > MAX_DIMENSION) {
+              height = MAX_DIMENSION
+              width = Math.round(height * aspectRatio)
             }
           }
           
+          // Set canvas dimensions
           canvas.width = width
           canvas.height = height
           
           const ctx = canvas.getContext('2d')
+          
+          // ✅ Improve image quality
+          ctx.imageSmoothingEnabled = true
+          ctx.imageSmoothingQuality = 'high'
+          
+          // Draw image
           ctx.drawImage(img, 0, 0, width, height)
           
-          // Adjust quality based on file size
-          let quality = 0.8
-          if (file.size > 2 * 1024 * 1024) quality = 0.7
-          if (file.size > 5 * 1024 * 1024) quality = 0.6
+          // ✅ SMART QUALITY BASED ON ORIGINAL SIZE
+          let quality = 0.7
           
+          // Original file size in MB
+          const originalSizeMB = file.size / (1024 * 1024)
+          
+          // Adjust quality based on original size
+          if (originalSizeMB < 1) {
+            quality = 0.8
+          } else if (originalSizeMB >= 1 && originalSizeMB < 3) {
+            quality = 0.6
+          } else if (originalSizeMB >= 3 && originalSizeMB < 5) {
+            quality = 0.5
+          } else {
+            quality = 0.4
+          }
+          
+          console.log(`📱 Compressing: ${originalSizeMB.toFixed(2)}MB → quality: ${quality}`)
+          
+          // Convert to Blob
           canvas.toBlob((blob) => {
             const compressedFile = new File([blob], file.name, {
               type: 'image/jpeg',
               lastModified: Date.now()
             })
+            
+            console.log(`✅ Compressed: ${originalSizeMB.toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
             resolve(compressedFile)
           }, 'image/jpeg', quality)
         }
@@ -564,116 +592,120 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  // ✅ UPDATED: MOBILE OPTIMIZED IMAGE UPLOAD
+  // ✅ FIXED: HANDLE IMAGE UPLOAD WITH STRICT 5MB PER IMAGE, 25MB TOTAL LIMIT
   const handleImageUpload = async (e) => {
-    // ✅ FIX: Check if event and files exist
-    if (!e || !e.target || !e.target.files) {
-      console.error('❌ Invalid file upload event:', e);
-      return;
-    }
+    if (!e?.target?.files) return
     
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files)
     
-    if (!files || files.length === 0) {
-      console.warn('No files selected');
-      return;
-    }
+    if (files.length === 0) return
     
-    // Set limits
-    const maxFiles = isMobile ? 3 : 5;
-    const remainingSlots = maxFiles - (formData?.images?.length || 0);
-    const filesToAdd = files.slice(0, remainingSlots);
+    // ✅ STRICT LIMITS
+    const maxFiles = 5 // Total 5 images
+    const maxSizePerFile = 5 * 1024 * 1024 // 5MB per image
+    const maxTotalSize = 25 * 1024 * 1024 // 25MB total
+    
+    const currentImages = Array.isArray(formData?.images) ? formData.images : []
+    const remainingSlots = maxFiles - currentImages.length
+    
+    // Filter files to add
+    const filesToAdd = files.slice(0, remainingSlots)
     
     if (filesToAdd.length === 0) {
-      alert(`You can upload maximum ${maxFiles} images${isMobile ? ' on mobile' : ''}`);
-      return;
+      alert(`Maximum ${maxFiles} images allowed`)
+      return
     }
     
-    // ✅ FIX: Initialize images array if it doesn't exist
-    const currentImages = Array.isArray(formData?.images) ? formData.images : [];
+    let validFiles = []
+    let errors = []
+    let totalSize = 0
     
-    // Set size limits based on device
-    const maxSizePerFile = isMobile ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+    console.log(`📱 Processing ${filesToAdd.length} files...`)
     
-    let validFiles = [];
-    let errors = [];
-    let totalSize = 0;
-
-    console.log(`📱 Mobile: ${isMobile}, Files to process: ${filesToAdd.length}`);
-
     for (const file of filesToAdd) {
       try {
-        // Validate file
+        // Basic validation
         if (!file || typeof file !== 'object') {
-          errors.push('Invalid file');
-          continue;
+          errors.push('Invalid file')
+          continue
         }
         
-        // Check file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        // File type check
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         if (!validTypes.includes(file.type)) {
-          errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`);
-          continue;
+          errors.push(`${file.name}: Only JPG, PNG, WebP allowed`)
+          continue
         }
-
-        // Check size per file
+        
+        // Check individual file size BEFORE compression
         if (file.size > maxSizePerFile) {
-          errors.push(`${file.name}: File too large (max ${isMobile ? '5MB' : '10MB'} per image).`);
-          continue;
+          errors.push(`${file.name}: File too large (max 5MB per image)`)
+          continue
         }
-
-        const minSize = 10 * 1024; // 10KB
+        
+        // Check minimum size
+        const minSize = 10 * 1024 // 10KB
         if (file.size < minSize) {
-          errors.push(`${file.name}: File too small (min 10KB).`);
-          continue;
+          errors.push(`${file.name}: File too small (min 10KB)`)
+          continue
         }
-
-        // Compress for mobile if needed
-        let processedFile = file;
-        if (isMobile && file.size > 1 * 1024 * 1024) { // Compress if > 1MB on mobile
+        
+        // ✅ FIX: ONLY COMPRESS IF FILE IS > 2MB
+        let processedFile = file
+        
+        if (isMobile && file.size > 2 * 1024 * 1024) {
           try {
-            console.log(`📱 Compressing ${file.name} for mobile...`);
-            processedFile = await compressImageForMobile(file);
-            console.log(`✅ Compressed: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(processedFile.size/(1024*1024)).toFixed(2)}MB`);
+            console.log(`📱 Compressing ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)...`)
+            processedFile = await compressImageForMobile(file)
+            
+            // Check compressed size
+            if (processedFile.size > maxSizePerFile) {
+              errors.push(`${file.name}: After compression still too large (${(processedFile.size/(1024*1024)).toFixed(2)}MB)`)
+              continue
+            }
           } catch (compressError) {
-            console.warn(`⚠️ Compression failed for ${file.name}, using original`);
+            console.warn(`Compression failed, using original: ${file.name}`)
+            // If compression fails, use original but check size
+            if (file.size > maxSizePerFile) {
+              errors.push(`${file.name}: Cannot compress, file too large`)
+              continue
+            }
           }
         }
-
+        
         // Check total size limit
-        const newTotalSize = totalSize + processedFile.size;
-        const maxTotalSize = isMobile ? 15 * 1024 * 1024 : 50 * 1024 * 1024;
-        
+        const newTotalSize = totalSize + processedFile.size
         if (newTotalSize > maxTotalSize) {
-          errors.push(`${file.name}: Total size would exceed ${isMobile ? '15MB' : '50MB'} limit.`);
-          continue;
+          errors.push(`${file.name}: Would exceed 25MB total limit`)
+          continue
         }
-
-        totalSize = newTotalSize;
-        validFiles.push(processedFile);
         
-      } catch (fileError) {
-        console.error(`Error processing ${file.name}:`, fileError);
-        errors.push(`${file.name}: Processing error`);
+        totalSize = newTotalSize
+        validFiles.push(processedFile)
+        
+        console.log(`✅ Added: ${file.name} (${(processedFile.size/(1024*1024)).toFixed(2)}MB)`)
+        
+      } catch (error) {
+        console.error(`Error with ${file.name}:`, error)
+        errors.push(`${file.name}: Processing error`)
       }
     }
-
+    
+    // Show errors
     if (errors.length > 0) {
-      alert('Upload issues:\n' + errors.join('\n'));
+      alert('Upload issues:\n' + errors.slice(0, 3).join('\n'))
     }
-
-    // ✅ FIX: Update formData safely
+    
+    // Update form data
     if (validFiles.length > 0) {
       setFormData(prev => ({
         ...prev,
         images: [...currentImages, ...validFiles]
-      }));
+      }))
       
-      // Show mobile warning
-      if (isMobile && validFiles.length > 0) {
-        const finalTotalSize = [...currentImages, ...validFiles].reduce((sum, img) => sum + img.size, 0);
-        console.log(`📱 Mobile upload: ${currentImages.length + validFiles.length} images, total ${(finalTotalSize/(1024*1024)).toFixed(2)}MB`);
-      }
+      // Show success message
+      const newTotalSize = [...currentImages, ...validFiles].reduce((sum, img) => sum + img.size, 0)
+      console.log(`📊 Total: ${currentImages.length + validFiles.length} images, ${(newTotalSize/(1024*1024)).toFixed(2)}MB/25MB`)
     }
   }
 
@@ -692,7 +724,7 @@ export default function SellNowPage() {
     setCurrentStep(prev => prev - 1)
   }
 
-  // ✅ UPDATED: XHR UPLOAD FOR MOBILE (MOST RELIABLE)
+  // ✅ XHR UPLOAD FOR MOBILE
   const uploadWithXHR = (token, formDataToSend) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -764,59 +796,88 @@ export default function SellNowPage() {
     });
   };
 
-  // ✅ UPDATED: HANDLE SUBMIT
+  // ✅ FIXED: HANDLE SUBMIT WITH SIZE VALIDATION
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // ✅ FIX 1: Validate images array
+    // ✅ Validate images array
     if (!formData || !formData.images || !Array.isArray(formData.images)) {
-      console.error('❌ FormData or images array is invalid:', formData);
       alert('Form data error. Please refresh the page and try again.');
       return;
     }
     
-    // ✅ FIX 2: Check if images exist
+    // ✅ Check if images exist
     if (formData.images.length === 0) {
       alert('❌ Please upload at least one product image');
       return;
     }
     
-    // ✅ FIX 3: Validate each image
-    let hasInvalidImages = false;
+    // ✅ STRICT SIZE VALIDATION - 5MB per image, 25MB total
+    const maxSizePerFile = 5 * 1024 * 1024; // 5MB per image
+    const maxTotalSize = 25 * 1024 * 1024; // 25MB total
+    
+    let totalSize = 0;
+    let hasOversizedImages = false;
+    let oversizedImages = [];
+    
+    // Check each image size
     formData.images.forEach((image, index) => {
-      if (!image || typeof image !== 'object' || !image.name || !image.size) {
-        console.error(`❌ Invalid image at index ${index}:`, image);
-        hasInvalidImages = true;
+      if (image?.size) {
+        totalSize += image.size;
+        
+        // Check if individual image exceeds 5MB
+        if (image.size > maxSizePerFile) {
+          hasOversizedImages = true;
+          oversizedImages.push({
+            index: index + 1,
+            name: image.name || `Image ${index + 1}`,
+            sizeMB: (image.size / (1024 * 1024)).toFixed(2)
+          });
+        }
       }
     });
     
-    if (hasInvalidImages) {
-      alert('❌ Some images are invalid. Please remove and re-upload them.');
+    // Show error for oversized images
+    if (hasOversizedImages) {
+      const errorMessage = `❌ Some images exceed 5MB limit:\n\n` +
+        oversizedImages.map(img => 
+          `• Image ${img.index}: ${img.name} (${img.sizeMB}MB)`
+        ).join('\n') +
+        `\n\nPlease compress or replace these images before uploading.`;
+      
+      alert(errorMessage);
       return;
     }
     
-    // ✅ FIX 4: Mobile pre-check
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Check total size
+    if (totalSize > maxTotalSize) {
+      alert(`❌ Total size exceeds 25MB limit!\n\n` +
+        `Current: ${(totalSize / (1024 * 1024)).toFixed(2)}MB\n` +
+        `Limit: 25MB\n\n` +
+        `Please remove some images or use smaller files.`);
+      return;
+    }
     
-    if (isMobile) {
-      const totalSize = formData.images.reduce((sum, img) => sum + (img?.size || 0), 0);
+    // ✅ Mobile pre-check
+    const isMobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobileCheck) {
+      const mobileTips = `
+📱 MOBILE UPLOAD GUIDE:
+
+✅ DO:
+• Use Wi-Fi for uploads
+• Maximum 5 images total
+• Maximum 5MB per image
+• Keep screen ON during upload
+• Don't switch apps
+
+📊 CURRENT STATUS:
+• Images: ${formData.images.length}/5
+• Total Size: ${(totalSize/(1024*1024)).toFixed(2)}MB/25MB
+      `;
       
-      if (totalSize > 15 * 1024 * 1024) {
-        alert(`❌ Mobile Upload Limit\n\nTotal size: ${(totalSize/(1024*1024)).toFixed(2)}MB\nMobile limit: 15MB\n\nPlease reduce image sizes.`);
-        return;
-      }
-      
-      const mobileConfirm = confirm(
-        `📱 Mobile Upload Notice\n\n` +
-        `IMPORTANT: Keep this screen open until upload completes.\n\n` +
-        `Do NOT:\n` +
-        `• Switch to another app\n` +
-        `• Lock your phone\n` +
-        `• Turn off screen\n` +
-        `• Lose network connection\n\n` +
-        `Uploading ${formData.images.length} image(s) (${(totalSize/(1024*1024)).toFixed(2)}MB)\n\n` +
-        `Continue with upload?`
-      );
+      const mobileConfirm = confirm(mobileTips + '\n\nContinue with upload?');
       
       if (!mobileConfirm) return;
     }
@@ -852,7 +913,7 @@ export default function SellNowPage() {
         return;
       }
       
-      // ✅ FIX 5: Prepare form data safely
+      // Prepare form data
       const submitFormData = new FormData();
       
       // Add product data
@@ -868,28 +929,18 @@ export default function SellNowPage() {
       submitFormData.append('platformFee', platformFee.toString());
       submitFormData.append('finalPrice', justBechoPrice.toString());
       
-      // ✅ FIX 6: Add images safely
+      // Add images safely
       console.log('📦 Adding images to FormData:', formData.images.length);
       
       formData.images.forEach((image, index) => {
         if (image && image.name && image.size) {
-          const fileName = isMobile 
+          const fileName = isMobileCheck 
             ? `mobile_${Date.now()}_${index}_${image.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
             : image.name;
           submitFormData.append('images', image, fileName);
           console.log(`  Added image ${index + 1}: ${image.name} (${(image.size/(1024*1024)).toFixed(2)}MB)`);
-        } else {
-          console.warn(`  Skipping invalid image at index ${index}:`, image);
         }
       });
-      
-      // ✅ FIX 7: Check if any images were added
-      const imageCount = Array.from(submitFormData.entries()).filter(([key]) => key === 'images').length;
-      if (imageCount === 0) {
-        throw new Error('No valid images to upload');
-      }
-      
-      console.log(`🚀 Starting upload with ${imageCount} images...`);
       
       // Use XHR for upload
       const result = await uploadWithXHR(token, submitFormData);
@@ -904,10 +955,8 @@ export default function SellNowPage() {
     } catch (error) {
       console.error('❌ Upload error:', error);
       
-      if (isMobile) {
-        if (error.message.includes('No valid images')) {
-          alert('❌ No valid images found. Please upload images again.');
-        } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+      if (isMobileCheck) {
+        if (error.message.includes('timeout') || error.message.includes('Timeout')) {
           alert('❌ Upload timeout. Try with Wi-Fi and fewer images.');
         } else if (error.message.includes('Failed to fetch') || error.message.includes('Network Error')) {
           alert('❌ Network error. Check connection and try again.');
@@ -1011,6 +1060,10 @@ export default function SellNowPage() {
       </div>
     )
   }
+
+  // ✅ Calculate total size for display
+  const totalSizeMB = formData.images.reduce((sum, img) => sum + img.size, 0) / (1024 * 1024);
+  const sizePercentage = Math.min(100, (totalSizeMB / 25) * 100);
 
   // ✅ Main form
   return (
@@ -1419,7 +1472,8 @@ export default function SellNowPage() {
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
                       Product Images * 
                       <span className="text-xs text-gray-500 ml-1">
-                        (Max {isMobile ? '3' : '5'} images, {isMobile ? '5MB' : '10MB'} each, {isMobile ? '15MB' : '50MB'} total)
+                        (Max 5 images, 5MB each, 25MB total)
+                        {isMobile && ' 📱'}
                       </span>
                     </label>
 
@@ -1440,14 +1494,14 @@ export default function SellNowPage() {
                         </div>
                         <p className="text-gray-600 text-sm md:text-base lg:text-lg font-medium">Click to upload images</p>
                         <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">
-                          {isMobile ? 'PNG, JPG up to 5MB each' : 'PNG, JPG, JPEG up to 10MB each'}
+                          PNG, JPG, JPEG up to 5MB each
                         </p>
                         <p className="text-gray-400 text-xs mt-0.5 md:mt-1">
-                          Maximum {isMobile ? '3' : '5'} images, total under {isMobile ? '15MB' : '50MB'}
+                          Maximum 5 images, total under 25MB
                         </p>
                         {isMobile && (
                           <p className="text-blue-500 text-xs mt-0.5 md:mt-1">
-                            📱 Large images are automatically compressed for mobile
+                            📱 Large images (2MB) are automatically compressed
                           </p>
                         )}
                       </label>
@@ -1456,7 +1510,7 @@ export default function SellNowPage() {
                     {formData.images.length > 0 && (
                       <div className="mt-4 md:mt-6">
                         <h4 className="text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
-                          Uploaded Images ({formData.images.length}/{isMobile ? '3' : '5'})
+                          Uploaded Images ({formData.images.length}/5)
                           {isMobile && <span className="text-blue-500 ml-2">📱</span>}
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3 lg:gap-4">
@@ -1480,7 +1534,7 @@ export default function SellNowPage() {
                             </div>
                           ))}
 
-                          {formData.images.length < (isMobile ? 3 : 5) && (
+                          {formData.images.length < 5 && (
                             <label htmlFor="image-upload" className="cursor-pointer">
                               <div className="w-full h-16 md:h-20 lg:h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors">
                                 <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 mb-0.5 md:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1494,16 +1548,26 @@ export default function SellNowPage() {
                         
                         {/* Total Size Display */}
                         <div className="mt-3 md:mt-4 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <div className="flex justify-between items-center">
+                          <div className="flex justify-between items-center mb-2">
                             <span className="text-blue-800 text-xs md:text-sm font-medium">
-                              Total Size: {formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024) > 1 
-                                ? `${(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)).toFixed(2)}MB`
-                                : `${Math.round(formData.images.reduce((sum, img) => sum + img.size, 0) / 1024)}KB`
-                              }
+                              Total Size: {totalSizeMB.toFixed(2)}MB / 25MB
                             </span>
                             <span className="text-xs text-blue-600">
-                              Limit: {isMobile ? '15MB' : '50MB'} ({Math.round((formData.images.reduce((sum, img) => sum + img.size, 0) / ((isMobile ? 15 : 50) * 1024 * 1024)) * 100)}% used)
+                              {Math.round(sizePercentage)}% used
                             </span>
+                          </div>
+                          
+                          {/* Progress bar */}
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div 
+                              className={`h-1.5 rounded-full transition-all duration-300 ${sizePercentage > 90 ? 'bg-red-500' : sizePercentage > 70 ? 'bg-yellow-500' : 'bg-blue-500'}`}
+                              style={{ width: `${sizePercentage}%` }}
+                            ></div>
+                          </div>
+                          
+                          <div className="flex justify-between text-xs text-blue-600 mt-1">
+                            <span>0MB</span>
+                            <span>25MB limit</span>
                           </div>
                         </div>
                       </div>
@@ -1517,12 +1581,12 @@ export default function SellNowPage() {
                         <div>
                           <p className="text-yellow-800 font-medium text-xs md:text-sm">Upload Tips {isMobile && 'for Mobile'}</p>
                           <ul className="text-yellow-700 text-xs md:text-sm mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
+                            <li>• Maximum 5 images, 5MB each, 25MB total</li>
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
-                            <li>• Capture any imperfections or wear</li>
-                            {isMobile && <li>• Use Wi-Fi for best results on mobile</li>}
-                            {isMobile && <li>• Large images are automatically compressed</li>}
+                            {isMobile && <li>• Images larger than 2MB are automatically compressed</li>}
+                            {isMobile && <li>• Use Wi-Fi for best results</li>}
                             <li>• Competitive Pricing makes items sell faster</li>
                           </ul>
                         </div>
@@ -1628,10 +1692,7 @@ export default function SellNowPage() {
                           <div className="flex justify-between border-b pb-2 md:pb-3">
                             <span className="text-gray-600 text-sm md:text-base">Total Size:</span>
                             <span className="font-medium text-gray-900 text-sm md:text-base">
-                              {formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024) > 1 
-                                ? `${(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)).toFixed(2)}MB`
-                                : `${Math.round(formData.images.reduce((sum, img) => sum + img.size, 0) / 1024)}KB`
-                              }
+                              {totalSizeMB.toFixed(2)}MB / 25MB
                             </span>
                           </div>
                         </div>
@@ -1693,7 +1754,8 @@ export default function SellNowPage() {
                         </p>
                         {isMobile && (
                           <p className="text-blue-600 text-xs mt-2">
-                            📱 <span className="font-semibold">Mobile Upload:</span> Images are optimized for mobile upload.
+                            📱 <span className="font-semibold">Mobile Upload:</span> 
+                            {formData.images.length} images ({totalSizeMB.toFixed(2)}MB/25MB)
                           </p>
                         )}
                       </div>
