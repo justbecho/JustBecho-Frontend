@@ -564,92 +564,115 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  // ✅ MOBILE OPTIMIZED IMAGE UPLOAD
+  // ✅ UPDATED: MOBILE OPTIMIZED IMAGE UPLOAD
   const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files)
-    
-    // Set limits based on device
-    const maxFiles = isMobile ? 3 : 5
-    const maxSizePerFile = isMobile ? 5 * 1024 * 1024 : 10 * 1024 * 1024
-    const remainingSlots = maxFiles - formData.images.length
-    const filesToAdd = files.slice(0, remainingSlots)
-
-    if (filesToAdd.length === 0) {
-      alert(`You can upload maximum ${maxFiles} images${isMobile ? ' on mobile' : ''}`)
-      return
+    // ✅ FIX: Check if event and files exist
+    if (!e || !e.target || !e.target.files) {
+      console.error('❌ Invalid file upload event:', e);
+      return;
     }
+    
+    const files = Array.from(e.target.files);
+    
+    if (!files || files.length === 0) {
+      console.warn('No files selected');
+      return;
+    }
+    
+    // Set limits
+    const maxFiles = isMobile ? 3 : 5;
+    const remainingSlots = maxFiles - (formData?.images?.length || 0);
+    const filesToAdd = files.slice(0, remainingSlots);
+    
+    if (filesToAdd.length === 0) {
+      alert(`You can upload maximum ${maxFiles} images${isMobile ? ' on mobile' : ''}`);
+      return;
+    }
+    
+    // ✅ FIX: Initialize images array if it doesn't exist
+    const currentImages = Array.isArray(formData?.images) ? formData.images : [];
+    
+    // Set size limits based on device
+    const maxSizePerFile = isMobile ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+    
+    let validFiles = [];
+    let errors = [];
+    let totalSize = 0;
 
-    let validFiles = []
-    let errors = []
-    let totalSize = 0
-
-    console.log(`📱 Mobile: ${isMobile}, Files to process: ${filesToAdd.length}`)
+    console.log(`📱 Mobile: ${isMobile}, Files to process: ${filesToAdd.length}`);
 
     for (const file of filesToAdd) {
       try {
+        // Validate file
+        if (!file || typeof file !== 'object') {
+          errors.push('Invalid file');
+          continue;
+        }
+        
         // Check file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!validTypes.includes(file.type)) {
-          errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`)
-          continue
+          errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`);
+          continue;
         }
 
         // Check size per file
         if (file.size > maxSizePerFile) {
-          errors.push(`${file.name}: File too large (max ${isMobile ? '5MB' : '10MB'} per image).`)
-          continue
+          errors.push(`${file.name}: File too large (max ${isMobile ? '5MB' : '10MB'} per image).`);
+          continue;
         }
 
-        const minSize = 10 * 1024 // 10KB
+        const minSize = 10 * 1024; // 10KB
         if (file.size < minSize) {
-          errors.push(`${file.name}: File too small (min 10KB).`)
-          continue
+          errors.push(`${file.name}: File too small (min 10KB).`);
+          continue;
         }
 
         // Compress for mobile if needed
-        let processedFile = file
+        let processedFile = file;
         if (isMobile && file.size > 1 * 1024 * 1024) { // Compress if > 1MB on mobile
           try {
-            console.log(`📱 Compressing ${file.name} for mobile...`)
-            processedFile = await compressImageForMobile(file)
-            console.log(`✅ Compressed: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(processedFile.size/(1024*1024)).toFixed(2)}MB`)
+            console.log(`📱 Compressing ${file.name} for mobile...`);
+            processedFile = await compressImageForMobile(file);
+            console.log(`✅ Compressed: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(processedFile.size/(1024*1024)).toFixed(2)}MB`);
           } catch (compressError) {
-            console.warn(`⚠️ Compression failed for ${file.name}, using original`)
+            console.warn(`⚠️ Compression failed for ${file.name}, using original`);
           }
         }
 
         // Check total size limit
-        const newTotalSize = totalSize + processedFile.size
-        const maxTotalSize = isMobile ? 15 * 1024 * 1024 : 50 * 1024 * 1024
+        const newTotalSize = totalSize + processedFile.size;
+        const maxTotalSize = isMobile ? 15 * 1024 * 1024 : 50 * 1024 * 1024;
         
         if (newTotalSize > maxTotalSize) {
-          errors.push(`${file.name}: Total size would exceed ${isMobile ? '15MB' : '50MB'} limit.`)
-          continue
+          errors.push(`${file.name}: Total size would exceed ${isMobile ? '15MB' : '50MB'} limit.`);
+          continue;
         }
 
-        totalSize = newTotalSize
-        validFiles.push(processedFile)
+        totalSize = newTotalSize;
+        validFiles.push(processedFile);
         
       } catch (fileError) {
-        console.error(`Error processing ${file.name}:`, fileError)
-        errors.push(`${file.name}: Processing error`)
+        console.error(`Error processing ${file.name}:`, fileError);
+        errors.push(`${file.name}: Processing error`);
       }
     }
 
     if (errors.length > 0) {
-      alert('Upload issues:\n' + errors.join('\n'))
+      alert('Upload issues:\n' + errors.join('\n'));
     }
 
+    // ✅ FIX: Update formData safely
     if (validFiles.length > 0) {
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, ...validFiles]
-      }))
+        images: [...currentImages, ...validFiles]
+      }));
       
       // Show mobile warning
       if (isMobile && validFiles.length > 0) {
-        const finalTotalSize = [...formData.images, ...validFiles].reduce((sum, img) => sum + img.size, 0)
-        console.log(`📱 Mobile upload: ${formData.images.length + validFiles.length} images, total ${(finalTotalSize/(1024*1024)).toFixed(2)}MB`)
+        const finalTotalSize = [...currentImages, ...validFiles].reduce((sum, img) => sum + img.size, 0);
+        console.log(`📱 Mobile upload: ${currentImages.length + validFiles.length} images, total ${(finalTotalSize/(1024*1024)).toFixed(2)}MB`);
       }
     }
   }
@@ -669,60 +692,33 @@ export default function SellNowPage() {
     setCurrentStep(prev => prev - 1)
   }
 
-  // ✅ XHR UPLOAD FOR MOBILE (MOST RELIABLE)
-  const uploadWithXHR = (token) => {
+  // ✅ UPDATED: XHR UPLOAD FOR MOBILE (MOST RELIABLE)
+  const uploadWithXHR = (token, formDataToSend) => {
     return new Promise((resolve, reject) => {
-      const formData = new FormData()
+      const xhr = new XMLHttpRequest();
+      const url = 'https://just-becho-backend.vercel.app/api/products';
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      // Add product data
-      const mappedCategory = strictCategoryMap()[formData.category] || formData.category
-      formData.append('productName', formData.productName)
-      formData.append('brand', formData.brand)
-      formData.append('category', mappedCategory)
-      formData.append('productType', formData.productType)
-      formData.append('purchaseYear', formData.purchaseYear || '')
-      formData.append('condition', formData.condition)
-      formData.append('description', formData.description)
-      formData.append('askingPrice', formData.askingPrice)
-      formData.append('platformFee', platformFee.toString())
-      formData.append('finalPrice', justBechoPrice.toString())
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       
-      // Add mobile flag if on mobile
-      if (isMobile) {
-        formData.append('isMobile', 'true')
-      }
-      
-      // Add images with unique names
-      formData.images.forEach((image, index) => {
-        const fileName = isMobile 
-          ? `mobile_${Date.now()}_${index}_${image.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
-          : image.name
-        formData.append('images', image, fileName)
-      })
-      
-      const xhr = new XMLHttpRequest()
-      const url = 'https://just-becho-backend.vercel.app/api/products'
-      
-      xhr.open('POST', url, true)
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`)
-      
-      // Timeout settings (longer for mobile)
-      xhr.timeout = isMobile ? 300000 : 180000 // 5 min mobile, 3 min desktop
-      xhr.responseType = 'json'
+      // Timeout settings
+      xhr.timeout = isMobile ? 300000 : 180000;
+      xhr.responseType = 'json';
       
       // Progress tracking
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
-          const percent = Math.round((event.loaded / event.total) * 100)
+          const percent = Math.round((event.loaded / event.total) * 100);
           setUploadProgress({
             isUploading: true,
             uploaded: event.loaded,
             total: event.total,
             percent: percent,
             currentFile: `Uploading... ${percent}%`
-          })
+          });
         }
-      }
+      };
       
       xhr.onload = () => {
         setUploadProgress({
@@ -731,14 +727,14 @@ export default function SellNowPage() {
           total: 0,
           percent: 0,
           currentFile: ''
-        })
+        });
         
         if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(xhr.response)
+          resolve(xhr.response);
         } else {
-          reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`))
+          reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`));
         }
-      }
+      };
       
       xhr.onerror = () => {
         setUploadProgress({
@@ -747,9 +743,9 @@ export default function SellNowPage() {
           total: 0,
           percent: 0,
           currentFile: ''
-        })
-        reject(new Error('Network error. Please check your connection.'))
-      }
+        });
+        reject(new Error('Network error. Please check your connection.'));
+      };
       
       xhr.ontimeout = () => {
         setUploadProgress({
@@ -758,125 +754,173 @@ export default function SellNowPage() {
           total: 0,
           percent: 0,
           currentFile: ''
-        })
-        reject(new Error('Upload timeout. Please try again.'))
-      }
-      
-      xhr.onabort = () => {
-        setUploadProgress({
-          isUploading: false,
-          uploaded: 0,
-          total: 0,
-          percent: 0,
-          currentFile: ''
-        })
-        reject(new Error('Upload cancelled.'))
-      }
+        });
+        reject(new Error('Upload timeout. Please try again.'));
+      };
       
       // Send request
-      console.log(`🚀 Starting ${isMobile ? 'MOBILE' : 'DESKTOP'} upload...`)
-      console.log(`📦 Files: ${formData.images.length}, Total size: ${formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)}MB`)
-      
-      xhr.send(formData)
-    })
-  }
+      console.log(`🚀 ${isMobile ? 'Mobile' : 'Desktop'} upload starting...`);
+      xhr.send(formDataToSend);
+    });
+  };
 
-  // ✅ HANDLE SUBMIT
+  // ✅ UPDATED: HANDLE SUBMIT
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     
-    // Pre-submit validation
+    // ✅ FIX 1: Validate images array
+    if (!formData || !formData.images || !Array.isArray(formData.images)) {
+      console.error('❌ FormData or images array is invalid:', formData);
+      alert('Form data error. Please refresh the page and try again.');
+      return;
+    }
+    
+    // ✅ FIX 2: Check if images exist
     if (formData.images.length === 0) {
-      alert('❌ Please upload at least one product image')
-      return
+      alert('❌ Please upload at least one product image');
+      return;
     }
     
-    const totalSize = formData.images.reduce((sum, img) => sum + img.size, 0)
+    // ✅ FIX 3: Validate each image
+    let hasInvalidImages = false;
+    formData.images.forEach((image, index) => {
+      if (!image || typeof image !== 'object' || !image.name || !image.size) {
+        console.error(`❌ Invalid image at index ${index}:`, image);
+        hasInvalidImages = true;
+      }
+    });
     
-    // Mobile size limit check
-    if (isMobile && totalSize > 15 * 1024 * 1024) {
-      alert(`❌ Mobile Upload Size Limit\n\nTotal size: ${(totalSize/(1024*1024)).toFixed(2)}MB\nMobile limit: 15MB\n\nPlease reduce image sizes or upload fewer images.`)
-      return
+    if (hasInvalidImages) {
+      alert('❌ Some images are invalid. Please remove and re-upload them.');
+      return;
     }
     
-    // Mobile warning
+    // ✅ FIX 4: Mobile pre-check
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     if (isMobile) {
+      const totalSize = formData.images.reduce((sum, img) => sum + (img?.size || 0), 0);
+      
+      if (totalSize > 15 * 1024 * 1024) {
+        alert(`❌ Mobile Upload Limit\n\nTotal size: ${(totalSize/(1024*1024)).toFixed(2)}MB\nMobile limit: 15MB\n\nPlease reduce image sizes.`);
+        return;
+      }
+      
       const mobileConfirm = confirm(
         `📱 Mobile Upload Notice\n\n` +
-        `IMPORTANT for successful upload:\n` +
-        `• Keep screen ON\n` +
-        `• Stay on this page\n` +
-        `• Don't switch apps\n` +
-        `• Use Wi-Fi if possible\n\n` +
+        `IMPORTANT: Keep this screen open until upload completes.\n\n` +
+        `Do NOT:\n` +
+        `• Switch to another app\n` +
+        `• Lock your phone\n` +
+        `• Turn off screen\n` +
+        `• Lose network connection\n\n` +
         `Uploading ${formData.images.length} image(s) (${(totalSize/(1024*1024)).toFixed(2)}MB)\n\n` +
-        `Click OK to continue`
-      )
+        `Continue with upload?`
+      );
       
-      if (!mobileConfirm) return
+      if (!mobileConfirm) return;
     }
     
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     
     try {
-      const token = getLocalStorage('token')
-      const userData = getLocalStorage('user')
-
+      const token = getLocalStorage('token');
+      const userData = getLocalStorage('user');
+      
       if (!token) {
-        alert('Please login to list a product')
-        router.push('/login?redirect=/sell-now')
-        return
+        alert('Please login to list a product');
+        router.push('/login?redirect=/sell-now');
+        return;
       }
-
+      
       if (!userData) {
-        alert('Please login to list a product')
-        router.push('/login?redirect=/sell-now')
-        return
+        alert('Please login to list a product');
+        router.push('/login?redirect=/sell-now');
+        return;
       }
-
-      const userObj = parseUserData(userData)
+      
+      const userObj = parseUserData(userData);
       if (!userObj || userObj.role !== 'seller') {
-        alert('You need to be a seller to list products. Please complete your profile.')
-        router.push('/complete-profile')
-        return
+        alert('You need to be a seller to list products. Please complete your profile.');
+        router.push('/complete-profile');
+        return;
       }
-
+      
       if (!userObj.sellerVerified) {
-        alert('Your seller account is pending approval. You cannot list products until approved.')
-        router.push('/dashboard')
-        return
+        alert('Your seller account is pending approval. You cannot list products until approved.');
+        router.push('/dashboard');
+        return;
       }
-
-      // Use XHR for upload (more reliable especially on mobile)
-      const result = await uploadWithXHR(token)
+      
+      // ✅ FIX 5: Prepare form data safely
+      const submitFormData = new FormData();
+      
+      // Add product data
+      const mappedCategory = strictCategoryMap()[formData.category] || formData.category;
+      submitFormData.append('productName', formData.productName || '');
+      submitFormData.append('brand', formData.brand || '');
+      submitFormData.append('category', mappedCategory || '');
+      submitFormData.append('productType', formData.productType || '');
+      submitFormData.append('purchaseYear', formData.purchaseYear || '');
+      submitFormData.append('condition', formData.condition || '');
+      submitFormData.append('description', formData.description || '');
+      submitFormData.append('askingPrice', formData.askingPrice || '0');
+      submitFormData.append('platformFee', platformFee.toString());
+      submitFormData.append('finalPrice', justBechoPrice.toString());
+      
+      // ✅ FIX 6: Add images safely
+      console.log('📦 Adding images to FormData:', formData.images.length);
+      
+      formData.images.forEach((image, index) => {
+        if (image && image.name && image.size) {
+          const fileName = isMobile 
+            ? `mobile_${Date.now()}_${index}_${image.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
+            : image.name;
+          submitFormData.append('images', image, fileName);
+          console.log(`  Added image ${index + 1}: ${image.name} (${(image.size/(1024*1024)).toFixed(2)}MB)`);
+        } else {
+          console.warn(`  Skipping invalid image at index ${index}:`, image);
+        }
+      });
+      
+      // ✅ FIX 7: Check if any images were added
+      const imageCount = Array.from(submitFormData.entries()).filter(([key]) => key === 'images').length;
+      if (imageCount === 0) {
+        throw new Error('No valid images to upload');
+      }
+      
+      console.log(`🚀 Starting upload with ${imageCount} images...`);
+      
+      // Use XHR for upload
+      const result = await uploadWithXHR(token, submitFormData);
       
       if (result.success) {
-        alert('✅ Product listed successfully!')
-        router.push('/dashboard?section=listings')
+        alert('✅ Product listed successfully!');
+        router.push('/dashboard?section=listings');
       } else {
-        throw new Error(result.message || 'Upload failed')
+        throw new Error(result.message || 'Upload failed');
       }
       
     } catch (error) {
-      console.error('❌ Upload error:', error)
+      console.error('❌ Upload error:', error);
       
-      // Mobile-specific error messages
       if (isMobile) {
-        if (error.message.includes('timeout') || error.message.includes('Timeout')) {
-          alert(`❌ Upload Timeout\n\nThe upload took too long to complete.\n\nCommon mobile issues:\n1. Weak signal/network\n2. Large file size\n3. Server busy\n\nTry:\n1. Switch to Wi-Fi\n2. Reduce to 1-2 images\n3. Try during off-peak hours`)
+        if (error.message.includes('No valid images')) {
+          alert('❌ No valid images found. Please upload images again.');
+        } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+          alert('❌ Upload timeout. Try with Wi-Fi and fewer images.');
         } else if (error.message.includes('Failed to fetch') || error.message.includes('Network Error')) {
-          alert(`❌ Network Connection Lost\n\nYour mobile connection was interrupted.\n\nPossible reasons:\n1. Switched from Wi-Fi to mobile data\n2. Entered low signal area\n3. Phone went to sleep\n4. App switched to background\n\nPlease try again with stable connection.`)
-        } else if (error.message.includes('413')) {
-          alert(`❌ File Too Large\n\nReduce image sizes or upload fewer images.\n\nMobile limits:\n• 5MB per image\n• 15MB total\n• 3 images max`)
+          alert('❌ Network error. Check connection and try again.');
         } else {
-          alert(`❌ Upload Failed\n\n${error.message}\n\nTry:\n1. Clear browser cache\n2. Update your browser\n3. Restart the app`)
+          alert(`❌ Upload failed: ${error.message}`);
         }
       } else {
-        alert(error.message || 'Something went wrong. Please try again.')
+        alert(error.message || 'Something went wrong. Please try again.');
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const transformedCategories = transformCategoriesForSelect(categories)
 
