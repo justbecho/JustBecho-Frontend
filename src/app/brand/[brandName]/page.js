@@ -142,10 +142,14 @@ export default function BrandPage() {
       {/* Main content ko header ke baad start karna */}
       <main className="min-h-screen bg-white">
         {/* 
-          Mobile view (md se chota): header height = ~80px 
-          Desktop view (md se bada): header (80px) + subheader (60px) = 140px
+          Mobile view: Header + Search bar total height = ~135px
+          Desktop view: Header (80px) + Subheader (60px) = 140px
+          
+          Mobile view specific: 
+          - Main header height: ~80px
+          - Search bar height: ~55px (including padding/margin)
         */}
-        <div className="pt-[80px] md:pt-[140px]"> 
+        <div className="pt-[135px] md:pt-[140px]"> 
           <div className="max-w-[1700px] mx-auto px-3 sm:px-4 md:px-6">
             {/* Brand Header Section */}
             <section className="py-6 sm:py-8 md:py-10 text-center">
