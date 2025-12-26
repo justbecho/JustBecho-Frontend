@@ -489,7 +489,7 @@ export default function PrivacyPolicyPage() {
         {isMobile && <MobileHeader />}
 
         {/* Hero Section */}
-        <section className={`${isMobile ? 'pt-4' : 'pt-32'} bg-gradient-to-r from-blue-900 to-indigo-900 text-white`}>
+        <section className={`${isMobile ? 'pt-[135px]' : 'pt-[140px]'} bg-gradient-to-r from-blue-900 to-indigo-900 text-white`}>
           <div className={`${isMobile ? 'px-4 py-6' : 'px-6 lg:px-8 py-16'}`}>
             <div className={`${isMobile ? '' : 'max-w-7xl'} mx-auto text-center`}>
               <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl md:text-5xl'} font-light tracking-widest uppercase mb-3`}>

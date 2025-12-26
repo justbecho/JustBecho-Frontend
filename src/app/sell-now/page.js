@@ -30,6 +30,13 @@ export default function SellNowPage() {
   const [categories, setCategories] = useState([])
   const [productTypes, setProductTypes] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(true)
+  const [uploadProgress, setUploadProgress] = useState({
+    isUploading: false,
+    totalFiles: 0,
+    uploadedFiles: 0,
+    percentage: 0,
+    currentFile: ''
+  })
 
   // ✅ STRICT CATEGORY MAPPING - UPDATED
   const strictCategoryMap = useCallback(() => {
@@ -329,6 +336,62 @@ export default function SellNowPage() {
     return uniqueItems
   }, [categories])
 
+  // ✅ IMAGE COMPRESSION FUNCTION
+  const compressImage = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Adjust quality based on original size
+          let quality = 0.8;
+          if (file.size > 5 * 1024 * 1024) {
+            quality = 0.6;
+          } else if (file.size > 2 * 1024 * 1024) {
+            quality = 0.7;
+          }
+          
+          canvas.toBlob((blob) => {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(compressedFile);
+          }, 'image/jpeg', quality);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
   const conditions = [
     'Brand New With Tag',
     'Brand New Without Tag',
@@ -496,38 +559,79 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  const handleImageUpload = (e) => {
+  // ✅ UPDATED: IMAGE UPLOAD WITH SIZE CHECK AND COMPRESSION
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     const remainingSlots = 5 - formData.images.length;
     const filesToAdd = files.slice(0, remainingSlots);
 
+    if (filesToAdd.length === 0) {
+      alert('You can upload maximum 5 images');
+      return;
+    }
+
+    // ✅ TOTAL SIZE TRACKING
+    const currentTotalSize = formData.images.reduce((sum, file) => sum + file.size, 0);
+    
     let validFiles = [];
     let errors = [];
 
-    filesToAdd.forEach(file => {
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`);
-        return;
-      }
+    console.log('📊 Starting image upload processing...');
 
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        errors.push(`${file.name}: File too large (max 5MB).`);
-        return;
-      }
+    for (const file of filesToAdd) {
+      try {
+        // Check file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+          errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`);
+          continue;
+        }
 
-      const minSize = 10 * 1024;
-      if (file.size < minSize) {
-        errors.push(`${file.name}: File too small (min 10KB).`);
-        return;
-      }
+        // ✅ INDIVIDUAL FILE SIZE CHECK - 10MB per file
+        const maxSizePerFile = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSizePerFile) {
+          errors.push(`${file.name}: File too large (max 10MB per image).`);
+          continue;
+        }
 
-      validFiles.push(file);
-    });
+        // Min size check
+        const minSize = 10 * 1024; // 10KB
+        if (file.size < minSize) {
+          errors.push(`${file.name}: File too small (min 10KB).`);
+          continue;
+        }
+
+        // ✅ Check if adding this file would exceed total limit
+        const newTotalSize = currentTotalSize + validFiles.reduce((sum, f) => sum + f.size, 0) + file.size;
+        const maxTotalSize = 50 * 1024 * 1024; // 50MB total for 5 files
+        
+        if (newTotalSize > maxTotalSize) {
+          errors.push(`${file.name}: Total size would exceed 50MB limit.`);
+          continue;
+        }
+
+        // ✅ COMPRESS IF LARGER THAN 2MB
+        let processedFile = file;
+        if (file.size > 2 * 1024 * 1024) {
+          try {
+            console.log(`⚙️ Compressing ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)...`);
+            processedFile = await compressImage(file);
+            console.log(`✅ Compressed to ${(processedFile.size/(1024*1024)).toFixed(2)}MB`);
+          } catch (compressError) {
+            console.warn(`⚠️ Compression failed for ${file.name}, using original`);
+          }
+        }
+
+        validFiles.push(processedFile);
+        
+      } catch (fileError) {
+        console.error(`Error processing ${file.name}:`, fileError);
+        errors.push(`${file.name}: Processing error`);
+      }
+    }
 
     if (errors.length > 0) {
-      alert('Upload errors:\n' + errors.join('\n'));
+      alert('Upload issues:\n' + errors.join('\n'));
     }
 
     if (validFiles.length > 0) {
@@ -535,6 +639,14 @@ export default function SellNowPage() {
         ...prev,
         images: [...prev.images, ...validFiles]
       }));
+      
+      // ✅ DEBUG LOGGING
+      console.log('📊 Image upload summary:');
+      const newTotalSize = [...formData.images, ...validFiles].reduce((sum, img) => sum + img.size, 0);
+      validFiles.forEach((img, i) => {
+        console.log(`  ${i+1}. ${img.name}: ${(img.size/(1024*1024)).toFixed(2)}MB`);
+      });
+      console.log(`  📦 Total: ${formData.images.length + validFiles.length} files, ${(newTotalSize/(1024*1024)).toFixed(2)}MB`);
     }
   }
 
@@ -553,10 +665,27 @@ export default function SellNowPage() {
     setCurrentStep(prev => prev - 1)
   }
 
+  // ✅ UPDATED: SUBMIT WITH NETWORK HANDLING
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // ✅ PRE-SUBMIT VALIDATION
+    if (formData.images.length === 0) {
+      alert('❌ Please upload at least one product image');
+      return;
+    }
+    
+    const totalSize = formData.images.reduce((sum, img) => sum + img.size, 0);
+    if (totalSize > 50 * 1024 * 1024) {
+      alert('❌ Total size of all images exceeds 50MB. Please reduce image sizes.');
+      return;
+    }
+    
+    console.log('🚀 Starting product listing...');
+    console.log(`📦 Files: ${formData.images.length}, Total size: ${(totalSize/(1024*1024)).toFixed(2)}MB`);
+    
     setIsSubmitting(true);
-
+    
     try {
       const token = getLocalStorage('token');
 
@@ -585,21 +714,24 @@ export default function SellNowPage() {
         return;
       }
 
-      if (formData.images.length === 0) {
-        alert('Please upload at least one product image');
-        return;
-      }
-
       // ✅ STRICT CATEGORY MAPPING before sending to backend
       const mappedCategory = strictCategoryMap()[formData.category] || formData.category;
       console.log(`🚀 Submitting with category: "${formData.category}" → "${mappedCategory}"`);
+
+      // ✅ NETWORK TIMEOUT CONFIGURATION
+      const controller = new AbortController();
+      const timeoutDuration = 180000; // 3 minutes for large uploads
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        console.error('⏰ Upload timeout after 3 minutes');
+      }, timeoutDuration);
 
       const submitFormData = new FormData();
 
       // Add product data with MAPPED category
       submitFormData.append('productName', formData.productName);
       submitFormData.append('brand', formData.brand);
-      submitFormData.append('category', mappedCategory); // ✅ MAPPED CATEGORY
+      submitFormData.append('category', mappedCategory);
       submitFormData.append('productType', formData.productType);
       submitFormData.append('purchaseYear', formData.purchaseYear || '');
       submitFormData.append('condition', formData.condition);
@@ -608,53 +740,100 @@ export default function SellNowPage() {
       submitFormData.append('platformFee', platformFee.toString());
       submitFormData.append('finalPrice', justBechoPrice.toString());
 
-      // Add images
+      // Add images with logging
+      console.log('📤 Adding images to form data:');
       formData.images.forEach((image, index) => {
         submitFormData.append('images', image, image.name);
+        console.log(`  ${index + 1}. ${image.name} (${(image.size/(1024*1024)).toFixed(2)}MB)`);
       });
 
-      console.log('📤 Submitting form data:', {
-        productName: formData.productName,
-        brand: formData.brand,
-        category: mappedCategory,
-        productType: formData.productType,
-        askingPrice: formData.askingPrice
-      });
+      console.log('📨 Sending request to backend...');
 
-      const response = await fetch('https://just-becho-backend.vercel.app/api/products', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: submitFormData
-      });
+      // ✅ FETCH WITH TIMEOUT AND RETRY
+      let retries = 2;
+      let lastError = null;
+      
+      while (retries >= 0) {
+        try {
+          console.log(`🔁 Attempt ${3 - retries}/3`);
+          
+          const response = await fetch('https://just-becho-backend.vercel.app/api/products', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: submitFormData,
+            signal: controller.signal,
+            keepalive: true
+          });
 
-      const data = await response.json();
+          clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        if (data.message?.includes('image is required')) {
-          throw new Error('Please upload at least one product image');
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Server error:', response.status, errorText);
+            
+            if (response.status === 413) {
+              throw new Error('File too large. Please reduce image sizes.');
+            } else if (response.status === 400) {
+              throw new Error(`Validation error: ${errorText}`);
+            } else {
+              throw new Error(`Server error ${response.status}`);
+            }
+          }
+
+          const data = await response.json();
+          
+          if (data.success) {
+            console.log('✅ Upload successful:', data);
+            alert('✅ Product listed successfully!');
+            router.push('/dashboard?section=listings');
+            return;
+          } else {
+            throw new Error(data.message || 'Upload failed');
+          }
+          
+        } catch (error) {
+          lastError = error;
+          
+          if (error.name === 'AbortError') {
+            console.error('⏰ Request timeout');
+            alert('❌ Upload timeout. Please check your internet connection and try again.');
+            break;
+          }
+          
+          if (retries > 0) {
+            console.log(`🔄 Retrying in 2 seconds... (${retries} attempts left)`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            retries--;
+          } else {
+            break;
+          }
         }
-        throw new Error(data.message || `Upload failed: ${response.status}`);
       }
 
-      alert('Product listed successfully!');
-      router.push('/dashboard?section=listings');
+      if (lastError) {
+        console.error('❌ Final error after retries:', lastError);
+        
+        if (lastError.message.includes('Failed to fetch') || lastError.message.includes('NetworkError')) {
+          alert('❌ Network error. Please check:\n\n1. Internet connection\n2. Try smaller image sizes\n3. Try on Wi-Fi instead of mobile data\n4. Wait a few minutes and try again');
+        } else if (lastError.message.includes('timeout')) {
+          alert('❌ Upload timeout. Try with:\n\n1. Fewer images (2-3 instead of 5)\n2. Smaller image sizes\n3. Better internet connection');
+        } else if (lastError.message.includes('too large')) {
+          alert('❌ File too large. Maximum 10MB per image.');
+        } else {
+          alert(lastError.message || 'Something went wrong. Please try again.');
+        }
+      }
 
     } catch (error) {
-      console.error('Error:', error);
-
-      if (error.message.includes('image is required')) {
-        alert('❌ Please upload at least one product image');
-      } else if (error.message.includes('Server error')) {
-        alert('🚨 Server issue. Please try again or contact support.');
-      } else {
-        alert(error.message || 'Something went wrong. Please try again.');
-      }
+      console.error('💥 Unexpected error:', error);
+      alert('An unexpected error occurred. Please try again or contact support.');
     } finally {
       setIsSubmitting(false);
+      clearTimeout(timeoutId);
     }
-  }
+  };
 
   const transformedCategories = transformCategoriesForSelect(categories);
 
@@ -701,10 +880,35 @@ export default function SellNowPage() {
     )
   }
 
+  // ✅ Upload Progress Overlay
+  const UploadProgressOverlay = () => {
+    if (!isSubmitting) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-6 md:p-8 max-w-md w-full mx-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Uploading Product</h3>
+            <p className="text-gray-600 mb-4">
+              Uploading {formData.images.length} images ({formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024) > 1 
+                ? `${(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)).toFixed(1)}MB` 
+                : `${Math.round(formData.images.reduce((sum, img) => sum + img.size, 0) / 1024)}KB`})
+            </p>
+            <p className="text-sm text-gray-500">
+              Please don't close this window. This may take a few seconds...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // ✅ Main form
   return (
     <>
       <Header />
+      <UploadProgressOverlay />
       <main className="min-h-screen bg-gray-50 pt-20 md:pt-40">
         {user?.sellerVerified && (
           <div className="bg-green-50 border-b border-green-200 py-2 md:py-3">
@@ -1105,7 +1309,7 @@ export default function SellNowPage() {
 
                   <div className="pt-6 md:pt-8 border-t border-gray-200">
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
-                      Product Images * (Max 5 images)
+                      Product Images * (Max 5 images, 10MB each, 50MB total)
                     </label>
 
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-6 lg:p-8 text-center hover:border-gray-400 transition-colors">
@@ -1124,8 +1328,9 @@ export default function SellNowPage() {
                           </svg>
                         </div>
                         <p className="text-gray-600 text-sm md:text-base lg:text-lg font-medium">Click to upload images</p>
-                        <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">PNG, JPG, JPEG up to 5MB each</p>
-                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">Upload clear, well-lit photos from different angles</p>
+                        <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">PNG, JPG, JPEG up to 10MB each</p>
+                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">Maximum 5 images, total size under 50MB</p>
+                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">Large images are automatically compressed</p>
                       </label>
                     </div>
 
@@ -1149,6 +1354,9 @@ export default function SellNowPage() {
                               >
                                 ×
                               </button>
+                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 text-center">
+                                {(image.size/(1024*1024)).toFixed(1)}MB
+                              </div>
                             </div>
                           ))}
 
@@ -1163,22 +1371,38 @@ export default function SellNowPage() {
                             </label>
                           )}
                         </div>
+                        
+                        {/* Total Size Display */}
+                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <span className="text-blue-800 text-xs md:text-sm font-medium">
+                              Total Size: {formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024) > 1 
+                                ? `${(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)).toFixed(2)}MB`
+                                : `${Math.round(formData.images.reduce((sum, img) => sum + img.size, 0) / 1024)}KB`
+                              }
+                            </span>
+                            <span className="text-xs text-blue-600">
+                              Limit: 50MB ({Math.round((formData.images.reduce((sum, img) => sum + img.size, 0) / (50 * 1024 * 1024)) * 100)}% used)
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     )}
 
-                    <div className="mt-3 md:mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+                    <div className="mt-3 md:mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 md:p-4">
                       <div className="flex items-start gap-2 md:gap-3">
-                        <div className="w-4 h-4 md:w-5 md:h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-4 h-4 md:w-5 md:h-5 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-xs">💡</span>
                         </div>
                         <div>
-                          <p className="text-blue-800 font-medium text-xs md:text-sm">Guidelines</p>
-                          <ul className="text-blue-700 text-xs md:text-sm mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
+                          <p className="text-yellow-800 font-medium text-xs md:text-sm">Upload Tips</p>
+                          <ul className="text-yellow-700 text-xs md:text-sm mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
                             <li>• Capture any imperfections or wear</li>
-                            <li>• Competitive Pricing makes items sell faster</li>
+                            <li>• Use Wi-Fi for large uploads (recommended)</li>
+                            <li>• Large images are automatically compressed</li>
                           </ul>
                         </div>
                       </div>
@@ -1277,6 +1501,15 @@ export default function SellNowPage() {
                             <span className="text-gray-600 text-sm md:text-base">Images Uploaded:</span>
                             <span className="font-medium text-gray-900 text-sm md:text-base">{formData.images.length} photos</span>
                           </div>
+                          <div className="flex justify-between border-b pb-2 md:pb-3">
+                            <span className="text-gray-600 text-sm md:text-base">Total Size:</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">
+                              {formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024) > 1 
+                                ? `${(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)).toFixed(2)}MB`
+                                : `${Math.round(formData.images.reduce((sum, img) => sum + img.size, 0) / 1024)}KB`
+                              }
+                            </span>
+                          </div>
                         </div>
 
                         {formData.images.length > 0 && (
@@ -1334,6 +1567,9 @@ export default function SellNowPage() {
                           <span className="font-semibold">Note:</span> The platform fee covers marketing,
                           payment processing, customer support, and buyer protection services.
                         </p>
+                        <p className="text-yellow-700 text-xs mt-2">
+                          <span className="font-semibold">Upload Note:</span> Large images are automatically compressed for faster upload.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1350,9 +1586,16 @@ export default function SellNowPage() {
                       type="submit"
                       onClick={handleSubmit}
                       disabled={isSubmitting}
-                      className="bg-green-600 text-white text-sm md:text-base px-4 py-2 md:px-8 md:py-3 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50"
+                      className="bg-green-600 text-white text-sm md:text-base px-4 py-2 md:px-8 md:py-3 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                      {isSubmitting ? 'Publishing Listing...' : 'Publish Listing'}
+                      {isSubmitting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Uploading...
+                        </>
+                      ) : (
+                        'Publish Listing'
+                      )}
                     </button>
                   </div>
                 </div>
