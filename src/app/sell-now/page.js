@@ -343,7 +343,7 @@ export default function SellNowPage() {
     return uniqueItems
   }, [categories])
 
-  // ✅ FIXED: PROPER MOBILE COMPRESSION FUNCTION
+  // ✅ FIXED: BETTER COMPRESSION FUNCTION
   const compressImageForMobile = async (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -354,29 +354,21 @@ export default function SellNowPage() {
         img.onload = () => {
           const canvas = document.createElement('canvas')
           
-          // ✅ TARGET MAXIMUM DIMENSION
-          const MAX_DIMENSION = 1024
+          // ✅ Calculate dimensions to maintain aspect ratio
+          const MAX_DIMENSION = 1200 // Slightly larger for better quality
           
           let width = img.width
           let height = img.height
           
-          // Calculate aspect ratio
-          const aspectRatio = width / height
+          // Calculate scaling factor
+          const scale = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
           
-          // Resize based on larger dimension
-          if (width > height) {
-            if (width > MAX_DIMENSION) {
-              width = MAX_DIMENSION
-              height = Math.round(width / aspectRatio)
-            }
-          } else {
-            if (height > MAX_DIMENSION) {
-              height = MAX_DIMENSION
-              width = Math.round(height * aspectRatio)
-            }
+          // If image is smaller than max, don't enlarge it
+          if (scale < 1) {
+            width = Math.round(width * scale)
+            height = Math.round(height * scale)
           }
           
-          // Set canvas dimensions
           canvas.width = width
           canvas.height = height
           
@@ -386,38 +378,60 @@ export default function SellNowPage() {
           ctx.imageSmoothingEnabled = true
           ctx.imageSmoothingQuality = 'high'
           
-          // Draw image
+          // Draw image with better quality
           ctx.drawImage(img, 0, 0, width, height)
           
-          // ✅ SMART QUALITY BASED ON ORIGINAL SIZE
-          let quality = 0.7
+          // ✅ SMART QUALITY ADJUSTMENT
+          let quality = 0.75 // Default quality
           
-          // Original file size in MB
-          const originalSizeMB = file.size / (1024 * 1024)
+          // Check file type
+          const isPNG = file.type === 'image/png'
+          const isLargeFile = file.size > 3 * 1024 * 1024 // > 3MB
           
-          // Adjust quality based on original size
-          if (originalSizeMB < 1) {
-            quality = 0.8
-          } else if (originalSizeMB >= 1 && originalSizeMB < 3) {
-            quality = 0.6
-          } else if (originalSizeMB >= 3 && originalSizeMB < 5) {
-            quality = 0.5
+          if (isPNG) {
+            // PNG files - be more aggressive with compression
+            quality = isLargeFile ? 0.6 : 0.7
+            
+            // Convert PNG to JPEG if it's very large
+            if (file.size > 4 * 1024 * 1024) {
+              console.log(`📱 Converting large PNG to JPEG for better compression`)
+              canvas.toBlob((blob) => {
+                const compressedFile = new File([blob], file.name.replace('.png', '.jpg'), {
+                  type: 'image/jpeg', // Convert to JPEG
+                  lastModified: Date.now()
+                })
+                
+                console.log(`✅ PNG → JPEG: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
+                resolve(compressedFile)
+              }, 'image/jpeg', quality)
+              return
+            }
           } else {
-            quality = 0.4
+            // JPEG/WebP files
+            quality = isLargeFile ? 0.65 : 0.75
           }
           
-          console.log(`📱 Compressing: ${originalSizeMB.toFixed(2)}MB → quality: ${quality}`)
+          console.log(`📱 Compressing ${file.name}: ${(file.size/(1024*1024)).toFixed(2)}MB → quality: ${quality}`)
           
-          // Convert to Blob
+          // Use appropriate format
+          const outputType = isPNG ? 'image/png' : 'image/jpeg'
+          
           canvas.toBlob((blob) => {
             const compressedFile = new File([blob], file.name, {
-              type: 'image/jpeg',
+              type: outputType,
               lastModified: Date.now()
             })
             
-            console.log(`✅ Compressed: ${originalSizeMB.toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
-            resolve(compressedFile)
-          }, 'image/jpeg', quality)
+            console.log(`✅ Compressed: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
+            
+            // Safety check - if compression failed and file got bigger
+            if (compressedFile.size > file.size * 1.1) { // 10% larger
+              console.warn(`⚠️ Compression increased size, using original`)
+              resolve(file)
+            } else {
+              resolve(compressedFile)
+            }
+          }, outputType, quality)
         }
         img.onerror = reject
       }
@@ -618,9 +632,9 @@ export default function SellNowPage() {
     
     let validFiles = []
     let errors = []
-    let totalSize = 0
+    let totalSize = currentImages.reduce((sum, img) => sum + img.size, 0)
     
-    console.log(`📱 Processing ${filesToAdd.length} files...`)
+    console.log(`📱 Processing ${filesToAdd.length} files, current total: ${(totalSize/(1024*1024)).toFixed(2)}MB`)
     
     for (const file of filesToAdd) {
       try {
@@ -638,8 +652,10 @@ export default function SellNowPage() {
         }
         
         // Check individual file size BEFORE compression
+        const fileSizeMB = file.size / (1024 * 1024)
+        
         if (file.size > maxSizePerFile) {
-          errors.push(`${file.name}: File too large (max 5MB per image)`)
+          errors.push(`${file.name}: ${fileSizeMB.toFixed(2)}MB exceeds 5MB limit`)
           continue
         }
         
@@ -650,24 +666,31 @@ export default function SellNowPage() {
           continue
         }
         
-        // ✅ FIX: ONLY COMPRESS IF FILE IS > 2MB
+        // ✅ Check file type and size
         let processedFile = file
         
-        if (isMobile && file.size > 2 * 1024 * 1024) {
+        // Only compress if needed
+        const needsCompression = isMobile && fileSizeMB > 1.5 // Compress if > 1.5MB on mobile
+        
+        if (needsCompression) {
           try {
-            console.log(`📱 Compressing ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)...`)
+            console.log(`📱 Compressing ${file.name} (${fileSizeMB.toFixed(2)}MB)...`)
             processedFile = await compressImageForMobile(file)
             
-            // Check compressed size
+            // Check if compression worked
+            const compressedSizeMB = processedFile.size / (1024 * 1024)
+            
             if (processedFile.size > maxSizePerFile) {
-              errors.push(`${file.name}: After compression still too large (${(processedFile.size/(1024*1024)).toFixed(2)}MB)`)
+              errors.push(`${file.name}: After compression ${compressedSizeMB.toFixed(2)}MB still exceeds 5MB`)
               continue
             }
+            
+            console.log(`✅ Compressed to ${compressedSizeMB.toFixed(2)}MB`)
           } catch (compressError) {
-            console.warn(`Compression failed, using original: ${file.name}`)
+            console.warn(`Compression failed: ${compressError.message}`)
             // If compression fails, use original but check size
             if (file.size > maxSizePerFile) {
-              errors.push(`${file.name}: Cannot compress, file too large`)
+              errors.push(`${file.name}: ${fileSizeMB.toFixed(2)}MB exceeds 5MB limit`)
               continue
             }
           }
@@ -683,7 +706,7 @@ export default function SellNowPage() {
         totalSize = newTotalSize
         validFiles.push(processedFile)
         
-        console.log(`✅ Added: ${file.name} (${(processedFile.size/(1024*1024)).toFixed(2)}MB)`)
+        console.log(`✅ Added: ${processedFile.name} (${(processedFile.size/(1024*1024)).toFixed(2)}MB)`)
         
       } catch (error) {
         console.error(`Error with ${file.name}:`, error)
@@ -693,7 +716,12 @@ export default function SellNowPage() {
     
     // Show errors
     if (errors.length > 0) {
-      alert('Upload issues:\n' + errors.slice(0, 3).join('\n'))
+      const errorMsg = errors.slice(0, 5).join('\n')
+      if (errors.length > 5) {
+        alert(`Upload issues (showing first 5):\n\n${errorMsg}\n\n...and ${errors.length - 5} more issues`)
+      } else {
+        alert(`Upload issues:\n\n${errorMsg}`)
+      }
     }
     
     // Update form data
@@ -703,9 +731,17 @@ export default function SellNowPage() {
         images: [...currentImages, ...validFiles]
       }))
       
-      // Show success message
-      const newTotalSize = [...currentImages, ...validFiles].reduce((sum, img) => sum + img.size, 0)
+      const newTotalSize = totalSize
       console.log(`📊 Total: ${currentImages.length + validFiles.length} images, ${(newTotalSize/(1024*1024)).toFixed(2)}MB/25MB`)
+      
+      // Show success summary
+      if (validFiles.length > 0) {
+        const addedCount = validFiles.length
+        const totalCount = currentImages.length + validFiles.length
+        const totalMB = (newTotalSize/(1024*1024)).toFixed(2)
+        
+        alert(`✅ Added ${addedCount} image(s)\n\nTotal: ${totalCount}/5 images\nSize: ${totalMB}MB/25MB`)
+      }
     }
   }
 
@@ -1501,7 +1537,7 @@ export default function SellNowPage() {
                         </p>
                         {isMobile && (
                           <p className="text-blue-500 text-xs mt-0.5 md:mt-1">
-                            📱 Large images (2MB) are automatically compressed
+                            📱 Images larger than 1.5MB are automatically compressed
                           </p>
                         )}
                       </label>
@@ -1585,8 +1621,8 @@ export default function SellNowPage() {
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
-                            {isMobile && <li>• Images larger than 2MB are automatically compressed</li>}
-                            {isMobile && <li>• Use Wi-Fi for best results</li>}
+                            {isMobile && <li>• Images larger than 1.5MB are automatically compressed</li>}
+                            {isMobile && <li>• Use Wi-Fi for best results on mobile</li>}
                             <li>• Competitive Pricing makes items sell faster</li>
                           </ul>
                         </div>
