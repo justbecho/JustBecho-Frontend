@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
@@ -30,18 +29,30 @@ export default function SellNowPage() {
   const [categories, setCategories] = useState([])
   const [productTypes, setProductTypes] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
   const [uploadProgress, setUploadProgress] = useState({
     isUploading: false,
-    totalFiles: 0,
-    uploadedFiles: 0,
-    percentage: 0,
+    uploaded: 0,
+    total: 0,
+    percent: 0,
     currentFile: ''
   })
+
+  // ✅ Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
+      setIsMobile(isMobileDevice)
+      console.log('📱 Device:', isMobileDevice ? 'Mobile' : 'Desktop')
+    }
+    
+    checkMobile()
+  }, [])
 
   // ✅ STRICT CATEGORY MAPPING - UPDATED
   const strictCategoryMap = useCallback(() => {
     return {
-      // Men's - All variations mapped to EXACT database name
       "Men's Fashion": "Men's Fashion",
       "Mens Fashion": "Men's Fashion",
       "Mens": "Men's Fashion",
@@ -51,7 +62,6 @@ export default function SellNowPage() {
       "men-fashion": "Men's Fashion",
       "men's": "Men's Fashion",
       
-      // Women's - All variations mapped to EXACT database name
       "Women's Fashion": "Women's Fashion",
       "Womens Fashion": "Women's Fashion",
       "Womens": "Women's Fashion",
@@ -61,7 +71,6 @@ export default function SellNowPage() {
       "women-fashion": "Women's Fashion",
       "women's": "Women's Fashion",
       
-      // Others - EXACT names as stored in database
       "Footwear": "Footwear",
       "footwear": "Footwear",
       "Shoes": "Footwear",
@@ -80,7 +89,6 @@ export default function SellNowPage() {
       "Toys & Collectibles": "TOYS & COLLECTIBLES",
       "toys": "TOYS & COLLECTIBLES",
       
-      // ✅ UPDATED: KID'S FASHION mapping
       "KID'S FASHION": "KID'S FASHION",
       "Kids Fashion": "KID'S FASHION",
       "Kids": "KID'S FASHION",
@@ -114,9 +122,9 @@ export default function SellNowPage() {
 
   // ✅ Brand input handler - Capitalize first letter
   const handleBrandInput = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     
-    let processedValue = value;
+    let processedValue = value
     
     if (value.trim()) {
       processedValue = value
@@ -124,16 +132,16 @@ export default function SellNowPage() {
         .split(' ')
         .map(word => {
           if (word.includes('&')) {
-            return word.toUpperCase();
+            return word.toUpperCase()
           }
           
           if (word.length <= 3 && !['the', 'and', 'for', 'but', 'nor', 'yet', 'so'].includes(word)) {
-            return word.toUpperCase();
+            return word.toUpperCase()
           }
           
-          return word.charAt(0).toUpperCase() + word.slice(1);
+          return word.charAt(0).toUpperCase() + word.slice(1)
         })
-        .join(' ');
+        .join(' ')
         
       const specialBrands = {
         'mcqueen': 'McQueen',
@@ -188,64 +196,64 @@ export default function SellNowPage() {
         'fila': 'Fila',
         'skechers': 'Skechers',
         'woodland': 'Woodland'
-      };
+      }
       
-      const lowerValue = value.toLowerCase().trim();
+      const lowerValue = value.toLowerCase().trim()
       if (specialBrands[lowerValue]) {
-        processedValue = specialBrands[lowerValue];
+        processedValue = specialBrands[lowerValue]
       }
       
       if (processedValue.includes('Mc') && processedValue.length > 2) {
-        processedValue = processedValue.replace(/Mc([a-z])/g, (match, p1) => `Mc${p1.toUpperCase()}`);
+        processedValue = processedValue.replace(/Mc([a-z])/g, (match, p1) => `Mc${p1.toUpperCase()}`)
       }
       
       if (processedValue.includes('\'s')) {
-        processedValue = processedValue.replace(/'s/gi, '\'s');
+        processedValue = processedValue.replace(/'s/gi, '\'s')
       }
       
-      processedValue = processedValue.replace(/\s+/g, ' ').trim();
+      processedValue = processedValue.replace(/\s+/g, ' ').trim()
     }
     
     setFormData(prev => ({
       ...prev,
       [name]: processedValue
-    }));
-  };
+    }))
+  }
 
   // ✅ General input handler with CATEGORY FIX
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     
     if (name === 'category') {
       // ✅ Apply strict category mapping
-      const mappedValue = strictCategoryMap()[value] || value;
-      console.log(`🗺️ Category mapping: "${value}" → "${mappedValue}"`);
+      const mappedValue = strictCategoryMap()[value] || value
+      console.log(`🗺️ Category mapping: "${value}" → "${mappedValue}"`)
       
       setFormData(prev => ({
         ...prev,
         [name]: mappedValue
-      }));
+      }))
     } else if (name === 'productName') {
-      let processedValue = value;
+      let processedValue = value
       if (value.trim()) {
         processedValue = value
           .toLowerCase()
           .split(' ')
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
+          .join(' ')
       }
       
       setFormData(prev => ({
         ...prev,
         [name]: processedValue
-      }));
+      }))
     } else {
       setFormData(prev => ({
         ...prev,
         [name]: value
-      }));
+      }))
     }
-  };
+  }
 
   // ✅ FETCH CATEGORIES FROM BACKEND
   const fetchCategories = useCallback(async () => {
@@ -261,12 +269,12 @@ export default function SellNowPage() {
         
         // ✅ Apply strict mapping to fetched categories
         const mappedCategories = data.categories.map(cat => {
-          const mappedName = strictCategoryMap()[cat.name] || cat.name;
+          const mappedName = strictCategoryMap()[cat.name] || cat.name
           return {
             ...cat,
             name: mappedName
-          };
-        });
+          }
+        })
         
         setCategories(mappedCategories)
       } else {
@@ -284,21 +292,21 @@ export default function SellNowPage() {
   // ✅ TRANSFORM CATEGORIES FOR SELECT
   const transformCategoriesForSelect = useCallback((backendCategories) => {
     // Get unique categories after mapping
-    const uniqueCategories = [];
-    const seen = new Set();
+    const uniqueCategories = []
+    const seen = new Set()
     
     backendCategories.forEach(category => {
       if (!seen.has(category.name)) {
-        seen.add(category.name);
+        seen.add(category.name)
         uniqueCategories.push({
           name: category.name,
           value: category.name,
           subCategories: category.subCategories || []
-        });
+        })
       }
-    });
+    })
     
-    return uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
+    return uniqueCategories.sort((a, b) => a.name.localeCompare(b.name))
   }, [])
 
   // ✅ GET PRODUCT TYPES BASED ON SELECTED CATEGORY
@@ -336,61 +344,58 @@ export default function SellNowPage() {
     return uniqueItems
   }, [categories])
 
-  // ✅ IMAGE COMPRESSION FUNCTION
-  const compressImage = async (file) => {
+  // ✅ MOBILE IMAGE COMPRESSION
+  const compressImageForMobile = async (file) => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
       reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
+        const img = new Image()
+        img.src = event.target.result
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1200;
-          const MAX_HEIGHT = 1200;
+          const canvas = document.createElement('canvas')
+          const MAX_SIZE = 1024 // Max dimension for mobile
           
-          let width = img.width;
-          let height = img.height;
+          let width = img.width
+          let height = img.height
           
+          // Calculate new dimensions
           if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
+            if (width > MAX_SIZE) {
+              height *= MAX_SIZE / width
+              width = MAX_SIZE
             }
           } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
+            if (height > MAX_SIZE) {
+              width *= MAX_SIZE / height
+              height = MAX_SIZE
             }
           }
           
-          canvas.width = width;
-          canvas.height = height;
+          canvas.width = width
+          canvas.height = height
           
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, 0, 0, width, height)
           
-          // Adjust quality based on original size
-          let quality = 0.8;
-          if (file.size > 5 * 1024 * 1024) {
-            quality = 0.6;
-          } else if (file.size > 2 * 1024 * 1024) {
-            quality = 0.7;
-          }
+          // Adjust quality based on file size
+          let quality = 0.8
+          if (file.size > 2 * 1024 * 1024) quality = 0.7
+          if (file.size > 5 * 1024 * 1024) quality = 0.6
           
           canvas.toBlob((blob) => {
             const compressedFile = new File([blob], file.name, {
               type: 'image/jpeg',
               lastModified: Date.now()
-            });
-            resolve(compressedFile);
-          }, 'image/jpeg', quality);
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
+            })
+            resolve(compressedFile)
+          }, 'image/jpeg', quality)
+        }
+        img.onerror = reject
+      }
+      reader.onerror = reject
+    })
+  }
 
   const conditions = [
     'Brand New With Tag',
@@ -484,14 +489,14 @@ export default function SellNowPage() {
           if (userObj.role !== 'seller') {
             console.log('❌ Not a seller, checking if wants to become seller...')
 
-            const shouldBecomeSeller = window.confirm('You need to be a seller to list products. Would you like to become a seller?');
+            const shouldBecomeSeller = window.confirm('You need to be a seller to list products. Would you like to become a seller?')
             if (shouldBecomeSeller) {
-              localStorage.setItem('changingRoleToSeller', 'true');
-              router.push('/complete-profile?role=seller');
+              localStorage.setItem('changingRoleToSeller', 'true')
+              router.push('/complete-profile?role=seller')
             } else {
-              router.push('/');
+              router.push('/')
             }
-            return;
+            return
           }
 
           if (!userObj.sellerVerified) {
@@ -503,25 +508,25 @@ export default function SellNowPage() {
                   'Authorization': `Bearer ${token}`,
                   'Content-Type': 'application/json'
                 }
-              });
+              })
 
               if (response.ok) {
-                const data = await response.json();
+                const data = await response.json()
 
                 if (data.success && data.sellerVerified) {
-                  const updatedUser = { ...userObj, ...data };
-                  localStorage.setItem('user', JSON.stringify(updatedUser));
-                  setUser(updatedUser);
-                  console.log('✅ Seller is now verified!');
+                  const updatedUser = { ...userObj, ...data }
+                  localStorage.setItem('user', JSON.stringify(updatedUser))
+                  setUser(updatedUser)
+                  console.log('✅ Seller is now verified!')
                 } else {
-                  setError('Your seller account is pending approval. You cannot list products until approved.');
+                  setError('Your seller account is pending approval. You cannot list products until approved.')
                   setTimeout(() => {
                     router.push('/dashboard')
                   }, 3000)
                   return
                 }
               } else {
-                setError('Your seller account is pending approval. You cannot list products until approved.');
+                setError('Your seller account is pending approval. You cannot list products until approved.')
                 setTimeout(() => {
                   router.push('/dashboard')
                 }, 3000)
@@ -529,7 +534,7 @@ export default function SellNowPage() {
               }
             } catch (statusError) {
               console.error('Error checking seller status:', statusError)
-              setError('Your seller account is pending approval. You cannot list products until approved.');
+              setError('Your seller account is pending approval. You cannot list products until approved.')
               setTimeout(() => {
                 router.push('/dashboard')
               }, 3000)
@@ -559,94 +564,93 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  // ✅ UPDATED: IMAGE UPLOAD WITH SIZE CHECK AND COMPRESSION
+  // ✅ MOBILE OPTIMIZED IMAGE UPLOAD
   const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const remainingSlots = 5 - formData.images.length;
-    const filesToAdd = files.slice(0, remainingSlots);
+    const files = Array.from(e.target.files)
+    
+    // Set limits based on device
+    const maxFiles = isMobile ? 3 : 5
+    const maxSizePerFile = isMobile ? 5 * 1024 * 1024 : 10 * 1024 * 1024
+    const remainingSlots = maxFiles - formData.images.length
+    const filesToAdd = files.slice(0, remainingSlots)
 
     if (filesToAdd.length === 0) {
-      alert('You can upload maximum 5 images');
-      return;
+      alert(`You can upload maximum ${maxFiles} images${isMobile ? ' on mobile' : ''}`)
+      return
     }
 
-    // ✅ TOTAL SIZE TRACKING
-    const currentTotalSize = formData.images.reduce((sum, file) => sum + file.size, 0);
-    
-    let validFiles = [];
-    let errors = [];
+    let validFiles = []
+    let errors = []
+    let totalSize = 0
 
-    console.log('📊 Starting image upload processing...');
+    console.log(`📱 Mobile: ${isMobile}, Files to process: ${filesToAdd.length}`)
 
     for (const file of filesToAdd) {
       try {
         // Check file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         if (!validTypes.includes(file.type)) {
-          errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`);
-          continue;
+          errors.push(`${file.name}: Invalid file type. Use JPG, PNG, WebP.`)
+          continue
         }
 
-        // ✅ INDIVIDUAL FILE SIZE CHECK - 10MB per file
-        const maxSizePerFile = 10 * 1024 * 1024; // 10MB
+        // Check size per file
         if (file.size > maxSizePerFile) {
-          errors.push(`${file.name}: File too large (max 10MB per image).`);
-          continue;
+          errors.push(`${file.name}: File too large (max ${isMobile ? '5MB' : '10MB'} per image).`)
+          continue
         }
 
-        // Min size check
-        const minSize = 10 * 1024; // 10KB
+        const minSize = 10 * 1024 // 10KB
         if (file.size < minSize) {
-          errors.push(`${file.name}: File too small (min 10KB).`);
-          continue;
+          errors.push(`${file.name}: File too small (min 10KB).`)
+          continue
         }
 
-        // ✅ Check if adding this file would exceed total limit
-        const newTotalSize = currentTotalSize + validFiles.reduce((sum, f) => sum + f.size, 0) + file.size;
-        const maxTotalSize = 50 * 1024 * 1024; // 50MB total for 5 files
-        
-        if (newTotalSize > maxTotalSize) {
-          errors.push(`${file.name}: Total size would exceed 50MB limit.`);
-          continue;
-        }
-
-        // ✅ COMPRESS IF LARGER THAN 2MB
-        let processedFile = file;
-        if (file.size > 2 * 1024 * 1024) {
+        // Compress for mobile if needed
+        let processedFile = file
+        if (isMobile && file.size > 1 * 1024 * 1024) { // Compress if > 1MB on mobile
           try {
-            console.log(`⚙️ Compressing ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)...`);
-            processedFile = await compressImage(file);
-            console.log(`✅ Compressed to ${(processedFile.size/(1024*1024)).toFixed(2)}MB`);
+            console.log(`📱 Compressing ${file.name} for mobile...`)
+            processedFile = await compressImageForMobile(file)
+            console.log(`✅ Compressed: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(processedFile.size/(1024*1024)).toFixed(2)}MB`)
           } catch (compressError) {
-            console.warn(`⚠️ Compression failed for ${file.name}, using original`);
+            console.warn(`⚠️ Compression failed for ${file.name}, using original`)
           }
         }
 
-        validFiles.push(processedFile);
+        // Check total size limit
+        const newTotalSize = totalSize + processedFile.size
+        const maxTotalSize = isMobile ? 15 * 1024 * 1024 : 50 * 1024 * 1024
+        
+        if (newTotalSize > maxTotalSize) {
+          errors.push(`${file.name}: Total size would exceed ${isMobile ? '15MB' : '50MB'} limit.`)
+          continue
+        }
+
+        totalSize = newTotalSize
+        validFiles.push(processedFile)
         
       } catch (fileError) {
-        console.error(`Error processing ${file.name}:`, fileError);
-        errors.push(`${file.name}: Processing error`);
+        console.error(`Error processing ${file.name}:`, fileError)
+        errors.push(`${file.name}: Processing error`)
       }
     }
 
     if (errors.length > 0) {
-      alert('Upload issues:\n' + errors.join('\n'));
+      alert('Upload issues:\n' + errors.join('\n'))
     }
 
     if (validFiles.length > 0) {
       setFormData(prev => ({
         ...prev,
         images: [...prev.images, ...validFiles]
-      }));
+      }))
       
-      // ✅ DEBUG LOGGING
-      console.log('📊 Image upload summary:');
-      const newTotalSize = [...formData.images, ...validFiles].reduce((sum, img) => sum + img.size, 0);
-      validFiles.forEach((img, i) => {
-        console.log(`  ${i+1}. ${img.name}: ${(img.size/(1024*1024)).toFixed(2)}MB`);
-      });
-      console.log(`  📦 Total: ${formData.images.length + validFiles.length} files, ${(newTotalSize/(1024*1024)).toFixed(2)}MB`);
+      // Show mobile warning
+      if (isMobile && validFiles.length > 0) {
+        const finalTotalSize = [...formData.images, ...validFiles].reduce((sum, img) => sum + img.size, 0)
+        console.log(`📱 Mobile upload: ${formData.images.length + validFiles.length} images, total ${(finalTotalSize/(1024*1024)).toFixed(2)}MB`)
+      }
     }
   }
 
@@ -665,177 +669,216 @@ export default function SellNowPage() {
     setCurrentStep(prev => prev - 1)
   }
 
-  // ✅ UPDATED: SUBMIT WITH NETWORK HANDLING
+  // ✅ XHR UPLOAD FOR MOBILE (MOST RELIABLE)
+  const uploadWithXHR = (token) => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData()
+      
+      // Add product data
+      const mappedCategory = strictCategoryMap()[formData.category] || formData.category
+      formData.append('productName', formData.productName)
+      formData.append('brand', formData.brand)
+      formData.append('category', mappedCategory)
+      formData.append('productType', formData.productType)
+      formData.append('purchaseYear', formData.purchaseYear || '')
+      formData.append('condition', formData.condition)
+      formData.append('description', formData.description)
+      formData.append('askingPrice', formData.askingPrice)
+      formData.append('platformFee', platformFee.toString())
+      formData.append('finalPrice', justBechoPrice.toString())
+      
+      // Add mobile flag if on mobile
+      if (isMobile) {
+        formData.append('isMobile', 'true')
+      }
+      
+      // Add images with unique names
+      formData.images.forEach((image, index) => {
+        const fileName = isMobile 
+          ? `mobile_${Date.now()}_${index}_${image.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
+          : image.name
+        formData.append('images', image, fileName)
+      })
+      
+      const xhr = new XMLHttpRequest()
+      const url = 'https://just-becho-backend.vercel.app/api/products'
+      
+      xhr.open('POST', url, true)
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      
+      // Timeout settings (longer for mobile)
+      xhr.timeout = isMobile ? 300000 : 180000 // 5 min mobile, 3 min desktop
+      xhr.responseType = 'json'
+      
+      // Progress tracking
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100)
+          setUploadProgress({
+            isUploading: true,
+            uploaded: event.loaded,
+            total: event.total,
+            percent: percent,
+            currentFile: `Uploading... ${percent}%`
+          })
+        }
+      }
+      
+      xhr.onload = () => {
+        setUploadProgress({
+          isUploading: false,
+          uploaded: 0,
+          total: 0,
+          percent: 0,
+          currentFile: ''
+        })
+        
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response)
+        } else {
+          reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`))
+        }
+      }
+      
+      xhr.onerror = () => {
+        setUploadProgress({
+          isUploading: false,
+          uploaded: 0,
+          total: 0,
+          percent: 0,
+          currentFile: ''
+        })
+        reject(new Error('Network error. Please check your connection.'))
+      }
+      
+      xhr.ontimeout = () => {
+        setUploadProgress({
+          isUploading: false,
+          uploaded: 0,
+          total: 0,
+          percent: 0,
+          currentFile: ''
+        })
+        reject(new Error('Upload timeout. Please try again.'))
+      }
+      
+      xhr.onabort = () => {
+        setUploadProgress({
+          isUploading: false,
+          uploaded: 0,
+          total: 0,
+          percent: 0,
+          currentFile: ''
+        })
+        reject(new Error('Upload cancelled.'))
+      }
+      
+      // Send request
+      console.log(`🚀 Starting ${isMobile ? 'MOBILE' : 'DESKTOP'} upload...`)
+      console.log(`📦 Files: ${formData.images.length}, Total size: ${formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)}MB`)
+      
+      xhr.send(formData)
+    })
+  }
+
+  // ✅ HANDLE SUBMIT
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     
-    // ✅ PRE-SUBMIT VALIDATION
+    // Pre-submit validation
     if (formData.images.length === 0) {
-      alert('❌ Please upload at least one product image');
-      return;
+      alert('❌ Please upload at least one product image')
+      return
     }
     
-    const totalSize = formData.images.reduce((sum, img) => sum + img.size, 0);
-    if (totalSize > 50 * 1024 * 1024) {
-      alert('❌ Total size of all images exceeds 50MB. Please reduce image sizes.');
-      return;
+    const totalSize = formData.images.reduce((sum, img) => sum + img.size, 0)
+    
+    // Mobile size limit check
+    if (isMobile && totalSize > 15 * 1024 * 1024) {
+      alert(`❌ Mobile Upload Size Limit\n\nTotal size: ${(totalSize/(1024*1024)).toFixed(2)}MB\nMobile limit: 15MB\n\nPlease reduce image sizes or upload fewer images.`)
+      return
     }
     
-    console.log('🚀 Starting product listing...');
-    console.log(`📦 Files: ${formData.images.length}, Total size: ${(totalSize/(1024*1024)).toFixed(2)}MB`);
+    // Mobile warning
+    if (isMobile) {
+      const mobileConfirm = confirm(
+        `📱 Mobile Upload Notice\n\n` +
+        `IMPORTANT for successful upload:\n` +
+        `• Keep screen ON\n` +
+        `• Stay on this page\n` +
+        `• Don't switch apps\n` +
+        `• Use Wi-Fi if possible\n\n` +
+        `Uploading ${formData.images.length} image(s) (${(totalSize/(1024*1024)).toFixed(2)}MB)\n\n` +
+        `Click OK to continue`
+      )
+      
+      if (!mobileConfirm) return
+    }
     
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     
     try {
-      const token = getLocalStorage('token');
+      const token = getLocalStorage('token')
+      const userData = getLocalStorage('user')
 
       if (!token) {
-        alert('Please login to list a product');
-        return;
+        alert('Please login to list a product')
+        router.push('/login?redirect=/sell-now')
+        return
       }
 
-      const userData = getLocalStorage('user');
       if (!userData) {
-        alert('Please login to list a product');
-        router.push('/login?redirect=/sell-now');
-        return;
+        alert('Please login to list a product')
+        router.push('/login?redirect=/sell-now')
+        return
       }
 
-      const userObj = parseUserData(userData);
+      const userObj = parseUserData(userData)
       if (!userObj || userObj.role !== 'seller') {
-        alert('You need to be a seller to list products. Please complete your profile.');
-        router.push('/complete-profile');
-        return;
+        alert('You need to be a seller to list products. Please complete your profile.')
+        router.push('/complete-profile')
+        return
       }
 
       if (!userObj.sellerVerified) {
-        alert('Your seller account is pending approval. You cannot list products until approved.');
-        router.push('/dashboard');
-        return;
+        alert('Your seller account is pending approval. You cannot list products until approved.')
+        router.push('/dashboard')
+        return
       }
 
-      // ✅ STRICT CATEGORY MAPPING before sending to backend
-      const mappedCategory = strictCategoryMap()[formData.category] || formData.category;
-      console.log(`🚀 Submitting with category: "${formData.category}" → "${mappedCategory}"`);
-
-      // ✅ NETWORK TIMEOUT CONFIGURATION
-      const controller = new AbortController();
-      const timeoutDuration = 180000; // 3 minutes for large uploads
-      const timeoutId = setTimeout(() => {
-        controller.abort();
-        console.error('⏰ Upload timeout after 3 minutes');
-      }, timeoutDuration);
-
-      const submitFormData = new FormData();
-
-      // Add product data with MAPPED category
-      submitFormData.append('productName', formData.productName);
-      submitFormData.append('brand', formData.brand);
-      submitFormData.append('category', mappedCategory);
-      submitFormData.append('productType', formData.productType);
-      submitFormData.append('purchaseYear', formData.purchaseYear || '');
-      submitFormData.append('condition', formData.condition);
-      submitFormData.append('description', formData.description);
-      submitFormData.append('askingPrice', formData.askingPrice);
-      submitFormData.append('platformFee', platformFee.toString());
-      submitFormData.append('finalPrice', justBechoPrice.toString());
-
-      // Add images with logging
-      console.log('📤 Adding images to form data:');
-      formData.images.forEach((image, index) => {
-        submitFormData.append('images', image, image.name);
-        console.log(`  ${index + 1}. ${image.name} (${(image.size/(1024*1024)).toFixed(2)}MB)`);
-      });
-
-      console.log('📨 Sending request to backend...');
-
-      // ✅ FETCH WITH TIMEOUT AND RETRY
-      let retries = 2;
-      let lastError = null;
+      // Use XHR for upload (more reliable especially on mobile)
+      const result = await uploadWithXHR(token)
       
-      while (retries >= 0) {
-        try {
-          console.log(`🔁 Attempt ${3 - retries}/3`);
-          
-          const response = await fetch('https://just-becho-backend.vercel.app/api/products', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: submitFormData,
-            signal: controller.signal,
-            keepalive: true
-          });
-
-          clearTimeout(timeoutId);
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ Server error:', response.status, errorText);
-            
-            if (response.status === 413) {
-              throw new Error('File too large. Please reduce image sizes.');
-            } else if (response.status === 400) {
-              throw new Error(`Validation error: ${errorText}`);
-            } else {
-              throw new Error(`Server error ${response.status}`);
-            }
-          }
-
-          const data = await response.json();
-          
-          if (data.success) {
-            console.log('✅ Upload successful:', data);
-            alert('✅ Product listed successfully!');
-            router.push('/dashboard?section=listings');
-            return;
-          } else {
-            throw new Error(data.message || 'Upload failed');
-          }
-          
-        } catch (error) {
-          lastError = error;
-          
-          if (error.name === 'AbortError') {
-            console.error('⏰ Request timeout');
-            alert('❌ Upload timeout. Please check your internet connection and try again.');
-            break;
-          }
-          
-          if (retries > 0) {
-            console.log(`🔄 Retrying in 2 seconds... (${retries} attempts left)`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            retries--;
-          } else {
-            break;
-          }
-        }
+      if (result.success) {
+        alert('✅ Product listed successfully!')
+        router.push('/dashboard?section=listings')
+      } else {
+        throw new Error(result.message || 'Upload failed')
       }
-
-      if (lastError) {
-        console.error('❌ Final error after retries:', lastError);
-        
-        if (lastError.message.includes('Failed to fetch') || lastError.message.includes('NetworkError')) {
-          alert('❌ Network error. Please check:\n\n1. Internet connection\n2. Try smaller image sizes\n3. Try on Wi-Fi instead of mobile data\n4. Wait a few minutes and try again');
-        } else if (lastError.message.includes('timeout')) {
-          alert('❌ Upload timeout. Try with:\n\n1. Fewer images (2-3 instead of 5)\n2. Smaller image sizes\n3. Better internet connection');
-        } else if (lastError.message.includes('too large')) {
-          alert('❌ File too large. Maximum 10MB per image.');
-        } else {
-          alert(lastError.message || 'Something went wrong. Please try again.');
-        }
-      }
-
+      
     } catch (error) {
-      console.error('💥 Unexpected error:', error);
-      alert('An unexpected error occurred. Please try again or contact support.');
+      console.error('❌ Upload error:', error)
+      
+      // Mobile-specific error messages
+      if (isMobile) {
+        if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+          alert(`❌ Upload Timeout\n\nThe upload took too long to complete.\n\nCommon mobile issues:\n1. Weak signal/network\n2. Large file size\n3. Server busy\n\nTry:\n1. Switch to Wi-Fi\n2. Reduce to 1-2 images\n3. Try during off-peak hours`)
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('Network Error')) {
+          alert(`❌ Network Connection Lost\n\nYour mobile connection was interrupted.\n\nPossible reasons:\n1. Switched from Wi-Fi to mobile data\n2. Entered low signal area\n3. Phone went to sleep\n4. App switched to background\n\nPlease try again with stable connection.`)
+        } else if (error.message.includes('413')) {
+          alert(`❌ File Too Large\n\nReduce image sizes or upload fewer images.\n\nMobile limits:\n• 5MB per image\n• 15MB total\n• 3 images max`)
+        } else {
+          alert(`❌ Upload Failed\n\n${error.message}\n\nTry:\n1. Clear browser cache\n2. Update your browser\n3. Restart the app`)
+        }
+      } else {
+        alert(error.message || 'Something went wrong. Please try again.')
+      }
     } finally {
-      setIsSubmitting(false);
-      clearTimeout(timeoutId);
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const transformedCategories = transformCategoriesForSelect(categories);
+  const transformedCategories = transformCategoriesForSelect(categories)
 
   // ✅ Loading state
   if (loading) {
@@ -882,27 +925,48 @@ export default function SellNowPage() {
 
   // ✅ Upload Progress Overlay
   const UploadProgressOverlay = () => {
-    if (!isSubmitting) return null;
+    if (!uploadProgress.isUploading) return null
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
         <div className="bg-white rounded-xl p-6 md:p-8 max-w-md w-full mx-4">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Uploading Product</h3>
-            <p className="text-gray-600 mb-4">
-              Uploading {formData.images.length} images ({formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024) > 1 
-                ? `${(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024*1024)).toFixed(1)}MB` 
-                : `${Math.round(formData.images.reduce((sum, img) => sum + img.size, 0) / 1024)}KB`})
-            </p>
-            <p className="text-sm text-gray-500">
-              Please don't close this window. This may take a few seconds...
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {isMobile ? '📱 Uploading from Mobile...' : 'Uploading Product...'}
+            </h3>
+            
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+              <div 
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                style={{ width: `${uploadProgress.percent}%` }}
+              ></div>
+            </div>
+            
+            <p className="text-gray-700 mb-2">{uploadProgress.currentFile}</p>
+            
+            {uploadProgress.total > 0 && (
+              <p className="text-sm text-gray-500 mb-2">
+                {Math.round(uploadProgress.uploaded / 1024)} KB / {Math.round(uploadProgress.total / 1024)} KB
+              </p>
+            )}
+            
+            {isMobile && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                <p className="text-yellow-800 text-sm">
+                  ⚠️ Important: Keep screen ON and stay on this page
+                </p>
+              </div>
+            )}
+            
+            <p className="text-xs text-gray-400 mt-3">
+              Please don't close or refresh this page...
             </p>
           </div>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   // ✅ Main form
   return (
@@ -1071,7 +1135,7 @@ export default function SellNowPage() {
                           onChange={handleBrandInput}
                           onBlur={(e) => {
                             if (e.target.value.trim()) {
-                              handleBrandInput(e);
+                              handleBrandInput(e)
                             }
                           }}
                           required
@@ -1309,7 +1373,10 @@ export default function SellNowPage() {
 
                   <div className="pt-6 md:pt-8 border-t border-gray-200">
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
-                      Product Images * (Max 5 images, 10MB each, 50MB total)
+                      Product Images * 
+                      <span className="text-xs text-gray-500 ml-1">
+                        (Max {isMobile ? '3' : '5'} images, {isMobile ? '5MB' : '10MB'} each, {isMobile ? '15MB' : '50MB'} total)
+                      </span>
                     </label>
 
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-6 lg:p-8 text-center hover:border-gray-400 transition-colors">
@@ -1328,16 +1395,25 @@ export default function SellNowPage() {
                           </svg>
                         </div>
                         <p className="text-gray-600 text-sm md:text-base lg:text-lg font-medium">Click to upload images</p>
-                        <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">PNG, JPG, JPEG up to 10MB each</p>
-                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">Maximum 5 images, total size under 50MB</p>
-                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">Large images are automatically compressed</p>
+                        <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">
+                          {isMobile ? 'PNG, JPG up to 5MB each' : 'PNG, JPG, JPEG up to 10MB each'}
+                        </p>
+                        <p className="text-gray-400 text-xs mt-0.5 md:mt-1">
+                          Maximum {isMobile ? '3' : '5'} images, total under {isMobile ? '15MB' : '50MB'}
+                        </p>
+                        {isMobile && (
+                          <p className="text-blue-500 text-xs mt-0.5 md:mt-1">
+                            📱 Large images are automatically compressed for mobile
+                          </p>
+                        )}
                       </label>
                     </div>
 
                     {formData.images.length > 0 && (
                       <div className="mt-4 md:mt-6">
                         <h4 className="text-xs md:text-sm font-medium text-gray-700 mb-3 md:mb-4">
-                          Uploaded Images ({formData.images.length}/5)
+                          Uploaded Images ({formData.images.length}/{isMobile ? '3' : '5'})
+                          {isMobile && <span className="text-blue-500 ml-2">📱</span>}
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3 lg:gap-4">
                           {formData.images.map((image, index) => (
@@ -1360,7 +1436,7 @@ export default function SellNowPage() {
                             </div>
                           ))}
 
-                          {formData.images.length < 5 && (
+                          {formData.images.length < (isMobile ? 3 : 5) && (
                             <label htmlFor="image-upload" className="cursor-pointer">
                               <div className="w-full h-16 md:h-20 lg:h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors">
                                 <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 mb-0.5 md:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1382,7 +1458,7 @@ export default function SellNowPage() {
                               }
                             </span>
                             <span className="text-xs text-blue-600">
-                              Limit: 50MB ({Math.round((formData.images.reduce((sum, img) => sum + img.size, 0) / (50 * 1024 * 1024)) * 100)}% used)
+                              Limit: {isMobile ? '15MB' : '50MB'} ({Math.round((formData.images.reduce((sum, img) => sum + img.size, 0) / ((isMobile ? 15 : 50) * 1024 * 1024)) * 100)}% used)
                             </span>
                           </div>
                         </div>
@@ -1395,14 +1471,15 @@ export default function SellNowPage() {
                           <span className="text-white text-xs">💡</span>
                         </div>
                         <div>
-                          <p className="text-yellow-800 font-medium text-xs md:text-sm">Upload Tips</p>
+                          <p className="text-yellow-800 font-medium text-xs md:text-sm">Upload Tips {isMobile && 'for Mobile'}</p>
                           <ul className="text-yellow-700 text-xs md:text-sm mt-0.5 md:mt-1 space-y-0.5 md:space-y-1">
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
                             <li>• Capture any imperfections or wear</li>
-                            <li>• Use Wi-Fi for large uploads (recommended)</li>
-                            <li>• Large images are automatically compressed</li>
+                            {isMobile && <li>• Use Wi-Fi for best results on mobile</li>}
+                            {isMobile && <li>• Large images are automatically compressed</li>}
+                            <li>• Competitive Pricing makes items sell faster</li>
                           </ul>
                         </div>
                       </div>
@@ -1438,7 +1515,7 @@ export default function SellNowPage() {
 
                   <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
                     <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4 text-center">
-                      Listing Summary
+                      Listing Summary {isMobile && '📱'}
                     </h3>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
@@ -1499,7 +1576,10 @@ export default function SellNowPage() {
                           </div>
                           <div className="flex justify-between border-b pb-2 md:pb-3">
                             <span className="text-gray-600 text-sm md:text-base">Images Uploaded:</span>
-                            <span className="font-medium text-gray-900 text-sm md:text-base">{formData.images.length} photos</span>
+                            <span className="font-medium text-gray-900 text-sm md:text-base">
+                              {formData.images.length} photo{formData.images.length !== 1 ? 's' : ''}
+                              {isMobile && ' 📱'}
+                            </span>
                           </div>
                           <div className="flex justify-between border-b pb-2 md:pb-3">
                             <span className="text-gray-600 text-sm md:text-base">Total Size:</span>
@@ -1567,9 +1647,11 @@ export default function SellNowPage() {
                           <span className="font-semibold">Note:</span> The platform fee covers marketing,
                           payment processing, customer support, and buyer protection services.
                         </p>
-                        <p className="text-yellow-700 text-xs mt-2">
-                          <span className="font-semibold">Upload Note:</span> Large images are automatically compressed for faster upload.
-                        </p>
+                        {isMobile && (
+                          <p className="text-blue-600 text-xs mt-2">
+                            📱 <span className="font-semibold">Mobile Upload:</span> Images are optimized for mobile upload.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1591,10 +1673,10 @@ export default function SellNowPage() {
                       {isSubmitting ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Uploading...
+                          {isMobile ? 'Uploading...' : 'Publishing...'}
                         </>
                       ) : (
-                        'Publish Listing'
+                        `Publish Listing${isMobile ? ' 📱' : ''}`
                       )}
                     </button>
                   </div>
