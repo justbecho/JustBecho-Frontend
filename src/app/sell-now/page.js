@@ -343,8 +343,8 @@ export default function SellNowPage() {
     return uniqueItems
   }, [categories])
 
-  // ✅ FIXED: BETTER COMPRESSION FUNCTION
-  const compressImageForMobile = async (file) => {
+  // ✅ SIMPLE COMPRESSION FUNCTION (NO SIZE INCREASE)
+  const compressImageSimple = async (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.readAsDataURL(file)
@@ -354,89 +354,138 @@ export default function SellNowPage() {
         img.onload = () => {
           const canvas = document.createElement('canvas')
           
-          // ✅ Calculate dimensions to maintain aspect ratio
-          const MAX_DIMENSION = 1200 // Slightly larger for better quality
-          
+          // Keep original dimensions
           let width = img.width
           let height = img.height
           
-          // Calculate scaling factor
-          const scale = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
-          
-          // If image is smaller than max, don't enlarge it
-          if (scale < 1) {
-            width = Math.round(width * scale)
-            height = Math.round(height * scale)
+          // Only resize if image is too large
+          const MAX_DIMENSION = 1200
+          if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
+            width = Math.round(width * ratio)
+            height = Math.round(height * ratio)
           }
           
           canvas.width = width
           canvas.height = height
           
           const ctx = canvas.getContext('2d')
-          
-          // ✅ Improve image quality
-          ctx.imageSmoothingEnabled = true
-          ctx.imageSmoothingQuality = 'high'
-          
-          // Draw image with better quality
           ctx.drawImage(img, 0, 0, width, height)
           
-          // ✅ SMART QUALITY ADJUSTMENT
-          let quality = 0.75 // Default quality
+          // Calculate quality based on original size
+          const originalSizeMB = file.size / (1024 * 1024)
+          let quality = 0.8 // Default
           
-          // Check file type
-          const isPNG = file.type === 'image/png'
-          const isLargeFile = file.size > 3 * 1024 * 1024 // > 3MB
+          if (originalSizeMB > 3) quality = 0.6
+          else if (originalSizeMB > 2) quality = 0.7
           
-          if (isPNG) {
-            // PNG files - be more aggressive with compression
-            quality = isLargeFile ? 0.6 : 0.7
-            
-            // Convert PNG to JPEG if it's very large
-            if (file.size > 4 * 1024 * 1024) {
-              console.log(`📱 Converting large PNG to JPEG for better compression`)
-              canvas.toBlob((blob) => {
-                const compressedFile = new File([blob], file.name.replace('.png', '.jpg'), {
-                  type: 'image/jpeg', // Convert to JPEG
-                  lastModified: Date.now()
-                })
-                
-                console.log(`✅ PNG → JPEG: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
-                resolve(compressedFile)
-              }, 'image/jpeg', quality)
-              return
-            }
-          } else {
-            // JPEG/WebP files
-            quality = isLargeFile ? 0.65 : 0.75
-          }
-          
-          console.log(`📱 Compressing ${file.name}: ${(file.size/(1024*1024)).toFixed(2)}MB → quality: ${quality}`)
-          
-          // Use appropriate format
-          const outputType = isPNG ? 'image/png' : 'image/jpeg'
+          console.log(`📱 Simple compression: ${originalSizeMB.toFixed(2)}MB → quality: ${quality}`)
           
           canvas.toBlob((blob) => {
             const compressedFile = new File([blob], file.name, {
-              type: outputType,
+              type: 'image/jpeg',
               lastModified: Date.now()
             })
             
-            console.log(`✅ Compressed: ${(file.size/(1024*1024)).toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
-            
-            // Safety check - if compression failed and file got bigger
-            if (compressedFile.size > file.size * 1.1) { // 10% larger
+            // ✅ IMPORTANT: If compressed file is LARGER, return original
+            if (compressedFile.size > file.size) {
               console.warn(`⚠️ Compression increased size, using original`)
               resolve(file)
             } else {
+              console.log(`✅ Simple compression: ${originalSizeMB.toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
               resolve(compressedFile)
             }
-          }, outputType, quality)
+          }, 'image/jpeg', quality)
         }
         img.onerror = reject
       }
       reader.onerror = reject
     })
+  }
+
+  // ✅ CHECK IF FILE IS HEIF/HEIC
+  const isHEIFFile = (file) => {
+    const validHEIFTypes = [
+      'image/heif',
+      'image/heic',
+      'image/heif-sequence',
+      'image/heic-sequence'
+    ]
+    
+    const fileExtension = file.name.toLowerCase().split('.').pop()
+    const isHEIF = validHEIFTypes.includes(file.type) || 
+                   fileExtension === 'heif' || 
+                   fileExtension === 'heic'
+    
+    return isHEIF
+  }
+
+  // ✅ HANDLE HEIF/HEIC FILES
+  const handleHEIFFile = async (file) => {
+    const fileSizeMB = file.size / (1024 * 1024)
+    
+    // Show warning for HEIF files
+    const userChoice = confirm(
+      `HEIF/HEIC File Detected: ${file.name}\n\n` +
+      `Size: ${fileSizeMB.toFixed(2)}MB\n\n` +
+      `HEIF/HEIC files from iPhone may not display properly.\n\n` +
+      `Recommended: Convert to JPEG/PNG for better compatibility.\n\n` +
+      `Options:\n` +
+      `1. Cancel and convert to JPEG manually (Recommended)\n` +
+      `2. Upload anyway (may not work properly)\n\n` +
+      `What would you like to do?`
+    )
+    
+    if (!userChoice) {
+      throw new Error('HEIF file cancelled by user')
+    }
+    
+    // Try simple canvas conversion
+    try {
+      console.log(`🔄 Attempting HEIF to JPEG conversion: ${file.name}`)
+      
+      // Create a simple conversion using canvas
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = (event) => {
+          const img = new Image()
+          img.src = event.target.result
+          img.onload = () => {
+            const canvas = document.createElement('canvas')
+            canvas.width = img.width
+            canvas.height = img.height
+            
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(img, 0, 0)
+            
+            canvas.toBlob((blob) => {
+              const convertedFile = new File([blob], 
+                file.name.replace(/\.[^/.]+$/, '.jpg'), // Change extension to .jpg
+                {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                }
+              )
+              
+              console.log(`✅ HEIF converted to JPEG: ${fileSizeMB.toFixed(2)}MB → ${(convertedFile.size/(1024*1024)).toFixed(2)}MB`)
+              resolve(convertedFile)
+            }, 'image/jpeg', 0.7)
+          }
+          img.onerror = () => {
+            console.warn('HEIF conversion failed, using original')
+            resolve(file) // Return original if conversion fails
+          }
+        }
+        reader.onerror = () => {
+          console.warn('HEIF read failed, using original')
+          resolve(file) // Return original if read fails
+        }
+      })
+    } catch (error) {
+      console.warn('HEIF conversion error:', error)
+      return file // Return original on error
+    }
   }
 
   const conditions = [
@@ -606,7 +655,7 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  // ✅ FIXED: HANDLE IMAGE UPLOAD WITH STRICT 5MB PER IMAGE, 25MB TOTAL LIMIT
+  // ✅ FIXED: HANDLE IMAGE UPLOAD - SIMPLE & RELIABLE
   const handleImageUpload = async (e) => {
     if (!e?.target?.files) return
     
@@ -615,14 +664,13 @@ export default function SellNowPage() {
     if (files.length === 0) return
     
     // ✅ STRICT LIMITS
-    const maxFiles = 5 // Total 5 images
+    const maxFiles = 5
     const maxSizePerFile = 5 * 1024 * 1024 // 5MB per image
     const maxTotalSize = 25 * 1024 * 1024 // 25MB total
     
     const currentImages = Array.isArray(formData?.images) ? formData.images : []
     const remainingSlots = maxFiles - currentImages.length
     
-    // Filter files to add
     const filesToAdd = files.slice(0, remainingSlots)
     
     if (filesToAdd.length === 0) {
@@ -644,14 +692,16 @@ export default function SellNowPage() {
           continue
         }
         
-        // File type check
+        // ✅ UPDATED: File type check with HEIF support
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-        if (!validTypes.includes(file.type)) {
-          errors.push(`${file.name}: Only JPG, PNG, WebP allowed`)
+        const isHEIF = isHEIFFile(file)
+        
+        if (!validTypes.includes(file.type) && !isHEIF) {
+          errors.push(`${file.name}: Only JPG, PNG, WebP, HEIF/HEIC allowed`)
           continue
         }
         
-        // Check individual file size BEFORE compression
+        // Check file size
         const fileSizeMB = file.size / (1024 * 1024)
         
         if (file.size > maxSizePerFile) {
@@ -666,34 +716,34 @@ export default function SellNowPage() {
           continue
         }
         
-        // ✅ Check file type and size
+        // ✅ Process file based on type
         let processedFile = file
         
-        // Only compress if needed
-        const needsCompression = isMobile && fileSizeMB > 1.5 // Compress if > 1.5MB on mobile
-        
-        if (needsCompression) {
+        // Handle HEIF/HEIC files
+        if (isHEIF) {
           try {
-            console.log(`📱 Compressing ${file.name} (${fileSizeMB.toFixed(2)}MB)...`)
-            processedFile = await compressImageForMobile(file)
-            
-            // Check if compression worked
-            const compressedSizeMB = processedFile.size / (1024 * 1024)
-            
-            if (processedFile.size > maxSizePerFile) {
-              errors.push(`${file.name}: After compression ${compressedSizeMB.toFixed(2)}MB still exceeds 5MB`)
-              continue
-            }
-            
-            console.log(`✅ Compressed to ${compressedSizeMB.toFixed(2)}MB`)
+            processedFile = await handleHEIFFile(file)
+          } catch (heifError) {
+            console.warn(`HEIF handling failed: ${heifError.message}`)
+            continue // Skip this file if user cancelled
+          }
+        }
+        // Compress large regular images on mobile only
+        else if (isMobile && fileSizeMB > 1.5) {
+          try {
+            console.log(`📱 Simple compression for: ${file.name}`)
+            processedFile = await compressImageSimple(file)
           } catch (compressError) {
             console.warn(`Compression failed: ${compressError.message}`)
-            // If compression fails, use original but check size
-            if (file.size > maxSizePerFile) {
-              errors.push(`${file.name}: ${fileSizeMB.toFixed(2)}MB exceeds 5MB limit`)
-              continue
-            }
+            // Keep original if compression fails
           }
+        }
+        
+        // Check processed file size
+        const processedSizeMB = processedFile.size / (1024 * 1024)
+        if (processedFile.size > maxSizePerFile) {
+          errors.push(`${file.name}: ${processedSizeMB.toFixed(2)}MB exceeds 5MB limit`)
+          continue
         }
         
         // Check total size limit
@@ -706,7 +756,7 @@ export default function SellNowPage() {
         totalSize = newTotalSize
         validFiles.push(processedFile)
         
-        console.log(`✅ Added: ${processedFile.name} (${(processedFile.size/(1024*1024)).toFixed(2)}MB)`)
+        console.log(`✅ Added: ${processedFile.name} (${processedSizeMB.toFixed(2)}MB)`)
         
       } catch (error) {
         console.error(`Error with ${file.name}:`, error)
@@ -717,11 +767,7 @@ export default function SellNowPage() {
     // Show errors
     if (errors.length > 0) {
       const errorMsg = errors.slice(0, 5).join('\n')
-      if (errors.length > 5) {
-        alert(`Upload issues (showing first 5):\n\n${errorMsg}\n\n...and ${errors.length - 5} more issues`)
-      } else {
-        alert(`Upload issues:\n\n${errorMsg}`)
-      }
+      alert(`Upload issues:\n\n${errorMsg}`)
     }
     
     // Update form data
@@ -733,15 +779,6 @@ export default function SellNowPage() {
       
       const newTotalSize = totalSize
       console.log(`📊 Total: ${currentImages.length + validFiles.length} images, ${(newTotalSize/(1024*1024)).toFixed(2)}MB/25MB`)
-      
-      // Show success summary
-      if (validFiles.length > 0) {
-        const addedCount = validFiles.length
-        const totalCount = currentImages.length + validFiles.length
-        const totalMB = (newTotalSize/(1024*1024)).toFixed(2)
-        
-        alert(`✅ Added ${addedCount} image(s)\n\nTotal: ${totalCount}/5 images\nSize: ${totalMB}MB/25MB`)
-      }
     }
   }
 
@@ -1517,7 +1554,7 @@ export default function SellNowPage() {
                       <input
                         type="file"
                         multiple
-                        accept="image/*"
+                        accept="image/*,image/heif,image/heic,image/heif-sequence,image/heic-sequence,.heif,.heic"
                         onChange={handleImageUpload}
                         className="hidden"
                         id="image-upload"
@@ -1530,14 +1567,14 @@ export default function SellNowPage() {
                         </div>
                         <p className="text-gray-600 text-sm md:text-base lg:text-lg font-medium">Click to upload images</p>
                         <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">
-                          PNG, JPG, JPEG up to 5MB each
+                          JPG, PNG, WebP, HEIF/HEIC up to 5MB each
                         </p>
                         <p className="text-gray-400 text-xs mt-0.5 md:mt-1">
                           Maximum 5 images, total under 25MB
                         </p>
                         {isMobile && (
                           <p className="text-blue-500 text-xs mt-0.5 md:mt-1">
-                            📱 Images larger than 1.5MB are automatically compressed
+                            📱 Images larger than 1.5MB are automatically optimized
                           </p>
                         )}
                       </label>
@@ -1621,7 +1658,7 @@ export default function SellNowPage() {
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
-                            {isMobile && <li>• Images larger than 1.5MB are automatically compressed</li>}
+                            <li>• HEIF/HEIC files (from iPhone) will be converted to JPEG</li>
                             {isMobile && <li>• Use Wi-Fi for best results on mobile</li>}
                             <li>• Competitive Pricing makes items sell faster</li>
                           </ul>
