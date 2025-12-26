@@ -58,8 +58,6 @@ function HomeContent() {
       { name: "Nike", logo: "/brandslogo/footwear/palmm.jpeg", fallback: "/brands/gucci.png" },
       { name: "Nike", logo: "/brandslogo/footwear/off-white.jpeg", fallback: "/brands/gucci.png" },
       { name: "Nike", logo: "/brandslogo/footwear/hermess.jpeg", fallback: "/brands/gucci.png" },
-      
-      
       { name: "Amiri", logo: "/brandslogo/footwear/Amiri.jpg", fallback: "/brands/jimmy-choo.png" },
       { name: "ANTA", logo: "/brandslogo/footwear/ANTA.jpg", fallback: "/brands/prada.png" },
       { name: "Armani", logo: "/brandslogo/footwear/Armani.png", fallback: "/brands/puma.png" },
@@ -149,7 +147,7 @@ function HomeContent() {
       { name: "Filorga", logo: "/brandslogo/perfumes/Filorga.png", fallback: "/brands/baggit.png" },
       { name: "Guerlain", logo: "/brandslogo/perfumes/Guerlain.png", fallback: "/brands/ray-ban.png" }
     ],
-    "KID'S FASHION": [  // ✅ Updated key
+    "KID'S FASHION": [
       { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },
       { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
       { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
@@ -170,13 +168,14 @@ function HomeContent() {
     "Watches": "/banners/watches new.png", 
     "Perfumes": "/banners/perfumes new.png",
     "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
-    "KID'S FASHION": "/banners/kids new.png",  // ✅ Updated key
+    "KID'S FASHION": "/banners/kids new.png",
     "default": "/banners/default.jpg"
   }), [])
 
   // ✅ BRAND MARQUEE CONFIGURATION - EXTREMELY SLOW SPEED
-  const BRAND_MARQUEE_SPEED = 120; // Very slow speed (120 seconds)
+  const BRAND_MARQUEE_SPEED = 120;
   const [isMarqueePaused, setIsMarqueePaused] = useState(false);
+  const marqueeRefs = useRef({}); // ✅ Track marquee container positions
 
   // ✅ Create marquee brands with proper animation
   const createInfiniteMarquee = (brands) => {
@@ -530,7 +529,6 @@ function HomeContent() {
             const formattedCategories = categoriesData.categories.map(cat => {
               const categoryName = cat.name || '';
               
-              // ✅ Display name properly capitalize
               const displayName = categoryName.split(' ')
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                 .join(' ');
@@ -538,32 +536,26 @@ function HomeContent() {
               const imagePath = getCategoryImage(categoryName);
               const brandLogos = getCategoryBrands(categoryName);
               
-              // ✅ Generate correct URL slug for frontend
               const urlSlug = getCategorySlug(displayName);
-              
-              // ✅ Generate correct API category for backend
               const apiCategory = getApiCategory(displayName);
               
               return {
                 name: displayName,
                 originalName: categoryName,
-                href: `/categories/${urlSlug}`,  // ✅ Correct URL
-                apiCategory: apiCategory,  // ✅ Correct API category
+                href: `/categories/${urlSlug}`,
+                apiCategory: apiCategory,
                 image: imagePath,
                 brands: brandLogos
               }
             })
             
             setCategoriesFromBackend(formattedCategories)
-            console.log('✅ Categories loaded:', formattedCategories.map(c => ({ name: c.name, href: c.href, api: c.apiCategory })))
             
-            // ✅ Fetch products for each category
             const productsByCategory = {}
             
             for (const category of formattedCategories) {
               try {
                 if (category.apiCategory) {
-                  // ✅ Correct API URL for backend
                   const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
                   
                   const response = await fetch(apiUrl)
@@ -667,93 +659,110 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: Brand Marquee Component with EXTREMELY SLOW SPEED and PROPER HOVER PAUSE
-  const InfiniteBrandMarquee = ({ brands, categoryName }) => {
+  // ✅ FIXED: Brand Marquee Component with SMOOTH HOVER
+  const InfiniteBrandMarquee = ({ brands, categoryName, index }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
+    const marqueeContainerRef = useRef(null);
+    const marqueeContentRef = useRef(null);
+    const animationRef = useRef(null);
+    const startTimeRef = useRef(0);
+    const progressRef = useRef(0);
+    
+    // Store ref in our tracking object
+    useEffect(() => {
+      marqueeRefs.current[index] = {
+        container: marqueeContainerRef,
+        content: marqueeContentRef,
+        animation: animationRef,
+        startTime: startTimeRef,
+        progress: progressRef
+      };
+      
+      return () => {
+        delete marqueeRefs.current[index];
+      };
+    }, [index]);
+    
+    const startMarquee = () => {
+      if (!marqueeContentRef.current || !marqueeContainerRef.current) return;
+      
+      const containerWidth = marqueeContainerRef.current.offsetWidth;
+      const contentWidth = marqueeContentRef.current.offsetWidth;
+      const segmentWidth = contentWidth / 3;
+      
+      // Reset transform
+      marqueeContentRef.current.style.transform = 'translateX(0)';
+      progressRef.current = 0;
+      startTimeRef.current = Date.now();
+      
+      const animate = () => {
+        if (!marqueeContentRef.current || isMarqueePaused) return;
+        
+        const elapsed = Date.now() - startTimeRef.current;
+        const progress = (elapsed / (BRAND_MARQUEE_SPEED * 1000)) % 1;
+        
+        // Calculate position based on segment width
+        const translateX = -progress * segmentWidth;
+        
+        marqueeContentRef.current.style.transform = `translateX(${translateX}px)`;
+        progressRef.current = progress;
+        
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    // Start animation on mount
+    useEffect(() => {
+      startMarquee();
+      
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
+    }, [brands.length]);
+    
+    // Handle pause/resume
+    useEffect(() => {
+      if (isMarqueePaused) {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+      } else {
+        if (!animationRef.current && marqueeContentRef.current) {
+          startTimeRef.current = Date.now() - (progressRef.current * BRAND_MARQUEE_SPEED * 1000);
+          startMarquee();
+        }
+      }
+    }, [isMarqueePaused]);
     
     return (
       <div 
         className="marquee-container w-full overflow-hidden py-4 sm:py-6"
+        ref={marqueeContainerRef}
         onMouseEnter={() => setIsMarqueePaused(true)}
         onMouseLeave={() => setIsMarqueePaused(false)}
         onTouchStart={() => setIsMarqueePaused(true)}
         onTouchEnd={() => setIsMarqueePaused(false)}
       >
-        <style jsx>{`
-          @keyframes marquee {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-33.33%);
-            }
-          }
-          
-          .marquee-seamless-desktop {
-            display: flex;
-            animation: marquee ${BRAND_MARQUEE_SPEED}s linear infinite;
-            animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
-            will-change: transform;
-          }
-          
-          @keyframes marquee-mobile {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-50%);
-            }
-          }
-          
-          .marquee-seamless-mobile {
-            display: flex;
-            animation: marquee-mobile ${BRAND_MARQUEE_SPEED * 0.6}s linear infinite;
-            animation-play-state: ${isMarqueePaused ? 'paused' : 'running'};
-            will-change: transform;
-          }
-          
-          .marquee-desktop {
-            display: none;
-          }
-          
-          .marquee-mobile {
-            display: block;
-          }
-          
-          @media (min-width: 768px) {
-            .marquee-desktop {
-              display: block;
-            }
-            .marquee-mobile {
-              display: none;
-            }
-          }
-        `}</style>
-        
-        <div className="marquee-desktop">
-          <div className="marquee-seamless-desktop">
-            {infiniteBrands.map((brand, index) => (
-              <BrandLogo 
-                key={`desktop-${brand.name}-${index}`} 
-                brand={brand} 
-                index={index}
-                categoryName={categoryName}
-              />
-            ))}
-          </div>
-        </div>
-        
-        <div className="marquee-mobile">
-          <div className="marquee-seamless-mobile">
-            {infiniteBrands.map((brand, index) => (
-              <BrandLogo 
-                key={`mobile-${brand.name}-${index}`} 
-                brand={brand} 
-                index={index}
-                categoryName={categoryName}
-              />
-            ))}
-          </div>
+        <div 
+          className="marquee-seamless flex transition-transform duration-200 ease-linear"
+          ref={marqueeContentRef}
+          style={{ 
+            transition: isMarqueePaused ? 'transform 0.2s ease' : 'none'
+          }}
+        >
+          {infiniteBrands.map((brand, idx) => (
+            <BrandLogo 
+              key={`${categoryName}-${brand.name}-${idx}`} 
+              brand={brand} 
+              index={idx}
+              categoryName={categoryName}
+            />
+          ))}
         </div>
       </div>
     )
@@ -1126,6 +1135,7 @@ function HomeContent() {
                       <InfiniteBrandMarquee 
                         brands={categoryBrandsData} 
                         categoryName={category.name}
+                        index={index}
                       />
                       
                       <div className="text-center mt-4 sm:mt-6">
