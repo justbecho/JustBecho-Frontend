@@ -80,7 +80,7 @@ export default function SellNowPage() {
       "accessories": "Accessories",
       
       "Watches": "Watches",
-      "watches": "Watches",
+      "watches": "Watche s",
       
       "Perfumes": "Perfumes",
       "perfumes": "Perfumes",
@@ -343,66 +343,6 @@ export default function SellNowPage() {
     return uniqueItems
   }, [categories])
 
-  // ✅ SIMPLE COMPRESSION FUNCTION (NO SIZE INCREASE)
-  const compressImageSimple = async (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (event) => {
-        const img = new Image()
-        img.src = event.target.result
-        img.onload = () => {
-          const canvas = document.createElement('canvas')
-          
-          // Keep original dimensions
-          let width = img.width
-          let height = img.height
-          
-          // Only resize if image is too large
-          const MAX_DIMENSION = 1200
-          if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
-            width = Math.round(width * ratio)
-            height = Math.round(height * ratio)
-          }
-          
-          canvas.width = width
-          canvas.height = height
-          
-          const ctx = canvas.getContext('2d')
-          ctx.drawImage(img, 0, 0, width, height)
-          
-          // Calculate quality based on original size
-          const originalSizeMB = file.size / (1024 * 1024)
-          let quality = 0.8 // Default
-          
-          if (originalSizeMB > 3) quality = 0.6
-          else if (originalSizeMB > 2) quality = 0.7
-          
-          console.log(`📱 Simple compression: ${originalSizeMB.toFixed(2)}MB → quality: ${quality}`)
-          
-          canvas.toBlob((blob) => {
-            const compressedFile = new File([blob], file.name, {
-              type: 'image/jpeg',
-              lastModified: Date.now()
-            })
-            
-            // ✅ IMPORTANT: If compressed file is LARGER, return original
-            if (compressedFile.size > file.size) {
-              console.warn(`⚠️ Compression increased size, using original`)
-              resolve(file)
-            } else {
-              console.log(`✅ Simple compression: ${originalSizeMB.toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
-              resolve(compressedFile)
-            }
-          }, 'image/jpeg', quality)
-        }
-        img.onerror = reject
-      }
-      reader.onerror = reject
-    })
-  }
-
   // ✅ CHECK IF FILE IS HEIF/HEIC
   const isHEIFFile = (file) => {
     const validHEIFTypes = [
@@ -420,7 +360,7 @@ export default function SellNowPage() {
     return isHEIF
   }
 
-  // ✅ HANDLE HEIF/HEIC FILES
+  // ✅ FIXED: HEIF/HEIC CONVERSION - PREVENTS SIZE INCREASE
   const handleHEIFFile = async (file) => {
     const fileSizeMB = file.size / (1024 * 1024)
     
@@ -428,23 +368,18 @@ export default function SellNowPage() {
     const userChoice = confirm(
       `HEIF/HEIC File Detected: ${file.name}\n\n` +
       `Size: ${fileSizeMB.toFixed(2)}MB\n\n` +
-      `HEIF/HEIC files from iPhone may not display properly.\n\n` +
-      `Recommended: Convert to JPEG/PNG for better compatibility.\n\n` +
-      `Options:\n` +
-      `1. Cancel and convert to JPEG manually (Recommended)\n` +
-      `2. Upload anyway (may not work properly)\n\n` +
-      `What would you like to do?`
+      `HEIF/HEIC files from iPhone will be converted to JPEG.\n\n` +
+      `Continue with conversion?`
     )
     
     if (!userChoice) {
       throw new Error('HEIF file cancelled by user')
     }
     
-    // Try simple canvas conversion
     try {
-      console.log(`🔄 Attempting HEIF to JPEG conversion: ${file.name}`)
+      console.log(`🔄 Converting HEIF to JPEG: ${file.name}`)
       
-      // Create a simple conversion using canvas
+      // Use a simple approach - read as data URL and draw to canvas
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
@@ -453,39 +388,161 @@ export default function SellNowPage() {
           img.src = event.target.result
           img.onload = () => {
             const canvas = document.createElement('canvas')
-            canvas.width = img.width
-            canvas.height = img.height
+            
+            // Keep original dimensions
+            let width = img.width
+            let height = img.height
+            
+            // Only resize if too large
+            const MAX_DIMENSION = 1200
+            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+              const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
+              width = Math.round(width * ratio)
+              height = Math.round(height * ratio)
+            }
+            
+            canvas.width = width
+            canvas.height = height
             
             const ctx = canvas.getContext('2d')
-            ctx.drawImage(img, 0, 0)
+            ctx.drawImage(img, 0, 0, width, height)
+            
+            // ✅ FIX: Use appropriate quality to prevent size increase
+            let quality = 0.75 // Default for HEIF conversion
+            
+            // Adjust quality based on original size
+            if (fileSizeMB > 3) quality = 0.65
+            else if (fileSizeMB > 1) quality = 0.7
             
             canvas.toBlob((blob) => {
+              if (!blob) {
+                console.warn('Canvas blob creation failed, returning original')
+                resolve(file)
+                return
+              }
+              
               const convertedFile = new File([blob], 
-                file.name.replace(/\.[^/.]+$/, '.jpg'), // Change extension to .jpg
+                file.name.replace(/\.[^/.]+$/, '.jpg'),
                 {
                   type: 'image/jpeg',
                   lastModified: Date.now()
                 }
               )
               
-              console.log(`✅ HEIF converted to JPEG: ${fileSizeMB.toFixed(2)}MB → ${(convertedFile.size/(1024*1024)).toFixed(2)}MB`)
-              resolve(convertedFile)
-            }, 'image/jpeg', 0.7)
+              const convertedSizeMB = convertedFile.size / (1024 * 1024)
+              
+              // ✅ CRITICAL FIX: If converted file is larger, use more aggressive compression
+              if (convertedSizeMB > fileSizeMB) {
+                console.log(`⚠️ Converted file larger (${convertedSizeMB.toFixed(2)}MB > ${fileSizeMB.toFixed(2)}MB), re-compressing...`)
+                
+                // Recompress with lower quality
+                const lowerQuality = Math.max(0.5, quality - 0.15)
+                canvas.toBlob((recompressedBlob) => {
+                  if (!recompressedBlob) {
+                    console.warn('Recompression failed, using original')
+                    resolve(file)
+                    return
+                  }
+                  
+                  const recompressedFile = new File([recompressedBlob], 
+                    file.name.replace(/\.[^/.]+$/, '.jpg'),
+                    {
+                      type: 'image/jpeg',
+                      lastModified: Date.now()
+                    }
+                  )
+                  
+                  const finalSizeMB = recompressedFile.size / (1024 * 1024)
+                  console.log(`✅ HEIF → JPEG: ${fileSizeMB.toFixed(2)}MB → ${finalSizeMB.toFixed(2)}MB (quality: ${lowerQuality})`)
+                  resolve(recompressedFile)
+                }, 'image/jpeg', lowerQuality)
+              } else {
+                console.log(`✅ HEIF → JPEG: ${fileSizeMB.toFixed(2)}MB → ${convertedSizeMB.toFixed(2)}MB (quality: ${quality})`)
+                resolve(convertedFile)
+              }
+            }, 'image/jpeg', quality)
           }
           img.onerror = () => {
-            console.warn('HEIF conversion failed, using original')
-            resolve(file) // Return original if conversion fails
+            console.warn('HEIF image load failed, using original')
+            resolve(file)
           }
         }
         reader.onerror = () => {
-          console.warn('HEIF read failed, using original')
-          resolve(file) // Return original if read fails
+          console.warn('HEIF file read failed, using original')
+          resolve(file)
         }
       })
     } catch (error) {
       console.warn('HEIF conversion error:', error)
-      return file // Return original on error
+      return file
     }
+  }
+
+  // ✅ FIXED: COMPRESSION FUNCTION WITH SIZE CHECK
+  const compressImageSimple = async (file) => {
+    const fileSizeMB = file.size / (1024 * 1024)
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (event) => {
+        const img = new Image()
+        img.src = event.target.result
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          
+          // Keep original dimensions
+          let width = img.width
+          let height = img.height
+          
+          // Calculate target dimensions based on file size
+          let scale = 1
+          if (fileSizeMB > 2) {
+            scale = 0.8
+          } else if (fileSizeMB > 1) {
+            scale = 0.9
+          }
+          
+          width = Math.round(width * scale)
+          height = Math.round(height * scale)
+          
+          canvas.width = width
+          canvas.height = height
+          
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, 0, 0, width, height)
+          
+          // Calculate quality - never go above 0.8
+          let quality = Math.max(0.5, 0.8 - (fileSizeMB * 0.1))
+          
+          console.log(`📱 Compression: ${fileSizeMB.toFixed(2)}MB → scale: ${scale}, quality: ${quality.toFixed(2)}`)
+          
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              console.warn('Compression blob creation failed')
+              resolve(file)
+              return
+            }
+            
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            })
+            
+            // ✅ Always ensure compressed file is smaller
+            if (compressedFile.size >= file.size) {
+              console.warn(`⚠️ Compression not effective, using original`)
+              resolve(file)
+            } else {
+              console.log(`✅ Compressed: ${fileSizeMB.toFixed(2)}MB → ${(compressedFile.size/(1024*1024)).toFixed(2)}MB`)
+              resolve(compressedFile)
+            }
+          }, 'image/jpeg', quality)
+        }
+        img.onerror = reject
+      }
+      reader.onerror = reject
+    })
   }
 
   const conditions = [
@@ -655,7 +712,7 @@ export default function SellNowPage() {
     checkUserAuth()
   }, [router, fetchCategories])
 
-  // ✅ FIXED: HANDLE IMAGE UPLOAD - SIMPLE & RELIABLE
+  // ✅ FIXED: HANDLE IMAGE UPLOAD WITH PROPER HEIF HANDLING
   const handleImageUpload = async (e) => {
     if (!e?.target?.files) return
     
@@ -692,7 +749,7 @@ export default function SellNowPage() {
           continue
         }
         
-        // ✅ UPDATED: File type check with HEIF support
+        // File type check with HEIF support
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         const isHEIF = isHEIFFile(file)
         
@@ -719,7 +776,7 @@ export default function SellNowPage() {
         // ✅ Process file based on type
         let processedFile = file
         
-        // Handle HEIF/HEIC files
+        // Handle HEIF/HEIC files with FIXED conversion
         if (isHEIF) {
           try {
             processedFile = await handleHEIFFile(file)
@@ -729,9 +786,9 @@ export default function SellNowPage() {
           }
         }
         // Compress large regular images on mobile only
-        else if (isMobile && fileSizeMB > 1.5) {
+        else if (isMobile && fileSizeMB > 1) {
           try {
-            console.log(`📱 Simple compression for: ${file.name}`)
+            console.log(`📱 Compression for: ${file.name}`)
             processedFile = await compressImageSimple(file)
           } catch (compressError) {
             console.warn(`Compression failed: ${compressError.message}`)
@@ -1046,48 +1103,9 @@ export default function SellNowPage() {
 
   const transformedCategories = transformCategoriesForSelect(categories)
 
-  // ✅ Loading state
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 pt-20 md:pt-40 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 md:h-12 w-8 md:w-12 border-b-2 border-gray-900 mx-auto mb-3 md:mb-4"></div>
-            <p className="text-gray-600 text-sm md:text-base">Checking seller status...</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
-  // ✅ Error state
-  if (error) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 pt-20 md:pt-40 flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto px-4">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-              <svg className="w-6 h-6 md:w-8 md:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">Access Denied</h3>
-            <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4">{error}</p>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 md:px-6 md:py-2 bg-gray-900 text-white text-sm md:text-base rounded-lg hover:bg-gray-800 transition-colors font-medium"
-            >
-              Go to Dashboard
-            </button>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
+  // ✅ Calculate total size for display
+  const totalSizeMB = formData.images.reduce((sum, img) => sum + img.size, 0) / (1024 * 1024);
+  const sizePercentage = Math.min(100, (totalSizeMB / 25) * 100);
 
   // ✅ Upload Progress Overlay
   const UploadProgressOverlay = () => {
@@ -1134,9 +1152,48 @@ export default function SellNowPage() {
     )
   }
 
-  // ✅ Calculate total size for display
-  const totalSizeMB = formData.images.reduce((sum, img) => sum + img.size, 0) / (1024 * 1024);
-  const sizePercentage = Math.min(100, (totalSizeMB / 25) * 100);
+  // ✅ Loading state
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 pt-20 md:pt-40 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 md:h-12 w-8 md:w-12 border-b-2 border-gray-900 mx-auto mb-3 md:mb-4"></div>
+            <p className="text-gray-600 text-sm md:text-base">Checking seller status...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  // ✅ Error state
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 pt-20 md:pt-40 flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto px-4">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+              <svg className="w-6 h-6 md:w-8 md:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">Access Denied</h3>
+            <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4">{error}</p>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="px-4 py-2 md:px-6 md:py-2 bg-gray-900 text-white text-sm md:text-base rounded-lg hover:bg-gray-800 transition-colors font-medium"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
 
   // ✅ Main form
   return (
@@ -1574,7 +1631,7 @@ export default function SellNowPage() {
                         </p>
                         {isMobile && (
                           <p className="text-blue-500 text-xs mt-0.5 md:mt-1">
-                            📱 Images larger than 1.5MB are automatically optimized
+                            📱 HEIF/HEIC files automatically converted to JPEG
                           </p>
                         )}
                       </label>
@@ -1658,7 +1715,7 @@ export default function SellNowPage() {
                             <li>• Upload clear, high-quality photos</li>
                             <li>• Include photos from all angles</li>
                             <li>• Show any tags, labels, or authenticity marks</li>
-                            <li>• HEIF/HEIC files (from iPhone) will be converted to JPEG</li>
+                            <li>• HEIF/HEIC files (from iPhone) are converted to JPEG</li>
                             {isMobile && <li>• Use Wi-Fi for best results on mobile</li>}
                             <li>• Competitive Pricing makes items sell faster</li>
                           </ul>
