@@ -172,8 +172,8 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ BRAND MARQUEE CONFIGURATION
-  const BRAND_MARQUEE_SPEED = 120;
+  // ✅ BRAND MARQUEE CONFIGURATION - FIXED SPEED (Medium speed)
+  const BRAND_MARQUEE_SPEED = 30; // ✅ Changed from 120 to 30 (4x faster)
 
   // ✅ Create marquee brands with proper animation
   const createInfiniteMarquee = (brands) => {
@@ -415,7 +415,7 @@ function HomeContent() {
     }
   }
 
-  // ✅ Carousel functions
+  // ✅ Carousel functions - TRANSITION SPEED INCREASED
   const nextSlide = () => {
     if (isTransitioning || carouselSlides.length === 0) return;
     
@@ -423,7 +423,7 @@ function HomeContent() {
     setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
       setIsTransitioning(false);
-    }, 500);
+    }, 300); // ✅ Changed from 500 to 300ms (faster transition)
   }
 
   const prevSlide = () => {
@@ -433,7 +433,7 @@ function HomeContent() {
     setTimeout(() => {
       setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
       setIsTransitioning(false);
-    }, 500);
+    }, 300); // ✅ Changed from 500 to 300ms (faster transition)
   }
 
   const goToSlide = (index) => {
@@ -443,15 +443,15 @@ function HomeContent() {
     setTimeout(() => {
       setCurrentSlide(index);
       setIsTransitioning(false);
-    }, 300);
+    }, 200); // ✅ Changed from 300 to 200ms (faster transition)
   }
 
-  // ✅ Start carousel auto-play
+  // ✅ Start carousel auto-play - AUTO-PLAY INTERVAL DECREASED
   useEffect(() => {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
         nextSlide();
-      }, 5000);
+      }, 3000); // ✅ Changed from 5000 to 3000ms (faster auto-play)
     }
     
     return () => {
@@ -657,7 +657,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ FIXED: Brand Marquee Component with SMOOTH JavaScript Animation
+  // ✅ FIXED: Brand Marquee Component with PROPER HOVER PAUSE and BETTER SPEED
   const InfiniteBrandMarquee = ({ brands, categoryName }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
     const containerRef = useRef(null);
@@ -666,28 +666,42 @@ function HomeContent() {
     const startTimeRef = useRef(null);
     const progressRef = useRef(0);
     const isPausedRef = useRef(false);
+    const segmentWidthRef = useRef(0);
     
+    // Initialize animation
+    const initAnimation = () => {
+      if (!contentRef.current || infiniteBrands.length === 0) return;
+      
+      // Calculate segment width (original brands list width)
+      const firstBrand = contentRef.current.children[0];
+      if (firstBrand) {
+        const brandWidth = firstBrand.offsetWidth + 40; // width + padding
+        const originalBrandsCount = brands.length;
+        segmentWidthRef.current = brandWidth * originalBrandsCount;
+      }
+    };
+    
+    // Animation function
     const animate = (timestamp) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
       }
       
       if (isPausedRef.current) {
-        // Pause hua hai, bas next frame request karo
+        // Keep requesting frames even when paused
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
       
       const elapsed = timestamp - startTimeRef.current;
       const totalDuration = BRAND_MARQUEE_SPEED * 1000; // Convert to milliseconds
-      const segmentWidth = contentRef.current?.offsetWidth / 3 || 0;
       
       // Calculate progress (0 to 1)
-      const progress = (elapsed % totalDuration) / totalDuration;
+      let progress = (elapsed % totalDuration) / totalDuration;
       progressRef.current = progress;
       
       // Calculate translation (one segment width ke across move karna hai)
-      const translateX = -progress * segmentWidth;
+      const translateX = -progress * segmentWidthRef.current;
       
       if (contentRef.current) {
         contentRef.current.style.transform = `translateX(${translateX}px)`;
@@ -701,41 +715,41 @@ function HomeContent() {
         cancelAnimationFrame(animationRef.current);
       }
       
+      // Reset position
       if (contentRef.current) {
         contentRef.current.style.transition = 'none';
         contentRef.current.style.transform = 'translateX(0)';
       }
       
       startTimeRef.current = null;
+      initAnimation();
       animationRef.current = requestAnimationFrame(animate);
     };
     
     const pauseAnimation = () => {
       isPausedRef.current = true;
       if (contentRef.current) {
-        contentRef.current.style.transition = 'transform 0.2s ease-out';
+        contentRef.current.style.transition = 'transform 0.1s ease-out';
       }
     };
     
     const resumeAnimation = () => {
+      isPausedRef.current = false;
       if (contentRef.current) {
         contentRef.current.style.transition = 'none';
       }
       
-      // Adjust start time so that animation continues from where it left off
+      // Adjust start time so animation continues from where it left off
       const currentProgress = progressRef.current;
       const totalDuration = BRAND_MARQUEE_SPEED * 1000;
       const elapsedTime = currentProgress * totalDuration;
       
       if (startTimeRef.current) {
-        // Subtract the elapsed time so animation continues from same point
         startTimeRef.current = performance.now() - elapsedTime;
       }
-      
-      isPausedRef.current = false;
     };
     
-    // Initialize animation
+    // Start animation on mount
     useEffect(() => {
       if (infiniteBrands.length > 0) {
         // Small delay to ensure DOM is ready
@@ -750,7 +764,7 @@ function HomeContent() {
           }
         };
       }
-    }, [infiniteBrands.length]);
+    }, [infiniteBrands.length, brands.length]);
     
     // Handle hover
     const handleMouseEnter = () => {
@@ -770,7 +784,7 @@ function HomeContent() {
       // Small delay to prevent immediate resume on scroll
       setTimeout(() => {
         resumeAnimation();
-      }, 300);
+      }, 100);
     };
     
     return (
@@ -877,7 +891,7 @@ function HomeContent() {
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
             onMouseLeave={() => {
               if (carouselSlides.length > 1) {
-                carouselIntervalRef.current = setInterval(() => nextSlide(), 5000);
+                carouselIntervalRef.current = setInterval(() => nextSlide(), 3000); // ✅ Updated to 3000ms
               }
             }}
           >
@@ -896,7 +910,7 @@ function HomeContent() {
               <div className="absolute inset-0 bg-black/40"></div>
               
               <div className="carousel-content">
-                <div className={`transform transition-all duration-1000 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
+                <div className={`transform transition-all duration-700 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
                   <h1 className="carousel-title text-white font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
                     {carouselSlides[currentSlide]?.title || "JUST BECHO"}
                   </h1>
