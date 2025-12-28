@@ -156,21 +156,21 @@ function HomeContent() {
   const featuredCollections = useMemo(() => [
     {
       title: "PRODUCTS UNDER ₹20K",
-      description: "Affordable luxury items under ₹20,000",
+      
       image: "/banners/mens new.jpeg",
       href: "/shop?budget=under-20k",
       filter: "under-20k"
     },
     {
       title: "PRODUCTS UNDER ₹40K",
-      description: "Premium items under ₹40,000",
+    
       image: "/banners/womens new.png",
       href: "/shop?budget=under-40k",
       filter: "under-40k"
     },
     {
       title: "PRODUCTS UNDER ₹60K",
-      description: "High-end luxury under ₹60,000",
+     
       image: "/banners/footwear new.png",
       href: "/shop?budget=under-60k",
       filter: "under-60k"
