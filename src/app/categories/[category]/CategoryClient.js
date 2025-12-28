@@ -635,50 +635,24 @@ export default function CategoryClient({
                 <div className="pt-32 md:pt-36"></div>
 
                 {/* ✅ Hero Banner */}
-                <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-10"></div>
-
-                    {/* Banner Image with object-fit: cover */}
-                    <div className="absolute inset-0">
-                        <Image
-                            src={config.banner || '/banners/default-banner.jpg'}
-                            alt={config.title}
-                            fill
-                            className="object-cover"
-                            priority
-                            sizes="100vw"
-                            onError={(e) => {
-                                console.error('Banner image failed:', config.banner)
-                                e.target.src = '/banners/default-banner.jpg'
-                            }}
-                        />
-                    </div>
-
-                    {/* Content */}
-                    <div className="relative z-20 h-full flex flex-col justify-center items-center text-white px-4">
-                        <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center">
-                            {config.title || 'CATEGORY'}
-                        </h1>
-                        <p className="text-lg md:text-xl text-center max-w-2xl mb-8">
-                            {config.subtitle || 'Explore our collection'}
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
-                                className="bg-white text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors"
-                            >
-                                SHOP NOW
-                            </button>
-                            <button
-                                onClick={handleSellItems}
-                                className="border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors text-center"
-                            >
-                                SELL ITEMS
-                            </button>
-                        </div>
-                    </div>
-                </div>
+               {/* ✅ Hero Banner - Clean Version (No Text/Buttons) */}
+<div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
+    {/* Only Banner Image */}
+    <div className="absolute inset-0">
+        <Image
+            src={config.banner || '/banners/default-banner.jpg'}
+            alt={config.title}
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            onError={(e) => {
+                console.error('Banner image failed:', config.banner)
+                e.target.src = '/banners/default-banner.jpg'
+            }}
+        />
+    </div>
+</div>
 
                 {/* ✅ Products Section */}
                 <section id="products" className="py-12 md:py-16">

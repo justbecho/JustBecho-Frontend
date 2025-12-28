@@ -27,137 +27,56 @@ function HomeContent() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const carouselIntervalRef = useRef(null)
 
-  // ✅ UPDATED: Brand logos
-  const categoryBrands = useMemo(() => ({
-    "Men's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png" },
-      { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png" },
-      { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png" },
-      { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png" },
-      { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
-      { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png", fallback: "/brands/burberry.png" },
-      { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png" }
-    ],
-    "Women's Fashion": [
-      { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png" },
-      { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png" },
-      { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png" },
-      { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png" },
-      { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png", fallback: "/brands/gucci.png" },
-      { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png", fallback: "/brands/givenchy.png" },
-      { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png" }
-    ],
-    "Footwear": [
-      { name: "Acne Studios", logo: "/brandslogo/footwear/Acne-Studios.jpg", fallback: "/brands/Balenciaga.png" },
-      { name: "Adidas", logo: "/brandslogo/footwear/Adidas.png", fallback: "/brands/jimmy-choo.png" },
-      { name: "Air Jordan", logo: "/brandslogo/footwear/Air-Jordan.png", fallback: "/brands/prada.png" },
-      { name: "ALAIA", logo: "/brandslogo/footwear/ALAIA.jpg", fallback: "/brands/puma.png" },
-      { name: "Alexander McQueen", logo: "/brandslogo/footwear/Alexander-McQueen.jpg", fallback: "/brands/gucci.png" },
-      { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png" },
-      { name: "Nike", logo: "/brandslogo/footwear/palmm.jpeg", fallback: "/brands/gucci.png" },
-      { name: "Nike", logo: "/brandslogo/footwear/off-white.jpeg", fallback: "/brands/gucci.png" },
-      { name: "Nike", logo: "/brandslogo/footwear/hermess.jpeg", fallback: "/brands/gucci.png" },
-      { name: "Amiri", logo: "/brandslogo/footwear/Amiri.jpg", fallback: "/brands/jimmy-choo.png" },
-      { name: "ANTA", logo: "/brandslogo/footwear/ANTA.jpg", fallback: "/brands/prada.png" },
-      { name: "Armani", logo: "/brandslogo/footwear/Armani.png", fallback: "/brands/puma.png" },
-      { name: "Balenciaga", logo: "/brandslogo/footwear/Balenciaga.jpg", fallback: "/brands/gucci.png" },
-      { name: "BALLY", logo: "/brandslogo/footwear/BALLY.png", fallback: "/brands/reebok.png" },
-      { name: "BALMAIN", logo: "/brandslogo/footwear/BALMAIN.png", fallback: "/brands/Balenciaga.png" },
-      { name: "BAPE", logo: "/brandslogo/footwear/BAPE.jpg", fallback: "/brands/jimmy-choo.png" },
-      { name: "Burberry", logo: "/brandslogo/footwear/Burberry.jpg", fallback: "/brands/prada.png" },
-      { name: "Calvin Klein", logo: "/brandslogo/footwear/Calvin Klein.png", fallback: "/brands/puma.png" },
-      { name: "Chloe", logo: "/brandslogo/footwear/Chloe.png", fallback: "/brands/gucci.png" },
-      { name: "Coach", logo: "/brandslogo/footwear/Coach.jpg", fallback: "/brands/reebok.png" },
-      { name: "Converse", logo: "/brandslogo/footwear/Converse.png", fallback: "/brands/Balenciaga.png" },
-      { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png" },
-      { name: "Dior", logo: "/brandslogo/footwear/Dior.png", fallback: "/brands/prada.png" },
-      { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png" },
-      { name: "On", logo: "/brandslogo/footwear/On.jpg", fallback: "/brands/reebok.png" },
-      { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/Balenciaga.png" }
-    ],
-    "Accessories": [
-      { name: "Alexander McQueen", logo: "/brandslogo/Accessories/Alenxander McQueen.jpg", fallback: "/brands/Alexander McQueen.jpg" },
-      { name: "Apm Monaco", logo: "/brandslogo/Accessories/Apm Monaco.png", fallback: "/brands/baggit.png" },
-      { name: "Balenciaga", logo: "/brandslogo/Accessories/Balenciaga.jpg", fallback: "/brands/ray-ban.png" },
-      { name: "Buccellati", logo: "/brandslogo/Accessories/Buccellati.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Cartier", logo: "/brandslogo/Accessories/Cartier.jpg", fallback: "/brands/nike.png" },
-      { name: "Chaumet", logo: "/brandslogo/Accessories/Chaumet.png", fallback: "/brands/Chaumet.png" },
-      { name: "Chloe", logo: "/brandslogo/Accessories/Chloe.png", fallback: "/brands/baggit.png" },
-      { name: "Dior", logo: "/brandslogo/Accessories/Dior.png", fallback: "/brands/ray-ban.png" },
-      { name: "Fendi", logo: "/brandslogo/Accessories/Fendi.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "FRED", logo: "/brandslogo/Accessories/FRED.png", fallback: "/brands/FRED.png" },
-      { name: "Gucci", logo: "/brandslogo/Accessories/Gucci.png", fallback: "/brands/baggit.png" },
-      { name: "Harry Winston", logo: "/brandslogo/Accessories/Harry Winston.jpg", fallback: "/brands/ray-ban.png" },
-      { name: "MCM", logo: "/brandslogo/Accessories/MCM.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Messika", logo: "/brandslogo/Accessories/Messika.png", fallback: "/brands/nike.png" },
-      { name: "Miu Miu", logo: "/brandslogo/Accessories/Miu Miu.png", fallback: "/brands/Miu Miu.png" },
-      { name: "Prada", logo: "/brandslogo/Accessories/Prada.jpg", fallback: "/brands/baggit.png" },
-      { name: "Qeelin", logo: "/brandslogo/Accessories/Qeelin.png", fallback: "/brands/ray-ban.png" },
-      { name: "Swaroski", logo: "/brandslogo/Accessories/Swaroski.png", fallback: "/brands/wildhorn.jpg" }
-    ],
-    "Watches": [
-      { name: "Armani", logo: "/brandslogo/watches/Armani.png", fallback: "/brands/Armani.png" },
-      { name: "AUDEMARS PIGUET", logo: "/brandslogo/watches/AUDEMARS PIGUET.png", fallback: "/brands/baggit.png" },
-      { name: "BLANCPAIN", logo: "/brandslogo/watches/BLANCPAIN.png", fallback: "/brands/ray-ban.png" },
-      { name: "BREGUET", logo: "/brandslogo/watches/BREGUET.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Hamilton", logo: "/brandslogo/watches/Hamilton.jpg", fallback: "/brands/nike.png" },
-      { name: "Chanel", logo: "/brandslogo/watches/Chanel.png", fallback: "/brands/Chanel.png" },
-      { name: "CORUM", logo: "/brandslogo/watches/CORUM.jpg", fallback: "/brands/baggit.png" },
-      { name: "Dior", logo: "/brandslogo/watches/Dior.png", fallback: "/brands/ray-ban.png" },
-      { name: "Fendi", logo: "/brandslogo/watches/Fendi.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Franck Muller", logo: "/brandslogo/watches/Franck Muller.jpg", fallback: "/brands/Franck Muller.jpg" },
-      { name: "Gucci", logo: "/brandslogo/watches/Gucci.png", fallback: "/brands/baggit.png" },
-      { name: "Hermes", logo: "/brandslogo/watches/Hermes.jpg", fallback: "/brands/ray-ban.png" },
-      { name: "HUBLOT", logo: "/brandslogo/watches/HUBLOT.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "LONGINES", logo: "/brandslogo/watches/LONGINES.jpg", fallback: "/brands/nike.png" },
-      { name: "OMEGA", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/OMEGA.png" },
-      { name: "CHOPARD", logo: "/brandslogo/watches/CHOPARD.png", fallback: "/brands/baggit.png" },
-      { name: "CHOPARD", logo: "/brandslogo/watches/fossill.jpeg", fallback: "/brands/baggit.png" },
-      { name: "CHOPARD", logo: "/brandslogo/watches/rolexx.jpeg", fallback: "/brands/baggit.png" },
-      { name: "CHOPARD", logo: "/brandslogo/watches/titann.jpeg", fallback: "/brands/baggit.png" }
-    ],
-    "TOYS & COLLECTIBLES": [
-      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },
-      { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
-      { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
-      { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "POP MART", logo: "/brandslogo/toys/POP MART.jpg", fallback: "/brands/nike.png" },
-      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/Sport Cards.jpg" },
-      { name: "Takashi Murakami", logo: "/brandslogo/toys/Takashi Murakami.png", fallback: "/brands/baggit.png" },
-      { name: "WWF", logo: "/brandslogo/toys/WWF.png", fallback: "/brands/ray-ban.png" }
-    ],
-    "PERFUMES": [
-      { name: "3CE", logo: "/brandslogo/perfumes/3CE.jpg", fallback: "/brands/3CE.jpg" },
-      { name: "Anessa", logo: "/brandslogo/perfumes/Anessa.jpg", fallback: "/brands/baggit.png" },
-      { name: "Anna Sui", logo: "/brandslogo/perfumes/Anna Sui.png", fallback: "/brands/ray-ban.png" },
-      { name: "Armani", logo: "/brandslogo/perfumes/Armani.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Bobbi Brown", logo: "/brandslogo/perfumes/Bobbi Brown.png", fallback: "/brands/nike.png" },
-      { name: "Bottega Veneta", logo: "/brandslogo/perfumes/Bottega Veneta.png", fallback: "/brands/Bottega Veneta.png" },
-      { name: "Burberry", logo: "/brandslogo/perfumes/Burberry.jpg", fallback: "/brands/baggit.png" },
-      { name: "Bvlgari", logo: "/brandslogo/perfumes/Bvlgari.png", fallback: "/brands/ray-ban.png" },
-      { name: "Chanel", logo: "/brandslogo/perfumes/Chanel.png", fallback: "/brands/baggit.png" },
-      { name: "Clarins", logo: "/brandslogo/perfumes/Clarins.png", fallback: "/brands/ray-ban.png" },
-      { name: "Cle de Peau", logo: "/brandslogo/perfumes/Cle de Peau.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "Clinique", logo: "/brandslogo/perfumes/Clinique.png", fallback: "/brands/nike.png" },
-      { name: "Cosmo Decorte", logo: "/brandslogo/perfumes/Cosmo Decorte.png", fallback: "/brands/Cosmo Decorte.png" },
-      { name: "Curel", logo: "/brandslogo/perfumes/Curel.png", fallback: "/brands/baggit.png" },
-      { name: "Davidoff", logo: "/brandslogo/perfumes/Davidoff.png", fallback: "/brands/ray-ban.png" },
-      { name: "FANCL", logo: "/brandslogo/perfumes/FANCL.png", fallback: "/brands/FANCL.png" },
-      { name: "Filorga", logo: "/brandslogo/perfumes/Filorga.png", fallback: "/brands/baggit.png" },
-      { name: "Guerlain", logo: "/brandslogo/perfumes/Guerlain.png", fallback: "/brands/ray-ban.png" }
-    ],
-    "KID'S FASHION": [
-      { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png" },
-      { name: "JellyCat", logo: "/brandslogo/toys/JellyCat.jpg", fallback: "/brands/baggit.png" },
-      { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png" },
-      { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg" },
-      { name: "POP MART", logo: "/brandslogo/toys/POP MART.jpg", fallback: "/brands/nike.png" },
-      { name: "Sport Cards", logo: "/brandslogo/toys/Sport Cards.jpg", fallback: "/brands/Sport Cards.jpg" },
-      { name: "Takashi Murakami", logo: "/brandslogo/toys/Takashi Murakami.png", fallback: "/brands/baggit.png" },
-      { name: "WWF", logo: "/brandslogo/toys/WWF.png", fallback: "/brands/ray-ban.png" }
-    ],
-  }), [])
+  // ✅ UPDATED: All brands combined into single array for unified carousel
+  const allBrands = useMemo(() => [
+    { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png", category: "Men's Fashion" },
+    { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png", category: "Men's Fashion" },
+    { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png", category: "Men's Fashion" },
+    { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png", category: "Men's Fashion" },
+    { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png", category: "Men's Fashion" },
+    { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png", fallback: "/brands/gucci.png", category: "Men's Fashion" },
+    { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png", fallback: "/brands/burberry.png", category: "Men's Fashion" },
+    { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png", category: "Men's Fashion" },
+    
+    // Women's Fashion brands
+    { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png", category: "Women's Fashion" },
+    { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png", category: "Women's Fashion" },
+    { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png", category: "Women's Fashion" },
+    { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png", category: "Women's Fashion" },
+    { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png", fallback: "/brands/gucci.png", category: "Women's Fashion" },
+    { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png", fallback: "/brands/givenchy.png", category: "Women's Fashion" },
+    { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png", category: "Women's Fashion" },
+    
+    // Footwear brands
+    { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png", category: "Footwear" },
+    { name: "Adidas", logo: "/brandslogo/footwear/Adidas.png", fallback: "/brands/jimmy-choo.png", category: "Footwear" },
+    { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/Balenciaga.png", category: "Footwear" },
+    { name: "Converse", logo: "/brandslogo/footwear/Converse.png", fallback: "/brands/Balenciaga.png", category: "Footwear" },
+    { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png", category: "Footwear" },
+    { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png", category: "Footwear" },
+    
+    // Accessories brands
+    { name: "Cartier", logo: "/brandslogo/Accessories/Cartier.jpg", fallback: "/brands/nike.png", category: "Accessories" },
+    { name: "Gucci", logo: "/brandslogo/Accessories/Gucci.png", fallback: "/brands/baggit.png", category: "Accessories" },
+    { name: "Prada", logo: "/brandslogo/Accessories/Prada.jpg", fallback: "/brands/baggit.png", category: "Accessories" },
+    
+    // Watches brands
+    { name: "Rolex", logo: "/brandslogo/watches/rolexx.jpeg", fallback: "/brands/baggit.png", category: "Watches" },
+    { name: "Omega", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/OMEGA.png", category: "Watches" },
+    { name: "Armani", logo: "/brandslogo/watches/Armani.png", fallback: "/brands/Armani.png", category: "Watches" },
+    
+    // Perfumes brands
+    { name: "Chanel", logo: "/brandslogo/perfumes/Chanel.png", fallback: "/brands/baggit.png", category: "Perfumes" },
+    { name: "Dior", logo: "/brandslogo/perfumes/Dior.png", fallback: "/brands/ray-ban.png", category: "Perfumes" },
+    { name: "Gucci", logo: "/brandslogo/perfumes/Gucci.png", fallback: "/brands/baggit.png", category: "Perfumes" },
+    
+    // Toys & Collectibles
+    { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png", category: "TOYS & COLLECTIBLES" },
+    { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png", category: "TOYS & COLLECTIBLES" },
+    
+    // Kid's Fashion
+    { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg", category: "KID'S FASHION" }
+  ], [])
 
   // ✅ Category images mapping for carousel
   const categoryImages = useMemo(() => ({
@@ -173,7 +92,7 @@ function HomeContent() {
   }), [])
 
   // ✅ BRAND MARQUEE CONFIGURATION - FIXED SPEED (Medium speed)
-  const BRAND_MARQUEE_SPEED = 30; // ✅ Changed from 120 to 30 (4x faster)
+  const BRAND_MARQUEE_SPEED = 30;
 
   // ✅ Create marquee brands with proper animation
   const createInfiniteMarquee = (brands) => {
@@ -231,25 +150,50 @@ function HomeContent() {
     ]
   }, [categoriesFromBackend])
 
-  // ✅ Featured Collections
+  // ✅ UPDATED: Featured Collections for budget-based filtering
   const featuredCollections = useMemo(() => [
     {
-      title: "LUXURY TIMEPIECES",
-      description: "Elevate your style with iconic watches",
-      image: "/banners/watches new.png",
-      href: "/categories/watches"
+      title: "PRODUCTS UNDER ₹20K",
+      description: "Affordable luxury items under ₹20,000",
+      image: "/banners/budget-20k.jpg",
+      filter: "under-20k"
     },
     {
-      title: "DESIGNER HANDBAGS",
-      description: "Carry timeless elegance",
-      image: "/banners/HERMES MINI KELLY.jpg",
-      href: "/categories/women"
+      title: "PRODUCTS UNDER ₹40K",
+      description: "Premium items under ₹40,000",
+      image: "/banners/budget-40k.jpg",
+      filter: "under-40k"
     },
     {
-      title: "POPULAR FOOTWEAR",
-      description: "Innovation meets luxury",
+      title: "PRODUCTS UNDER ₹60K",
+      description: "High-end luxury under ₹60,000",
+      image: "/banners/budget-60k.jpg",
+      filter: "under-60k"
+    }
+  ], [])
+
+  // ✅ UPDATED: Featured fashion categories (only Men's, Women's, Footwear)
+  const featuredCategories = useMemo(() => [
+    {
+      title: "MEN'S FASHION",
+      description: "Explore premium men's clothing and accessories",
+      image: "/banners/mens new.jpeg",
+      href: "/categories/men",
+      category: "Men's Fashion"
+    },
+    {
+      title: "WOMEN'S FASHION",
+      description: "Discover luxury women's collections",
+      image: "/banners/womens new.png",
+      href: "/categories/women",
+      category: "Women's Fashion"
+    },
+    {
+      title: "FOOTWEAR",
+      description: "Step into luxury shoes and sneakers",
       image: "/banners/footwear new.png",
-      href: "/categories/footwear"
+      href: "/categories/footwear",
+      category: "Footwear"
     }
   ], [])
 
@@ -415,6 +359,11 @@ function HomeContent() {
     }
   }
 
+  // ✅ Handle Budget Filter Click
+  const handleBudgetFilterClick = (filterType) => {
+    router.push(`/products?budget=${filterType}`)
+  }
+
   // ✅ Carousel functions - TRANSITION SPEED INCREASED
   const nextSlide = () => {
     if (isTransitioning || carouselSlides.length === 0) return;
@@ -423,7 +372,7 @@ function HomeContent() {
     setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
       setIsTransitioning(false);
-    }, 300); // ✅ Changed from 500 to 300ms (faster transition)
+    }, 300);
   }
 
   const prevSlide = () => {
@@ -433,7 +382,7 @@ function HomeContent() {
     setTimeout(() => {
       setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
       setIsTransitioning(false);
-    }, 300); // ✅ Changed from 500 to 300ms (faster transition)
+    }, 300);
   }
 
   const goToSlide = (index) => {
@@ -443,7 +392,7 @@ function HomeContent() {
     setTimeout(() => {
       setCurrentSlide(index);
       setIsTransitioning(false);
-    }, 200); // ✅ Changed from 300 to 200ms (faster transition)
+    }, 200);
   }
 
   // ✅ Start carousel auto-play - AUTO-PLAY INTERVAL DECREASED
@@ -451,7 +400,7 @@ function HomeContent() {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
         nextSlide();
-      }, 3000); // ✅ Changed from 5000 to 3000ms (faster auto-play)
+      }, 3000);
     }
     
     return () => {
@@ -486,31 +435,6 @@ function HomeContent() {
     return categoryImages["default"];
   }
 
-  // ✅ Helper function to get category brands
-  const getCategoryBrands = (categoryName) => {
-    if (!categoryName) {
-      return [];
-    }
-    
-    if (categoryBrands[categoryName]) {
-      return categoryBrands[categoryName];
-    }
-    
-    const capitalized = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
-    if (categoryBrands[capitalized]) {
-      return categoryBrands[capitalized];
-    }
-    
-    const normalizedInput = categoryName.toLowerCase();
-    for (const [key, value] of Object.entries(categoryBrands)) {
-      if (key.toLowerCase() === normalizedInput) {
-        return value;
-      }
-    }
-    
-    return [];
-  }
-
   // ✅ FIXED: Fetch categories and brands from backend
   useEffect(() => {
     const fetchData = async () => {
@@ -532,7 +456,6 @@ function HomeContent() {
                 .join(' ');
               
               const imagePath = getCategoryImage(categoryName);
-              const brandLogos = getCategoryBrands(categoryName);
               
               const urlSlug = getCategorySlug(displayName);
               const apiCategory = getApiCategory(displayName);
@@ -542,16 +465,21 @@ function HomeContent() {
                 originalName: categoryName,
                 href: `/categories/${urlSlug}`,
                 apiCategory: apiCategory,
-                image: imagePath,
-                brands: brandLogos
+                image: imagePath
               }
             })
             
-            setCategoriesFromBackend(formattedCategories)
+            // ✅ Filter categories to only include Men's Fashion, Women's Fashion, and Footwear
+            const allowedCategories = ["Men's Fashion", "Women's Fashion", "Footwear"];
+            const filteredCategories = formattedCategories.filter(cat => 
+              allowedCategories.includes(cat.name)
+            );
+            
+            setCategoriesFromBackend(filteredCategories)
             
             const productsByCategory = {}
             
-            for (const category of formattedCategories) {
+            for (const category of filteredCategories) {
               try {
                 if (category.apiCategory) {
                   const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
@@ -616,8 +544,8 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ UPDATED: Brand logo component
-  const BrandLogo = ({ brand, index, categoryName }) => {
+  // ✅ UPDATED: Brand logo component for unified carousel
+  const BrandLogo = ({ brand, index }) => {
     const [imgSrc, setImgSrc] = useState(brand.logo);
     const [hasError, setHasError] = useState(false);
     
@@ -625,16 +553,15 @@ function HomeContent() {
 
     const handleBrandClick = () => {
       const brandSlug = encodeURIComponent(brand.name.toLowerCase().replace(/\s+/g, '-'));
-      const categorySlug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'));
       
-      router.push(`/brand/${brandSlug}?category=${categorySlug}`);
+      router.push(`/brand/${brandSlug}`);
     };
 
     return (
       <div 
         key={index} 
         className="flex-shrink-0 px-3 sm:px-4 md:px-5 cursor-pointer group brand-logo-hover tap-highlight"
-        title={`Browse ${brand.name} products in ${categoryName}`}
+        title={`Browse ${brand.name} products`}
         onClick={handleBrandClick}
       >
         <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
@@ -657,8 +584,8 @@ function HomeContent() {
     )
   }
 
-  // ✅ FIXED: Brand Marquee Component with PROPER HOVER PAUSE and BETTER SPEED
-  const InfiniteBrandMarquee = ({ brands, categoryName }) => {
+  // ✅ FIXED: Brand Marquee Component for unified brand carousel
+  const InfiniteBrandMarquee = ({ brands }) => {
     const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
     const containerRef = useRef(null);
     const contentRef = useRef(null);
@@ -668,39 +595,33 @@ function HomeContent() {
     const isPausedRef = useRef(false);
     const segmentWidthRef = useRef(0);
     
-    // Initialize animation
     const initAnimation = () => {
       if (!contentRef.current || infiniteBrands.length === 0) return;
       
-      // Calculate segment width (original brands list width)
       const firstBrand = contentRef.current.children[0];
       if (firstBrand) {
-        const brandWidth = firstBrand.offsetWidth + 40; // width + padding
+        const brandWidth = firstBrand.offsetWidth + 40;
         const originalBrandsCount = brands.length;
         segmentWidthRef.current = brandWidth * originalBrandsCount;
       }
     };
     
-    // Animation function
     const animate = (timestamp) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
       }
       
       if (isPausedRef.current) {
-        // Keep requesting frames even when paused
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
       
       const elapsed = timestamp - startTimeRef.current;
-      const totalDuration = BRAND_MARQUEE_SPEED * 1000; // Convert to milliseconds
+      const totalDuration = BRAND_MARQUEE_SPEED * 1000;
       
-      // Calculate progress (0 to 1)
       let progress = (elapsed % totalDuration) / totalDuration;
       progressRef.current = progress;
       
-      // Calculate translation (one segment width ke across move karna hai)
       const translateX = -progress * segmentWidthRef.current;
       
       if (contentRef.current) {
@@ -715,7 +636,6 @@ function HomeContent() {
         cancelAnimationFrame(animationRef.current);
       }
       
-      // Reset position
       if (contentRef.current) {
         contentRef.current.style.transition = 'none';
         contentRef.current.style.transform = 'translateX(0)';
@@ -739,7 +659,6 @@ function HomeContent() {
         contentRef.current.style.transition = 'none';
       }
       
-      // Adjust start time so animation continues from where it left off
       const currentProgress = progressRef.current;
       const totalDuration = BRAND_MARQUEE_SPEED * 1000;
       const elapsedTime = currentProgress * totalDuration;
@@ -749,10 +668,8 @@ function HomeContent() {
       }
     };
     
-    // Start animation on mount
     useEffect(() => {
       if (infiniteBrands.length > 0) {
-        // Small delay to ensure DOM is ready
         const timer = setTimeout(() => {
           startAnimation();
         }, 100);
@@ -766,7 +683,6 @@ function HomeContent() {
       }
     }, [infiniteBrands.length, brands.length]);
     
-    // Handle hover
     const handleMouseEnter = () => {
       pauseAnimation();
     };
@@ -775,13 +691,11 @@ function HomeContent() {
       resumeAnimation();
     };
     
-    // Handle touch for mobile
     const handleTouchStart = () => {
       pauseAnimation();
     };
     
     const handleTouchEnd = () => {
-      // Small delay to prevent immediate resume on scroll
       setTimeout(() => {
         resumeAnimation();
       }, 100);
@@ -806,10 +720,9 @@ function HomeContent() {
         >
           {infiniteBrands.map((brand, idx) => (
             <BrandLogo 
-              key={`${categoryName}-${brand.name}-${idx}`} 
+              key={`${brand.name}-${idx}`} 
               brand={brand} 
               index={idx}
-              categoryName={categoryName}
             />
           ))}
         </div>
@@ -817,7 +730,7 @@ function HomeContent() {
     )
   }
 
-  // ✅ UPDATED: Product card render function
+  // ✅ Product card render function
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
     
@@ -885,13 +798,14 @@ function HomeContent() {
       <div className="bg-white">
         <div className="pt-24"></div>
         
+        {/* ✅ 2. Home Banner with increased width */}
         <section className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
           <div 
             className="absolute inset-0 z-0"
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
             onMouseLeave={() => {
               if (carouselSlides.length > 1) {
-                carouselIntervalRef.current = setInterval(() => nextSlide(), 3000); // ✅ Updated to 3000ms
+                carouselIntervalRef.current = setInterval(() => nextSlide(), 3000);
               }
             }}
           >
@@ -960,140 +874,29 @@ function HomeContent() {
           </div>
         </section>
 
-        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
-                WHY CHOOSE JUST BECHO
+        {/* ✅ 3. Brand Carousel (right after home banner) */}
+        <section className="py-8 sm:py-12 bg-white border-t border-gray-100">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-gray-900 text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase responsive-heading">
+                POPULAR BRANDS IN JUST BECHO
               </h2>
-              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto responsive-text">
-                Experience luxury redefined with our curated collection of luxury items
+              <p className="text-gray-600 text-sm sm:text-base font-light mt-1 sm:mt-2 responsive-text">
+                Explore luxury brands across all categories
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {features.map((feature, index) => (
-                <div key={index} className="text-center group">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white text-lg sm:text-xl font-light">{feature.icon}</span>
-                  </div>
-                  <h3 className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-text">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed px-2 responsive-text-sm">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
+            <InfiniteBrandMarquee brands={allBrands} />
+            
+            <div className="text-center mt-4 sm:mt-6">
+              <p className="text-gray-500 text-xs sm:text-sm responsive-text-sm">
+                Click on any brand to view all products from that brand
+              </p>
             </div>
           </div>
         </section>
 
-        <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
-                EXPLORE CATEGORIES
-              </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
-                DISCOVER LUXURY ITEMS
-              </p>
-            </div>
-
-            {loading ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
-                {[...Array(7)].map((_, index) => (
-                  <div key={index} className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full bg-gray-200 animate-pulse category-image"></div>
-                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4 mt-3 sm:mt-4"></div>
-                  </div>
-                ))}
-              </div>
-            ) : categoriesFromBackend.length > 0 ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
-                {categoriesFromBackend.slice(0, 7).map((cat, index) => (
-                  <div
-                    key={index}
-                    className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
-                    onClick={() => router.push(cat.href)}
-                  >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full overflow-hidden shadow-lg sm:shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500 category-image">
-                      <Image
-                        src={cat.image}
-                        alt={cat.name}
-                        fill
-                        className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
-                        sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, (max-width: 1280px) 128px, 160px"
-                        onError={(e) => e.target.src = '/images/category-placeholder.jpg'}
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
-                    </div>
-                    <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-3 sm:mt-4 md:mt-6 leading-tight mobile-text-sm">
-                      {cat.name.toUpperCase()}
-                    </h3>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 sm:py-12">
-                <p className="text-gray-500 text-base sm:text-lg responsive-text">No categories available yet.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
-          <div className="max-w-[1700px] mx-auto">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
-                FEATURED COLLECTIONS
-              </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
-                CURATED LUXURY SELECTIONS
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 featured-collections-grid">
-              {featuredCollections.map((collection, index) => (
-                <Link
-                  href={collection.href}
-                  key={index}
-                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
-                >
-                  <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
-                    <Image
-                      src={collection.image}
-                      alt={collection.title}
-                      fill
-                      className="object-cover object-center group-hover:scale-110 transition-transform duration-700"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      onError={(e) => {
-                        e.target.src = '/images/placeholder.jpg';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-subheading">
-                        {collection.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm font-light opacity-90 responsive-text-sm">
-                        {collection.description}
-                      </p>
-                      <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <span>Explore Collection</span>
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
+        {/* ✅ 4. How It Works (after brand carousel) */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1132,8 +935,114 @@ function HomeContent() {
           </div>
         </section>
 
+        {/* ✅ 5. Explore Categories (only Men's, Women's, Footwear) */}
+        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
+          <div className="max-w-[1700px] mx-auto">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
+                EXPLORE CATEGORIES
+              </h2>
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
+                DISCOVER LUXURY ITEMS
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+              {featuredCategories.map((category, index) => (
+                <Link
+                  href={category.href}
+                  key={index}
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
+                >
+                  <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
+                    <Image
+                      src={category.image}
+                      alt={category.title}
+                      fill
+                      className="object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onError={(e) => {
+                        e.target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-subheading">
+                        {category.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm font-light opacity-90 responsive-text-sm">
+                        {category.description}
+                      </p>
+                      <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span>Explore Collection</span>
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ✅ 6. Featured Collections (Budget-based) */}
+        <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
+          <div className="max-w-[1700px] mx-auto">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase responsive-heading">
+                SHOP BY BUDGET
+              </h2>
+              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3 responsive-subheading">
+                FIND LUXURY ITEMS WITHIN YOUR BUDGET
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 featured-collections-grid">
+              {featuredCollections.map((collection, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleBudgetFilterClick(collection.filter)}
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
+                >
+                  <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
+                    <Image
+                      src={collection.image}
+                      alt={collection.title}
+                      fill
+                      className="object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onError={(e) => {
+                        e.target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-subheading">
+                        {collection.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm font-light opacity-90 responsive-text-sm">
+                        {collection.description}
+                      </p>
+                      <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span>View Products</span>
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ✅ 7. Category-wise Products (Only Men's, Women's, Footwear) */}
         {categoriesFromBackend.map((category, index) => {
-          const categoryBrandsData = category.brands || [];
           const products = categoryProducts[category.name] || [];
 
           return (
@@ -1167,30 +1076,6 @@ function HomeContent() {
                     <div className="text-center py-8 sm:py-12">
                       <p className="text-gray-500 text-base sm:text-lg responsive-text">No products available in this category yet.</p>
                       <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2 responsive-text-sm">Be the first to list a product!</p>
-                    </div>
-                  )}
-
-                  {categoryBrandsData.length > 0 && (
-                    <div className="mt-12 sm:mt-16">
-                      <div className="text-center mb-6 sm:mb-8">
-                        <h3 className="text-gray-900 text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase responsive-subheading">
-                          POPULAR BRANDS IN {category.name.toUpperCase()}
-                        </h3>
-                        <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mt-1 sm:mt-2 responsive-text">
-                          AUTHENTIC LUXURY BRANDS YOU CAN TRUST
-                        </p>
-                      </div>
-
-                      <InfiniteBrandMarquee 
-                        brands={categoryBrandsData} 
-                        categoryName={category.name}
-                      />
-                      
-                      <div className="text-center mt-4 sm:mt-6">
-                        <p className="text-gray-500 text-xs sm:text-sm responsive-text-sm">
-                          Click on any brand to view all {category.name} products from that brand
-                        </p>
-                      </div>
                     </div>
                   )}
 
@@ -1230,6 +1115,7 @@ function HomeContent() {
           )
         })}
 
+        {/* Testimonials Section */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1800px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1323,6 +1209,37 @@ function HomeContent() {
           </div>
         </section>
 
+        {/* ✅ 1. Why Choose Just Becho (moved to just before footer) */}
+        <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
+          <div className="max-w-[1700px] mx-auto">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3 responsive-heading">
+                WHY CHOOSE JUST BECHO
+              </h2>
+              <p className="text-gray-600 text-sm sm:text-base font-light max-w-2xl mx-auto responsive-text">
+                Experience luxury redefined with our curated collection of luxury items
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {features.map((feature, index) => (
+                <div key={index} className="text-center group">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-white text-lg sm:text-xl font-light">{feature.icon}</span>
+                  </div>
+                  <h3 className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-text">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed px-2 responsive-text-sm">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
         <section className="py-10 sm:py-16 bg-gray-900 text-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto text-center">
             <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-light tracking-widest uppercase mb-3 sm:mb-4 responsive-heading">
