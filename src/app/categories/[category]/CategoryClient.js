@@ -568,13 +568,13 @@ export default function CategoryClient({
             href={`/products/${product._id}`}
             className="group block cursor-pointer transform hover:-translate-y-1 transition-all duration-300"
         >
-            <div className="relative w-full aspect-square overflow-hidden mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+            <div className="relative w-full aspect-square overflow-hidden mb-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
                 <Image
                     src={product.images?.[0]?.url || '/placeholder-image.jpg'}
                     alt={product.productName}
                     fill
                     className="object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
                     onError={(e) => {
                         e.target.src = '/placeholder-image.jpg'
                     }}
@@ -608,7 +608,7 @@ export default function CategoryClient({
                 )}
             </div>
 
-            <div className="text-left px-1 space-y-2">
+            <div className="text-left px-1 space-y-1">
                 <h3 className="text-gray-900 text-sm font-light tracking-widest uppercase line-clamp-2 min-h-[2.5rem]">
                     {product.productName?.toUpperCase() || 'Product Name'}
                 </h3>
@@ -633,10 +633,10 @@ export default function CategoryClient({
 
     // ✅ Loading Skeleton
     const LoadingSkeleton = () => (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                    <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
+                    <div className="bg-gray-200 aspect-square rounded-lg mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
@@ -1194,10 +1194,10 @@ export default function CategoryClient({
                                         </div>
                                     ) :
 
-                                        /* Products Grid */
+                                        /* ✅ UPDATED: Products Grid - Mobile: 2 columns, Desktop: 3 columns */
                                         (
                                             <>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                                                     {sortedProducts.map(product => (
                                                         <ProductCard key={product._id} product={product} />
                                                     ))}
