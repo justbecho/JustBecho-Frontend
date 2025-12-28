@@ -175,9 +175,6 @@ function HomeContent() {
     }
   ], [])
 
-  // ✅ UPDATED: Featured fashion categories (only Men's, Women's, Footwear)
- 
-
   // How It Works Steps
   const howItWorks = useMemo(() => [
     {
@@ -450,17 +447,11 @@ function HomeContent() {
               }
             })
             
-            // ✅ Filter categories to only include Men's Fashion, Women's Fashion, and Footwear
-            const allowedCategories = ["Men's Fashion", "Women's Fashion", "Footwear"];
-            const filteredCategories = formattedCategories.filter(cat => 
-              allowedCategories.includes(cat.name)
-            );
-            
-            setCategoriesFromBackend(filteredCategories)
+            setCategoriesFromBackend(formattedCategories)
             
             const productsByCategory = {}
             
-            for (const category of filteredCategories) {
+            for (const category of formattedCategories) {
               try {
                 if (category.apiCategory) {
                   const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
@@ -912,7 +903,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 5. Explore Categories (only Men's, Women's, Footwear) */}
+        {/* ✅ 5. Explore Categories - PURANE WALA CIRCLES DESIGN (पुराने वाला design) */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -924,48 +915,49 @@ function HomeContent() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-              {featuredCategories.map((category, index) => (
-                <Link
-                  href={category.href}
-                  key={index}
-                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
-                >
-                  <div className="relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
-                    <Image
-                      src={category.image}
-                      alt={category.title}
-                      fill
-                      className="object-cover object-center group-hover:scale-110 transition-transform duration-700"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      onError={(e) => {
-                        e.target.src = '/images/placeholder.jpg';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest uppercase mb-1 sm:mb-2 responsive-subheading">
-                        {category.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm font-light opacity-90 responsive-text-sm">
-                        {category.description}
-                      </p>
-                      <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <span>Explore Collection</span>
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </div>
-                    </div>
+            {loading ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
+                {[...Array(7)].map((_, index) => (
+                  <div key={index} className="flex flex-col items-center text-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full bg-gray-200 animate-pulse category-image"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4 mt-3 sm:mt-4"></div>
                   </div>
-                </Link>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : categoriesFromBackend.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
+                {categoriesFromBackend.slice(0, 7).map((cat, index) => (
+                  <div
+                    key={index}
+                    className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
+                    onClick={() => router.push(cat.href)}
+                  >
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-40 xl:h-40 rounded-full overflow-hidden shadow-lg sm:shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-500 category-image">
+                      <Image
+                        src={cat.image}
+                        alt={cat.name}
+                        fill
+                        className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                        sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, (max-width: 1280px) 128px, 160px"
+                        onError={(e) => e.target.src = '/images/category-placeholder.jpg'}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500"></div>
+                    </div>
+                    <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase mt-3 sm:mt-4 md:mt-6 leading-tight mobile-text-sm">
+                      {cat.name.toUpperCase()}
+                    </h3>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 sm:py-12">
+                <p className="text-gray-500 text-base sm:text-lg responsive-text">No categories available yet.</p>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* ✅ 6. Featured Collections (Budget-based) */}
+        {/* ✅ 6. Featured Collections (Budget-based) - NEW WALA PERFECT SECTION */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1018,7 +1010,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 7. Category-wise Products (Only Men's, Women's, Footwear) */}
+        {/* ✅ 7. Category-wise Products */}
         {categoriesFromBackend.map((category, index) => {
           const products = categoryProducts[category.name] || [];
 
