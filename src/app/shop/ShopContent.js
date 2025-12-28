@@ -7,6 +7,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { FiFilter, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi'
 
 export default function ShopContent() {
     const router = useRouter()
@@ -25,6 +26,15 @@ export default function ShopContent() {
     const [loadingMore, setLoadingMore] = useState(false)
     const [page, setPage] = useState(1)
     const [hasMore, setHasMore] = useState(true)
+
+    // ✅ NEW: Mobile filter state (category page जैसा)
+    const [showMobileFilters, setShowMobileFilters] = useState(false)
+    const [expandedSections, setExpandedSections] = useState({
+        brands: false,
+        categories: false,
+        conditions: false,
+        price: false
+    })
 
     // Filters
     const [filters, setFilters] = useState({
@@ -183,7 +193,6 @@ export default function ShopContent() {
     const handleBudgetChange = (budgetType) => {
         setActiveFilter(budgetType)
         setPage(1)
-        // Update URL with query parameter
         router.push(`/shop?budget=${budgetType}`, { scroll: false })
     }
 
@@ -198,13 +207,11 @@ export default function ShopContent() {
 
             setError(null)
 
-            // Build query params
             const queryParams = new URLSearchParams()
             queryParams.append('sort', sortBy)
             queryParams.append('page', pageNum)
             queryParams.append('limit', 12)
 
-            // Add filters
             if (filters.brands.length > 0) {
                 queryParams.append('brand', filters.brands.join(','))
             }
@@ -221,12 +228,10 @@ export default function ShopContent() {
                 queryParams.append('minPrice', filters.minPrice)
             }
 
-            // ✅ CORRECTION: Always use filters.maxPrice for API call
             if (filters.maxPrice) {
                 queryParams.append('maxPrice', filters.maxPrice)
             }
 
-            // ✅ CORRECT API URL: /api/products
             const apiUrl = `https://just-becho-backend.vercel.app/api/products?${queryParams.toString()}`
 
             console.log('📡 [SHOP PAGE] Fetching products from:', apiUrl)
@@ -251,7 +256,6 @@ export default function ShopContent() {
                     setProducts(data.products)
                 }
 
-                // Update available filters
                 if (pageNum === 1) {
                     const brands = [...new Set(data.products.map(p => p.brand).filter(Boolean))]
                     const categories = [...new Set(data.products.map(p => p.category).filter(Boolean))]
@@ -262,7 +266,6 @@ export default function ShopContent() {
                     setAvailableConditions(conditions)
                 }
 
-                // Check if there are more pages
                 setHasMore(data.products.length === 12)
                 setPage(pageNum)
             } else {
@@ -284,7 +287,7 @@ export default function ShopContent() {
                 setLoadingMore(false)
             }
         }
-    }, [sortBy, filters]) // ✅ Remove config.maxPrice from dependencies
+    }, [sortBy, filters])
 
     // ✅ Initial fetch and filter/sort changes
     useEffect(() => {
@@ -358,46 +361,49 @@ export default function ShopContent() {
             })
         }
         setPage(1)
+        setShowMobileFilters(false)
     }
 
     const handleLoadMore = () => {
         fetchProducts(page + 1, true)
     }
 
-    // ✅ Filtered and sorted products - SIMPLIFIED like category page
+    // ✅ Toggle section expansion for mobile (category page जैसा)
+    const toggleSection = (section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }))
+    }
+
+    // ✅ Filtered and sorted products
     const filteredProducts = useMemo(() => {
         return products.filter(product => {
-            // Brand filter
             if (filters.brands.length > 0 && !filters.brands.includes(product.brand)) {
                 return false
             }
 
-            // Category filter
             if (filters.categories.length > 0 && !filters.categories.includes(product.category)) {
                 return false
             }
 
-            // Condition filter
             if (filters.conditions.length > 0 && !filters.conditions.includes(product.condition)) {
                 return false
             }
 
-            // Price filter - ONLY use filters values
             const price = product.finalPrice || 0
             
-            // Min price filter
             if (filters.minPrice && price < parseInt(filters.minPrice)) {
                 return false
             }
 
-            // Max price filter - ONLY use filters.maxPrice
             if (filters.maxPrice && price > parseInt(filters.maxPrice)) {
                 return false
             }
 
             return true
         })
-    }, [products, filters]) // ✅ Remove config.maxPrice from dependencies
+    }, [products, filters])
 
     const sortedProducts = useMemo(() => {
         return [...filteredProducts].sort((a, b) => {
@@ -406,11 +412,20 @@ export default function ShopContent() {
                     return (a.finalPrice || 0) - (b.finalPrice || 0)
                 case 'price-high':
                     return (b.finalPrice || 0) - (a.finalPrice || 0)
-                default: // newest
+                default:
                     return new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
             }
         })
     }, [filteredProducts, sortBy])
+
+    // ✅ Active filters count (category page जैसा)
+    const activeFiltersCount = (
+        (filters.brands.length > 0 ? 1 : 0) +
+        (filters.categories.length > 0 ? 1 : 0) +
+        (filters.conditions.length > 0 ? 1 : 0) +
+        (filters.minPrice ? 1 : 0) +
+        (filters.maxPrice ? 1 : 0)
+    )
 
     // ✅ Product Card Component
     const ProductCard = ({ product }) => (
@@ -424,13 +439,12 @@ export default function ShopContent() {
                     alt={product.productName}
                     fill
                     className="object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     onError={(e) => {
                         e.target.src = '/placeholder-image.jpg'
                     }}
                 />
 
-                {/* Condition Badge */}
                 {product.condition && (
                     <div className="absolute top-2 left-2">
                         <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
@@ -439,7 +453,6 @@ export default function ShopContent() {
                     </div>
                 )}
 
-                {/* Views Count */}
                 {product.views > 0 && (
                     <div className="absolute bottom-2 left-2">
                         <span className="text-white text-xs bg-black/70 px-2 py-1 rounded-full">
@@ -448,7 +461,6 @@ export default function ShopContent() {
                     </div>
                 )}
 
-                {/* Likes Count */}
                 {product.likes > 0 && (
                     <div className="absolute bottom-2 right-2">
                         <span className="text-white text-xs bg-red-500/70 px-2 py-1 rounded-full">
@@ -483,10 +495,10 @@ export default function ShopContent() {
 
     // ✅ Loading Skeleton
     const LoadingSkeleton = () => (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                    <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
+                    <div className="bg-gray-200 aspect-square rounded-lg mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
@@ -581,10 +593,332 @@ export default function ShopContent() {
                             </div>
                         )}
 
-                        <div className="flex flex-col lg:flex-row gap-8">
+                        {/* ✅ MOBILE FILTERS TOGGLE (category page जैसा) */}
+                        <div className="lg:hidden mb-6">
+                            <div className="flex items-center justify-between gap-4">
+                                <button
+                                    onClick={() => setShowMobileFilters(!showMobileFilters)}
+                                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-50 transition-colors"
+                                >
+                                    <FiFilter className="w-4 h-4" />
+                                    Filters
+                                    {activeFiltersCount > 0 && (
+                                        <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                            {activeFiltersCount}
+                                        </span>
+                                    )}
+                                </button>
+                                
+                                <div className="flex-1">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
+                                    >
+                                        <option value="newest">Newest First</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                    </select>
+                                </div>
+                                
+                                <button
+                                    onClick={handleSellItems}
+                                    className="bg-black text-white px-4 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap"
+                                >
+                                    + SELL
+                                </button>
+                            </div>
 
-                            {/* ✅ Sidebar Filters */}
-                            <div className="lg:w-80 flex-shrink-0">
+                            {/* Active Filters Badges - Mobile */}
+                            {(filters.brands.length > 0 || filters.categories.length > 0 || filters.conditions.length > 0 || filters.minPrice || filters.maxPrice) && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                    {filters.brands.map(brand => (
+                                        <div key={brand} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                            <span className="text-gray-700">{brand}</span>
+                                            <button
+                                                onClick={() => handleBrandChange(brand)}
+                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {filters.categories.map(category => (
+                                        <div key={category} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                            <span className="text-gray-700">{category}</span>
+                                            <button
+                                                onClick={() => handleCategoryChange(category)}
+                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {filters.conditions.map(condition => (
+                                        <div key={condition} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                            <span className="text-gray-700">{condition}</span>
+                                            <button
+                                                onClick={() => handleConditionChange(condition)}
+                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {filters.minPrice && (
+                                        <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                            <span className="text-gray-700">Min: ₹{filters.minPrice}</span>
+                                            <button
+                                                onClick={() => handlePriceChange('', filters.maxPrice)}
+                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    )}
+                                    {filters.maxPrice && (
+                                        <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                            <span className="text-gray-700">Max: ₹{filters.maxPrice}</span>
+                                            <button
+                                                onClick={() => handlePriceChange(filters.minPrice, '')}
+                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* ✅ MOBILE FILTERS MODAL (category page जैसा) */}
+                        {showMobileFilters && (
+                            <div className="lg:hidden fixed inset-0 z-50 bg-white overflow-y-auto">
+                                {/* Header */}
+                                <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
+                                    <h3 className="text-lg font-light tracking-widest uppercase">Filters</h3>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={handleClearFilters}
+                                            className="text-sm text-gray-500 hover:text-gray-700"
+                                        >
+                                            Clear All
+                                        </button>
+                                        <button
+                                            onClick={() => setShowMobileFilters(false)}
+                                            className="p-1 hover:bg-gray-100 rounded-full"
+                                        >
+                                            <FiX className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Filters Content */}
+                                <div className="p-4 space-y-6 pb-24">
+                                    {/* Budget Info */}
+                                    {config.maxPrice && (
+                                        <div className="p-4 bg-gray-100 border border-gray-200 rounded-lg">
+                                            <h4 className="text-gray-900 text-sm font-medium mb-1">
+                                                BUDGET RANGE
+                                            </h4>
+                                            <p className="text-gray-600 text-sm">
+                                                All products under ₹{config.maxPrice.toLocaleString()}
+                                            </p>
+                                            <p className="text-gray-500 text-xs mt-1">
+                                                Max price is auto-set to ₹{config.maxPrice.toLocaleString()}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Brands Filter */}
+                                    {availableBrands.length > 0 && (
+                                        <div className="border-b border-gray-200 pb-4">
+                                            <button
+                                                onClick={() => toggleSection('brands')}
+                                                className="flex items-center justify-between w-full text-left mb-2"
+                                            >
+                                                <h4 className="text-gray-900 text-sm font-medium">
+                                                    BRANDS ({availableBrands.length})
+                                                </h4>
+                                                {expandedSections.brands ? (
+                                                    <FiChevronUp className="w-4 h-4 text-gray-500" />
+                                                ) : (
+                                                    <FiChevronDown className="w-4 h-4 text-gray-500" />
+                                                )}
+                                            </button>
+                                            
+                                            {expandedSections.brands && (
+                                                <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                                    {availableBrands.map(brand => (
+                                                        <label key={brand} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filters.brands.includes(brand)}
+                                                                onChange={() => handleBrandChange(brand)}
+                                                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                            />
+                                                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                                {brand}
+                                                            </span>
+                                                            <span className="text-gray-400 text-xs ml-auto">
+                                                                ({products.filter(p => p.brand === brand).length})
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Categories Filter */}
+                                    {availableCategories.length > 0 && (
+                                        <div className="border-b border-gray-200 pb-4">
+                                            <button
+                                                onClick={() => toggleSection('categories')}
+                                                className="flex items-center justify-between w-full text-left mb-2"
+                                            >
+                                                <h4 className="text-gray-900 text-sm font-medium">
+                                                    CATEGORIES ({availableCategories.length})
+                                                </h4>
+                                                {expandedSections.categories ? (
+                                                    <FiChevronUp className="w-4 h-4 text-gray-500" />
+                                                ) : (
+                                                    <FiChevronDown className="w-4 h-4 text-gray-500" />
+                                                )}
+                                            </button>
+                                            
+                                            {expandedSections.categories && (
+                                                <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                                    {availableCategories.map(category => (
+                                                        <label key={category} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filters.categories.includes(category)}
+                                                                onChange={() => handleCategoryChange(category)}
+                                                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                            />
+                                                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                                {category}
+                                                            </span>
+                                                            <span className="text-gray-400 text-xs ml-auto">
+                                                                ({products.filter(p => p.category === category).length})
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Condition Filter */}
+                                    {availableConditions.length > 0 && (
+                                        <div className="border-b border-gray-200 pb-4">
+                                            <button
+                                                onClick={() => toggleSection('conditions')}
+                                                className="flex items-center justify-between w-full text-left mb-2"
+                                            >
+                                                <h4 className="text-gray-900 text-sm font-medium">
+                                                    CONDITION ({availableConditions.length})
+                                                </h4>
+                                                {expandedSections.conditions ? (
+                                                    <FiChevronUp className="w-4 h-4 text-gray-500" />
+                                                ) : (
+                                                    <FiChevronDown className="w-4 h-4 text-gray-500" />
+                                                )}
+                                            </button>
+                                            
+                                            {expandedSections.conditions && (
+                                                <div className="space-y-2">
+                                                    {availableConditions.map(condition => (
+                                                        <label key={condition} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={filters.conditions.includes(condition)}
+                                                                onChange={() => handleConditionChange(condition)}
+                                                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                            />
+                                                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                                {condition}
+                                                            </span>
+                                                            <span className="text-gray-400 text-xs ml-auto">
+                                                                ({products.filter(p => p.condition === condition).length})
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Price Filter */}
+                                    <div className="border-b border-gray-200 pb-4">
+                                        <button
+                                            onClick={() => toggleSection('price')}
+                                            className="flex items-center justify-between w-full text-left mb-2"
+                                        >
+                                            <h4 className="text-gray-900 text-sm font-medium">
+                                                PRICE RANGE
+                                            </h4>
+                                            {expandedSections.price ? (
+                                                <FiChevronUp className="w-4 h-4 text-gray-500" />
+                                            ) : (
+                                                <FiChevronDown className="w-4 h-4 text-gray-500" />
+                                            )}
+                                        </button>
+                                        
+                                        {expandedSections.price && (
+                                            <div className="space-y-4">
+                                                <div className="flex gap-2">
+                                                    <div className="flex-1">
+                                                        <label className="text-xs text-gray-500 block mb-1">Min</label>
+                                                        <input
+                                                            type="number"
+                                                            placeholder="₹0"
+                                                            value={filters.minPrice}
+                                                            onChange={(e) => handlePriceChange(e.target.value, filters.maxPrice)}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                            min="0"
+                                                            max={filters.maxPrice ? filters.maxPrice - 1 : ''}
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label className="text-xs text-gray-500 block mb-1">Max</label>
+                                                        <input
+                                                            type="number"
+                                                            placeholder={config.maxPrice ? `₹${config.maxPrice}` : '₹100000'}
+                                                            value={filters.maxPrice}
+                                                            onChange={(e) => handlePriceChange(filters.minPrice, e.target.value)}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                            min="0"
+                                                            max={config.maxPrice || 1000000}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    <p>
+                                                        Price Range: ₹{filters.minPrice || 0} - ₹{filters.maxPrice || (config.maxPrice ? config.maxPrice.toLocaleString() : 'Any')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Apply Button */}
+                                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+                                    <button
+                                        onClick={() => setShowMobileFilters(false)}
+                                        className="w-full bg-black text-white py-3 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors"
+                                    >
+                                        Apply Filters ({activeFiltersCount})
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col lg:flex-row gap-8">
+                            {/* ✅ DESKTOP Sidebar Filters */}
+                            <div className="hidden lg:block lg:w-80 flex-shrink-0">
                                 <div className="bg-gray-50 rounded-2xl p-6 sticky top-44">
 
                                     {/* Filters Header */}
@@ -808,8 +1142,8 @@ export default function ShopContent() {
                             {/* ✅ Products Grid */}
                             <div className="flex-1">
 
-                                {/* Header with Stats */}
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                                {/* DESKTOP Header with Stats */}
+                                <div className="hidden lg:flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                                     <div>
                                         <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-1">
                                             {config.title}
@@ -830,7 +1164,6 @@ export default function ShopContent() {
                                             <option value="newest">Newest First</option>
                                             <option value="price-low">Price: Low to High</option>
                                             <option value="price-high">Price: High to Low</option>
-                                            <option value="popular">Most Popular</option>
                                         </select>
 
                                         <button
@@ -840,6 +1173,18 @@ export default function ShopContent() {
                                             + SELL ITEM
                                         </button>
                                     </div>
+                                </div>
+
+                                {/* MOBILE Header Title */}
+                                <div className="lg:hidden mb-6">
+                                    <h2 className="text-gray-900 text-xl font-light tracking-widest uppercase mb-1">
+                                        {config.title}
+                                    </h2>
+                                    <p className="text-gray-600 text-sm font-light">
+                                        Showing {sortedProducts.length} of {products.length} products
+                                        {config.maxPrice && ` under ₹${config.maxPrice.toLocaleString()}`}
+                                        {loading && ' • Loading...'}
+                                    </p>
                                 </div>
 
                                 {/* Loading State */}
@@ -882,10 +1227,10 @@ export default function ShopContent() {
                                         </div>
                                     ) :
 
-                                        /* Products Grid */
+                                        /* ✅ UPDATED: Products Grid - Mobile: 2 columns, Desktop: 3 columns (category page जैसा) */
                                         (
                                             <>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                                                     {sortedProducts.map(product => (
                                                         <ProductCard key={product._id} product={product} />
                                                     ))}
