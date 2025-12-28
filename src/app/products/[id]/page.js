@@ -751,9 +751,7 @@ export default function ProductPage() {
               <h2 className="text-gray-900 text-xl sm:text-3xl font-light tracking-widest uppercase">
                 PRODUCT DETAILS
               </h2>
-              <p className="text-gray-900 text-base font-light tracking-widest uppercase mt-3">
-                PRODUCT DESCRIPTION
-              </p>
+              
             </div>
             
             <div className="max-w-4xl mx-auto">

@@ -6,16 +6,19 @@ import Image from 'next/image'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function ProductsUnder60k() {
+export default function ProductsPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const budgetFilter = searchParams.get('budget') || 'all'
 
     // ✅ Auth Modal state
     const [showAuthModal, setShowAuthModal] = useState(false)
     const [authAction, setAuthAction] = useState(null)
 
     // State Management
+    const [activeFilter, setActiveFilter] = useState(budgetFilter)
     const [sortBy, setSortBy] = useState('newest')
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(false)
@@ -29,7 +32,7 @@ export default function ProductsUnder60k() {
         categories: [],
         conditions: [],
         minPrice: '',
-        maxPrice: '60000',
+        maxPrice: '',
         search: ''
     })
 
@@ -38,33 +41,107 @@ export default function ProductsUnder60k() {
     const [availableConditions, setAvailableConditions] = useState([])
     const [error, setError] = useState(null)
 
-    // Page Configuration for Under 60K
-    const pageConfig = {
-        title: "PRODUCTS UNDER ₹60K",
-        subtitle: "High-end luxury items under ₹60,000",
-        banner: "/banners/budget-60k.jpg",
-        metaTitle: "Products Under ₹60,000 | High-End Luxury Items",
-        metaDescription: "Shop authentic high-end luxury items under ₹60,000. Premium brands at amazing prices.",
-        whyTitle: "WHY SHOP UNDER ₹60K AT JUST BECHO",
-        features: [
-            {
-                icon: '👑',
-                title: 'HIGH-END LUXURY',
-                description: 'Get high-end luxury items at 40-60% off retail prices'
-            },
-            {
-                icon: '🛡️',
-                title: 'AUTHENTICITY GUARANTEED',
-                description: 'Every item verified by our luxury experts'
-            },
-            {
-                icon: '🚚',
-                title: 'FREE SHIPPING',
-                description: 'Free shipping on all orders above ₹1999'
-            }
-        ],
-        maxPrice: 60000
+    // Budget configurations
+    const budgetConfigs = {
+        'under-20k': {
+            title: "PRODUCTS UNDER ₹20K",
+            subtitle: "Affordable luxury items under ₹20,000",
+            banner: "/banners/budget-20k.jpg",
+            maxPrice: 20000,
+            whyTitle: "WHY SHOP UNDER ₹20K AT JUST BECHO",
+            features: [
+                {
+                    icon: '💰',
+                    title: 'AFFORDABLE LUXURY',
+                    description: 'Get authentic luxury items at 50-80% off retail prices'
+                },
+                {
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every item verified by our luxury experts'
+                },
+                {
+                    icon: '🚚',
+                    title: 'FREE SHIPPING',
+                    description: 'Free shipping on all orders above ₹1999'
+                }
+            ]
+        },
+        'under-40k': {
+            title: "PRODUCTS UNDER ₹40K", 
+            subtitle: "Premium items under ₹40,000",
+            banner: "/banners/budget-40k.jpg",
+            maxPrice: 40000,
+            whyTitle: "WHY SHOP UNDER ₹40K AT JUST BECHO",
+            features: [
+                {
+                    icon: '💎',
+                    title: 'PREMIUM LUXURY',
+                    description: 'Get premium luxury items at 50-70% off retail prices'
+                },
+                {
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every item verified by our luxury experts'
+                },
+                {
+                    icon: '🚚',
+                    title: 'FREE SHIPPING',
+                    description: 'Free shipping on all orders above ₹1999'
+                }
+            ]
+        },
+        'under-60k': {
+            title: "PRODUCTS UNDER ₹60K",
+            subtitle: "High-end luxury under ₹60,000",
+            banner: "/banners/budget-60k.jpg",
+            maxPrice: 60000,
+            whyTitle: "WHY SHOP UNDER ₹60K AT JUST BECHO",
+            features: [
+                {
+                    icon: '👑',
+                    title: 'HIGH-END LUXURY',
+                    description: 'Get high-end luxury items at 40-60% off retail prices'
+                },
+                {
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every item verified by our luxury experts'
+                },
+                {
+                    icon: '🚚',
+                    title: 'FREE SHIPPING',
+                    description: 'Free shipping on all orders above ₹1999'
+                }
+            ]
+        },
+        'all': {
+            title: "ALL PRODUCTS",
+            subtitle: "Explore our complete luxury collection",
+            banner: "/banners/all-products.jpg",
+            maxPrice: null,
+            whyTitle: "WHY SHOP AT JUST BECHO",
+            features: [
+                {
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every product verified by luxury experts'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
+                },
+                {
+                    icon: '🚚',
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
+                }
+            ]
+        }
     }
+
+    const config = budgetConfigs[activeFilter] || budgetConfigs.all
 
     // ✅ Auth Modal close handler
     const handleAuthModalClose = () => {
@@ -83,6 +160,14 @@ export default function ProductsUnder60k() {
         router.push('/sell-now')
     }
 
+    // ✅ Handle budget filter change
+    const handleBudgetChange = (budgetType) => {
+        setActiveFilter(budgetType)
+        setPage(1)
+        // Update URL with query parameter
+        router.push(`/products?budget=${budgetType}`, { scroll: false })
+    }
+
     // ✅ FIXED: Optimized product fetching
     const fetchProducts = useCallback(async (pageNum = 1, isLoadMore = false) => {
         try {
@@ -99,7 +184,6 @@ export default function ProductsUnder60k() {
             queryParams.append('sort', sortBy)
             queryParams.append('page', pageNum)
             queryParams.append('limit', 12)
-            queryParams.append('maxPrice', pageConfig.maxPrice)
 
             // Add filters
             if (filters.brands.length > 0) {
@@ -118,10 +202,20 @@ export default function ProductsUnder60k() {
                 queryParams.append('minPrice', filters.minPrice)
             }
 
-            // ✅ CORRECT API URL: /api/products with maxPrice filter
+            // Add max price based on budget filter
+            let maxPrice = filters.maxPrice
+            if (config.maxPrice && !filters.maxPrice) {
+                maxPrice = config.maxPrice
+            }
+            
+            if (maxPrice) {
+                queryParams.append('maxPrice', maxPrice)
+            }
+
+            // ✅ CORRECT API URL: /api/products
             const apiUrl = `https://just-becho-backend.vercel.app/api/products?${queryParams.toString()}`
 
-            console.log('📡 [UNDER 60K] Fetching products from:', apiUrl)
+            console.log('📡 [PRODUCTS PAGE] Fetching products from:', apiUrl)
 
             const response = await fetch(apiUrl, {
                 cache: 'no-store',
@@ -176,13 +270,18 @@ export default function ProductsUnder60k() {
                 setLoadingMore(false)
             }
         }
-    }, [sortBy, filters])
+    }, [sortBy, filters, config.maxPrice])
 
     // ✅ Initial fetch and filter/sort changes
     useEffect(() => {
-        console.log('🔄 Triggering product fetch for Under 60K')
+        console.log('🔄 Triggering product fetch for budget:', activeFilter)
         fetchProducts(1, false)
-    }, [sortBy, filters.brands, filters.categories, filters.conditions, filters.minPrice])
+    }, [activeFilter, sortBy, filters.brands, filters.categories, filters.conditions, filters.minPrice, filters.maxPrice])
+
+    // ✅ Update active filter when URL changes
+    useEffect(() => {
+        setActiveFilter(budgetFilter)
+    }, [budgetFilter])
 
     // ✅ Filter handlers
     const handleBrandChange = (brand) => {
@@ -219,7 +318,7 @@ export default function ProductsUnder60k() {
         setFilters(prev => ({
             ...prev,
             minPrice: min,
-            maxPrice: max || pageConfig.maxPrice.toString()
+            maxPrice: max
         }))
         setPage(1)
     }
@@ -230,7 +329,7 @@ export default function ProductsUnder60k() {
             categories: [],
             conditions: [],
             minPrice: '',
-            maxPrice: pageConfig.maxPrice.toString(),
+            maxPrice: '',
             search: ''
         })
         setPage(1)
@@ -266,14 +365,19 @@ export default function ProductsUnder60k() {
                 return false
             }
 
-            // Max price filter (always 60000 for this page)
-            if (price > pageConfig.maxPrice) {
+            // Max price filter
+            let maxPrice = filters.maxPrice
+            if (!maxPrice && config.maxPrice) {
+                maxPrice = config.maxPrice
+            }
+            
+            if (maxPrice && price > parseInt(maxPrice)) {
                 return false
             }
 
             return true
         })
-    }, [products, filters])
+    }, [products, filters, config.maxPrice])
 
     const sortedProducts = useMemo(() => {
         return [...filteredProducts].sort((a, b) => {
@@ -382,27 +486,60 @@ export default function ProductsUnder60k() {
                 <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
                     <div className="absolute inset-0">
                         <Image
-                            src={pageConfig.banner}
-                            alt={pageConfig.title}
+                            src={config.banner || '/banners/default-banner.jpg'}
+                            alt={config.title}
                             fill
                             className="object-cover"
                             priority
                             sizes="100vw"
                             onError={(e) => {
+                                console.error('Banner image failed:', config.banner)
                                 e.target.src = '/banners/default-banner.jpg'
                             }}
                         />
                         <div className="absolute inset-0 bg-black/40"></div>
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
                             <h1 className="text-3xl md:text-5xl lg:text-6xl font-light tracking-widest uppercase text-center mb-4">
-                                {pageConfig.title}
+                                {config.title}
                             </h1>
                             <p className="text-lg md:text-xl text-center max-w-2xl mx-auto">
-                                {pageConfig.subtitle}
+                                {config.subtitle}
                             </p>
                         </div>
                     </div>
                 </div>
+
+                {/* ✅ Budget Filter Tabs */}
+                <section className="py-6 bg-gray-50 border-b">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
+                            <button
+                                onClick={() => handleBudgetChange('all')}
+                                className={`px-4 py-2 rounded-full text-sm font-light tracking-widest uppercase transition-all ${activeFilter === 'all' ? 'bg-black text-white' : 'bg-white text-gray-700 border hover:bg-gray-100'}`}
+                            >
+                                ALL PRODUCTS
+                            </button>
+                            <button
+                                onClick={() => handleBudgetChange('under-20k')}
+                                className={`px-4 py-2 rounded-full text-sm font-light tracking-widest uppercase transition-all ${activeFilter === 'under-20k' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100'}`}
+                            >
+                                UNDER ₹20K
+                            </button>
+                            <button
+                                onClick={() => handleBudgetChange('under-40k')}
+                                className={`px-4 py-2 rounded-full text-sm font-light tracking-widest uppercase transition-all ${activeFilter === 'under-40k' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100'}`}
+                            >
+                                UNDER ₹40K
+                            </button>
+                            <button
+                                onClick={() => handleBudgetChange('under-60k')}
+                                className={`px-4 py-2 rounded-full text-sm font-light tracking-widest uppercase transition-all ${activeFilter === 'under-60k' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100'}`}
+                            >
+                                UNDER ₹60K
+                            </button>
+                        </div>
+                    </div>
+                </section>
 
                 {/* ✅ Products Section */}
                 <section id="products" className="py-12 md:py-16">
@@ -444,14 +581,16 @@ export default function ProductsUnder60k() {
                                     </div>
 
                                     {/* Budget Info */}
-                                    <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                                        <h4 className="text-gray-900 text-sm font-medium mb-1">
-                                            BUDGET RANGE
-                                        </h4>
-                                        <p className="text-gray-600 text-sm">
-                                            All products under ₹60,000
-                                        </p>
-                                    </div>
+                                    {config.maxPrice && (
+                                        <div className="mb-6 p-4 bg-gray-100 border border-gray-200 rounded-lg">
+                                            <h4 className="text-gray-900 text-sm font-medium mb-1">
+                                                BUDGET RANGE
+                                            </h4>
+                                            <p className="text-gray-600 text-sm">
+                                                All products under ₹{config.maxPrice.toLocaleString()}
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {/* Brands Filter */}
                                     {availableBrands.length > 0 && (
@@ -537,29 +676,45 @@ export default function ProductsUnder60k() {
                                     {/* Price Filter */}
                                     <div>
                                         <h4 className="text-gray-700 text-sm font-medium mb-3">
-                                            MINIMUM PRICE
+                                            PRICE RANGE
                                         </h4>
                                         <div className="space-y-4">
-                                            <div>
-                                                <label className="text-xs text-gray-500 block mb-1">From</label>
-                                                <input
-                                                    type="number"
-                                                    placeholder="₹0"
-                                                    value={filters.minPrice}
-                                                    onChange={(e) => handlePriceChange(e.target.value, pageConfig.maxPrice)}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
-                                                    min="0"
-                                                    max={pageConfig.maxPrice - 1}
-                                                />
+                                            <div className="flex gap-2">
+                                                <div className="flex-1">
+                                                    <label className="text-xs text-gray-500 block mb-1">Min</label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="₹0"
+                                                        value={filters.minPrice}
+                                                        onChange={(e) => handlePriceChange(e.target.value, filters.maxPrice)}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                        min="0"
+                                                        max={config.maxPrice ? config.maxPrice - 1 : ''}
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="text-xs text-gray-500 block mb-1">Max</label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder={config.maxPrice ? `₹${config.maxPrice}` : '₹100000'}
+                                                        value={filters.maxPrice}
+                                                        onChange={(e) => handlePriceChange(filters.minPrice, e.target.value)}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                        min="0"
+                                                        max={config.maxPrice || 1000000}
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="text-xs text-gray-500">
-                                                <p>Price Range: ₹{filters.minPrice || 0} - ₹{pageConfig.maxPrice.toLocaleString()}</p>
+                                                <p>
+                                                    Price Range: ₹{filters.minPrice || 0} - ₹{filters.maxPrice || (config.maxPrice ? config.maxPrice.toLocaleString() : 'Any')}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Active Filters Summary */}
-                                    {(filters.brands.length > 0 || filters.categories.length > 0 || filters.conditions.length > 0 || filters.minPrice) && (
+                                    {(filters.brands.length > 0 || filters.categories.length > 0 || filters.conditions.length > 0 || filters.minPrice || filters.maxPrice) && (
                                         <div className="mt-6 pt-6 border-t border-gray-200">
                                             <h4 className="text-gray-700 text-sm font-medium mb-2">
                                                 ACTIVE FILTERS
@@ -602,7 +757,18 @@ export default function ProductsUnder60k() {
                                                     <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
                                                         <span className="text-gray-700">Min: ₹{filters.minPrice}</span>
                                                         <button
-                                                            onClick={() => handlePriceChange('', pageConfig.maxPrice)}
+                                                            onClick={() => handlePriceChange('', filters.maxPrice)}
+                                                            className="text-gray-400 hover:text-gray-600 text-xs"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                )}
+                                                {filters.maxPrice && (
+                                                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                                        <span className="text-gray-700">Max: ₹{filters.maxPrice}</span>
+                                                        <button
+                                                            onClick={() => handlePriceChange(filters.minPrice, '')}
                                                             className="text-gray-400 hover:text-gray-600 text-xs"
                                                         >
                                                             ×
@@ -623,10 +789,11 @@ export default function ProductsUnder60k() {
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                                     <div>
                                         <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-1">
-                                            {pageConfig.title}
+                                            {config.title}
                                         </h2>
                                         <p className="text-gray-600 text-sm font-light">
-                                            Showing {sortedProducts.length} of {products.length} products under ₹60,000
+                                            Showing {sortedProducts.length} of {products.length} products
+                                            {config.maxPrice && ` under ₹${config.maxPrice.toLocaleString()}`}
                                             {loading && ' • Loading...'}
                                         </p>
                                     </div>
@@ -664,7 +831,12 @@ export default function ProductsUnder60k() {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                                 </svg>
                                             </div>
-                                            <p className="text-gray-500 text-lg mb-2">No products found under ₹60,000.</p>
+                                            <p className="text-gray-500 text-lg mb-2">
+                                                {config.maxPrice 
+                                                    ? `No products found under ₹${config.maxPrice.toLocaleString()}.`
+                                                    : 'No products found.'
+                                                }
+                                            </p>
                                             <p className="text-gray-400 text-sm mb-6">
                                                 {products.length === 0
                                                     ? 'No products available in this price range.'
@@ -720,21 +892,21 @@ export default function ProductsUnder60k() {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6">
                         <div className="text-center mb-12">
                             <h2 className="text-gray-900 text-3xl sm:text-4xl font-light tracking-widest uppercase mb-4">
-                                {pageConfig.whyTitle}
+                                {config.whyTitle}
                             </h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {pageConfig.features.map((feature, index) => (
+                            {config.features.map((feature, index) => (
                                 <div key={index} className="text-center p-6">
                                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center">
-                                        <span className="text-white text-2xl">{feature.icon}</span>
+                                        <span className="text-white text-2xl">{feature.icon || '✨'}</span>
                                     </div>
                                     <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-2">
-                                        {feature.title}
+                                        {feature.title || 'FEATURE'}
                                     </h3>
                                     <p className="text-gray-600 text-sm">
-                                        {feature.description}
+                                        {feature.description || 'Premium service and quality guaranteed'}
                                     </p>
                                 </div>
                             ))}
@@ -742,60 +914,60 @@ export default function ProductsUnder60k() {
                     </div>
                 </section>
 
-                {/* ✅ Other Budget Options */}
+                {/* ✅ Explore Categories Section */}
                 <section className="py-12 md:py-16 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6">
                         <div className="text-center mb-8">
                             <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-2">
-                                EXPLORE OTHER BUDGET RANGES
+                                EXPLORE CATEGORIES
                             </h2>
                             <p className="text-gray-600 text-sm">
-                                Discover more luxury items within different budgets
+                                Discover more luxury items by category
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <Link
-                                href="/products/under-20k"
+                                href="/categories/men"
                                 className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1"
                             >
                                 <div className="relative h-48 w-full">
                                     <Image
-                                        src="/banners/budget-20k.jpg"
-                                        alt="Products Under ₹20K"
+                                        src="/banners/mens new.jpeg"
+                                        alt="Men's Fashion"
                                         fill
                                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                                         <h3 className="text-lg font-light tracking-widest uppercase mb-1">
-                                            UNDER ₹20K
+                                            MEN'S FASHION
                                         </h3>
                                         <p className="text-xs opacity-90">
-                                            Affordable luxury items
+                                            Premium men's luxury items
                                         </p>
                                     </div>
                                 </div>
                             </Link>
 
                             <Link
-                                href="/products/under-40k"
+                                href="/categories/women"
                                 className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1"
                             >
                                 <div className="relative h-48 w-full">
                                     <Image
-                                        src="/banners/budget-40k.jpg"
-                                        alt="Products Under ₹40K"
+                                        src="/banners/womens new.png"
+                                        alt="Women's Fashion"
                                         fill
                                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                                         <h3 className="text-lg font-light tracking-widest uppercase mb-1">
-                                            UNDER ₹40K
+                                            WOMEN'S FASHION
                                         </h3>
                                         <p className="text-xs opacity-90">
-                                            Premium luxury items
+                                            Luxury women's collections
                                         </p>
                                     </div>
                                 </div>
@@ -818,7 +990,7 @@ export default function ProductsUnder60k() {
                                             FOOTWEAR
                                         </h3>
                                         <p className="text-xs opacity-90">
-                                            Explore all categories
+                                            Luxury shoes and sneakers
                                         </p>
                                     </div>
                                 </div>

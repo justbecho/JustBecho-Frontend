@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiUser, FiHeart, FiShoppingBag, FiLogOut, FiSettings, FiPackage, FiShoppingCart, FiSearch, FiHome, FiMenu, FiX } from 'react-icons/fi'
+import { FiUser, FiHeart, FiShoppingBag, FiLogOut, FiSettings, FiPackage, FiShoppingCart, FiSearch, FiHome, FiMenu, FiX, FiArrowLeft } from 'react-icons/fi'
 import { usePathname, useRouter } from 'next/navigation'
 import AuthModal from '@/components/ui/AuthModal'
 
@@ -26,6 +26,7 @@ export default function Header() {
   const [searchLoading, setSearchLoading] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const searchInputRef = useRef(null)
 
   const isProductPage = pathname?.includes('/products/')
   const isSellNowPage = pathname === '/sell-now'
@@ -54,14 +55,25 @@ export default function Header() {
     const handleEscKey = (e) => {
       if (e.key === 'Escape') {
         setIsMobileSearchOpen(false);
+        setSearchQuery('');
+        setShowSearchResults(false);
       }
     };
     
     if (isMobileSearchOpen) {
       document.addEventListener('keydown', handleEscKey);
       document.body.style.overflow = 'hidden';
+      
+      // Focus on search input when modal opens
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }, 100);
     } else {
       document.body.style.overflow = 'auto';
+      setSearchQuery('');
+      setShowSearchResults(false);
     }
     
     return () => {
@@ -334,7 +346,9 @@ export default function Header() {
     e.preventDefault();
     if (searchQuery.trim()) {
       setShowSearchResults(false);
+      setIsMobileSearchOpen(false);
       router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
     }
   };
 
@@ -686,6 +700,18 @@ export default function Header() {
     setIsMenuOpen(false);
   }, [user, router]);
 
+  // Handle mobile search icon click
+  const handleMobileSearchClick = () => {
+    setIsMobileSearchOpen(true);
+  };
+
+  // Handle close mobile search
+  const handleCloseMobileSearch = () => {
+    setIsMobileSearchOpen(false);
+    setSearchQuery('');
+    setShowSearchResults(false);
+  };
+
   return (
     <>
       <header
@@ -922,8 +948,9 @@ export default function Header() {
               <div className="md:hidden flex items-center space-x-5">
                 {/* Mobile Search Icon */}
                 <button
-                  onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                  onClick={handleMobileSearchClick}
                   className="hover:text-gray-700 transition-all duration-300 flex items-center text-gray-900"
+                  aria-label="Search"
                 >
                   <FiSearch className="w-6 h-6" />
                 </button>
@@ -949,91 +976,131 @@ export default function Header() {
           {/* MOBILE SEARCH BAR - REMOVED */}
         </div>
 
-        {/* MOBILE SEARCH MODAL */}
+        {/* MOBILE SEARCH MODAL - IMPROVED VERSION */}
         {isMobileSearchOpen && (
-          <div className="md:hidden fixed inset-0 z-[100] bg-white p-4">
-            {/* Search Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Search Products</h3>
+          <div className="md:hidden fixed inset-0 z-[100] bg-white animate-fadeIn">
+            {/* Search Header - Slim Design */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white sticky top-0">
               <button
-                onClick={() => setIsMobileSearchOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                onClick={handleCloseMobileSearch}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Close search"
               >
-                <FiX className="w-5 h-5 text-gray-600" />
+                <FiArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
+              
+              <div className="flex-1 mx-3">
+                <form onSubmit={handleSearchSubmit} className="relative">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search for products, brands..."
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    className="w-full border-0 px-4 py-2 text-base outline-none bg-gray-100 rounded-full text-gray-800 placeholder-gray-500 pr-12"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                    aria-label="Search"
+                  >
+                    <FiSearch className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
+              
+              <div className="w-9"></div> {/* For spacing balance */}
             </div>
 
-            {/* Search Input */}
-            <div className="relative mb-4">
-              <form onSubmit={handleSearchSubmit}>
-                <input
-                  type="text"
-                  placeholder="Search for products..."
-                  value={searchQuery}
-                  onChange={handleSearchInputChange}
-                  onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                  className="border border-gray-300 rounded-full px-4 py-3 text-sm outline-none w-full text-gray-800 bg-white placeholder-gray-500 pr-12"
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
-                >
-                  <FiSearch className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
-
-            {/* Search Results */}
-            {showSearchResults && (
-              <div className="border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
-                {searchLoading ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-2 text-sm">Searching...</p>
-                  </div>
-                ) : searchResults.length > 0 ? (
-                  <div className="py-2">
-                    {searchResults.map((product) => (
-                      <Link
-                        key={product._id}
-                        href={`/products/${product._id}`}
-                        className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+            {/* Search Content */}
+            <div className="h-full overflow-y-auto pb-20">
+              {/* Recent Searches / Popular Searches Section (Optional) */}
+              {!searchQuery.trim() && (
+                <div className="p-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Popular Searches</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {['Shoes', 'Watches', 'Bags', 'Shirts', 'Jeans', 'Perfumes', 'Wallets'].map((term) => (
+                      <button
+                        key={term}
                         onClick={() => {
-                          setShowSearchResults(false);
-                          setIsMobileSearchOpen(false);
-                          setSearchQuery('');
+                          setSearchQuery(term);
+                          setTimeout(() => {
+                            if (searchInputRef.current) {
+                              searchInputRef.current.focus();
+                            }
+                          }, 50);
                         }}
+                        className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
                       >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Search Results */}
+              {searchLoading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                  <p className="mt-3 text-gray-600 text-sm">Searching products...</p>
+                </div>
+              ) : showSearchResults && searchResults.length > 0 ? (
+                <div className="divide-y divide-gray-100">
+                  <div className="px-4 py-3 bg-gray-50">
+                    <p className="text-sm text-gray-600">
+                      Found {searchResults.length} product{searchResults.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  
+                  {searchResults.map((product) => (
+                    <Link
+                      key={product._id}
+                      href={`/products/${product._id}`}
+                      className="flex items-center px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                      onClick={handleCloseMobileSearch}
+                    >
+                      <div className="flex-shrink-0 w-14 h-14 bg-gray-100 rounded-lg overflow-hidden mr-4">
                         {product.images?.[0]?.url ? (
                           <img
                             src={product.images[0].url}
                             alt={product.productName}
-                            className="w-10 h-10 object-cover rounded mr-3"
+                            className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
-                            <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                          <div className="w-full h-full flex items-center justify-center">
+                            <FiShoppingBag className="w-6 h-6 text-gray-400" />
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {product.productName}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            ₹{product.finalPrice?.toLocaleString() || '0'}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {product.productName}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {product.brand || 'Brand not specified'}
+                        </p>
+                        <p className="text-sm font-medium text-gray-900 mt-1">
+                          ₹{product.finalPrice?.toLocaleString() || '0'}
+                        </p>
+                      </div>
+                      <FiArrowLeft className="w-4 h-4 text-gray-400 transform rotate-180 ml-2" />
+                    </Link>
+                  ))}
+                </div>
+              ) : searchQuery.trim() && !searchLoading && (
+                <div className="p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                    <FiSearch className="w-8 h-8 text-gray-400" />
                   </div>
-                ) : searchQuery.trim() && (
-                  <div className="p-4 text-center text-gray-500">
-                    <p className="text-sm">No products found</p>
-                  </div>
-                )}
-              </div>
-            )}
+                  <p className="text-gray-600 font-medium">No products found</p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    Try searching with different keywords
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -1295,6 +1362,21 @@ export default function Header() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
       />
+
+      {/* Add CSS animation */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-in-out;
+        }
+      `}</style>
     </>
   )
 }
