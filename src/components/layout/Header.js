@@ -11,6 +11,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMenuAnimating, setIsMenuAnimating] = useState(false)
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [user, setUser] = useState(null)
@@ -47,6 +48,27 @@ export default function Header() {
     
     return `${clean}@justbecho`;
   }, [])
+
+  // ESC key handler for mobile search modal
+  useEffect(() => {
+    const handleEscKey = (e) => {
+      if (e.key === 'Escape') {
+        setIsMobileSearchOpen(false);
+      }
+    };
+    
+    if (isMobileSearchOpen) {
+      document.addEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMobileSearchOpen]);
 
   // ✅ FIXED: Handle Google OAuth redirect from URL
   useEffect(() => {
@@ -896,26 +918,53 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Mobile Cart Icon */}
-              {cartApiAvailable && (
-                <button 
-                  onClick={handleMobileCartClick}
-                  className="md:hidden relative hover:text-gray-700 transition-all duration-300 flex items-center text-gray-900"
+              {/* MOBILE ICONS - SEARCH + CART */}
+              <div className="md:hidden flex items-center space-x-5">
+                {/* Mobile Search Icon */}
+                <button
+                  onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                  className="hover:text-gray-700 transition-all duration-300 flex items-center text-gray-900"
                 >
-                  <FiShoppingBag className="w-6 h-6" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
-                      {cartCount > 99 ? '99+' : cartCount}
-                    </span>
-                  )}
+                  <FiSearch className="w-6 h-6" />
                 </button>
-              )}
+
+                {/* Mobile Cart Icon */}
+                {cartApiAvailable && (
+                  <button 
+                    onClick={handleMobileCartClick}
+                    className="relative hover:text-gray-700 transition-all duration-300 flex items-center text-gray-900"
+                  >
+                    <FiShoppingBag className="w-6 h-6" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* MOBILE SEARCH BAR */}
-          <div className="md:hidden border-t border-gray-200 mt-2 pt-2 pb-1 search-container">
-            <div className="relative">
+          {/* MOBILE SEARCH BAR - REMOVED */}
+        </div>
+
+        {/* MOBILE SEARCH MODAL */}
+        {isMobileSearchOpen && (
+          <div className="md:hidden fixed inset-0 z-[100] bg-white p-4">
+            {/* Search Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Search Products</h3>
+              <button
+                onClick={() => setIsMobileSearchOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <FiX className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative mb-4">
               <form onSubmit={handleSearchSubmit}>
                 <input
                   type="text"
@@ -923,7 +972,8 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-                  className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm outline-none w-full font-light tracking-wide text-gray-800 placeholder-gray-500 bg-white"
+                  className="border border-gray-300 rounded-full px-4 py-3 text-sm outline-none w-full text-gray-800 bg-white placeholder-gray-500 pr-12"
+                  autoFocus
                 />
                 <button
                   type="submit"
@@ -932,59 +982,60 @@ export default function Header() {
                   <FiSearch className="w-4 h-4" />
                 </button>
               </form>
-              
-              {/* Mobile Search Results - WITHOUT "VIEW ALL RESULTS" */}
-              {showSearchResults && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
-                  {searchLoading ? (
-                    <div className="p-4 text-center text-gray-500">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                      <p className="mt-2 text-sm">Searching...</p>
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    <div className="py-2">
-                      {searchResults.map((product) => (
-                        <Link
-                          key={product._id}
-                          href={`/products/${product._id}`}
-                          className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                          onClick={() => {
-                            setShowSearchResults(false);
-                            setIsMenuOpen(false);
-                          }}
-                        >
-                          {product.images?.[0]?.url ? (
-                            <img
-                              src={product.images[0].url}
-                              alt={product.productName}
-                              className="w-10 h-10 object-cover rounded mr-3"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
-                              <FiShoppingBag className="w-5 h-5 text-gray-400" />
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {product.productName}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              ₹{product.finalPrice?.toLocaleString() || '0'}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  ) : searchQuery.trim() && (
-                    <div className="p-4 text-center text-gray-500">
-                      <p className="text-sm">No products found</p>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
+
+            {/* Search Results */}
+            {showSearchResults && (
+              <div className="border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
+                {searchLoading ? (
+                  <div className="p-4 text-center text-gray-500">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-2 text-sm">Searching...</p>
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <div className="py-2">
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product._id}
+                        href={`/products/${product._id}`}
+                        className="flex items-center px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                        onClick={() => {
+                          setShowSearchResults(false);
+                          setIsMobileSearchOpen(false);
+                          setSearchQuery('');
+                        }}
+                      >
+                        {product.images?.[0]?.url ? (
+                          <img
+                            src={product.images[0].url}
+                            alt={product.productName}
+                            className="w-10 h-10 object-cover rounded mr-3"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                            <FiShoppingBag className="w-5 h-5 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {product.productName}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            ₹{product.finalPrice?.toLocaleString() || '0'}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : searchQuery.trim() && (
+                  <div className="p-4 text-center text-gray-500">
+                    <p className="text-sm">No products found</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* MOBILE MENU */}
         <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 z-[60] transition-all duration-300 ease-in-out ${
@@ -1068,6 +1119,31 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">SELL NOW</span>
                 </button>
                 
+                {/* COMMON LINKS FOR ALL USERS */}
+                
+                {/* Mobile Wishlist */}
+                <button 
+                  onClick={handleMobileWishlistClick}
+                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
+                >
+                  <FiHeart className="w-5 h-5 mr-4 text-gray-900" />
+                  <span className="font-light tracking-widest uppercase">WISHLIST</span>
+                </button>
+                
+                {/* Mobile Cart */}
+                {cartApiAvailable && (
+                  <button 
+                    onClick={handleMobileCartClick}
+                    className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
+                  >
+                    <FiShoppingBag className="w-5 h-5 mr-4 text-gray-900" />
+                    <span className="font-light tracking-widest uppercase">
+                      CART {cartCount > 0 && `(${cartCount})`}
+                    </span>
+                  </button>
+                )}
+
+                {/* USER SPECIFIC LINKS */}
                 {user ? (
                   <>
                     {/* Seller Status in Mobile Menu */}
@@ -1102,11 +1178,6 @@ export default function Header() {
                       <FiShoppingCart className="w-5 h-5 mr-4 text-gray-900" />
                       <span className="font-light tracking-widest uppercase">MY PURCHASES</span>
                     </Link>
-                    
-                    <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300 text-left">
-                      <FiLogOut className="w-5 h-5 mr-4 text-red-600" />
-                      <span className="font-light tracking-widest uppercase">LOGOUT</span>
-                    </button>
                   </>
                 ) : (
                   <button onClick={handleMobileProfileClick} className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left">
@@ -1114,27 +1185,15 @@ export default function Header() {
                     <span className="font-light tracking-widest uppercase">PROFILE</span>
                   </button>
                 )}
-                
-                {/* Mobile Wishlist */}
-                <button 
-                  onClick={handleMobileWishlistClick}
-                  className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
-                >
-                  <FiHeart className="w-5 h-5 mr-4 text-gray-900" />
-                  <span className="font-light tracking-widest uppercase">WISHLIST</span>
-                </button>
-                
-                {/* Mobile Cart */}
-                {cartApiAvailable && (
-                  <button 
-                    onClick={handleMobileCartClick}
-                    className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
-                  >
-                    <FiShoppingBag className="w-5 h-5 mr-4 text-gray-900" />
-                    <span className="font-light tracking-widest uppercase">
-                      CART {cartCount > 0 && `(${cartCount})`}
-                    </span>
-                  </button>
+
+                {/* LOGOUT - MOVED TO VERY LAST */}
+                {user && (
+                  <div className="border-t border-gray-200 pt-4 mt-4">
+                    <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300 text-left">
+                      <FiLogOut className="w-5 h-5 mr-4 text-red-600" />
+                      <span className="font-light tracking-widest uppercase">LOGOUT</span>
+                    </button>
+                  </div>
                 )}
               </div>
 
