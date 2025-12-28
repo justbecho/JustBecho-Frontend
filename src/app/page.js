@@ -413,7 +413,7 @@ function HomeContent() {
     return categoryImages["default"];
   }
 
-  // ✅ FIXED: Fetch categories and brands from backend
+  // ✅ FIXED: Fetch categories and brands from backend - ONLY 3 CATEGORIES
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -447,11 +447,17 @@ function HomeContent() {
               }
             })
             
-            setCategoriesFromBackend(formattedCategories)
+            // ✅ FILTER: Only show Men's Fashion, Women's Fashion, and Footwear
+            const allowedCategories = ["Men's Fashion", "Women's Fashion", "Footwear"];
+            const filteredCategories = formattedCategories.filter(cat => 
+              allowedCategories.includes(cat.name)
+            );
+            
+            setCategoriesFromBackend(filteredCategories)
             
             const productsByCategory = {}
             
-            for (const category of formattedCategories) {
+            for (const category of filteredCategories) {
               try {
                 if (category.apiCategory) {
                   const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
@@ -1010,7 +1016,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 7. Category-wise Products */}
+        {/* ✅ 7. Category-wise Products - ONLY 3 CATEGORIES (Men's, Women's, Footwear) */}
         {categoriesFromBackend.map((category, index) => {
           const products = categoryProducts[category.name] || [];
 
@@ -1051,35 +1057,15 @@ function HomeContent() {
                   <div className="text-center mt-8 sm:mt-12">
                     <button
                       onClick={() => router.push(category.href)}
-                      className="text-gray-900 text-sm sm:text-base md:text-lg font-light hover:text-gray-700 transition-all duration-500 tracking-widest uppercase group relative touch-button responsive-text"
+                      className="border border-black text-black font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-500 px-8 py-3 rounded-none responsive-text"
                     >
-                      <span className="relative">
-                        → VIEW ALL {category.name.toUpperCase()}
-                        <span className="absolute bottom-0 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-700 group-hover:delay-100"></span>
-                      </span>
+                      → VIEW ALL {category.name.toUpperCase()}
                     </button>
                   </div>
                 </div>
               </section>
 
-              {index < categoriesFromBackend.length - 1 && (
-                <section className="py-10 sm:py-16 bg-gradient-to-r from-gray-900 to-black section-padding safe-area-padding">
-                  <div className="max-w-[1700px] mx-auto text-center">
-                    <h2 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-3 sm:mb-4 responsive-subheading">
-                      READY TO SELL YOUR {category.name.toUpperCase()}?
-                    </h2>
-                    <p className="text-gray-300 text-sm sm:text-base font-light tracking-widest uppercase mb-4 sm:mb-6 max-w-2xl mx-auto responsive-text">
-                      Get the best value for your luxury items
-                    </p>
-                    <button
-                      onClick={handleSellNowClick}
-                      className="touch-button bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block responsive-text px-6 py-3"
-                    >
-                      SELL NOW
-                    </button>
-                  </div>
-                </section>
-              )}
+              {/* ❌ REMOVED: "Ready to sell" section */}
             </div>
           )
         })}

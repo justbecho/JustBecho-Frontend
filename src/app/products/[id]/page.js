@@ -577,7 +577,7 @@ export default function ProductPage() {
                           {/* Title Text */}
                           <div>
                             <span className="text-gray-900 font-bold text-sm">
-                              Authenticity Guaranteed with Becho Protect
+                             AUTHENTICITY AND MONEY-BACK GUARANTEE WITH BECHO PROTECT
                             </span>
                           </div>
                         </label>
@@ -594,6 +594,10 @@ export default function ProductPage() {
                       <li className="flex items-center gap-2">
                         <span className="text-green-600 font-bold">✓</span>
                         <span>Professional authentication at our warehouse</span>
+                      </li>
+                       <li className="flex items-center gap-2">
+                        <span className="text-green-600 font-bold">✓</span>
+                        <span>our money is safe. Becho Protect covers counterfeits, quality issues, and non-shipment.</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <span className="text-green-600 font-bold">✓</span>
