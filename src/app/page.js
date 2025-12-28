@@ -16,6 +16,7 @@ function HomeContent() {
   const [loading, setLoading] = useState(true)
   const [isAnimating, setIsAnimating] = useState(false)
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
+  const [allCategoriesFromBackend, setAllCategoriesFromBackend] = useState([])
   const [brandsFromBackend, setBrandsFromBackend] = useState([])
   
   // ✅ NEW: Auth Modal State
@@ -88,6 +89,7 @@ function HomeContent() {
     "Perfumes": "/banners/perfumes new.png",
     "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
     "KID'S FASHION": "/banners/kids new.png",
+    "INFLUENCER": "/banners/default.jpg",
     "default": "/banners/default.jpg"
   }), [])
 
@@ -102,8 +104,8 @@ function HomeContent() {
 
   // ✅ Carousel slides from categories
   const carouselSlides = useMemo(() => {
-    if (categoriesFromBackend.length > 0) {
-      return categoriesFromBackend.slice(0, 6).map(cat => ({
+    if (allCategoriesFromBackend.length > 0) {
+      return allCategoriesFromBackend.slice(0, 6).map(cat => ({
         image: cat.image,
         title: cat.name,
         description: `Explore luxury ${cat.name.toLowerCase()}`,
@@ -148,7 +150,7 @@ function HomeContent() {
         href: "/categories/perfumes"
       }
     ]
-  }, [categoriesFromBackend])
+  }, [allCategoriesFromBackend])
 
   // ✅ UPDATED: Featured Collections for budget-based filtering
   const featuredCollections = useMemo(() => [
@@ -283,7 +285,8 @@ function HomeContent() {
       "Perfumes": "perfumes",
       "PERFUMES": "perfumes",
       "TOYS & COLLECTIBLES": "toys",
-      "KID'S FASHION": "kids-fashion"
+      "KID'S FASHION": "kids-fashion",
+      "INFLUENCER": "influencer"
     };
     
     return slugMap[categoryName] || categoryName.toLowerCase().replace(/\s+/g, '-').replace(/'/g, '');
@@ -300,7 +303,8 @@ function HomeContent() {
       "Perfumes": "Perfumes",
       "PERFUMES": "Perfumes",
       "TOYS & COLLECTIBLES": "Toys",
-      "KID'S FASHION": "Kids"
+      "KID'S FASHION": "Kids",
+      "INFLUENCER": "Influencer"
     };
     
     return apiMap[categoryName] || categoryName;
@@ -413,7 +417,7 @@ function HomeContent() {
     return categoryImages["default"];
   }
 
-  // ✅ FIXED: Fetch categories and brands from backend - ONLY 3 CATEGORIES
+  // ✅ FIXED: Fetch categories and brands from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -447,14 +451,20 @@ function HomeContent() {
               }
             })
             
-            // ✅ FILTER: Only show Men's Fashion, Women's Fashion, and Footwear
+            // ✅ 1. For Explore Categories: Show all categories EXCEPT INFLUENCER
+            const allCategoriesExceptInfluencer = formattedCategories.filter(cat => 
+              cat.name !== "INFLUENCER"
+            );
+            setAllCategoriesFromBackend(allCategoriesExceptInfluencer);
+            
+            // ✅ 2. For Product by Category: Only show Men's Fashion, Women's Fashion, and Footwear
             const allowedCategories = ["Men's Fashion", "Women's Fashion", "Footwear"];
             const filteredCategories = formattedCategories.filter(cat => 
               allowedCategories.includes(cat.name)
             );
+            setCategoriesFromBackend(filteredCategories);
             
-            setCategoriesFromBackend(filteredCategories)
-            
+            // Fetch products for filtered categories only
             const productsByCategory = {}
             
             for (const category of filteredCategories) {
@@ -484,13 +494,16 @@ function HomeContent() {
             
             setCategoryProducts(productsByCategory)
           } else {
+            setAllCategoriesFromBackend([])
             setCategoriesFromBackend([])
           }
         } else {
+          setAllCategoriesFromBackend([])
           setCategoriesFromBackend([])
         }
       } catch (error) {
         console.error('Error fetching homepage data:', error)
+        setAllCategoriesFromBackend([])
         setCategoriesFromBackend([])
       } finally {
         setLoading(false)
@@ -852,8 +865,8 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel (right after home banner) */}
-        <section className="py-8 sm:py-12 bg-white border-t border-gray-100">
+        {/* ✅ 3. Brand Carousel (right after home banner) - LIGHT BACKGROUND ADDED */}
+        <section className="py-8 sm:py-12 bg-gray-50 border-t border-gray-100">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-6 sm:mb-8">
               <h2 className="text-gray-900 text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase responsive-heading">
@@ -909,7 +922,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 5. Explore Categories - PURANE WALA CIRCLES DESIGN (पुराने वाला design) */}
+        {/* ✅ 5. Explore Categories - सभी categories दिखाएंगे (सिर्फ Influencer को छोड़कर) */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -930,9 +943,9 @@ function HomeContent() {
                   </div>
                 ))}
               </div>
-            ) : categoriesFromBackend.length > 0 ? (
+            ) : allCategoriesFromBackend.length > 0 ? (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 sm:gap-6 md:gap-8 lg:gap-10 category-grid">
-                {categoriesFromBackend.slice(0, 7).map((cat, index) => (
+                {allCategoriesFromBackend.slice(0, 7).map((cat, index) => (
                   <div
                     key={index}
                     className="group flex flex-col items-center text-center transition-all duration-500 transform hover:-translate-y-2 cursor-pointer tap-highlight"
@@ -963,7 +976,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 6. Featured Collections (Budget-based) - NEW WALA PERFECT SECTION */}
+        {/* ✅ 6. Featured Collections (Budget-based) */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1016,7 +1029,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 7. Category-wise Products - ONLY 3 CATEGORIES (Men's, Women's, Footwear) */}
+        {/* ✅ 7. Category-wise Products - सिर्फ 3 CATEGORIES (Men's, Women's, Footwear) */}
         {categoriesFromBackend.map((category, index) => {
           const products = categoryProducts[category.name] || [];
 
@@ -1064,8 +1077,6 @@ function HomeContent() {
                   </div>
                 </div>
               </section>
-
-              {/* ❌ REMOVED: "Ready to sell" section */}
             </div>
           )
         })}
