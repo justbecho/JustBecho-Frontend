@@ -156,21 +156,21 @@ function HomeContent() {
       title: "PRODUCTS UNDER ₹20K",
       description: "Affordable luxury items under ₹20,000",
       image: "/banners/budget-20k.jpg",
-      href: "/products?budget=under-20k",
+      href: "/shop?budget=under-20k",
       filter: "under-20k"
     },
     {
       title: "PRODUCTS UNDER ₹40K",
       description: "Premium items under ₹40,000",
       image: "/banners/budget-40k.jpg",
-      href: "/products?budget=under-40k",
+      href: "/shop?budget=under-40k",
       filter: "under-40k"
     },
     {
       title: "PRODUCTS UNDER ₹60K",
       description: "High-end luxury under ₹60,000",
       image: "/banners/budget-60k.jpg",
-      href: "/products?budget=under-60k",
+      href: "/shop?budget=under-60k",
       filter: "under-60k"
     }
   ], [])
@@ -364,7 +364,7 @@ function HomeContent() {
 
   // ✅ Handle Budget Filter Click
   const handleBudgetFilterClick = (filterType) => {
-    router.push(`/products?budget=${filterType}`)
+    router.push(`/shop?budget=${filterType}`)
   }
 
   // ✅ Carousel functions - TRANSITION SPEED INCREASED

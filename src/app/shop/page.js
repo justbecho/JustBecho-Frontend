@@ -8,7 +8,7 @@ import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function ProductsPage() {
+export default function ShopPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const budgetFilter = searchParams.get('budget') || 'all'
@@ -65,7 +65,8 @@ export default function ProductsPage() {
                     title: 'FREE SHIPPING',
                     description: 'Free shipping on all orders above ₹1999'
                 }
-            ]
+            ],
+            color: 'bg-yellow-600'
         },
         'under-40k': {
             title: "PRODUCTS UNDER ₹40K", 
@@ -89,7 +90,8 @@ export default function ProductsPage() {
                     title: 'FREE SHIPPING',
                     description: 'Free shipping on all orders above ₹1999'
                 }
-            ]
+            ],
+            color: 'bg-blue-600'
         },
         'under-60k': {
             title: "PRODUCTS UNDER ₹60K",
@@ -113,7 +115,8 @@ export default function ProductsPage() {
                     title: 'FREE SHIPPING',
                     description: 'Free shipping on all orders above ₹1999'
                 }
-            ]
+            ],
+            color: 'bg-purple-600'
         },
         'all': {
             title: "ALL PRODUCTS",
@@ -137,7 +140,8 @@ export default function ProductsPage() {
                     title: 'WHITE GLOVE DELIVERY',
                     description: 'Premium packaging and insured shipping'
                 }
-            ]
+            ],
+            color: 'bg-gray-900'
         }
     }
 
@@ -165,7 +169,7 @@ export default function ProductsPage() {
         setActiveFilter(budgetType)
         setPage(1)
         // Update URL with query parameter
-        router.push(`/products?budget=${budgetType}`, { scroll: false })
+        router.push(`/shop?budget=${budgetType}`, { scroll: false })
     }
 
     // ✅ FIXED: Optimized product fetching
@@ -215,7 +219,7 @@ export default function ProductsPage() {
             // ✅ CORRECT API URL: /api/products
             const apiUrl = `https://just-becho-backend.vercel.app/api/products?${queryParams.toString()}`
 
-            console.log('📡 [PRODUCTS PAGE] Fetching products from:', apiUrl)
+            console.log('📡 [SHOP PAGE] Fetching products from:', apiUrl)
 
             const response = await fetch(apiUrl, {
                 cache: 'no-store',
