@@ -147,6 +147,21 @@ export default function ShopContent() {
 
     const config = budgetConfigs[activeFilter] || budgetConfigs.all
 
+    // ✅ Reset filters when budget changes
+    useEffect(() => {
+        if (config.maxPrice) {
+            setFilters(prev => ({
+                ...prev,
+                maxPrice: config.maxPrice.toString()
+            }))
+        } else {
+            setFilters(prev => ({
+                ...prev,
+                maxPrice: ''
+            }))
+        }
+    }, [activeFilter])
+
     // ✅ Auth Modal close handler
     const handleAuthModalClose = () => {
         setShowAuthModal(false)
@@ -172,7 +187,7 @@ export default function ShopContent() {
         router.push(`/shop?budget=${budgetType}`, { scroll: false })
     }
 
-    // ✅ FIXED: Optimized product fetching
+    // ✅ FIXED: Optimized product fetching with budget filter
     const fetchProducts = useCallback(async (pageNum = 1, isLoadMore = false) => {
         try {
             if (pageNum === 1) {
@@ -206,14 +221,9 @@ export default function ShopContent() {
                 queryParams.append('minPrice', filters.minPrice)
             }
 
-            // Add max price based on budget filter
-            let maxPrice = filters.maxPrice
-            if (config.maxPrice && !filters.maxPrice) {
-                maxPrice = config.maxPrice
-            }
-            
-            if (maxPrice) {
-                queryParams.append('maxPrice', maxPrice)
+            // ✅ CORRECTION: Always use filters.maxPrice for API call
+            if (filters.maxPrice) {
+                queryParams.append('maxPrice', filters.maxPrice)
             }
 
             // ✅ CORRECT API URL: /api/products
@@ -274,11 +284,11 @@ export default function ShopContent() {
                 setLoadingMore(false)
             }
         }
-    }, [sortBy, filters, config.maxPrice])
+    }, [sortBy, filters]) // ✅ Remove config.maxPrice from dependencies
 
     // ✅ Initial fetch and filter/sort changes
     useEffect(() => {
-        console.log('🔄 Triggering product fetch for budget:', activeFilter)
+        console.log('🔄 Triggering product fetch for budget:', activeFilter, 'filters:', filters)
         fetchProducts(1, false)
     }, [activeFilter, sortBy, filters.brands, filters.categories, filters.conditions, filters.minPrice, filters.maxPrice])
 
@@ -328,14 +338,25 @@ export default function ShopContent() {
     }
 
     const handleClearFilters = () => {
-        setFilters({
-            brands: [],
-            categories: [],
-            conditions: [],
-            minPrice: '',
-            maxPrice: '',
-            search: ''
-        })
+        if (config.maxPrice) {
+            setFilters({
+                brands: [],
+                categories: [],
+                conditions: [],
+                minPrice: '',
+                maxPrice: config.maxPrice.toString(),
+                search: ''
+            })
+        } else {
+            setFilters({
+                brands: [],
+                categories: [],
+                conditions: [],
+                minPrice: '',
+                maxPrice: '',
+                search: ''
+            })
+        }
         setPage(1)
     }
 
@@ -343,7 +364,7 @@ export default function ShopContent() {
         fetchProducts(page + 1, true)
     }
 
-    // ✅ Filtered and sorted products
+    // ✅ Filtered and sorted products - SIMPLIFIED like category page
     const filteredProducts = useMemo(() => {
         return products.filter(product => {
             // Brand filter
@@ -361,7 +382,7 @@ export default function ShopContent() {
                 return false
             }
 
-            // Price filter
+            // Price filter - ONLY use filters values
             const price = product.finalPrice || 0
             
             // Min price filter
@@ -369,19 +390,14 @@ export default function ShopContent() {
                 return false
             }
 
-            // Max price filter
-            let maxPrice = filters.maxPrice
-            if (!maxPrice && config.maxPrice) {
-                maxPrice = config.maxPrice
-            }
-            
-            if (maxPrice && price > parseInt(maxPrice)) {
+            // Max price filter - ONLY use filters.maxPrice
+            if (filters.maxPrice && price > parseInt(filters.maxPrice)) {
                 return false
             }
 
             return true
         })
-    }, [products, filters, config.maxPrice])
+    }, [products, filters]) // ✅ Remove config.maxPrice from dependencies
 
     const sortedProducts = useMemo(() => {
         return [...filteredProducts].sort((a, b) => {
@@ -593,6 +609,9 @@ export default function ShopContent() {
                                             <p className="text-gray-600 text-sm">
                                                 All products under ₹{config.maxPrice.toLocaleString()}
                                             </p>
+                                            <p className="text-gray-500 text-xs mt-1">
+                                                Max price is auto-set to ₹{config.maxPrice.toLocaleString()}
+                                            </p>
                                         </div>
                                     )}
 
@@ -693,7 +712,7 @@ export default function ShopContent() {
                                                         onChange={(e) => handlePriceChange(e.target.value, filters.maxPrice)}
                                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
                                                         min="0"
-                                                        max={config.maxPrice ? config.maxPrice - 1 : ''}
+                                                        max={filters.maxPrice ? filters.maxPrice - 1 : ''}
                                                     />
                                                 </div>
                                                 <div className="flex-1">

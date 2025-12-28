@@ -155,50 +155,28 @@ function HomeContent() {
     {
       title: "PRODUCTS UNDER ₹20K",
       description: "Affordable luxury items under ₹20,000",
-      image: "/banners/budget-20k.jpg",
+      image: "/banners/mens new.jpeg",
       href: "/shop?budget=under-20k",
       filter: "under-20k"
     },
     {
       title: "PRODUCTS UNDER ₹40K",
       description: "Premium items under ₹40,000",
-      image: "/banners/budget-40k.jpg",
+      image: "/banners/womens new.png",
       href: "/shop?budget=under-40k",
       filter: "under-40k"
     },
     {
       title: "PRODUCTS UNDER ₹60K",
       description: "High-end luxury under ₹60,000",
-      image: "/banners/budget-60k.jpg",
+      image: "/banners/footwear new.png",
       href: "/shop?budget=under-60k",
       filter: "under-60k"
     }
   ], [])
 
   // ✅ UPDATED: Featured fashion categories (only Men's, Women's, Footwear)
-  const featuredCategories = useMemo(() => [
-    {
-      title: "MEN'S FASHION",
-      description: "Explore premium men's clothing and accessories",
-      image: "/banners/mens new.jpeg",
-      href: "/categories/men",
-      category: "Men's Fashion"
-    },
-    {
-      title: "WOMEN'S FASHION",
-      description: "Discover luxury women's collections",
-      image: "/banners/womens new.png",
-      href: "/categories/women",
-      category: "Women's Fashion"
-    },
-    {
-      title: "FOOTWEAR",
-      description: "Step into luxury shoes and sneakers",
-      image: "/banners/footwear new.png",
-      href: "/categories/footwear",
-      category: "Footwear"
-    }
-  ], [])
+ 
 
   // How It Works Steps
   const howItWorks = useMemo(() => [
@@ -891,11 +869,7 @@ function HomeContent() {
 
             <InfiniteBrandMarquee brands={allBrands} />
             
-            <div className="text-center mt-4 sm:mt-6">
-              <p className="text-gray-500 text-xs sm:text-sm responsive-text-sm">
-                Click on any brand to view all products from that brand
-              </p>
-            </div>
+          
           </div>
         </section>
 
