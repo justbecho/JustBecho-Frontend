@@ -23,17 +23,17 @@ const getCategoryConfig = (categorySlug) => {
                 {
                     icon: '🛡️',
                     title: 'AUTHENTICITY GUARANTEED',
-                    description: 'Every item undergoes 7-point verification by luxury experts'
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
                 },
                 {
                     icon: '💎',
                     title: 'PREMIUM QUALITY',
-                    description: 'Only gently used items in excellent condition'
+                    description: 'Only genuine luxury items'
                 },
                 {
                     icon: '🚚',
-                    title: 'FREE SHIPPING',
-                    description: 'Free shipping on all orders above ₹1999'
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
                 }
             ],
             apiSlug: 'Men',
