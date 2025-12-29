@@ -442,9 +442,7 @@ export default function ContactUs() {
                     <p className="text-gray-600 text-sm md:text-base">
                       Registered Office: Ghaziabad, Uttar Pradesh, India
                     </p>
-                    <p className="text-gray-500 text-xs md:text-sm mt-2">
-                      GSTIN: 09AAECJ5521F1Z5
-                    </p>
+                    
                   </div>
                 </div>
               </div>
