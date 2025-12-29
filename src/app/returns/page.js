@@ -52,7 +52,7 @@ export default function RefundReturnPolicyPage() {
                     </p>
                     <div className="mt-3 md:mt-4 p-2 md:p-3 bg-red-100 border border-red-200 rounded">
                       <p className="text-red-800 font-semibold text-sm md:text-base">
-                        🔒 Refunds are processed only under specific conditions outlined in this policy.
+                        🔒 Refunds are processed under specific conditions outlined in this policy.
                       </p>
                     </div>
                   </div>
@@ -67,9 +67,9 @@ export default function RefundReturnPolicyPage() {
                     <h3 className="font-bold text-gray-900 text-sm md:text-base mb-3 md:mb-4">Quick Navigation</h3>
                     <div className="space-y-1 md:space-y-2">
                       {[
-                        { id: 'section1', title: '1. All Sales Are Final' },
+                        { id: 'section1', title: '1. Refund Eligibility Criteria' },
                         { id: 'section2', title: '2. Exceptions (Becho Protect)' },
-                        { id: 'section3', title: '3. Refund Eligibility Criteria' },
+                        { id: 'section3', title: '3. All Sales Are Final' },
                         { id: 'section4', title: '4. Required Documentation' },
                         { id: 'section5', title: '5. Unboxing Video Requirements' },
                         { id: 'section6', title: '6. Refund Process Timeline' },
