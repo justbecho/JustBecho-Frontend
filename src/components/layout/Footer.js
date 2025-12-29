@@ -10,7 +10,7 @@ export default function Footer() {
           <div>
             <h3 className="text-base sm:text-lg font-semibold text-black mb-3 sm:mb-4">JustBecho</h3>
             <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-A curated marketplace for luxury and premium fashion.
+A curated marketplace for luxury and premium fashion.<br/>
 Buy and sell brand-new or pre-owned pieces with confidence, backed by Becho Protect, which offers authenticity verification and secure transactions.
 A refined way to experience luxury online.            </p>
           </div>
