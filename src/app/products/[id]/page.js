@@ -597,7 +597,7 @@ export default function ProductPage() {
                       </li>
                        <li className="flex items-center gap-2">
                         <span className="text-green-600 font-bold">✓</span>
-                        <span>our money is safe. Becho Protect covers counterfeits, quality issues, and non-shipment.</span>
+                        <span>Your money is safe. Becho Protect covers counterfeits, quality issues, and non-shipment.</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <span className="text-green-600 font-bold">✓</span>
