@@ -125,14 +125,8 @@ export default function ContactUs() {
       email: "connect@justbecho.com",
       icon: FiBriefcase,
       color: "green"
-    },
-    {
-      title: "General Inquiries",
-      description: "For general questions, feedback, and suggestions",
-      email: "info@justbecho.com",
-      icon: FiMail,
-      color: "purple"
     }
+    
   ]
 
   const handleBack = () => {
@@ -174,26 +168,8 @@ export default function ContactUs() {
         )}
 
         <div className="pt-4 md:pt-24 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8">
-          {/* Mobile Quick Actions */}
-          {isMobile && (
-            <div className="mb-6">
-              <a 
-                href="tel:+919301847748"
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium mb-3"
-              >
-                <FiPhone className="w-5 h-5" />
-                Call Now
-              </a>
-              
-              <a 
-                href="mailto:support@justbecho.com"
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-900 to-black text-white py-3 rounded-xl font-medium"
-              >
-                <FiMail className="w-5 h-5" />
-                Email Support
-              </a>
-            </div>
-          )}
+        
+          
 
           {/* Page Header */}
           <div className={`text-center mb-8 md:mb-16 ${isMobile ? 'px-2' : ''}`}>
@@ -438,9 +414,9 @@ export default function ContactUs() {
                     Business Address
                   </h3>
                   <div className="bg-white rounded-lg p-4">
-                    <p className="text-gray-900 font-medium mb-1">Just Becho Pvt. Ltd.</p>
+                    
                     <p className="text-gray-600 text-sm md:text-base">
-                      Registered Office: Ghaziabad, Uttar Pradesh, India
+                      Registered Office: 11 USHAGANJ 1ST FLOOR BETALA COMPLEX, INDORE, M.P – 452001
                     </p>
                     
                   </div>
