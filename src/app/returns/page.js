@@ -68,7 +68,7 @@ export default function RefundReturnPolicyPage() {
                     <div className="space-y-1 md:space-y-2">
                       {[
                         { id: 'section1', title: '1. Refund Eligibility Criteria' },
-                        { id: 'section2', title: '2. Exceptions (Becho Protect)' },
+                        { id: 'section2', title: '2. Becho Protect' },
                         { id: 'section3', title: '3. All Sales Are Final' },
                         { id: 'section4', title: '4. Required Documentation' },
                         { id: 'section5', title: '5. Unboxing Video Requirements' },
