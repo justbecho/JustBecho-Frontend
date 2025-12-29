@@ -914,20 +914,7 @@ export default function ShopContent() {
                                         </button>
                                     </div>
 
-                                    {/* Budget Info */}
-                                    {config.maxPrice && (
-                                        <div className="mb-6 p-4 bg-gray-100 border border-gray-200 rounded-lg">
-                                            <h4 className="text-gray-900 text-sm font-medium mb-1">
-                                                BUDGET RANGE
-                                            </h4>
-                                            <p className="text-gray-600 text-sm">
-                                                All products under ₹{config.maxPrice.toLocaleString()}
-                                            </p>
-                                            <p className="text-gray-500 text-xs mt-1">
-                                                Max price is auto-set to ₹{config.maxPrice.toLocaleString()}
-                                            </p>
-                                        </div>
-                                    )}
+                                   
 
                                     {/* Brands Filter */}
                                     {availableBrands.length > 0 && (
