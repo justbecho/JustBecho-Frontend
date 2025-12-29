@@ -107,7 +107,7 @@ export default function ContactUs() {
     },
     {
       question: "What's your return policy?",
-      answer: "We offer a 7-day return policy on all items. Please contact support for return requests."
+      answer: "ALL SALES ARE FINAL. However, if a seller ships a counterfeit, an incorrect or a wrong item, your money is perfectly safeguarded by-BECHO PROTECT"
     }
   ]
 
@@ -396,15 +396,7 @@ export default function ContactUs() {
                       <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                         <FiClock className="w-5 h-5 text-green-600" />
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Response Time</p>
-                        <p className="text-gray-600 text-sm md:text-base">
-                          Within 24 hours
-                        </p>
-                        <p className="text-gray-500 text-xs md:text-sm mt-1">
-                          For all email inquiries
-                        </p>
-                      </div>
+                     
                     </div>
                   </div>
                 </div>
