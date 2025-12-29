@@ -92,48 +92,86 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ UPDATED: SIMPLE MARQUEE - FIXED ALL BRANDS DISPLAY
+  // ✅ UPDATED: SIMPLE MARQUEE - SUPER SMOOTH WITHOUT JERKS
   const BrandMarquee = () => {
     const containerRef = useRef(null);
     const contentRef = useRef(null);
     const animationRef = useRef(null);
     const [isHovered, setIsHovered] = useState(false);
+    const [currentPosition, setCurrentPosition] = useState(0);
     
-    // Duplicate brands for seamless loop
-    const duplicatedBrands = useMemo(() => {
-      return [...allBrands, ...allBrands, ...allBrands];
-    }, [allBrands]);
+    // Calculate content width properly
+    const [contentWidth, setContentWidth] = useState(0);
     
-    // Start animation
     useEffect(() => {
-      const animate = () => {
-        if (!contentRef.current || isHovered) return;
-        
-        // Move content left by 1px
-        const currentTransform = contentRef.current.style.transform || 'translateX(0px)';
-        const currentX = parseInt(currentTransform.replace('translateX(', '').replace('px)', '')) || 0;
-        
-        // Reset when fully scrolled
-        const contentWidth = contentRef.current.scrollWidth / 3; // Divide by 3 because we have 3 copies
-        if (Math.abs(currentX) >= contentWidth) {
-          contentRef.current.style.transform = 'translateX(0px)';
-        } else {
-          contentRef.current.style.transform = `translateX(${currentX - 1}px)`;
+      // Calculate initial content width
+      const calculateWidth = () => {
+        if (contentRef.current) {
+          // Get width of one set of brands
+          const items = contentRef.current.children;
+          if (items.length > 0) {
+            const itemWidth = items[0].offsetWidth || 120;
+            const gap = 32; // px-8 = 2rem = 32px
+            const singleSetWidth = allBrands.length * (itemWidth + gap);
+            setContentWidth(singleSetWidth);
+          }
         }
+      };
+      
+      calculateWidth();
+      window.addEventListener('resize', calculateWidth);
+      
+      return () => {
+        window.removeEventListener('resize', calculateWidth);
+      };
+    }, [allBrands.length]);
+    
+    // Animation with requestAnimationFrame for butter smoothness
+    useEffect(() => {
+      let lastTime = 0;
+      const speed = 0.5; // pixels per frame (slower = smoother)
+      
+      const animate = (currentTime) => {
+        if (!contentRef.current || isHovered) {
+          lastTime = currentTime;
+          animationRef.current = requestAnimationFrame(animate);
+          return;
+        }
+        
+        if (lastTime === 0) lastTime = currentTime;
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        
+        // Calculate movement based on time for consistent speed
+        const movement = speed * (deltaTime / 16.67); // Normalize to 60fps
+        
+        setCurrentPosition(prev => {
+          let newPosition = prev - movement;
+          
+          // Reset when we've scrolled one complete set
+          if (contentWidth > 0 && Math.abs(newPosition) >= contentWidth) {
+            newPosition = 0;
+          }
+          
+          // Update transform
+          if (contentRef.current) {
+            contentRef.current.style.transform = `translateX(${newPosition}px)`;
+          }
+          
+          return newPosition;
+        });
         
         animationRef.current = requestAnimationFrame(animate);
       };
       
-      // Start animation
       animationRef.current = requestAnimationFrame(animate);
       
-      // Cleanup
       return () => {
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current);
         }
       };
-    }, [isHovered]);
+    }, [isHovered, contentWidth]);
     
     const handleMouseEnter = () => {
       setIsHovered(true);
@@ -143,38 +181,34 @@ function HomeContent() {
       setIsHovered(false);
     };
     
-    const handleTouchStart = () => {
-      setIsHovered(true);
-    };
-    
-    const handleTouchEnd = () => {
-      setTimeout(() => {
-        setIsHovered(false);
-      }, 100);
-    };
+    // Duplicate brands for seamless loop (need 3 copies for smooth looping)
+    const duplicatedBrands = useMemo(() => {
+      return [...allBrands, ...allBrands, ...allBrands];
+    }, [allBrands]);
     
     return (
       <div 
-        className="marquee-container w-full overflow-hidden py-4 sm:py-6"
+        className="marquee-container w-full overflow-hidden py-4 sm:py-6 relative"
         ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={handleMouseEnter}
+        onTouchEnd={handleMouseLeave}
       >
         <div 
-          className="marquee-content flex items-center"
+          className="marquee-content flex items-center will-change-transform"
           ref={contentRef}
           style={{ 
             width: 'fit-content',
-            willChange: 'transform',
-            transition: isHovered ? 'transform 0.3s ease' : 'none'
+            display: 'flex',
+            alignItems: 'center',
+            transition: isHovered ? 'transform 0.2s ease' : 'none'
           }}
         >
           {duplicatedBrands.map((brand, idx) => (
             <div 
               key={`${brand.name}-${idx}`} 
-              className="flex-shrink-0 px-4 sm:px-6 md:px-8"
+              className="flex-shrink-0 px-8"
             >
               <div className="relative h-12 w-28 sm:h-14 sm:w-32 md:h-16 md:w-36 flex items-center justify-center">
                 <img
@@ -190,6 +224,10 @@ function HomeContent() {
             </div>
           ))}
         </div>
+        
+        {/* Gradient overlays for smooth edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-100 to-transparent pointer-events-none z-10"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
       </div>
     );
   };
@@ -435,43 +473,49 @@ function HomeContent() {
     router.push(`/shop?budget=${filterType}`)
   }
 
-  // ✅ Carousel functions - TRANSITION SPEED INCREASED
+  // ✅ UPDATED: SIMPLE CAROUSEL ANIMATION - Right to Left Swipe Only
   const nextSlide = () => {
     if (isTransitioning || carouselSlides.length === 0) return;
     
     setIsTransitioning(true);
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    
+    // Reset transition state after animation completes
     setTimeout(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
       setIsTransitioning(false);
-    }, 300);
+    }, 500);
   }
 
   const prevSlide = () => {
     if (isTransitioning || carouselSlides.length === 0) return;
     
     setIsTransitioning(true);
+    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+    
+    // Reset transition state after animation completes
     setTimeout(() => {
-      setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
       setIsTransitioning(false);
-    }, 300);
+    }, 500);
   }
 
   const goToSlide = (index) => {
     if (isTransitioning || index === currentSlide || carouselSlides.length === 0) return;
     
     setIsTransitioning(true);
+    setCurrentSlide(index);
+    
+    // Reset transition state after animation completes
     setTimeout(() => {
-      setCurrentSlide(index);
       setIsTransitioning(false);
-    }, 200);
+    }, 500);
   }
 
-  // ✅ Start carousel auto-play - AUTO-PLAY INTERVAL DECREASED
+  // ✅ Start carousel auto-play - SIMPLE RIGHT TO LEFT SWIPE
   useEffect(() => {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
         nextSlide();
-      }, 3000);
+      }, 4000); // 4 seconds interval
     }
     
     return () => {
@@ -693,18 +737,19 @@ function HomeContent() {
         {/* ✅ 1. Header ke baad reduced gap - Pahle 24 thi, ab 16 kar di */}
         <div className="pt-16"></div>
         
-        {/* ✅ 2. Home Banner - FIXED: Mobile scroll pe enlarge issue solve kiya */}
+        {/* ✅ 2. Home Banner - UPDATED: Simple Right to Left Swipe Animation */}
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
             onMouseLeave={() => {
               if (carouselSlides.length > 1) {
-                carouselIntervalRef.current = setInterval(() => nextSlide(), 3000);
+                carouselIntervalRef.current = setInterval(() => nextSlide(), 4000);
               }
             }}
           >
-            <div className={`absolute inset-0 ${isTransitioning ? 'carousel-fade-out' : 'carousel-fade-in'}`}>
+            {/* Simple Fade Transition */}
+            <div className={`absolute inset-0 transition-opacity duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
               <Image
                 src={carouselSlides[currentSlide]?.image || "/banners/Men_s Fashion.png"}
                 alt={carouselSlides[currentSlide]?.title || "Just Becho"}
@@ -720,7 +765,7 @@ function HomeContent() {
               <div className="absolute inset-0 bg-black/30"></div>
               
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4 z-10">
-                <div className={`transform transition-all duration-700 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'} text-center`}>
+                <div className={`transform transition-all duration-700 ${isTransitioning ? 'translate-x-[-50px] opacity-0' : 'translate-x-0 opacity-100'} text-center`}>
                   <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light tracking-widest uppercase mb-4 sm:mb-6 md:mb-8">
                     {carouselSlides[currentSlide]?.title || "JUST BECHO"}
                   </h1>
@@ -770,18 +815,9 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - FIXED: Simple smooth marquee */}
+        {/* ✅ 3. Brand Carousel - UPDATED: Super Smooth Marquee */}
         <section className="py-10 sm:py-12 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl font-light tracking-widest uppercase">
-                POPULAR BRANDS IN JUST BECHO
-              </h2>
-              <p className="text-gray-600 text-sm sm:text-base font-light mt-1 sm:mt-2">
-                Explore luxury brands across all categories
-              </p>
-            </div>
-
             <BrandMarquee />
           </div>
         </section>
@@ -832,9 +868,6 @@ function HomeContent() {
               <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                 EXPLORE CATEGORIES
               </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
-                DISCOVER LUXURY ITEMS
-              </p>
             </div>
 
             {loading ? (
@@ -886,9 +919,6 @@ function HomeContent() {
               <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase">
                 SHOP BY BUDGET
               </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-2 sm:mt-3">
-                FIND LUXURY ITEMS WITHIN YOUR BUDGET
-              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 featured-collections-grid">
@@ -918,7 +948,7 @@ function HomeContent() {
                       <p className="text-xs sm:text-sm font-light opacity-90">
                         {collection.description}
                       </p>
-                      <div className="mt-2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="mt:2 sm:mt-4 flex items-center text-xs sm:text-sm font-light tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         <span>View Products</span>
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -973,7 +1003,8 @@ function HomeContent() {
                   <div className="text-center mt-8 sm:mt-12">
                     <button
                       onClick={() => router.push(category.href)}
-                      className="border border-black text-black font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-500 px-8 py-3 rounded-none"
+                      // ✅ UPDATED: Golden white background for premium look
+                      className="bg-gradient-to-r from-amber-50 to-amber-100 text-amber-900 border border-amber-200 font-light tracking-widest uppercase hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 transition-all duration-500 px-8 py-3 rounded-none shadow-md hover:shadow-lg"
                     >
                       → VIEW ALL {category.name.toUpperCase()}
                     </button>
