@@ -17,7 +17,6 @@ function HomeContent() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [categoriesFromBackend, setCategoriesFromBackend] = useState([])
   const [allCategoriesFromBackend, setAllCategoriesFromBackend] = useState([])
-  const [brandsFromBackend, setBrandsFromBackend] = useState([])
   
   // ✅ NEW: Auth Modal State
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -93,13 +92,106 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ BRAND MARQUEE CONFIGURATION - FIXED SPEED (Medium speed)
-  const BRAND_MARQUEE_SPEED = 30;
-
-  // ✅ Create marquee brands with proper animation
-  const createInfiniteMarquee = (brands) => {
-    if (!brands || brands.length === 0) return [];
-    return [...brands, ...brands, ...brands];
+  // ✅ UPDATED: SIMPLE MARQUEE - FIXED ALL BRANDS DISPLAY
+  const BrandMarquee = () => {
+    const containerRef = useRef(null);
+    const contentRef = useRef(null);
+    const animationRef = useRef(null);
+    const [isHovered, setIsHovered] = useState(false);
+    
+    // Duplicate brands for seamless loop
+    const duplicatedBrands = useMemo(() => {
+      return [...allBrands, ...allBrands, ...allBrands];
+    }, [allBrands]);
+    
+    // Start animation
+    useEffect(() => {
+      const animate = () => {
+        if (!contentRef.current || isHovered) return;
+        
+        // Move content left by 1px
+        const currentTransform = contentRef.current.style.transform || 'translateX(0px)';
+        const currentX = parseInt(currentTransform.replace('translateX(', '').replace('px)', '')) || 0;
+        
+        // Reset when fully scrolled
+        const contentWidth = contentRef.current.scrollWidth / 3; // Divide by 3 because we have 3 copies
+        if (Math.abs(currentX) >= contentWidth) {
+          contentRef.current.style.transform = 'translateX(0px)';
+        } else {
+          contentRef.current.style.transform = `translateX(${currentX - 1}px)`;
+        }
+        
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      
+      // Start animation
+      animationRef.current = requestAnimationFrame(animate);
+      
+      // Cleanup
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
+    }, [isHovered]);
+    
+    const handleMouseEnter = () => {
+      setIsHovered(true);
+    };
+    
+    const handleMouseLeave = () => {
+      setIsHovered(false);
+    };
+    
+    const handleTouchStart = () => {
+      setIsHovered(true);
+    };
+    
+    const handleTouchEnd = () => {
+      setTimeout(() => {
+        setIsHovered(false);
+      }, 100);
+    };
+    
+    return (
+      <div 
+        className="marquee-container w-full overflow-hidden py-4 sm:py-6"
+        ref={containerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div 
+          className="marquee-content flex items-center"
+          ref={contentRef}
+          style={{ 
+            width: 'fit-content',
+            willChange: 'transform',
+            transition: isHovered ? 'transform 0.3s ease' : 'none'
+          }}
+        >
+          {duplicatedBrands.map((brand, idx) => (
+            <div 
+              key={`${brand.name}-${idx}`} 
+              className="flex-shrink-0 px-4 sm:px-6 md:px-8"
+            >
+              <div className="relative h-12 w-28 sm:h-14 sm:w-32 md:h-16 md:w-36 flex items-center justify-center">
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-80 hover:opacity-100"
+                  onError={(e) => {
+                    e.target.src = brand.fallback || '/images/placeholder.jpg';
+                  }}
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   // ✅ Carousel slides from categories
@@ -532,185 +624,6 @@ function HomeContent() {
     testimonials[(testimonialStart + 4) % testimonials.length]
   ]
 
-  // ✅ UPDATED: Brand logo component for unified carousel - NOT CLICKABLE
-  const BrandLogo = ({ brand, index }) => {
-    const [imgSrc, setImgSrc] = useState(brand.logo);
-    const [hasError, setHasError] = useState(false);
-    
-    if (!brand || !brand.name) return null;
-
-    return (
-      <div 
-        key={index} 
-        className="flex-shrink-0 px-3 sm:px-4 md:px-5 brand-logo-hover tap-highlight"
-        title={brand.name}
-      >
-        <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
-          <img
-            src={imgSrc}
-            alt={brand.name}
-            className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-80 hover:opacity-100"
-            onError={(e) => {
-              if (!hasError && brand.fallback) {
-                setImgSrc(brand.fallback);
-                setHasError(true);
-              } else {
-                setImgSrc('/images/placeholder.jpg');
-              }
-            }}
-            loading="lazy"
-          />
-        </div>
-      </div>
-    )
-  }
-
-  // ✅ FIXED: Brand Marquee Component for unified brand carousel
-  const InfiniteBrandMarquee = ({ brands }) => {
-    const infiniteBrands = useMemo(() => createInfiniteMarquee(brands), [brands]);
-    const containerRef = useRef(null);
-    const contentRef = useRef(null);
-    const animationRef = useRef(null);
-    const startTimeRef = useRef(null);
-    const progressRef = useRef(0);
-    const isPausedRef = useRef(false);
-    const segmentWidthRef = useRef(0);
-    
-    const initAnimation = () => {
-      if (!contentRef.current || infiniteBrands.length === 0) return;
-      
-      const firstBrand = contentRef.current.children[0];
-      if (firstBrand) {
-        const brandWidth = firstBrand.offsetWidth + 40;
-        const originalBrandsCount = brands.length;
-        segmentWidthRef.current = brandWidth * originalBrandsCount;
-      }
-    };
-    
-    const animate = (timestamp) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp;
-      }
-      
-      if (isPausedRef.current) {
-        animationRef.current = requestAnimationFrame(animate);
-        return;
-      }
-      
-      const elapsed = timestamp - startTimeRef.current;
-      const totalDuration = BRAND_MARQUEE_SPEED * 1000;
-      
-      let progress = (elapsed % totalDuration) / totalDuration;
-      progressRef.current = progress;
-      
-      const translateX = -progress * segmentWidthRef.current;
-      
-      if (contentRef.current) {
-        contentRef.current.style.transform = `translateX(${translateX}px)`;
-      }
-      
-      animationRef.current = requestAnimationFrame(animate);
-    };
-    
-    const startAnimation = () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      
-      if (contentRef.current) {
-        contentRef.current.style.transition = 'none';
-        contentRef.current.style.transform = 'translateX(0)';
-      }
-      
-      startTimeRef.current = null;
-      initAnimation();
-      animationRef.current = requestAnimationFrame(animate);
-    };
-    
-    const pauseAnimation = () => {
-      isPausedRef.current = true;
-      if (contentRef.current) {
-        contentRef.current.style.transition = 'transform 0.1s ease-out';
-      }
-    };
-    
-    const resumeAnimation = () => {
-      isPausedRef.current = false;
-      if (contentRef.current) {
-        contentRef.current.style.transition = 'none';
-      }
-      
-      const currentProgress = progressRef.current;
-      const totalDuration = BRAND_MARQUEE_SPEED * 1000;
-      const elapsedTime = currentProgress * totalDuration;
-      
-      if (startTimeRef.current) {
-        startTimeRef.current = performance.now() - elapsedTime;
-      }
-    };
-    
-    useEffect(() => {
-      if (infiniteBrands.length > 0) {
-        const timer = setTimeout(() => {
-          startAnimation();
-        }, 100);
-        
-        return () => {
-          clearTimeout(timer);
-          if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current);
-          }
-        };
-      }
-    }, [infiniteBrands.length, brands.length]);
-    
-    const handleMouseEnter = () => {
-      pauseAnimation();
-    };
-    
-    const handleMouseLeave = () => {
-      resumeAnimation();
-    };
-    
-    const handleTouchStart = () => {
-      pauseAnimation();
-    };
-    
-    const handleTouchEnd = () => {
-      setTimeout(() => {
-        resumeAnimation();
-      }, 100);
-    };
-    
-    return (
-      <div 
-        className="marquee-container w-full overflow-hidden py-4 sm:py-6"
-        ref={containerRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div 
-          className="marquee-content flex"
-          ref={contentRef}
-          style={{ 
-            width: 'fit-content',
-            willChange: 'transform'
-          }}
-        >
-          {infiniteBrands.map((brand, idx) => (
-            <BrandLogo 
-              key={`${brand.name}-${idx}`} 
-              brand={brand} 
-              index={idx}
-            />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   // ✅ Product card render function
   const renderProductCard = (product) => {
     if (!product || !product._id) return null;
@@ -780,7 +693,7 @@ function HomeContent() {
         {/* ✅ 1. Header ke baad reduced gap - Pahle 24 thi, ab 16 kar di */}
         <div className="pt-16"></div>
         
-        {/* ✅ 2. Home Banner - DESKTOP PE FULL SCREEN HEIGHT WITH MARGIN TOP */}
+        {/* ✅ 2. Home Banner - FIXED: Mobile scroll pe enlarge issue solve kiya */}
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
@@ -799,6 +712,7 @@ function HomeContent() {
                 className="object-cover object-center"
                 priority
                 sizes="100vw"
+                style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
                 onError={(e) => {
                   e.target.src = '/images/hero-placeholder.jpg';
                 }}
@@ -856,7 +770,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - LIGHT BACKGROUND (MATCHES WEBSITE) */}
+        {/* ✅ 3. Brand Carousel - FIXED: Simple smooth marquee */}
         <section className="py-10 sm:py-12 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-6 sm:mb-8">
@@ -868,7 +782,7 @@ function HomeContent() {
               </p>
             </div>
 
-            <InfiniteBrandMarquee brands={allBrands} />
+            <BrandMarquee />
           </div>
         </section>
 
