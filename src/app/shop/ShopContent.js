@@ -405,13 +405,19 @@ export default function ShopContent() {
         })
     }, [products, filters])
 
+    // ✅ UPDATED: Sorting logic with all options
     const sortedProducts = useMemo(() => {
         return [...filteredProducts].sort((a, b) => {
             switch (sortBy) {
+                case 'alphabetical-az':
+                    return (a.productName || '').localeCompare(b.productName || '')
+                case 'alphabetical-za':
+                    return (b.productName || '').localeCompare(a.productName || '')
                 case 'price-low':
                     return (a.finalPrice || 0) - (b.finalPrice || 0)
                 case 'price-high':
                     return (b.finalPrice || 0) - (a.finalPrice || 0)
+                case 'newest':
                 default:
                     return new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
             }
@@ -449,22 +455,6 @@ export default function ShopContent() {
                     <div className="absolute top-2 left-2">
                         <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
                             {product.condition}
-                        </span>
-                    </div>
-                )}
-
-                {product.views > 0 && (
-                    <div className="absolute bottom-2 left-2">
-                        <span className="text-white text-xs bg-black/70 px-2 py-1 rounded-full">
-                            👁️ {product.views}
-                        </span>
-                    </div>
-                )}
-
-                {product.likes > 0 && (
-                    <div className="absolute bottom-2 right-2">
-                        <span className="text-white text-xs bg-red-500/70 px-2 py-1 rounded-full">
-                            ❤️ {product.likes}
                         </span>
                     </div>
                 )}
@@ -609,6 +599,7 @@ export default function ShopContent() {
                                     )}
                                 </button>
                                 
+                                {/* ✅ UPDATED: Mobile sorting dropdown */}
                                 <div className="flex-1">
                                     <select
                                         value={sortBy}
@@ -616,6 +607,8 @@ export default function ShopContent() {
                                         className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
                                     >
                                         <option value="newest">Newest First</option>
+                                        <option value="alphabetical-az">Alphabetical A-Z</option>
+                                        <option value="alphabetical-za">Alphabetical Z-A</option>
                                         <option value="price-low">Price: Low to High</option>
                                         <option value="price-high">Price: High to Low</option>
                                     </select>
@@ -715,20 +708,7 @@ export default function ShopContent() {
 
                                 {/* Filters Content */}
                                 <div className="p-4 space-y-6 pb-24">
-                                    {/* Budget Info */}
-                                    {config.maxPrice && (
-                                        <div className="p-4 bg-gray-100 border border-gray-200 rounded-lg">
-                                            <h4 className="text-gray-900 text-sm font-medium mb-1">
-                                                BUDGET RANGE
-                                            </h4>
-                                            <p className="text-gray-600 text-sm">
-                                                All products under ₹{config.maxPrice.toLocaleString()}
-                                            </p>
-                                            <p className="text-gray-500 text-xs mt-1">
-                                                Max price is auto-set to ₹{config.maxPrice.toLocaleString()}
-                                            </p>
-                                        </div>
-                                    )}
+                                   
 
                                     {/* Brands Filter */}
                                     {availableBrands.length > 0 && (
@@ -1156,12 +1136,15 @@ export default function ShopContent() {
                                     </div>
 
                                     <div className="flex items-center gap-4">
+                                        {/* ✅ UPDATED: Desktop sorting dropdown */}
                                         <select
                                             value={sortBy}
                                             onChange={(e) => setSortBy(e.target.value)}
                                             className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
                                         >
                                             <option value="newest">Newest First</option>
+                                            <option value="alphabetical-az">Alphabetical A-Z</option>
+                                            <option value="alphabetical-za">Alphabetical Z-A</option>
                                             <option value="price-low">Price: Low to High</option>
                                             <option value="price-high">Price: High to Low</option>
                                         </select>

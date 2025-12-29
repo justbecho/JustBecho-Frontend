@@ -1019,24 +1019,7 @@ export default function Header() {
               {!searchQuery.trim() && (
                 <div className="p-4">
                   <h3 className="text-sm font-medium text-gray-900 mb-3">Popular Searches</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {['Shoes', 'Watches', 'Bags', 'Shirts', 'Jeans', 'Perfumes', 'Wallets'].map((term) => (
-                      <button
-                        key={term}
-                        onClick={() => {
-                          setSearchQuery(term);
-                          setTimeout(() => {
-                            if (searchInputRef.current) {
-                              searchInputRef.current.focus();
-                            }
-                          }, 50);
-                        }}
-                        className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
-                      >
-                        {term}
-                      </button>
-                    ))}
-                  </div>
+                  
                 </div>
               )}
 

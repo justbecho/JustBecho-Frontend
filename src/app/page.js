@@ -740,23 +740,23 @@ function HomeContent() {
           />
           {safeCondition && (
             <div className="absolute top-2 left-2 z-10">
-              <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full mobile-text-xs">
+              <span className="text-gray-900 text-xs font-light tracking-widest uppercase bg-white px-2 py-1 rounded-full">
                 {safeCondition.toUpperCase()}
               </span>
             </div>
           )}
         </div>
         <div className="text-left px-1">
-          <h3 className="text-gray-800 text-xs sm:text-sm font-light tracking-widest uppercase mb-1 line-clamp-2 mobile-text-sm">
+          <h3 className="text-gray-800 text-xs sm:text-sm font-light tracking-widest uppercase mb-1 line-clamp-2">
             {safeProductName.toUpperCase()}
           </h3>
           <div className="flex items-center justify-between">
-            <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mobile-text-sm">
+            <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase">
               ₹{product.finalPrice?.toLocaleString() || '0'}
             </p>
           </div>
           {product.originalPrice && product.originalPrice > product.finalPrice && (
-            <p className="text-gray-500 text-xs sm:text-sm line-through mobile-text-xs">
+            <p className="text-gray-500 text-xs sm:text-sm line-through">
               ₹{product.originalPrice.toLocaleString()}
             </p>
           )}
@@ -780,8 +780,8 @@ function HomeContent() {
         {/* ✅ 1. Header ke baad reduced gap - Pahle 24 thi, ab 16 kar di */}
         <div className="pt-16"></div>
         
-        {/* ✅ 2. Home Banner - FULL SCREEN HEIGHT ON MOBILE AND DESKTOP */}
-        <section className="relative h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] overflow-hidden">
+        {/* ✅ 2. Home Banner - DESKTOP PE FULL SCREEN HEIGHT WITH MARGIN TOP */}
+        <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
@@ -796,26 +796,26 @@ function HomeContent() {
                 src={carouselSlides[currentSlide]?.image || "/banners/Men_s Fashion.png"}
                 alt={carouselSlides[currentSlide]?.title || "Just Becho"}
                 fill
-                className="object-cover object-center brightness-110 contrast-105 saturate-110"
+                className="object-cover object-center"
                 priority
                 sizes="100vw"
                 onError={(e) => {
                   e.target.src = '/images/hero-placeholder.jpg';
                 }}
               />
-              <div className="absolute inset-0 bg-black/40"></div>
+              <div className="absolute inset-0 bg-black/30"></div>
               
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4 z-10">
                 <div className={`transform transition-all duration-700 ${isTransitioning ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'} text-center`}>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-light tracking-widest uppercase mb-3 sm:mb-4 md:mb-6">
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light tracking-widest uppercase mb-4 sm:mb-6 md:mb-8">
                     {carouselSlides[currentSlide]?.title || "JUST BECHO"}
                   </h1>
-                  <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-light tracking-widest uppercase mb-4 sm:mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+                  <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-4">
                     {carouselSlides[currentSlide]?.description || "Luxury Reborn • Trust Redefined"}
                   </p>
                   <Link
                     href={carouselSlides[currentSlide]?.href || "/products"}
-                    className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block px-8 py-3 sm:px-10 sm:py-4 text-sm sm:text-base"
+                    className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block px-10 py-4 sm:px-12 sm:py-5 text-base sm:text-lg shadow-lg hover:shadow-xl"
                   >
                     EXPLORE NOW
                   </Link>
@@ -825,30 +825,30 @@ function HomeContent() {
 
             <button
               onClick={prevSlide}
-              className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group mobile-hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
+              className="absolute left-4 sm:left-6 md:left-8 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group mobile-hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14"
               aria-label="Previous slide"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             
             <button
               onClick={nextSlide}
-              className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group mobile-hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
+              className="absolute right-4 sm:right-6 md:right-8 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group mobile-hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14"
               aria-label="Next slide"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
 
-            <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-1 sm:space-x-2">
+            <div className="absolute bottom-6 sm:bottom-10 md:bottom-12 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2 sm:space-x-3">
               {carouselSlides.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
+                  className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'}`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
@@ -856,14 +856,14 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - DARKER BACKGROUND */}
-        <section className="py-8 sm:py-12 bg-gray-800 border-t border-gray-700">
+        {/* ✅ 3. Brand Carousel - LIGHT BACKGROUND (MATCHES WEBSITE) */}
+        <section className="py-10 sm:py-12 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase">
+              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl font-light tracking-widest uppercase">
                 POPULAR BRANDS IN JUST BECHO
               </h2>
-              <p className="text-gray-300 text-sm sm:text-base font-light mt-1 sm:mt-2">
+              <p className="text-gray-600 text-sm sm:text-base font-light mt-1 sm:mt-2">
                 Explore luxury brands across all categories
               </p>
             </div>
