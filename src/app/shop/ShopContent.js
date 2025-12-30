@@ -500,9 +500,9 @@ export default function ShopContent() {
     return (
         <>
             <Header />
-
-            <div className="bg-white">
-                <div className="pt-32 md:pt-36"></div>
+            
+            {/* Main content with proper header padding */}
+            <div className="bg-white pt-[5rem] md:pt-[8rem]">
 
                 {/* ✅ Hero Banner */}
                 <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
@@ -963,7 +963,7 @@ export default function ShopContent() {
                                                         </span>
                                                         <span className="text-gray-400 text-xs ml-auto">
                                                             ({products.filter(p => p.category === category).length})
-                                                        </span>
+                                                            </span>
                                                     </label>
                                                 ))}
                                             </div>
