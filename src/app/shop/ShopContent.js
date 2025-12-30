@@ -61,19 +61,19 @@ export default function ShopContent() {
             whyTitle: "WHY SHOP UNDER ₹20K AT JUST BECHO",
             features: [
                 {
-                    icon: '💰',
-                    title: 'AFFORDABLE LUXURY',
-                    description: 'Get authentic luxury items at 50-80% off retail prices'
-                },
-                {
                     icon: '🛡️',
                     title: 'AUTHENTICITY GUARANTEED',
-                    description: 'Every item verified by our luxury experts'
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
                 },
                 {
                     icon: '🚚',
-                    title: 'FREE SHIPPING',
-                    description: 'Free shipping on all orders above ₹1999'
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
                 }
             ],
             color: 'bg-yellow-600'
@@ -86,19 +86,19 @@ export default function ShopContent() {
             whyTitle: "WHY SHOP UNDER ₹40K AT JUST BECHO",
             features: [
                 {
-                    icon: '💎',
-                    title: 'PREMIUM LUXURY',
-                    description: 'Get premium luxury items at 50-70% off retail prices'
-                },
-                {
                     icon: '🛡️',
                     title: 'AUTHENTICITY GUARANTEED',
-                    description: 'Every item verified by our luxury experts'
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
                 },
                 {
                     icon: '🚚',
-                    title: 'FREE SHIPPING',
-                    description: 'Free shipping on all orders above ₹1999'
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
                 }
             ],
             color: 'bg-blue-600'
@@ -110,20 +110,20 @@ export default function ShopContent() {
             maxPrice: 60000,
             whyTitle: "WHY SHOP UNDER ₹60K AT JUST BECHO",
             features: [
-                {
-                    icon: '👑',
-                    title: 'HIGH-END LUXURY',
-                    description: 'Get high-end luxury items at 40-60% off retail prices'
-                },
-                {
+                 {
                     icon: '🛡️',
                     title: 'AUTHENTICITY GUARANTEED',
-                    description: 'Every item verified by our luxury experts'
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
                 },
                 {
                     icon: '🚚',
-                    title: 'FREE SHIPPING',
-                    description: 'Free shipping on all orders above ₹1999'
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
                 }
             ],
             color: 'bg-purple-600'
@@ -138,7 +138,7 @@ export default function ShopContent() {
                 {
                     icon: '🛡️',
                     title: 'AUTHENTICITY GUARANTEED',
-                    description: 'Every product verified by luxury experts'
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
                 },
                 {
                     icon: '💎',
@@ -505,7 +505,7 @@ export default function ShopContent() {
             <div className="bg-white pt-[5rem] md:pt-[8rem]">
 
                 {/* ✅ Hero Banner */}
-                <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
+                <div className="relative w-full h-[30vh] md:h-[60vh] overflow-hidden">
                     <div className="absolute inset-0">
                         <Image
                             src={config.banner || '/banners/default-banner.jpg'}

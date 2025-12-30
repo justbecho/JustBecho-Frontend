@@ -2,6 +2,7 @@
 
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import BrandMarquee from '@/components/BrandMarquee' // ✅ Import the new component
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo, Suspense, useRef } from 'react'
@@ -26,57 +27,6 @@ function HomeContent() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const carouselIntervalRef = useRef(null)
 
-  // ✅ UPDATED: All brands combined into single array for unified carousel
-  const allBrands = useMemo(() => [
-    { name: "Balenciaga", logo: "/brandslogo/mens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png", category: "Men's Fashion" },
-    { name: "Armani", logo: "/brandslogo/mens-fashion/Armani.png", fallback: "/brands/armani.png", category: "Men's Fashion" },
-    { name: "Prada", logo: "/brandslogo/mens-fashion/Prada.png", fallback: "/brands/prada.png", category: "Men's Fashion" },
-    { name: "Versace", logo: "/brandslogo/mens-fashion/Versace.png", fallback: "/brands/versace.png", category: "Men's Fashion" },
-    { name: "Louis Vuitton", logo: "/brandslogo/mens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png", category: "Men's Fashion" },
-    { name: "Gucci", logo: "/brandslogo/mens-fashion/Gucci.png", fallback: "/brands/gucci.png", category: "Men's Fashion" },
-    { name: "Burberry", logo: "/brandslogo/mens-fashion/Burberry.png", fallback: "/brands/burberry.png", category: "Men's Fashion" },
-    { name: "Fendi", logo: "/brandslogo/mens-fashion/Fendi.png", fallback: "/brands/fendi.png", category: "Men's Fashion" },
-    
-    // Women's Fashion brands
-    { name: "Balenciaga", logo: "/brandslogo/womens-fashion/Balenciaga.png", fallback: "/brands/Balenciaga.png", category: "Women's Fashion" },
-    { name: "Dior", logo: "/brandslogo/womens-fashion/Dior.png", fallback: "/brands/dior.png", category: "Women's Fashion" },
-    { name: "Chanel", logo: "/brandslogo/womens-fashion/Chanel.png", fallback: "/brands/chanel.png", category: "Women's Fashion" },
-    { name: "Louis Vuitton", logo: "/brandslogo/womens-fashion/Louis Vuitton.png", fallback: "/brands/louis-vuiton.png", category: "Women's Fashion" },
-    { name: "Gucci", logo: "/brandslogo/womens-fashion/Gucci.png", fallback: "/brands/gucci.png", category: "Women's Fashion" },
-    { name: "Givenchy", logo: "/brandslogo/womens-fashion/Givenchy.png", fallback: "/brands/givenchy.png", category: "Women's Fashion" },
-    { name: "Dolce & Gabbana", logo: "/brandslogo/womens-fashion/Dolce & Gabbana.png", fallback: "/brands/dolce-gabbana.png", category: "Women's Fashion" },
-    
-    // Footwear brands
-    { name: "Nike", logo: "/brandslogo/footwear/Nike.png", fallback: "/brands/gucci.png", category: "Footwear" },
-    { name: "Adidas", logo: "/brandslogo/footwear/Adidas.png", fallback: "/brands/jimmy-choo.png", category: "Footwear" },
-    { name: "Puma", logo: "/brandslogo/footwear/Puma.jpg", fallback: "/brands/Balenciaga.png", category: "Footwear" },
-    { name: "Converse", logo: "/brandslogo/footwear/Converse.png", fallback: "/brands/Balenciaga.png", category: "Footwear" },
-    { name: "Crocs", logo: "/brandslogo/footwear/Crocs.png", fallback: "/brands/jimmy-choo.png", category: "Footwear" },
-    { name: "Hoka", logo: "/brandslogo/footwear/Hoka.png", fallback: "/brands/puma.png", category: "Footwear" },
-    
-    // Accessories brands
-    { name: "Cartier", logo: "/brandslogo/Accessories/Cartier.jpg", fallback: "/brands/nike.png", category: "Accessories" },
-    { name: "Gucci", logo: "/brandslogo/Accessories/Gucci.png", fallback: "/brands/baggit.png", category: "Accessories" },
-    { name: "Prada", logo: "/brandslogo/Accessories/Prada.jpg", fallback: "/brands/baggit.png", category: "Accessories" },
-    
-    // Watches brands
-    { name: "Rolex", logo: "/brandslogo/watches/rolexx.jpeg", fallback: "/brands/baggit.png", category: "Watches" },
-    { name: "Omega", logo: "/brandslogo/watches/OMEGA.png", fallback: "/brands/OMEGA.png", category: "Watches" },
-    { name: "Armani", logo: "/brandslogo/watches/Armani.png", fallback: "/brands/Armani.png", category: "Watches" },
-    
-    // Perfumes brands
-    { name: "Chanel", logo: "/brandslogo/perfumes/Chanel.png", fallback: "/brands/baggit.png", category: "Perfumes" },
-    { name: "Dior", logo: "/brandslogo/perfumes/Dior.png", fallback: "/brands/ray-ban.png", category: "Perfumes" },
-    { name: "Gucci", logo: "/brandslogo/perfumes/Gucci.png", fallback: "/brands/baggit.png", category: "Perfumes" },
-    
-    // Toys & Collectibles
-    { name: "Bearbrick", logo: "/brandslogo/toys/Bearbrick.png", fallback: "/brands/Bearbrick.png", category: "TOYS & COLLECTIBLES" },
-    { name: "KAWS", logo: "/brandslogo/toys/KAWS.png", fallback: "/brands/ray-ban.png", category: "TOYS & COLLECTIBLES" },
-    
-    // Kid's Fashion
-    { name: "Pokemon", logo: "/brandslogo/toys/Pokemon.png", fallback: "/brands/wildhorn.jpg", category: "KID'S FASHION" }
-  ], [])
-
   // ✅ Category images mapping for carousel
   const categoryImages = useMemo(() => ({
     "Men's Fashion": "/banners/mensnew.jpeg",
@@ -90,70 +40,6 @@ function HomeContent() {
     "INFLUENCER": "/banners/default.jpg",
     "default": "/banners/default.jpg"
   }), [])
-
-  // ✅ UPDATED: BRAND CAROUSEL - IMPROVED ANIMATION CONTROL
-  const BrandMarquee = () => {
-    // Duplicate brands 3 times for seamless looping
-    const duplicatedBrands = useMemo(() => {
-      return [...allBrands, ...allBrands, ...allBrands];
-    }, [allBrands]);
-    
-    return (
-      <div 
-        className="marquee-container w-full overflow-hidden py-3 sm:py-4 relative"
-        id="brand-marquee-container"
-      >
-        {/* ✅ PURE CSS ANIMATION - With JavaScript control for pause/resume */}
-        <div 
-          className="flex items-center animate-fast-smooth-marquee whitespace-nowrap"
-          id="brand-marquee-track"
-        >
-          {duplicatedBrands.map((brand, idx) => (
-            <div 
-              key={`${brand.name}-${idx}`} 
-              className="flex-shrink-0 px-4 sm:px-6"
-            >
-              <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
-                <img
-                  src={brand.logo}
-                  alt={brand.name}
-                  className="max-h-full max-w-full w-auto h-auto object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-80 hover:opacity-100"
-                  onError={(e) => {
-                    e.target.src = brand.fallback || '/images/placeholder.jpg';
-                  }}
-                  loading="lazy"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Gradient overlays for smooth edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-r from-gray-100 to-transparent pointer-events-none z-10"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
-      </div>
-    );
-  };
-
-  // ✅ Function to pause brand marquee
-  const pauseBrandMarquee = () => {
-    if (typeof window !== 'undefined') {
-      const marqueeTrack = document.getElementById('brand-marquee-track');
-      if (marqueeTrack) {
-        marqueeTrack.style.animationPlayState = 'paused';
-      }
-    }
-  };
-
-  // ✅ Function to resume brand marquee
-  const resumeBrandMarquee = () => {
-    if (typeof window !== 'undefined') {
-      const marqueeTrack = document.getElementById('brand-marquee-track');
-      if (marqueeTrack) {
-        marqueeTrack.style.animationPlayState = 'running';
-      }
-    }
-  };
 
   // ✅ Carousel slides from categories
   const carouselSlides = useMemo(() => {
@@ -396,74 +282,35 @@ function HomeContent() {
     router.push(`/shop?budget=${filterType}`)
   }
 
-  // ✅ UPDATED: SIMPLE CAROUSEL - With proper brand marquee control
+  // ✅ SIMPLIFIED: Home banner carousel - NO BRAND INTERFERENCE
   const nextSlide = () => {
-    // ✅ Pause brand carousel when home banner image changes
-    pauseBrandMarquee();
-    
-    setCurrentSlide((prev) => {
-      const nextSlideIndex = (prev + 1) % carouselSlides.length
-      
-      // ✅ Resume brand carousel after 300ms (shorter pause)
-      setTimeout(() => {
-        resumeBrandMarquee();
-      }, 300)
-      
-      return nextSlideIndex
-    })
-  }
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+  };
 
   const prevSlide = () => {
-    // ✅ Pause brand carousel when home banner image changes
-    pauseBrandMarquee();
-    
-    setCurrentSlide((prev) => {
-      const prevSlideIndex = (prev - 1 + carouselSlides.length) % carouselSlides.length
-      
-      // ✅ Resume brand carousel after 300ms
-      setTimeout(() => {
-        resumeBrandMarquee();
-      }, 300)
-      
-      return prevSlideIndex
-    })
-  }
+    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+  };
 
   const goToSlide = (index) => {
     if (index !== currentSlide) {
-      // ✅ Pause brand carousel when manually changing slide
-      pauseBrandMarquee();
-      
-      setCurrentSlide(index)
-      
-      // ✅ Resume brand carousel after 300ms
-      setTimeout(() => {
-        resumeBrandMarquee();
-      }, 300)
+      setCurrentSlide(index);
     }
-  }
+  };
 
-  // ✅ Start carousel auto-play - WITH BRAND CAROUSEL PAUSE CONTROL
+  // ✅ SIMPLE INTERVAL - NO BRAND CAROUSEL INTERFERENCE
   useEffect(() => {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
-        // ✅ Pause brand carousel when auto-changing slide
-        pauseBrandMarquee();
-        setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
-        
-        // ✅ Resume brand carousel after 300ms
-        setTimeout(() => {
-          resumeBrandMarquee();
-        }, 300)
-      }, 4000); // 4 seconds interval
+        setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+      }, 4000);
+      
+      return () => {
+        if (carouselIntervalRef.current) {
+          clearInterval(carouselIntervalRef.current);
+        }
+      };
     }
-    
-    return () => {
-      if (carouselIntervalRef.current) {
-        clearInterval(carouselIntervalRef.current)
-      }
-    };
-  }, [carouselSlides.length])
+  }, [carouselSlides.length]);
 
   // ✅ Helper function to get category image
   const getCategoryImage = (categoryName) => {
@@ -674,10 +521,10 @@ function HomeContent() {
       )}
       
       <div className="bg-white">
-        {/* ✅ 1. Header ke baad reduced gap - Pahle 24 thi, ab 16 kar di */}
+        {/* ✅ 1. Header ke baad reduced gap */}
         <div className="pt-16"></div>
         
-        {/* ✅ 2. Home Banner - UPDATED: Fixed image fit and smooth transition */}
+        {/* ✅ 2. Home Banner */}
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
@@ -689,14 +536,11 @@ function HomeContent() {
             onMouseLeave={() => {
               if (carouselSlides.length > 1) {
                 carouselIntervalRef.current = setInterval(() => {
-                  pauseBrandMarquee();
                   setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
-                  setTimeout(() => resumeBrandMarquee(), 300)
                 }, 4000)
               }
             }}
           >
-            {/* Simple Swipe Transition - Text and Image together */}
             <div className="absolute inset-0">
               {carouselSlides.map((slide, index) => (
                 <div
@@ -709,7 +553,6 @@ function HomeContent() {
                         : 'opacity-0 translate-x-full'
                   }`}
                 >
-                  {/* ✅ UPDATED: Image ko pure banner area mein fit karne ke liye - object-contain se object-cover */}
                   <div className="absolute inset-0 bg-gray-900">
                     <Image
                       src={slide.image}
@@ -784,14 +627,10 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - UPDATED: FASTER ANIMATION (12s) */}
-        <section className="py-6 sm:py-8 bg-gray-100 border-t border-gray-200">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <BrandMarquee />
-          </div>
-        </section>
+        {/* ✅ 3. Brand Carousel - SEPARATE COMPONENT */}
+        <BrandMarquee />
 
-        {/* ✅ 4. How It Works (after brand carousel) */}
+        {/* ✅ 4. How It Works */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -830,7 +669,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 5. Explore Categories - सभी categories दिखाएंगे (सिर्फ Influencer को छोड़कर) */}
+        {/* ✅ 5. Explore Categories */}
         <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -931,7 +770,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 7. Category-wise Products - सिर्फ 3 CATEGORIES (Men's, Women's, Footwear) */}
+        {/* ✅ 7. Category-wise Products */}
         {categoriesFromBackend.map((category, index) => {
           const products = categoryProducts[category.name] || [];
 
@@ -970,13 +809,13 @@ function HomeContent() {
                   )}
 
                   <div className="text-center mt-8 sm:mt-12">
+                    {/* ✅ UPDATED: DARK BLUE BUTTON (CTA section ka same color - bg-gray-900) */}
                     <button
                       onClick={() => router.push(category.href)}
-                      // ✅ UPDATED: Premium Textured Gold Button (logo color ka)
-                      className="bg-gradient-to-r from-[#D4AF37] via-[#B8860B] to-[#DAA520] text-white font-light tracking-widest uppercase hover:from-[#B8860B] hover:via-[#D4AF37] hover:to-[#B8860B] transition-all duration-500 px-8 py-3 rounded-none shadow-lg hover:shadow-xl border border-amber-400/30 relative overflow-hidden group"
+                      className="bg-gray-900 hover:bg-gray-800 text-white font-light tracking-widest uppercase transition-all duration-300 px-8 py-3 rounded-full shadow-lg hover:shadow-xl border border-gray-700 relative overflow-hidden group"
                     >
                       <span className="relative z-10">→ VIEW ALL {category.name.toUpperCase()}</span>
-                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                     </button>
                   </div>
                 </div>
@@ -1079,7 +918,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 1. Why Choose Just Becho (moved to just before footer) */}
+        {/* ✅ Why Choose Just Becho */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
             <div className="text-center mb-8 sm:mb-12">
@@ -1119,6 +958,7 @@ function HomeContent() {
               Join India's most trusted managed marketplace for pre-loved and brand new luxury
             </p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+              {/* ✅ "Sell With Confidence" button same white border style (unchanged) */}
               <button
                 onClick={handleSellNowClick}
                 className="border border-white text-white font-light tracking-widest uppercase hover:bg-white hover:text-gray-900 transition-all duration-300 rounded-full px-6 py-3"

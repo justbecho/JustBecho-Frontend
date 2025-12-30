@@ -1180,19 +1180,6 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">WISHLIST</span>
                 </button>
                 
-                {/* Mobile Cart */}
-                {cartApiAvailable && (
-                  <button 
-                    onClick={handleMobileCartClick}
-                    className="flex items-center w-full py-3 px-4 text-gray-900 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-300 text-left"
-                  >
-                    <FiShoppingBag className="w-5 h-5 mr-4 text-gray-900" />
-                    <span className="font-light tracking-widest uppercase">
-                      CART {cartCount > 0 && `(${cartCount})`}
-                    </span>
-                  </button>
-                )}
-
                 {/* USER SPECIFIC LINKS */}
                 {user ? (
                   <>

@@ -1,4 +1,4 @@
-/* globals.css - UPDATED WITH FASTER BRAND CAROUSEL */
+/* globals.css - SIMPLIFIED VERSION */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -20,266 +20,6 @@ body {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-}
-
-/* ✅ UPDATED: FASTER Brand Carousel Animation */
-@keyframes fastSmoothMarquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-33.33%);
-  }
-}
-
-.animate-fast-smooth-marquee {
-  animation: fastSmoothMarquee 12s linear infinite !important; /* ✅ FASTER: 12 seconds */
-}
-
-/* ✅ UPDATED: Different speed for mobile */
-@media (max-width: 768px) {
-  .animate-fast-smooth-marquee {
-    animation-duration: 15s !important; /* ✅ Mobile ke liye: 15s */
-  }
-}
-
-/* ✅ UPDATED: Hover effect for brand carousel */
-.marquee-container:hover .animate-fast-smooth-marquee {
-  animation-play-state: paused !important;
-}
-
-/* ✅ UPDATED: Animation pause/resume control */
-.animation-paused {
-  animation-play-state: paused !important;
-}
-
-.animation-running {
-  animation-play-state: running !important;
-}
-
-/* ✅ UPDATED: Banner Content Positioning for Mobile & Desktop */
-.carousel-content {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  z-index: 20;
-}
-
-/* Mobile: Content bottom mein */
-@media (max-width: 768px) {
-  .carousel-content {
-    bottom: 80px;
-    top: auto;
-    transform: none;
-    padding: 0 1rem;
-  }
-  
-  .carousel-title {
-    font-size: 1.5rem !important;
-    margin-bottom: 0.5rem !important;
-  }
-  
-  .carousel-description {
-    font-size: 0.875rem !important;
-    margin-bottom: 1rem !important;
-    line-height: 1.4;
-  }
-  
-  .carousel-button {
-    padding: 0.75rem 1.5rem !important;
-    font-size: 0.875rem !important;
-  }
-}
-
-/* Desktop: Content center mein */
-@media (min-width: 769px) {
-  .carousel-content {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
-/* ✅ UPDATED: FASTER Marquee Animations for Brands - MOBILE SLOWER */
-@keyframes faster-marquee-mobile {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-@keyframes faster-marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-.animate-faster-marquee-mobile {
-  animation: faster-marquee-mobile 22s linear infinite !important; /* ✅ MOBILE: 22s (dheere) */
-}
-
-.animate-faster-marquee {
-  animation: faster-marquee 15s linear infinite !important; /* ✅ DESKTOP: 15s (fast) */
-}
-
-/* ✅ UPDATED: SINGLE MARQUEE CONTAINER (No duplicate marquees) */
-.marquee-container {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 5%,
-    black 95%,
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 5%,
-    black 95%,
-    transparent
-  );
-}
-
-/* ✅ SMOOTH INFINITE MARQUEE WITHOUT GLITCH */
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: faster-marquee 15s linear infinite;
-  will-change: transform;
-}
-
-.marquee-track-mobile {
-  display: flex;
-  width: max-content;
-  animation: faster-marquee-mobile 22s linear infinite; /* ✅ MOBILE: 22s */
-  will-change: transform;
-}
-
-/* ✅ FIX: Prevent hover pause causing glitch */
-.marquee-track:hover,
-.marquee-track-mobile:hover {
-  animation-play-state: paused;
-}
-
-/* ✅ SEAMLESS INFINITE LOOP TECHNIQUE */
-.marquee-infinite {
-  display: flex;
-  position: relative;
-}
-
-.marquee-infinite::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 100%;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1));
-  pointer-events: none;
-}
-
-/* ✅ SMOOTH TRANSITION FOR LAST TO FIRST LOGO */
-@keyframes seamless-loop {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.marquee-seamless {
-  display: flex;
-  animation: seamless-loop 15s linear infinite; /* ✅ DESKTOP: 15s */
-}
-
-.marquee-seamless-mobile {
-  display: flex;
-  animation: seamless-loop 22s linear infinite !important; /* ✅ MOBILE: 22s (dheere) */
-}
-
-/* ✅ MOBILE: Hide desktop marquee, Show mobile marquee */
-@media (max-width: 768px) {
-  .marquee-desktop {
-    display: none !important;
-  }
-  
-  .marquee-mobile {
-    display: flex !important;
-  }
-  
-  .animate-faster-marquee-mobile {
-    animation: faster-marquee-mobile 22s linear infinite !important; /* ✅ MOBILE: 22s (dheere) */
-  }
-  
-  .marquee-track-mobile {
-    animation: faster-marquee-mobile 22s linear infinite !important; /* ✅ MOBILE: 22s */
-  }
-  
-  .marquee-seamless-mobile {
-    animation: seamless-loop 22s linear infinite !important; /* ✅ MOBILE: 22s */
-  }
-}
-
-/* ✅ DESKTOP: Hide mobile marquee, Show desktop marquee */
-@media (min-width: 769px) {
-  .marquee-desktop {
-    display: flex !important;
-  }
-  
-  .marquee-mobile {
-    display: none !important;
-  }
-  
-  .animate-faster-marquee {
-    animation: faster-marquee 15s linear infinite !important; /* ✅ DESKTOP: 15s (fast) */
-  }
-  
-  .marquee-track {
-    animation: faster-marquee 15s linear infinite !important; /* ✅ DESKTOP: 15s */
-  }
-  
-  .marquee-seamless {
-    animation: seamless-loop 15s linear infinite !important; /* ✅ DESKTOP: 15s */
-  }
-}
-
-/* ✅ UPDATED: Carousel Animations */
-@keyframes slideInFromRight {
-  0% { transform: translateX(100%); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideOutToLeft {
-  0% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateX(-100%); opacity: 0; }
-}
-
-.carousel-slide-in {
-  animation: slideInFromRight 1s ease-out forwards;
-}
-
-.carousel-slide-out {
-  animation: slideOutToLeft 1s ease-out forwards;
-}
-
-/* Fade transition for carousel */
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-.carousel-fade-in {
-  animation: fadeIn 1.2s ease-out forwards;
-}
-
-.carousel-fade-out {
-  animation: fadeOut 0.8s ease-out forwards;
 }
 
 /* Mobile optimizations */
@@ -401,171 +141,6 @@ html {
   }
 }
 
-/* Base animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes marquee-mobile {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes slideOutLeft {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(-100%); opacity: 0; }
-}
-
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes bounceSoft {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-5px);
-  }
-  60% {
-    transform: translateY(-3px);
-  }
-}
-
-@keyframes pulseSoft {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -468px 0;
-  }
-  100% {
-    background-position: 468px 0;
-  }
-}
-
-/* Animation classes */
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-fade-in-down {
-  animation: fadeInDown 0.6s ease-out;
-}
-
-.animate-fade-in-left {
-  animation: fadeInLeft 0.6s ease-out;
-}
-
-.animate-fade-in-right {
-  animation: fadeInRight 0.6s ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.5s ease-out;
-}
-
-.animate-bounce-soft {
-  animation: bounceSoft 2s infinite;
-}
-
-.animate-pulse-soft {
-  animation: pulseSoft 2s infinite;
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
-  background-size: 800px 104px;
-}
-
-.animate-marquee {
-  animation: marquee 40s linear infinite;
-}
-
-.animate-marquee-mobile {
-  animation: marquee-mobile 30s linear infinite;
-}
-
-.slide-out-left {
-  animation: slideOutLeft 0.5s ease-in-out forwards;
-}
-
-.slide-in-right {
-  animation: slideInRight 0.5s ease-in-out forwards;
-}
-
 /* Line clamp utilities */
 .line-clamp-1 {
   display: -webkit-box;
@@ -639,12 +214,13 @@ input:focus-visible {
   animation: shimmer 1.5s infinite;
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #000 0%, #333 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
 }
 
 /* Luxury shadow effects */
@@ -666,10 +242,6 @@ input:focus-visible {
 /* Custom transitions */
 .transition-smooth {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.transition-bounce {
-  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* Hide scrollbar but keep functionality */
@@ -698,56 +270,11 @@ input:focus-visible {
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
 }
 
-/* Gradient borders */
-.gradient-border {
-  position: relative;
-  background: white;
-}
-
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  padding: 2px;
-  background: linear-gradient(45deg, #000, #333, #666, #000);
-  border-radius: inherit;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-}
-
-/* Typewriter effect */
-.typewriter {
-  overflow: hidden;
-  border-right: 2px solid #000;
-  white-space: nowrap;
-  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-}
-
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
-}
-
-@keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: #000 }
-}
-
 /* ✅ NEW: Touch-friendly buttons for mobile */
 .touch-button {
   min-height: 44px;
   min-width: 44px;
   padding: 0.75rem 1.5rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.touch-button-small {
-  min-height: 36px;
-  min-width: 36px;
-  padding: 0.5rem 1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -769,73 +296,35 @@ input:focus-visible {
   overflow-x: hidden;
 }
 
+/* ✅ NEW: Mobile tap highlights */
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.tap-highlight-none {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ✅ NEW: Performance optimizations */
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+
+/* ✅ NEW: Smooth scrolling for anchor links */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
 /* ✅ NEW: Better image loading */
 .lazy-image {
   background-color: #f5f5f5;
   background-image: linear-gradient(90deg, #f5f5f5 0%, #e8e8e8 50%, #f5f5f5 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-}
-
-/* ✅ NEW: Responsive typography */
-.responsive-heading {
-  font-size: clamp(1.5rem, 4vw, 3rem);
-  line-height: 1.2;
-}
-
-.responsive-subheading {
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  line-height: 1.4;
-}
-
-.responsive-text {
-  font-size: clamp(0.875rem, 2vw, 1rem);
-  line-height: 1.5;
-}
-
-.responsive-text-sm {
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-  line-height: 1.4;
-}
-
-/* ✅ NEW: Aspect ratio utilities */
-.aspect-square-mobile {
-  aspect-ratio: 1 / 1;
-}
-
-/* ✅ NEW: Grid utilities */
-.mobile-grid-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.mobile-grid-1 {
-  grid-template-columns: 1fr;
-}
-
-/* ✅ NEW: Carousel speed adjustments */
-.carousel-speed-slow {
-  animation-duration: 60s;
-}
-
-.carousel-speed-medium {
-  animation-duration: 40s;
-}
-
-.carousel-speed-fast {
-  animation-duration: 20s;
-}
-
-/* ✅ NEW: Brand logo hover effects */
-.brand-logo-hover {
-  transition: all 0.3s ease;
-  filter: grayscale(100%);
-  opacity: 0.8;
-}
-
-.brand-logo-hover:hover {
-  filter: grayscale(0%);
-  opacity: 1;
-  transform: scale(1.05);
 }
 
 /* Print styles */
@@ -855,208 +344,4 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
-  .animate-faster-marquee,
-  .animate-faster-marquee-mobile,
-  .animate-marquee,
-  .animate-marquee-mobile,
-  .marquee-seamless,
-  .marquee-seamless-mobile {
-    animation: none !important;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .dark-mode-auto {
-    /* Add dark mode styles here when needed */
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .high-contrast {
-    border: 1px solid currentColor;
-  }
-  
-  .brand-logo-hover {
-    filter: contrast(200%) !important;
-  }
-}
-
-/* ✅ NEW: Mobile tap highlights */
-.tap-highlight {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-}
-
-.tap-highlight-none {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ✅ NEW: Performance optimizations */
-.will-change-transform {
-  will-change: transform;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-/* ✅ NEW: Loading states */
-.loading-overlay {
-  position: relative;
-}
-
-.loading-overlay::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ✅ NEW: Container queries support */
-@container (max-width: 400px) {
-  .container-responsive {
-    padding: 1rem;
-  }
-}
-
-/* ✅ NEW: Viewport height adjustments */
-.mobile-vh-50 {
-  height: 50vh;
-}
-
-.mobile-vh-60 {
-  height: 60vh;
-}
-
-.mobile-vh-70 {
-  height: 70vh;
-}
-
-/* ✅ NEW: Text balance for better readability */
-.text-balance {
-  text-wrap: balance;
-}
-
-/* ✅ NEW: Smooth font rendering */
-.antialiased {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ✅ NEW: Prevent text overflow */
-.text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ✅ NEW: Grid auto-fit responsive */
-.grid-auto-fit {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
-
-/* ✅ NEW: Flex gap fallback for older browsers */
-.flex-gap {
-  gap: 1rem;
-}
-
-.flex-gap > * {
-  margin: 0.5rem;
-}
-
-/* ✅ NEW: Sticky positioning utilities */
-.sticky-top {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-/* ✅ NEW: Gradient backgrounds */
-.bg-gradient-luxury {
-  background: linear-gradient(135deg, #000000 0%, #333333 100%);
-}
-
-.bg-gradient-light {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-}
-
-/* ✅ NEW: Better brand logo sizing */
-.brand-logo-size {
-  width: 120px;
-  height: 50px;
-}
-
-@media (max-width: 768px) {
-  .brand-logo-size {
-    width: 100px;
-    height: 40px;
-  }
-}
-
-/* ✅ NEW: Smooth transitions for all elements */
-* {
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-/* ✅ NEW: Optimized image rendering */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* ✅ NEW: Better focus states */
-:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* ✅ NEW: Improved button styles */
-button {
-  cursor: pointer;
-  user-select: none;
-}
-
-/* ✅ NEW: Scroll snap for better mobile experience */
-.scroll-snap-x {
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.scroll-snap-item {
-  scroll-snap-align: start;
-}
-
-/* ✅ NEW: Improved form elements */
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-}
-
-/* ✅ NEW: Better selection colors */
-::-moz-selection {
-  background-color: rgba(0, 0, 0, 0.2);
-  color: #000;
-}
-
-::selection {
-  background-color: rgba(0, 0, 0, 0.2);
-  color: #000;
-}
-
-/* ✅ NEW: Smooth scrolling for anchor links */
-html:focus-within {
-  scroll-behavior: smooth;
 }

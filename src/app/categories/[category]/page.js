@@ -20,9 +20,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   try {
     const { category } = params
-    
+
     const categoryConfig = getCategoryConfig(category)
-    
+
     return {
       title: `${categoryConfig.title} | Just Becho - Luxury Pre-Loved Fashion`,
       description: categoryConfig.subtitle,
@@ -62,17 +62,17 @@ function getCategoryConfig(categorySlug) {
         {
           icon: '🛡️',
           title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every item undergoes 7-point verification by luxury experts'
+          description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
         },
         {
           icon: '💎',
           title: 'PREMIUM QUALITY',
-          description: 'Only gently used items in excellent condition'
+          description: 'Only genuine luxury items'
         },
         {
           icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1999'
+          title: 'WHITE GLOVE DELIVERY',
+          description: 'Premium packaging and insured shipping'
         }
       ],
       apiSlug: 'Men',
@@ -89,17 +89,17 @@ function getCategoryConfig(categorySlug) {
         {
           icon: '🛡️',
           title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every women\'s fashion item verified by our experts'
+          description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
         },
         {
           icon: '💎',
           title: 'PREMIUM QUALITY',
-          description: 'Only genuine luxury women\'s fashion'
+          description: 'Only genuine luxury items'
         },
         {
           icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1999'
+          title: 'WHITE GLOVE DELIVERY',
+          description: 'Premium packaging and insured shipping'
         }
       ],
       apiSlug: 'Women',
@@ -116,17 +116,17 @@ function getCategoryConfig(categorySlug) {
         {
           icon: '🛡️',
           title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every pair verified by footwear experts'
+          description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
         },
         {
           icon: '💎',
           title: 'PREMIUM QUALITY',
-          description: 'Only genuine luxury footwear in perfect condition'
+          description: 'Only genuine luxury items'
         },
         {
           icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1999'
+          title: 'WHITE GLOVE DELIVERY',
+          description: 'Premium packaging and insured shipping'
         }
       ],
       apiSlug: 'Footwear',
@@ -143,17 +143,17 @@ function getCategoryConfig(categorySlug) {
         {
           icon: '🛡️',
           title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every accessory verified by our experts'
+          description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
         },
         {
           icon: '💎',
           title: 'PREMIUM QUALITY',
-          description: 'Only genuine luxury accessories'
+          description: 'Only genuine luxury items'
         },
         {
           icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1499'
+          title: 'WHITE GLOVE DELIVERY',
+          description: 'Premium packaging and insured shipping'
         }
       ],
       apiSlug: 'Accessories',
@@ -167,21 +167,21 @@ function getCategoryConfig(categorySlug) {
       metaDescription: 'Authentic pre-loved luxury watches. Rolex, Omega, Tag Heuer and more.',
       whyTitle: 'WHY SHOP WATCHES AT JUST BECHO',
       features: [
-        {
-          icon: '🛡️',
-          title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every watch verified by horology experts'
-        },
-        {
-          icon: '💎',
-          title: 'PREMIUM QUALITY',
-          description: 'Only genuine luxury watches'
-        },
-        {
-          icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹2999'
-        }
+         {
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
+                },
+                {
+                    icon: '🚚',
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
+                }
       ],
       apiSlug: 'Watches',
       seoKeywords: ['luxury watches', 'rolex', 'designer watches', 'pre-loved watches', 'timepieces']
@@ -195,20 +195,20 @@ function getCategoryConfig(categorySlug) {
       whyTitle: 'WHY SHOP PERFUMES AT JUST BECHO',
       features: [
         {
-          icon: '🛡️',
-          title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every perfume verified by fragrance experts'
-        },
-        {
-          icon: '💎',
-          title: 'PREMIUM QUALITY',
-          description: 'Only genuine luxury fragrances'
-        },
-        {
-          icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1499'
-        }
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
+                },
+                {
+                    icon: '🚚',
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
+                }
       ],
       apiSlug: 'Perfumes',
       seoKeywords: ['designer perfumes', 'luxury fragrances', 'cologne', 'perfume', 'scents']
@@ -221,21 +221,21 @@ function getCategoryConfig(categorySlug) {
       metaDescription: 'Rare and luxury toys & collectibles. Authentic items at great prices.',
       whyTitle: 'WHY SHOP TOYS AT JUST BECHO',
       features: [
-        {
-          icon: '🛡️',
-          title: 'SAFETY GUARANTEED',
-          description: 'Every item verified for quality and safety'
-        },
-        {
-          icon: '💎',
-          title: 'GENTLY USED',
-          description: 'Only gently used toys and collectibles'
-        },
-        {
-          icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1299'
-        }
+       {
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
+                },
+                {
+                    icon: '🚚',
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
+                }
       ],
       apiSlug: 'Toys',
       seoKeywords: ['luxury toys', 'collectibles', 'figurines', 'pre-loved toys', 'rare toys']
@@ -249,20 +249,20 @@ function getCategoryConfig(categorySlug) {
       whyTitle: "WHY SHOP KIDS FASHION AT JUST BECHO",
       features: [
         {
-          icon: '🛡️',
-          title: 'SAFETY GUARANTEED',
-          description: 'Every kids item verified for safety and quality standards'
-        },
-        {
-          icon: '💎',
-          title: 'GENTLY USED',
-          description: 'Only gently used kids fashion items in perfect condition'
-        },
-        {
-          icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1499'
-        }
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
+                },
+                {
+                    icon: '🚚',
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
+                }
       ],
       apiSlug: 'Kids',
       seoKeywords: ['kids fashion', 'children clothes', 'designer kids', 'pre-loved kids', 'baby clothes']
@@ -274,22 +274,22 @@ function getCategoryConfig(categorySlug) {
       metaTitle: 'Influencer Fashion | Designer Influencer Clothes',
       metaDescription: 'Authentic pre-loved luxury fashion for influencers. Premium brands for influencers.',
       whyTitle: "WHY SHOP INFLUENCER'S ONLY AT JUST BECHO",
-      features: [ 
+      features: [
         {
-          icon: '⭐',
-          title: 'EXCLUSIVE COLLECTIONS',
-          description: 'Limited edition pieces from top influencers'
-        },
-        {
-          icon: '💎',
-          title: 'AUTHENTICITY GUARANTEED',
-          description: 'Every item verified for quality and authenticity'
-        },
-        {
-          icon: '🚚',
-          title: 'FREE SHIPPING',
-          description: 'Free shipping on all orders above ₹1499'
-        }
+                    icon: '🛡️',
+                    title: 'AUTHENTICITY GUARANTEED',
+                    description: 'Every product verified by luxury experts (Only with BECHO PROTECT)'
+                },
+                {
+                    icon: '💎',
+                    title: 'PREMIUM QUALITY',
+                    description: 'Only genuine luxury items'
+                },
+                {
+                    icon: '🚚',
+                    title: 'WHITE GLOVE DELIVERY',
+                    description: 'Premium packaging and insured shipping'
+                }
       ],
       apiSlug: 'influencer',
       seoKeywords: ['influencer fashion', 'influencer', 'designer influencer', 'pre-loved influencer']
@@ -306,7 +306,7 @@ function getDefaultConfig(categorySlug) {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
-  
+
   return {
     title: formattedName.toUpperCase(),
     subtitle: `Discover premium ${formattedName.toLowerCase()} at amazing prices`,
@@ -341,25 +341,25 @@ async function fetchCategoryProducts(apiSlug, sortBy = 'newest') {
   try {
     // ✅ CORRECT API ENDPOINT: Use /api/products with category parameter
     const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(apiSlug)}&sort=${sortBy}&limit=50`
-    
+
     console.log('📡 [SERVER] Fetching products from:', apiUrl)
-    
+
     const response = await fetch(apiUrl, {
       next: { revalidate: 3600 }
     })
-    
+
     if (!response.ok) {
       console.log('⚠️ [SERVER] Products endpoint failed')
       return []
     }
-    
+
     const data = await response.json()
-    
+
     if (data.success && data.products) {
       console.log(`✅ [SERVER] Found ${data.products.length} products for ${apiSlug}`)
       return data.products
     }
-    
+
     return []
   } catch (error) {
     console.error('❌ [SERVER] Error fetching products:', error)
@@ -371,32 +371,32 @@ async function fetchCategoryProducts(apiSlug, sortBy = 'newest') {
 export default async function CategoryPage({ params }) {
   try {
     const { category } = params
-    
+
     console.log('🎯 Category Page - Slug:', category)
-    
+
     if (!category) {
       notFound()
     }
-    
+
     // ✅ Get category configuration
     const config = getCategoryConfig(category)
-    
+
     // ✅ Fetch products using correct API slug
     const initialProducts = await fetchCategoryProducts(config.apiSlug, 'newest')
-    
+
     // ✅ Calculate filters
     const brands = [...new Set(initialProducts
       .map(p => p.brand)
       .filter(brand => brand && typeof brand === 'string')
       .map(brand => brand.trim())
     )].sort()
-    
+
     const conditions = [...new Set(initialProducts
       .map(p => p.condition)
       .filter(condition => condition && typeof condition === 'string')
       .map(condition => condition.trim())
     )].sort()
-    
+
     // ✅ Prepare props
     const clientProps = {
       categorySlug: category,
@@ -414,14 +414,14 @@ export default async function CategoryPage({ params }) {
         }
       }
     }
-    
+
     console.log(`✅ ${category.toUpperCase()} Page - Ready with ${initialProducts.length} products`)
-    
+
     return <CategoryClient {...clientProps} />
-    
+
   } catch (error) {
     console.error('💥 Error in CategoryPage:', error)
-    
+
     return (
       <div className="min-h-screen bg-white">
         <div className="pt-32 md:pt-36"></div>
@@ -433,7 +433,7 @@ export default async function CategoryPage({ params }) {
             <p className="text-gray-600 mb-8">
               We're having trouble loading this category. Please try again.
             </p>
-            <a 
+            <a
               href="/"
               className="bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >

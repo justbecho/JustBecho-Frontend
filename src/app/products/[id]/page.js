@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - COMPLETE UPDATED VERSION
+// app/products/[id]/page.js - BLACK & WHITE VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -13,7 +13,7 @@ export default function ProductPage() {
   const router = useRouter()
   const productId = params.id
   
-  // ✅ NEW: Auth Modal state
+  // ✅ Auth Modal state
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authAction, setAuthAction] = useState(null) // 'addToCart' or 'buyNow'
   
@@ -32,7 +32,7 @@ export default function ProductPage() {
       try {
         setLoading(true)
         
-        // ✅ UPDATED: Production URL
+        // ✅ Production URL
         const productResponse = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}`)
         
         if (productResponse.ok) {
@@ -43,7 +43,7 @@ export default function ProductPage() {
             setProduct(currentProduct)
             checkWishlistStatus(currentProduct._id)
             
-            // ✅ UPDATED: Production URL
+            // ✅ Production URL
             if (currentProduct.category) {
               console.log('📦 Fetching products of category:', currentProduct.category)
               
@@ -92,7 +92,7 @@ export default function ProductPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      // ✅ UPDATED: Production URL
+      // ✅ Production URL
       const response = await fetch('https://just-becho-backend.vercel.app/api/wishlist', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -173,7 +173,7 @@ export default function ProductPage() {
 
       console.log('📦 Sending cart data to backend:', cartData)
 
-      // ✅ UPDATED: Production URL
+      // ✅ Production URL
       const response = await fetch('https://just-becho-backend.vercel.app/api/cart/add', {
         method: 'POST',
         headers: {
@@ -268,7 +268,7 @@ export default function ProductPage() {
         return
       }
 
-      // ✅ UPDATED: Production URL
+      // ✅ Production URL
       const response = await fetch('https://just-becho-backend.vercel.app/api/wishlist', {
         method: 'POST',
         headers: {
@@ -302,7 +302,7 @@ export default function ProductPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      // ✅ UPDATED: Production URL
+      // ✅ Production URL
       const response = await fetch(`https://just-becho-backend.vercel.app/api/wishlist/${product._id}`, {
         method: 'DELETE',
         headers: {
@@ -403,7 +403,6 @@ export default function ProductPage() {
     "Excellent",
     "Fairly Used",
     "Good"
-    
   ]
 
   if (loading) {
@@ -545,7 +544,7 @@ export default function ProductPage() {
                   <p className="text-gray-600 text-xs">Seller's Price | GST calculated at checkout</p>
                 </div>
 
-                {/* ✅ BECHO PROTECT SECTION */}
+                {/* ✅ BECHO PROTECT SECTION - Black & White Version */}
                 <div className="relative">
                   <div className={`border ${isBechoProtectSelected ? 'border-black' : 'border-gray-300'} rounded-lg p-4 bg-white`}>
                     {/* First Row: Checkbox + Main Title + Price */}
@@ -592,29 +591,29 @@ export default function ProductPage() {
                     {/* Third Row: Features List */}
                     <ul className="space-y-1 text-gray-700 text-xs">
                       <li className="flex items-center gap-2">
-                        <span className="text-green-600 font-bold">✓</span>
+                        <span className="text-gray-800 font-bold">✓</span>
                         <span>Professional authentication at our warehouse</span>
                       </li>
                        <li className="flex items-center gap-2">
-                        <span className="text-green-600 font-bold">✓</span>
+                        <span className="text-gray-800 font-bold">✓</span>
                         <span>Your money is safe. Becho Protect covers counterfeits, quality issues, and non-shipment.</span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <span className="text-green-600 font-bold">✓</span>
+                        <span className="text-gray-800 font-bold">✓</span>
                         <span>Genuine product guarantee with certificate</span>
                       </li>
                     </ul>
                     
                     {/* Warning message if unchecked */}
                     {showWarning && (
-                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                      <div className="mt-3 p-3 bg-gray-100 border border-gray-300 rounded">
                         <div className="flex items-start gap-2">
-                          <span className="text-red-600">⚠️</span>
+                          <span className="text-gray-800">⚠️</span>
                           <div>
-                            <p className="text-red-700 font-medium text-xs">
+                            <p className="text-gray-800 font-medium text-xs">
                               You are opting out of Authenticity Guarantee
                             </p>
-                            <p className="text-red-600 text-xs mt-1">
+                            <p className="text-gray-700 text-xs mt-1">
                               Without Becho Protect, we will directly deliver the product without authentication check and no certificate will be provided.
                             </p>
                           </div>
@@ -658,8 +657,8 @@ export default function ProductPage() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-300">
+                        <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-xs">🚚</span>
                         </div>
                         <div>
@@ -667,8 +666,8 @@ export default function ProductPage() {
                           <p className="text-gray-600 text-xs">5-7 days</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200">
-                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-300">
+                        <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-xs">💳</span>
                         </div>
                         <div>
@@ -678,12 +677,12 @@ export default function ProductPage() {
                       </div>
                     </div>
 
-                    {/* ✅ UPDATED: SIMPLE SELLER INFO - LEFT: Logo + Name, RIGHT: Verified */}
+                    {/* ✅ UPDATED: SIMPLE SELLER INFO - Black & White */}
                     <div className="bg-white rounded-lg p-3 border border-gray-300 shadow-sm">
                       <div className="flex items-center justify-between">
                         {/* Left Side: Logo and Name */}
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white font-medium text-sm">
                               {product.seller?.name?.charAt(0) || 'U'}
                             </span>
@@ -697,7 +696,7 @@ export default function ProductPage() {
                         
                         {/* Right Side: Verified Badge */}
                         <div className="text-right">
-                          <span className="bg-green-100 text-green-800 text-xs px-3 py-1.5 rounded-full font-medium">
+                          <span className="bg-gray-100 text-gray-800 text-xs px-3 py-1.5 rounded-full font-medium">
                             Verified Seller
                           </span>
                         </div>
@@ -720,7 +719,7 @@ export default function ProductPage() {
                       onClick={handleAddToWishlist}
                       className={`w-12 border-2 py-3 flex items-center justify-center transition-all duration-300 rounded-lg ${
                         isInWishlist 
-                          ? 'border-red-500 text-red-500 bg-red-50 hover:bg-red-100' 
+                          ? 'border-gray-800 text-gray-800 bg-gray-100 hover:bg-gray-200' 
                           : 'border-gray-300 text-gray-600 hover:border-gray-900 hover:bg-gray-50'
                       }`}
                     >
@@ -738,7 +737,7 @@ export default function ProductPage() {
                   <button
                     onClick={handleBuyNow}
                     disabled={addingToCart}
-                    className="w-full bg-gradient-to-r from-gray-900 to-black text-white py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-black to-gray-900 text-white py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {addingToCart ? 'PROCESSING...' : 'BUY NOW'}
                   </button>
@@ -755,7 +754,6 @@ export default function ProductPage() {
               <h2 className="text-gray-900 text-xl sm:text-3xl font-light tracking-widest uppercase">
                 PRODUCT DETAILS
               </h2>
-              
             </div>
             
             <div className="max-w-4xl mx-auto">
