@@ -1025,3 +1025,32 @@ input, textarea, select {
 html:focus-within {
   scroll-behavior: smooth;
 }
+
+
+
+/* ✅ ADD THIS TO YOUR globals.css FILE AT THE END */
+
+/* Brand Carousel CSS Animation - Simple and Smooth */
+@keyframes smooth-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+.animate-smooth-marquee {
+  animation: smooth-marquee 45s linear infinite;
+}
+
+.marquee-container:hover .animate-smooth-marquee {
+  animation-play-state: paused;
+}
+
+/* Optional: Different speed for mobile */
+@media (max-width: 768px) {
+  .animate-smooth-marquee {
+    animation-duration: 60s; /* Slower on mobile */
+  }
+}

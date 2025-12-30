@@ -423,7 +423,7 @@ export default function PrivacyPolicyPage() {
 
   // Mobile Header
   const MobileHeader = () => (
-    <div className="sticky top-0 z-40 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
+    <div className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
       <div className="px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
@@ -484,13 +484,14 @@ export default function PrivacyPolicyPage() {
     <>
       <Header />
       
-      <main className="min-h-screen bg-white">
-        {/* Mobile Header */}
+      {/* Main content with proper padding for header */}
+      <main className="min-h-screen bg-white pt-[5rem] md:pt-[8rem]">
+        {/* Mobile Header - Fixed at top */}
         {isMobile && <MobileHeader />}
 
         {/* Hero Section */}
-        <section className={`${isMobile ? 'pt-[135px]' : 'pt-[140px]'} bg-gradient-to-r from-blue-900 to-indigo-900 text-white`}>
-          <div className={`${isMobile ? 'px-4 py-6' : 'px-6 lg:px-8 py-16'}`}>
+        <section className={`${isMobile ? 'pt-16' : ''} bg-gradient-to-r from-blue-900 to-indigo-900 text-white`}>
+          <div className={`${isMobile ? 'px-4 py-8' : 'px-6 lg:px-8 py-16'}`}>
             <div className={`${isMobile ? '' : 'max-w-7xl'} mx-auto text-center`}>
               <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl md:text-5xl'} font-light tracking-widest uppercase mb-3`}>
                 PRIVACY POLICY
@@ -623,7 +624,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Mobile Back to Top */}
         {isMobile && (
-          <div className="sticky bottom-4 left-0 right-0 px-4">
+          <div className="sticky bottom-4 left-0 right-0 px-4 z-30">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-medium shadow-lg"

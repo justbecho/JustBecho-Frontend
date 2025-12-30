@@ -79,92 +79,29 @@ function HomeContent() {
 
   // ✅ Category images mapping for carousel
   const categoryImages = useMemo(() => ({
-    "Men's Fashion": "/banners/mens new.jpeg",
-    "Women's Fashion": "/banners/womens new.png", 
-    "Footwear": "/banners/footwear new.png",
-    "Accessories": "/banners/accessories new.png",
-    "Watches": "/banners/watches new.png", 
-    "Perfumes": "/banners/perfumes new.png",
-    "TOYS & COLLECTIBLES": "/banners/Toys and Figurines.png",
-    "KID'S FASHION": "/banners/kids new.png",
+    "Men's Fashion": "/banners/mensnew.jpeg",
+    "Women's Fashion": "/banners/womensnew.jpeg", 
+    "Footwear": "/banners/footwearnew.jpeg",
+    "Accessories": "/banners/accessoriesnew.jpeg",
+    "Watches": "/banners/watchesnew.jpeg", 
+    "Perfumes": "/banners/perfumenew.jpeg",
+    "TOYS & COLLECTIBLES": "/banners/Toysnew.jpeg",
+    "KID'S FASHION": "/banners/kidsnew.jpeg",
     "INFLUENCER": "/banners/default.jpg",
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ UPDATED: SIMPLE MARQUEE - COMPLETELY SEPARATE FROM HOME BANNER
+  // ✅ ✅✅✅✅✅ FIXED: BRAND CAROUSEL - PURE CSS ANIMATION (NO JAVASCRIPT)
   const BrandMarquee = () => {
-    const containerRef = useRef(null);
-    const contentRef = useRef(null);
-    const animationRef = useRef(null);
-    const [isHovered, setIsHovered] = useState(false);
-    
-    // Create two sets of brands for seamless looping
+    // Duplicate brands 3 times for seamless looping
     const duplicatedBrands = useMemo(() => {
-      return [...allBrands, ...allBrands];
+      return [...allBrands, ...allBrands, ...allBrands];
     }, [allBrands]);
     
-    useEffect(() => {
-      let animationId;
-      let position = 0;
-      const speed = 0.8; // pixels per frame
-      
-      const animate = () => {
-        if (!contentRef.current || isHovered) {
-          animationId = requestAnimationFrame(animate);
-          return;
-        }
-        
-        position -= speed;
-        
-        // Reset when we've scrolled one complete set
-        if (contentRef.current) {
-          const contentWidth = contentRef.current.scrollWidth / 2;
-          if (Math.abs(position) >= contentWidth) {
-            position = 0;
-          }
-          
-          contentRef.current.style.transform = `translateX(${position}px)`;
-        }
-        
-        animationId = requestAnimationFrame(animate);
-      };
-      
-      animationId = requestAnimationFrame(animate);
-      
-      return () => {
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-        }
-      };
-    }, [isHovered]);
-    
-    const handleMouseEnter = () => {
-      setIsHovered(true);
-    };
-    
-    const handleMouseLeave = () => {
-      setIsHovered(false);
-    };
-    
     return (
-      <div 
-        className="marquee-container w-full overflow-hidden py-2 sm:py-3 relative"
-        ref={containerRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleMouseEnter}
-        onTouchEnd={handleMouseLeave}
-      >
-        <div 
-          className="marquee-content flex items-center will-change-transform"
-          ref={contentRef}
-          style={{ 
-            width: 'fit-content',
-            display: 'flex',
-            alignItems: 'center',
-            transition: isHovered ? 'transform 0.3s ease' : 'none'
-          }}
-        >
+      <div className="marquee-container w-full overflow-hidden py-3 sm:py-4 relative">
+        {/* ✅ PURE CSS ANIMATION - No JavaScript lag */}
+        <div className="flex items-center animate-smooth-marquee whitespace-nowrap">
           {duplicatedBrands.map((brand, idx) => (
             <div 
               key={`${brand.name}-${idx}`} 
@@ -252,7 +189,7 @@ function HomeContent() {
     },
     {
       title: "PRODUCTS UNDER ₹40K",
-      image: "/banners/womensnew.png",
+      image: "/banners/womensnew.jpeg",
       href: "/shop?budget=under-40k",
       filter: "under-40k"
     },
@@ -673,7 +610,7 @@ function HomeContent() {
         {/* ✅ 1. Header ke baad reduced gap - Pahle 24 thi, ab 16 kar di */}
         <div className="pt-16"></div>
         
-        {/* ✅ 2. Home Banner - UPDATED: Simple Right to Left Swipe Animation with simultaneous text and image */}
+        {/* ✅ 2. Home Banner - UPDATED: Fixed image fit and smooth transition */}
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
@@ -689,7 +626,7 @@ function HomeContent() {
               {carouselSlides.map((slide, index) => (
                 <div
                   key={index}
-                  className={`absolute inset-0 transition-all duration-700 ${
+                  className={`absolute inset-0 transition-all duration-700 ease-in-out ${
                     index === currentSlide 
                       ? 'opacity-100 translate-x-0' 
                       : index < currentSlide 
@@ -697,18 +634,26 @@ function HomeContent() {
                         : 'opacity-0 translate-x-full'
                   }`}
                 >
-                  <Image
-                    src={slide.image}
-                    alt={slide.title}
-                    fill
-                    className="object-cover object-center"
-                    priority={index === 0}
-                    sizes="100vw"
-                    style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                    onError={(e) => {
-                      e.target.src = '/images/hero-placeholder.jpg';
-                    }}
-                  />
+                  <div className="absolute inset-0 bg-gray-900">
+                    <Image
+                      src={slide.image}
+                      alt={slide.title}
+                      fill
+                      className="object-contain object-center"
+                      priority={index === 0}
+                      sizes="100vw"
+                      style={{ 
+                        userSelect: 'none', 
+                        WebkitUserSelect: 'none',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        margin: '0 auto'
+                      }}
+                      onError={(e) => {
+                        e.target.src = '/images/hero-placeholder.jpg';
+                      }}
+                    />
+                  </div>
                   <div className="absolute inset-0 bg-black/30"></div>
                   
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4 z-10">
@@ -764,7 +709,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - UPDATED: COMPLETELY SEPARATE ANIMATION */}
+        {/* ✅ 3. Brand Carousel - UPDATED: PURE CSS ANIMATION - NO LAG */}
         <section className="py-6 sm:py-8 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <BrandMarquee />
