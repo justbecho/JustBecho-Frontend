@@ -24,7 +24,6 @@ function HomeContent() {
   
   // ✅ Carousel states
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
   const carouselIntervalRef = useRef(null)
 
   // ✅ UPDATED: All brands combined into single array for unified carousel
@@ -92,7 +91,7 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ UPDATED: SIMPLE MARQUEE - SUPER SMOOTH WITHOUT JERKS
+  // ✅ UPDATED: SIMPLE MARQUEE - SUPER SMOOTH WITHOUT JERKS AND REDUCED HEIGHT
   const BrandMarquee = () => {
     const containerRef = useRef(null);
     const contentRef = useRef(null);
@@ -188,7 +187,7 @@ function HomeContent() {
     
     return (
       <div 
-        className="marquee-container w-full overflow-hidden py-4 sm:py-6 relative"
+        className="marquee-container w-full overflow-hidden py-2 sm:py-3 relative" // ✅ REDUCED HEIGHT: py-2 instead of py-4
         ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -208,9 +207,9 @@ function HomeContent() {
           {duplicatedBrands.map((brand, idx) => (
             <div 
               key={`${brand.name}-${idx}`} 
-              className="flex-shrink-0 px-8"
+              className="flex-shrink-0 px-6 sm:px-8" // ✅ REDUCED SPACING
             >
-              <div className="relative h-12 w-28 sm:h-14 sm:w-32 md:h-16 md:w-36 flex items-center justify-center">
+              <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center"> {/* ✅ REDUCED SIZE */}
                 <img
                   src={brand.logo}
                   alt={brand.name}
@@ -226,8 +225,8 @@ function HomeContent() {
         </div>
         
         {/* Gradient overlays for smooth edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-100 to-transparent pointer-events-none z-10"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-gray-100 to-transparent pointer-events-none z-10"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
       </div>
     );
   };
@@ -244,7 +243,7 @@ function HomeContent() {
     }
     return [
       {
-        image: "/banners/Mens new.png",
+        image: "/banners/mens new.jpeg",
         title: "Men's Fashion",
         description: "Discover premium men's fashion",
         href: "/categories/men"
@@ -473,41 +472,17 @@ function HomeContent() {
     router.push(`/shop?budget=${filterType}`)
   }
 
-  // ✅ UPDATED: SIMPLE CAROUSEL ANIMATION - Right to Left Swipe Only
+  // ✅ UPDATED: SIMPLE CAROUSEL - Right to Left Swipe Only with simultaneous text and image
   const nextSlide = () => {
-    if (isTransitioning || carouselSlides.length === 0) return;
-    
-    setIsTransitioning(true);
     setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
-    
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 500);
   }
 
   const prevSlide = () => {
-    if (isTransitioning || carouselSlides.length === 0) return;
-    
-    setIsTransitioning(true);
     setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
-    
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 500);
   }
 
   const goToSlide = (index) => {
-    if (isTransitioning || index === currentSlide || carouselSlides.length === 0) return;
-    
-    setIsTransitioning(true);
     setCurrentSlide(index);
-    
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 500);
   }
 
   // ✅ Start carousel auto-play - SIMPLE RIGHT TO LEFT SWIPE
@@ -737,7 +712,7 @@ function HomeContent() {
         {/* ✅ 1. Header ke baad reduced gap - Pahle 24 thi, ab 16 kar di */}
         <div className="pt-16"></div>
         
-        {/* ✅ 2. Home Banner - UPDATED: Simple Right to Left Swipe Animation */}
+        {/* ✅ 2. Home Banner - UPDATED: Simple Right to Left Swipe Animation with simultaneous text and image */}
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
@@ -748,38 +723,51 @@ function HomeContent() {
               }
             }}
           >
-            {/* Simple Fade Transition */}
-            <div className={`absolute inset-0 transition-opacity duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-              <Image
-                src={carouselSlides[currentSlide]?.image || "/banners/Men_s Fashion.png"}
-                alt={carouselSlides[currentSlide]?.title || "Just Becho"}
-                fill
-                className="object-cover object-center"
-                priority
-                sizes="100vw"
-                style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                onError={(e) => {
-                  e.target.src = '/images/hero-placeholder.jpg';
-                }}
-              />
-              <div className="absolute inset-0 bg-black/30"></div>
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4 z-10">
-                <div className={`transform transition-all duration-700 ${isTransitioning ? 'translate-x-[-50px] opacity-0' : 'translate-x-0 opacity-100'} text-center`}>
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light tracking-widest uppercase mb-4 sm:mb-6 md:mb-8">
-                    {carouselSlides[currentSlide]?.title || "JUST BECHO"}
-                  </h1>
-                  <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-4">
-                    {carouselSlides[currentSlide]?.description || "Luxury Reborn • Trust Redefined"}
-                  </p>
-                  <Link
-                    href={carouselSlides[currentSlide]?.href || "/products"}
-                    className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block px-10 py-4 sm:px-12 sm:py-5 text-base sm:text-lg shadow-lg hover:shadow-xl"
-                  >
-                    EXPLORE NOW
-                  </Link>
+            {/* Simple Swipe Transition - Text and Image together */}
+            <div className="absolute inset-0">
+              {carouselSlides.map((slide, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 transition-all duration-700 ${
+                    index === currentSlide 
+                      ? 'opacity-100 translate-x-0' 
+                      : index < currentSlide 
+                        ? 'opacity-0 -translate-x-full' 
+                        : 'opacity-0 translate-x-full'
+                  }`}
+                >
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    className="object-cover object-center"
+                    priority={index === 0}
+                    sizes="100vw"
+                    style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+                    onError={(e) => {
+                      e.target.src = '/images/hero-placeholder.jpg';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/30"></div>
+                  
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4 z-10">
+                    <div className="text-center">
+                      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light tracking-widest uppercase mb-4 sm:mb-6 md:mb-8">
+                        {slide.title}
+                      </h1>
+                      <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-4">
+                        {slide.description}
+                      </p>
+                      <Link
+                        href={slide.href}
+                        className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block px-10 py-4 sm:px-12 sm:py-5 text-base sm:text-lg shadow-lg hover:shadow-xl"
+                      >
+                        EXPLORE NOW
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
 
             <button
@@ -815,8 +803,8 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - UPDATED: Super Smooth Marquee */}
-        <section className="py-10 sm:py-12 bg-gray-100 border-t border-gray-200">
+        {/* ✅ 3. Brand Carousel - UPDATED: Reduced height and super smooth */}
+        <section className="py-6 sm:py-8 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <BrandMarquee />
           </div>
@@ -1003,10 +991,11 @@ function HomeContent() {
                   <div className="text-center mt-8 sm:mt-12">
                     <button
                       onClick={() => router.push(category.href)}
-                      // ✅ UPDATED: Golden white background for premium look
-                      className="bg-gradient-to-r from-amber-50 to-amber-100 text-amber-900 border border-amber-200 font-light tracking-widest uppercase hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 transition-all duration-500 px-8 py-3 rounded-none shadow-md hover:shadow-lg"
+                      // ✅ UPDATED: Premium Textured Gold Button
+                      className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white font-light tracking-widest uppercase hover:from-amber-600 hover:via-amber-700 hover:to-amber-800 transition-all duration-500 px-8 py-3 rounded-none shadow-lg hover:shadow-xl border border-amber-400/30 relative overflow-hidden group"
                     >
-                      → VIEW ALL {category.name.toUpperCase()}
+                      <span className="relative z-10">→ VIEW ALL {category.name.toUpperCase()}</span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                     </button>
                   </div>
                 </div>
