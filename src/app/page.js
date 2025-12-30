@@ -25,10 +25,6 @@ function HomeContent() {
   // ✅ Carousel states
   const [currentSlide, setCurrentSlide] = useState(0)
   const carouselIntervalRef = useRef(null)
-  
-  // ✅ NEW: Brand carousel pause state
-  const [isBrandCarouselPaused, setIsBrandCarouselPaused] = useState(false)
-  const brandMarqueeRef = useRef(null)
 
   // ✅ UPDATED: All brands combined into single array for unified carousel
   const allBrands = useMemo(() => [
@@ -89,13 +85,13 @@ function HomeContent() {
     "Accessories": "/banners/accessoriesnew.jpeg",
     "Watches": "/banners/watchesnew.jpeg", 
     "Perfumes": "/banners/perfumenew.jpeg",
-    "TOYS & COLLECTIBLES": "/banners/Toysnew.jpeg",
+    "TOYS & COLLECTIBLES": "/banners/toysnew.jpeg",
     "KID'S FASHION": "/banners/kidsnew.jpeg",
     "INFLUENCER": "/banners/default.jpg",
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ UPDATED: BRAND CAROUSEL - PURE CSS ANIMATION with pause control
+  // ✅ UPDATED: BRAND CAROUSEL - IMPROVED ANIMATION CONTROL
   const BrandMarquee = () => {
     // Duplicate brands 3 times for seamless looping
     const duplicatedBrands = useMemo(() => {
@@ -105,12 +101,12 @@ function HomeContent() {
     return (
       <div 
         className="marquee-container w-full overflow-hidden py-3 sm:py-4 relative"
-        ref={brandMarqueeRef}
+        id="brand-marquee-container"
       >
-        {/* ✅ PURE CSS ANIMATION - With pause control */}
+        {/* ✅ PURE CSS ANIMATION - With JavaScript control for pause/resume */}
         <div 
-          className={`flex items-center animate-smooth-marquee whitespace-nowrap ${isBrandCarouselPaused ? 'animation-paused' : ''}`}
-          style={{ animationDuration: '15s' }} // ✅ Speed thodi si badayi hai
+          className="flex items-center animate-fast-smooth-marquee whitespace-nowrap"
+          id="brand-marquee-track"
         >
           {duplicatedBrands.map((brand, idx) => (
             <div 
@@ -137,6 +133,26 @@ function HomeContent() {
         <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
       </div>
     );
+  };
+
+  // ✅ Function to pause brand marquee
+  const pauseBrandMarquee = () => {
+    if (typeof window !== 'undefined') {
+      const marqueeTrack = document.getElementById('brand-marquee-track');
+      if (marqueeTrack) {
+        marqueeTrack.style.animationPlayState = 'paused';
+      }
+    }
+  };
+
+  // ✅ Function to resume brand marquee
+  const resumeBrandMarquee = () => {
+    if (typeof window !== 'undefined') {
+      const marqueeTrack = document.getElementById('brand-marquee-track');
+      if (marqueeTrack) {
+        marqueeTrack.style.animationPlayState = 'running';
+      }
+    }
   };
 
   // ✅ Carousel slides from categories
@@ -380,18 +396,18 @@ function HomeContent() {
     router.push(`/shop?budget=${filterType}`)
   }
 
-  // ✅ UPDATED: SIMPLE CAROUSEL - With pause control for brand carousel
+  // ✅ UPDATED: SIMPLE CAROUSEL - With proper brand marquee control
   const nextSlide = () => {
     // ✅ Pause brand carousel when home banner image changes
-    setIsBrandCarouselPaused(true)
+    pauseBrandMarquee();
     
     setCurrentSlide((prev) => {
       const nextSlideIndex = (prev + 1) % carouselSlides.length
       
-      // ✅ Restart brand carousel after 500ms
+      // ✅ Resume brand carousel after 300ms (shorter pause)
       setTimeout(() => {
-        setIsBrandCarouselPaused(false)
-      }, 500)
+        resumeBrandMarquee();
+      }, 300)
       
       return nextSlideIndex
     })
@@ -399,15 +415,15 @@ function HomeContent() {
 
   const prevSlide = () => {
     // ✅ Pause brand carousel when home banner image changes
-    setIsBrandCarouselPaused(true)
+    pauseBrandMarquee();
     
     setCurrentSlide((prev) => {
       const prevSlideIndex = (prev - 1 + carouselSlides.length) % carouselSlides.length
       
-      // ✅ Restart brand carousel after 500ms
+      // ✅ Resume brand carousel after 300ms
       setTimeout(() => {
-        setIsBrandCarouselPaused(false)
-      }, 500)
+        resumeBrandMarquee();
+      }, 300)
       
       return prevSlideIndex
     })
@@ -416,14 +432,14 @@ function HomeContent() {
   const goToSlide = (index) => {
     if (index !== currentSlide) {
       // ✅ Pause brand carousel when manually changing slide
-      setIsBrandCarouselPaused(true)
+      pauseBrandMarquee();
       
       setCurrentSlide(index)
       
-      // ✅ Restart brand carousel after 500ms
+      // ✅ Resume brand carousel after 300ms
       setTimeout(() => {
-        setIsBrandCarouselPaused(false)
-      }, 500)
+        resumeBrandMarquee();
+      }, 300)
     }
   }
 
@@ -432,13 +448,13 @@ function HomeContent() {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
         // ✅ Pause brand carousel when auto-changing slide
-        setIsBrandCarouselPaused(true)
+        pauseBrandMarquee();
         setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
         
-        // ✅ Restart brand carousel after 500ms
+        // ✅ Resume brand carousel after 300ms
         setTimeout(() => {
-          setIsBrandCarouselPaused(false)
-        }, 500)
+          resumeBrandMarquee();
+        }, 300)
       }, 4000); // 4 seconds interval
     }
     
@@ -665,14 +681,17 @@ function HomeContent() {
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
           <div 
             className="absolute inset-0 z-0"
-            onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
+            onMouseEnter={() => {
+              if (carouselIntervalRef.current) {
+                clearInterval(carouselIntervalRef.current)
+              }
+            }}
             onMouseLeave={() => {
               if (carouselSlides.length > 1) {
                 carouselIntervalRef.current = setInterval(() => {
-                  // ✅ Pause brand carousel on auto change
-                  setIsBrandCarouselPaused(true)
+                  pauseBrandMarquee();
                   setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
-                  setTimeout(() => setIsBrandCarouselPaused(false), 500)
+                  setTimeout(() => resumeBrandMarquee(), 300)
                 }, 4000)
               }
             }}
@@ -765,7 +784,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - UPDATED: PURE CSS ANIMATION - WITH PAUSE CONTROL */}
+        {/* ✅ 3. Brand Carousel - UPDATED: FASTER ANIMATION (12s) */}
         <section className="py-6 sm:py-8 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <BrandMarquee />

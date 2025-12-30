@@ -1,4 +1,4 @@
-/* globals.css - UPDATED WITH ADJUSTED MOBILE SPEED */
+/* globals.css - UPDATED WITH FASTER BRAND CAROUSEL */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -22,15 +22,8 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ✅ UPDATED: Animation pause class for brand carousel */
-.animation-paused {
-  animation-play-state: paused !important;
-}
-
-/* ✅ ADD THIS TO YOUR globals.css FILE AT THE END */
-
-/* Brand Carousel CSS Animation - Simple and Smooth */
-@keyframes smooth-marquee {
+/* ✅ UPDATED: FASTER Brand Carousel Animation */
+@keyframes fastSmoothMarquee {
   0% {
     transform: translateX(0);
   }
@@ -39,19 +32,29 @@ html {
   }
 }
 
-.animate-smooth-marquee {
-  animation: smooth-marquee 15s linear infinite; /* ✅ Speed thodi si badayi hai (15s) */
+.animate-fast-smooth-marquee {
+  animation: fastSmoothMarquee 12s linear infinite !important; /* ✅ FASTER: 12 seconds */
 }
 
-.marquee-container:hover .animate-smooth-marquee {
-  animation-play-state: paused;
-}
-
-/* Optional: Different speed for mobile */
+/* ✅ UPDATED: Different speed for mobile */
 @media (max-width: 768px) {
-  .animate-smooth-marquee {
-    animation-duration: 20s; /* ✅ Mobile ke liye bhi speed badayi (20s) */
+  .animate-fast-smooth-marquee {
+    animation-duration: 15s !important; /* ✅ Mobile ke liye: 15s */
   }
+}
+
+/* ✅ UPDATED: Hover effect for brand carousel */
+.marquee-container:hover .animate-fast-smooth-marquee {
+  animation-play-state: paused !important;
+}
+
+/* ✅ UPDATED: Animation pause/resume control */
+.animation-paused {
+  animation-play-state: paused !important;
+}
+
+.animation-running {
+  animation-play-state: running !important;
 }
 
 /* ✅ UPDATED: Banner Content Positioning for Mobile & Desktop */

@@ -1,4 +1,4 @@
-// app/terms/buyer-terms/page.js - MOBILE RESPONSIVE VERSION
+// app/terms/buyer-terms/page.js - BLACK & WHITE VERSION WITH HEADER ALIGNMENT
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -13,9 +13,9 @@ export default function BuyerTermsPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white pt-20 md:pt-40">
+      <main className="min-h-screen bg-white pt-24 md:pt-40">
         {/* Hero Section - Full Width */}
-        <section className="w-full bg-gradient-to-r from-gray-900 to-black text-white">
+        <section className="w-full bg-gradient-to-r from-black to-gray-900 text-white">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16">
             <div className="max-w-7xl mx-auto text-center">
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-widest uppercase mb-3 md:mb-4">
@@ -33,15 +33,15 @@ export default function BuyerTermsPage() {
           <div className="w-full px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
               {/* Introduction Box */}
-              <div className="mb-8 md:mb-12 bg-blue-50 border-l-4 border-blue-500 p-4 md:p-6 rounded-r-lg">
-                <p className="text-blue-800 font-bold text-base md:text-lg mb-1 md:mb-2">
+              <div className="mb-8 md:mb-12 bg-gray-50 border-l-4 border-gray-700 p-4 md:p-6 rounded-r-lg">
+                <p className="text-gray-900 font-bold text-base md:text-lg mb-1 md:mb-2">
                   JUSTBECHO.COM – BUYER TERMS & CONDITIONS
                 </p>
-                <p className="text-blue-700 text-sm md:text-base">
+                <p className="text-gray-700 text-sm md:text-base">
                   Welcome to JustBecho.com ("JustBecho", "we", "our", "platform"). JustBecho provides a secure online marketplace connecting buyers with verified independent sellers. These Buyer Terms & Conditions ("Terms") govern your ("Buyer/ you/ your") use of the Company's online e-commerce platform ("Platform") <span className="font-semibold">justbecho.com</span>, operated by House of DK ("Company"). By creating a Buyer Account or using any services on the Platform, you agree to be bound by these Terms.
                 </p>
-                <div className="mt-3 md:mt-4 p-2 md:p-3 bg-yellow-50 border border-yellow-200 rounded">
-                  <p className="text-yellow-800 font-medium text-sm md:text-base">⚠️ Please read these Terms carefully before placing any order.</p>
+                <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-100 border border-gray-300 rounded">
+                  <p className="text-gray-800 font-medium text-sm md:text-base">⚠️ Please read these Terms carefully before placing any order.</p>
                 </div>
               </div>
 
@@ -49,7 +49,7 @@ export default function BuyerTermsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
                 {/* Left Sidebar - Navigation */}
                 <div className="lg:col-span-1">
-                  <div className="sticky top-24 md:top-32 bg-white border border-gray-200 rounded-lg p-4 md:p-6 shadow-sm">
+                  <div className="sticky top-32 md:top-40 bg-white border border-gray-200 rounded-lg p-4 md:p-6 shadow-sm">
                     <h3 className="font-bold text-gray-900 text-sm md:text-base mb-3 md:mb-4">Quick Navigation</h3>
                     <div className="space-y-1 md:space-y-2">
                       {[
@@ -74,7 +74,7 @@ export default function BuyerTermsPage() {
                         <a
                           key={section.id}
                           href={`#${section.id}`}
-                          className="block text-xs md:text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 p-1.5 md:p-2 rounded transition-colors"
+                          className="block text-xs md:text-sm text-gray-600 hover:text-black hover:bg-gray-50 p-1.5 md:p-2 rounded transition-colors"
                         >
                           {section.title}
                         </a>
@@ -87,9 +87,9 @@ export default function BuyerTermsPage() {
                 <div className="lg:col-span-3">
                   <div className="space-y-8 md:space-y-12">
                     {/* Section 1: INTRODUCTION */}
-                    <div id="section1" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section1" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           1
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">INTRODUCTION</h2>
@@ -120,9 +120,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 2: TYPES OF PRODUCTS */}
-                    <div id="section2" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section2" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           2
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">TYPES OF PRODUCTS SOLD ON JUSTBECHO</h2>
@@ -130,8 +130,8 @@ export default function BuyerTermsPage() {
                       
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                         {/* Brand New Products */}
-                        <div className="bg-white border border-green-200 rounded-lg p-4 md:p-6 shadow-sm">
-                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-green-800 mb-3 md:mb-4">Brand-New Products</h3>
+                        <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">Brand-New Products</h3>
                           <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1 md:space-y-2">
                             <li>Labeled as "Brand New"</li>
                             <li>Completely unused</li>
@@ -141,8 +141,8 @@ export default function BuyerTermsPage() {
                         </div>
 
                         {/* Pre-Owned Products */}
-                        <div className="bg-white border border-blue-200 rounded-lg p-4 md:p-6 shadow-sm">
-                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-blue-800 mb-3 md:mb-4">Pre-Owned / Second-Hand Products</h3>
+                        <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">Pre-Owned / Second-Hand Products</h3>
                           <p className="text-gray-700 text-sm md:text-base mb-3 md:mb-4">
                             Labeled as "Pre-Owned" or "Brand New Without Tags". Condition is seller-declared and categorized as:
                           </p>
@@ -150,29 +150,29 @@ export default function BuyerTermsPage() {
                             <div className="bg-gray-50 p-2 md:p-3 rounded-lg text-center">
                               <p className="font-semibold text-gray-800 text-xs md:text-sm">Brand New Without Tags</p>
                             </div>
-                            <div className="bg-green-50 p-2 md:p-3 rounded-lg text-center">
-                              <p className="font-semibold text-green-800 text-xs md:text-sm">Excellent</p>
+                            <div className="bg-gray-100 p-2 md:p-3 rounded-lg text-center">
+                              <p className="font-semibold text-gray-800 text-xs md:text-sm">Excellent</p>
                             </div>
-                            <div className="bg-yellow-50 p-2 md:p-3 rounded-lg text-center">
-                              <p className="font-semibold text-yellow-800 text-xs md:text-sm">Good</p>
+                            <div className="bg-gray-100 p-2 md:p-3 rounded-lg text-center">
+                              <p className="font-semibold text-gray-800 text-xs md:text-sm">Good</p>
                             </div>
-                            <div className="bg-orange-50 p-2 md:p-3 rounded-lg text-center">
-                              <p className="font-semibold text-orange-800 text-xs md:text-sm">Fair</p>
+                            <div className="bg-gray-100 p-2 md:p-3 rounded-lg text-center">
+                              <p className="font-semibold text-gray-800 text-xs md:text-sm">Fair</p>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className="mt-3 md:mt-4 p-2 md:p-3 bg-yellow-50 border border-yellow-200 rounded">
-                        <p className="text-yellow-800 font-medium text-sm md:text-base">
+                      <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-100 border border-gray-300 rounded">
+                        <p className="text-gray-800 font-medium text-sm md:text-base">
                           ⚠️ Buyers must carefully review all condition information before purchase.
                         </p>
                       </div>
                     </div>
 
                     {/* Section 3: PRODUCT INFORMATION */}
-                    <div id="section3" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section3" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           3
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">PRODUCT INFORMATION & BUYER RESPONSIBILITY</h2>
@@ -195,14 +195,14 @@ export default function BuyerTermsPage() {
                           </ul>
                         </div>
 
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+                        <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 md:p-4">
                           <div className="flex items-start gap-2 md:gap-3">
-                            <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <span className="text-blue-600 text-sm md:text-base">ℹ️</span>
+                            <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-gray-600 text-sm md:text-base">ℹ️</span>
                             </div>
                             <div>
-                              <p className="text-blue-800 font-semibold text-sm md:text-base">We care for our Buyers</p>
-                              <p className="text-blue-700 text-xs md:text-sm">
+                              <p className="text-gray-800 font-semibold text-sm md:text-base">We care for our Buyers</p>
+                              <p className="text-gray-700 text-xs md:text-sm">
                                 We verify all our Sellers. JustBecho is NOT responsible for misunderstandings arising from the Buyer's failure to read product details carefully.
                               </p>
                             </div>
@@ -212,9 +212,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 4: AUTHENTICATION & BECHO PROTECT */}
-                    <div id="section4" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section4" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           4
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">AUTHENTICATION & BECHO PROTECT</h2>
@@ -225,16 +225,16 @@ export default function BuyerTermsPage() {
                           <p className="text-gray-700 text-sm md:text-base mb-3 md:mb-4">
                             Becho Protect is an optional product authentication and inspection service.
                           </p>
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
-                            <p className="text-red-700 font-semibold text-sm md:text-base">
+                          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 md:p-4">
+                            <p className="text-gray-800 font-semibold text-sm md:text-base">
                               ⚠️ If you skip Becho Protect, you accept the product as-is (except watches, which include free checking).
                             </p>
                           </div>
                         </div>
 
                         {/* Pricing Table */}
-                        <div className="bg-white border border-green-200 rounded-lg p-4 md:p-6 shadow-sm">
-                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-green-800 mb-3 md:mb-4">Becho Protect Pricing</h3>
+                        <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">Becho Protect Pricing</h3>
                           <div className="overflow-x-auto">
                             <table className="min-w-full bg-white border border-gray-300">
                               <thead className="bg-gray-50">
@@ -257,7 +257,7 @@ export default function BuyerTermsPage() {
                                 </tr>
                                 <tr>
                                   <td className="py-2 px-3 md:py-3 md:px-4 border-b text-xs md:text-sm">Watches</td>
-                                  <td className="py-2 px-3 md:py-3 md:px-4 border-b font-bold text-green-600 text-xs md:text-sm">FREE</td>
+                                  <td className="py-2 px-3 md:py-3 md:px-4 border-b font-bold text-gray-700 text-xs md:text-sm">FREE</td>
                                   <td className="py-2 px-3 md:py-3 md:px-4 border-b text-xs md:text-sm">Always authenticated at no charge</td>
                                 </tr>
                                 <tr>
@@ -271,8 +271,8 @@ export default function BuyerTermsPage() {
                         </div>
 
                         {/* What's Included */}
-                        <div className="bg-white border border-blue-200 rounded-lg p-4 md:p-6 shadow-sm">
-                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-blue-800 mb-3 md:mb-4">What Becho Protect Includes</h3>
+                        <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">What Becho Protect Includes</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1 md:space-y-2">
                               <li>Professional authentication by experts</li>
@@ -289,17 +289,17 @@ export default function BuyerTermsPage() {
 
                         {/* Outcomes */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-4 md:p-6 shadow-sm">
-                            <h4 className="font-bold text-green-800 text-sm md:text-base mb-2 md:mb-3">✅ If Item Passes Inspection</h4>
-                            <ul className="list-disc pl-5 md:pl-6 text-green-700 text-xs md:text-sm space-y-1">
+                          <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                            <h4 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-3">✅ If Item Passes Inspection</h4>
+                            <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1">
                               <li>It is shipped to the Buyer immediately</li>
                               <li>Authenticity certificate provided</li>
                               <li>Full buyer protection activated</li>
                             </ul>
                           </div>
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-4 md:p-6 shadow-sm">
-                            <h4 className="font-bold text-red-800 text-sm md:text-base mb-2 md:mb-3">❌ If Item Fails Inspection</h4>
-                            <ul className="list-disc pl-5 md:pl-6 text-red-700 text-xs md:text-sm space-y-1">
+                          <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                            <h4 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-3">❌ If Item Fails Inspection</h4>
+                            <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1">
                               <li>Buyer gets 100% refund</li>
                               <li>Seller receives no payment</li>
                               <li>Product is returned to Seller</li>
@@ -309,8 +309,8 @@ export default function BuyerTermsPage() {
                         </div>
 
                         {/* Without Becho Protect */}
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 md:p-6 shadow-sm">
-                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-red-800 mb-3 md:mb-4">Purchases WITHOUT Becho Protect</h3>
+                        <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
+                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">Purchases WITHOUT Becho Protect</h3>
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                             <div>
                               <p className="text-gray-700 text-sm md:text-base mb-2 md:mb-3">If Buyer does NOT choose Becho Protect:</p>
@@ -321,9 +321,9 @@ export default function BuyerTermsPage() {
                               </ul>
                             </div>
                             <div>
-                              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 md:p-4">
-                                <p className="text-yellow-800 font-bold text-sm md:text-base mb-1 md:mb-2">JustBecho is NOT responsible for:</p>
-                                <ul className="list-disc pl-5 md:pl-6 text-yellow-700 text-xs md:text-sm space-y-1">
+                              <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 md:p-4">
+                                <p className="text-gray-800 font-bold text-sm md:text-base mb-1 md:mb-2">JustBecho is NOT responsible for:</p>
+                                <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1">
                                   <li>Counterfeits/Fake items</li>
                                   <li>Undisclosed damages</li>
                                   <li>Wrong items/Missing accessories</li>
@@ -332,8 +332,8 @@ export default function BuyerTermsPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="mt-3 md:mt-4 p-2 md:p-3 bg-red-100 border border-red-300 rounded">
-                            <p className="text-red-700 font-bold text-sm md:text-base">
+                          <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-200 border border-gray-400 rounded">
+                            <p className="text-gray-800 font-bold text-sm md:text-base">
                               ⚠️ Buyer assumes full responsibility for skipping Becho Protect (except watches).
                             </p>
                           </div>
@@ -342,30 +342,30 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 5: REFUND & RETURN POLICY */}
-                    <div id="section5" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section5" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           5
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">REFUND & RETURN POLICY</h2>
                       </div>
                       
                       <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 shadow-sm">
-                        <h3 className="text-base md:text-lg lg:text-xl font-bold text-red-800 mb-3 md:mb-4">All Sales Are Final</h3>
+                        <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">All Sales Are Final</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
-                          <div className="bg-red-50 p-3 md:p-4 rounded-lg text-center">
-                            <p className="font-bold text-red-700 text-sm md:text-base lg:text-lg">Non-refundable</p>
+                          <div className="bg-gray-100 p-3 md:p-4 rounded-lg text-center">
+                            <p className="font-bold text-gray-800 text-sm md:text-base lg:text-lg">Non-refundable</p>
                           </div>
-                          <div className="bg-red-50 p-3 md:p-4 rounded-lg text-center">
-                            <p className="font-bold text-red-700 text-sm md:text-base lg:text-lg">Non-returnable</p>
+                          <div className="bg-gray-100 p-3 md:p-4 rounded-lg text-center">
+                            <p className="font-bold text-gray-800 text-sm md:text-base lg:text-lg">Non-returnable</p>
                           </div>
-                          <div className="bg-red-50 p-3 md:p-4 rounded-lg text-center">
-                            <p className="font-bold text-red-700 text-sm md:text-base lg:text-lg">Non-exchangeable</p>
+                          <div className="bg-gray-100 p-3 md:p-4 rounded-lg text-center">
+                            <p className="font-bold text-gray-800 text-sm md:text-base lg:text-lg">Non-exchangeable</p>
                           </div>
                         </div>
 
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 md:p-6 mt-4 md:mt-6">
-                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-green-800 mb-3 md:mb-4">Exceptions (ONLY Under Becho Protect)</h3>
+                        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 md:p-6 mt-4 md:mt-6">
+                          <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800 mb-3 md:mb-4">Exceptions (ONLY Under Becho Protect)</h3>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
                             <div className="bg-white p-3 md:p-4 rounded-lg">
                               <p className="font-semibold text-gray-800 text-center text-xs md:text-sm">Item fails authentication</p>
@@ -377,9 +377,9 @@ export default function BuyerTermsPage() {
                               <p className="font-semibold text-gray-800 text-center text-xs md:text-sm">Item does not match seller's description</p>
                             </div>
                           </div>
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
-                            <p className="text-blue-800 font-semibold text-sm md:text-base">In such cases:</p>
-                            <p className="text-blue-700 text-xs md:text-sm">
+                          <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 md:p-4">
+                            <p className="text-gray-800 font-semibold text-sm md:text-base">In such cases:</p>
+                            <p className="text-gray-700 text-xs md:text-sm">
                               Buyer receives a full refund provided it has provided an unpacking video of the Product upto the satisfaction of the Company.
                             </p>
                           </div>
@@ -388,15 +388,15 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 6: PAYMENT SAFETY */}
-                    <div id="section6" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section6" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           6
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">PAYMENT SAFETY</h2>
                       </div>
                       
-                      <div className="bg-white border border-green-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                           <div>
                             <h3 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-4">Secure Payments</h3>
@@ -419,15 +419,15 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 7: SHIPPING & DELIVERY */}
-                    <div id="section7" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section7" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           7
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">SHIPPING & DELIVERY</h2>
                       </div>
                       
-                      <div className="bg-white border border-blue-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                           <div>
                             <h3 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-4">Delivery Information</h3>
@@ -440,8 +440,8 @@ export default function BuyerTermsPage() {
                           </div>
                           <div>
                             <h3 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-4">Important Notes</h3>
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 md:p-4">
-                              <p className="text-yellow-800 font-semibold text-sm md:text-base">
+                            <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 md:p-4">
+                              <p className="text-gray-800 font-semibold text-sm md:text-base">
                                 Delays arising from courier partners or sellers are not the responsibility of JustBecho.
                               </p>
                             </div>
@@ -451,9 +451,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 8: DISPUTE RESOLUTION */}
-                    <div id="section8" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section8" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           8
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">DISPUTE RESOLUTION</h2>
@@ -472,9 +472,9 @@ export default function BuyerTermsPage() {
                           </div>
                           <div>
                             <h3 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-4">Consequences</h3>
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
-                              <p className="text-red-800 font-bold text-sm md:text-base mb-1 md:mb-2">Failure to cooperate may result in:</p>
-                              <ul className="list-disc pl-5 md:pl-6 text-red-700 text-xs md:text-sm space-y-1">
+                            <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 md:p-4">
+                              <p className="text-gray-800 font-bold text-sm md:text-base mb-1 md:mb-2">Failure to cooperate may result in:</p>
+                              <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1">
                                 <li>Claim rejection</li>
                                 <li>Account suspension</li>
                               </ul>
@@ -485,23 +485,23 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 9: LIABILITY */}
-                    <div id="section9" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section9" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           9
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">LIABILITY</h2>
                       </div>
                       
-                      <div className="bg-white border border-red-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <p className="text-gray-700 mb-3 md:mb-4 font-semibold text-center text-sm md:text-base">
                           JustBecho acts solely as a marketplace.
                         </p>
                         
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
-                            <p className="text-red-800 font-bold text-sm md:text-base mb-2 md:mb-3">JustBecho is NOT responsible for:</p>
-                            <ul className="list-disc pl-5 md:pl-6 text-red-700 text-xs md:text-sm space-y-1 md:space-y-2">
+                          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 md:p-4">
+                            <p className="text-gray-800 font-bold text-sm md:text-base mb-2 md:mb-3">JustBecho is NOT responsible for:</p>
+                            <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1 md:space-y-2">
                               <li>Authenticity of non-Becho Protect items</li>
                               <li>Condition discrepancies</li>
                               <li>Counterfeit goods</li>
@@ -509,9 +509,9 @@ export default function BuyerTermsPage() {
                               <li>Missing accessories</li>
                             </ul>
                           </div>
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
-                            <p className="text-red-800 font-bold text-sm md:text-base mb-2 md:mb-3">Additional Exclusions:</p>
-                            <ul className="list-disc pl-5 md:pl-6 text-red-700 text-xs md:text-sm space-y-1 md:space-y-2">
+                          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 md:p-4">
+                            <p className="text-gray-800 font-bold text-sm md:text-base mb-2 md:mb-3">Additional Exclusions:</p>
+                            <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1 md:space-y-2">
                               <li>Misrepresentation by Sellers</li>
                               <li>Delayed shipping due to courier issues</li>
                               <li>Buyer's incorrect address</li>
@@ -519,11 +519,11 @@ export default function BuyerTermsPage() {
                           </div>
                         </div>
                         
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 md:p-4">
-                          <p className="text-yellow-800 font-semibold text-sm md:text-base mb-1 md:mb-2">
+                        <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 md:p-4">
+                          <p className="text-gray-800 font-semibold text-sm md:text-base mb-1 md:mb-2">
                             JustBecho is not the manufacturer, unless explicitly stated on listing.
                           </p>
-                          <p className="text-yellow-700 text-xs md:text-sm">
+                          <p className="text-gray-700 text-xs md:text-sm">
                             Under NO circumstance shall JustBecho's liability exceed the cost of the Product collected by the Company for such transaction.
                           </p>
                         </div>
@@ -531,15 +531,15 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 10: VERIFICATION & SAFETY */}
-                    <div id="section10" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section10" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           10
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">VERIFICATION & SAFETY</h2>
                       </div>
                       
-                      <div className="bg-white border border-green-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
                           <div className="text-center p-3 md:p-4 bg-gray-50 rounded-lg">
                             <div className="text-xl md:text-2xl mb-1 md:mb-2">✅</div>
@@ -561,9 +561,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 11: PROHIBITED ACTIVITIES */}
-                    <div id="section11" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section11" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           11
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">PROHIBITED ACTIVITIES</h2>
@@ -573,7 +573,7 @@ export default function BuyerTermsPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                           <div>
                             <h3 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-4">Buyers agree NOT to:</h3>
-                            <ul className="list-disc pl-5 md:pl-6 text-red-700 text-xs md:text-sm space-y-1 md:space-y-2">
+                            <ul className="list-disc pl-5 md:pl-6 text-gray-700 text-xs md:text-sm space-y-1 md:space-y-2">
                               <li>Harass or threaten Sellers or staff</li>
                               <li>Manipulate ratings or feedback</li>
                               <li>Open false disputes</li>
@@ -586,17 +586,17 @@ export default function BuyerTermsPage() {
                           <div>
                             <h3 className="font-bold text-gray-800 text-sm md:text-base mb-2 md:mb-4">Violations may result in:</h3>
                             <div className="grid grid-cols-2 gap-2 md:gap-3">
-                              <div className="bg-red-50 p-2 md:p-3 rounded text-center">
-                                <p className="text-red-700 font-semibold text-xs md:text-sm">Order cancellations</p>
+                              <div className="bg-gray-100 p-2 md:p-3 rounded text-center">
+                                <p className="text-gray-700 font-semibold text-xs md:text-sm">Order cancellations</p>
                               </div>
-                              <div className="bg-red-50 p-2 md:p-3 rounded text-center">
-                                <p className="text-red-700 font-semibold text-xs md:text-sm">Account suspension</p>
+                              <div className="bg-gray-100 p-2 md:p-3 rounded text-center">
+                                <p className="text-gray-700 font-semibold text-xs md:text-sm">Account suspension</p>
                               </div>
-                              <div className="bg-red-50 p-2 md:p-3 rounded text-center">
-                                <p className="text-red-700 font-semibold text-xs md:text-sm">Permanent bans</p>
+                              <div className="bg-gray-100 p-2 md:p-3 rounded text-center">
+                                <p className="text-gray-700 font-semibold text-xs md:text-sm">Permanent bans</p>
                               </div>
-                              <div className="bg-red-50 p-2 md:p-3 rounded text-center">
-                                <p className="text-red-700 font-semibold text-xs md:text-sm">Legal action</p>
+                              <div className="bg-gray-100 p-2 md:p-3 rounded text-center">
+                                <p className="text-gray-700 font-semibold text-xs md:text-sm">Legal action</p>
                               </div>
                             </div>
                           </div>
@@ -605,9 +605,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 12: FEEDBACK & REVIEWS */}
-                    <div id="section12" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section12" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           12
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">FEEDBACK & REVIEWS</h2>
@@ -616,29 +616,29 @@ export default function BuyerTermsPage() {
                       <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                           <div className="text-center p-3 md:p-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-                              <span className="text-green-600 text-lg md:text-xl">✓</span>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                              <span className="text-gray-600 text-lg md:text-xl">✓</span>
                             </div>
                             <p className="font-bold text-gray-800 text-sm md:text-base">Honest Reviews</p>
                             <p className="text-gray-600 text-xs md:text-sm mt-0.5 md:mt-1">Leave honest reviews after receiving products</p>
                           </div>
                           <div className="text-center p-3 md:p-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-                              <span className="text-red-600 text-lg md:text-xl">✗</span>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                              <span className="text-gray-600 text-lg md:text-xl">✗</span>
                             </div>
                             <p className="font-bold text-gray-800 text-sm md:text-base">Prohibited Reviews</p>
                             <p className="text-gray-600 text-xs md:text-sm mt-0.5 md:mt-1">Fake, abusive, or manipulative reviews may be removed</p>
                           </div>
                           <div className="text-center p-3 md:p-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-                              <span className="text-yellow-600 text-lg md:text-xl">⚠️</span>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                              <span className="text-gray-600 text-lg md:text-xl">⚠️</span>
                             </div>
                             <p className="font-bold text-gray-800 text-sm md:text-base">No Extortion</p>
                             <p className="text-gray-600 text-xs md:text-sm mt-0.5 md:mt-1">Extortion-style reviews are prohibited</p>
                           </div>
                         </div>
-                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded">
-                          <p className="text-blue-700 text-xs md:text-sm">
+                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-50 border border-gray-300 rounded">
+                          <p className="text-gray-700 text-xs md:text-sm">
                             Buyer provides consent to the Company to use their feedbacks, reviews, names and photographs for purpose of advertising and marketing of the Platform.
                           </p>
                         </div>
@@ -646,9 +646,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 13: INTELLECTUAL PROPERTY */}
-                    <div id="section13" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section13" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           13
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">INTELLECTUAL PROPERTY</h2>
@@ -675,19 +675,19 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 14: PRIVACY */}
-                    <div id="section14" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section14" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           14
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">PRIVACY</h2>
                       </div>
                       
-                      <div className="bg-white border border-blue-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="flex items-center gap-3 md:gap-4">
                           <div className="flex-shrink-0">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                              <span className="text-blue-600 text-lg md:text-xl">🔒</span>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                              <span className="text-gray-600 text-lg md:text-xl">🔒</span>
                             </div>
                           </div>
                           <div>
@@ -697,7 +697,7 @@ export default function BuyerTermsPage() {
                             <div className="mt-2 md:mt-3">
                               <Link 
                                 href="/privacy-policy" 
-                                className="text-blue-600 hover:text-blue-800 font-semibold text-sm md:text-base inline-flex items-center gap-1 md:gap-2"
+                                className="text-gray-800 hover:text-black font-semibold text-sm md:text-base inline-flex items-center gap-1 md:gap-2"
                               >
                                 View Privacy Policy
                                 <span>→</span>
@@ -709,9 +709,9 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 15: GOVERNING LAW */}
-                    <div id="section15" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section15" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           15
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">GOVERNING LAW & JURISDICTION</h2>
@@ -734,27 +734,27 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 16: MODIFICATIONS */}
-                    <div id="section16" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section16" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           16
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">MODIFICATIONS</h2>
                       </div>
                       
-                      <div className="bg-white border border-yellow-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="flex items-center gap-3 md:gap-4">
                           <div className="flex-shrink-0">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                              <span className="text-yellow-600 text-lg md:text-xl">📝</span>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                              <span className="text-gray-600 text-lg md:text-xl">📝</span>
                             </div>
                           </div>
                           <div>
                             <p className="text-gray-700 text-sm md:text-base mb-2 md:mb-3">
                               JustBecho may update these Terms at any time.
                             </p>
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 md:p-4">
-                              <p className="text-yellow-800 font-semibold text-sm md:text-base">
+                            <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 md:p-4">
+                              <p className="text-gray-800 font-semibold text-sm md:text-base">
                                 Continued use of the platform after updates constitutes acceptance of the revised Terms.
                               </p>
                             </div>
@@ -764,37 +764,37 @@ export default function BuyerTermsPage() {
                     </div>
 
                     {/* Section 17: ACCEPTANCE */}
-                    <div id="section17" className="scroll-mt-24 md:scroll-mt-32">
+                    <div id="section17" className="scroll-mt-32 md:scroll-mt-40">
                       <div className="flex items-center gap-3 mb-4 md:mb-6">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center text-sm md:text-lg font-bold">
                           17
                         </div>
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">ACCEPTANCE</h2>
                       </div>
                       
-                      <div className="bg-white border border-green-200 rounded-lg p-4 md:p-6 shadow-sm">
+                      <div className="bg-white border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div className="text-center">
-                          <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                            <span className="text-green-600 text-xl md:text-2xl">✓</span>
+                          <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                            <span className="text-gray-600 text-xl md:text-2xl">✓</span>
                           </div>
                           <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 mb-3 md:mb-4">By placing an order on JustBecho.com, you acknowledge that:</h3>
                           
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
-                            <div className="bg-green-50 p-3 md:p-4 rounded-lg">
-                              <p className="font-semibold text-green-800 text-xs md:text-sm">Read & Understood</p>
-                              <p className="text-green-700 text-xs mt-0.5 md:mt-1">You have read and understood these Terms</p>
+                            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                              <p className="font-semibold text-gray-800 text-xs md:text-sm">Read & Understood</p>
+                              <p className="text-gray-700 text-xs mt-0.5 md:mt-1">You have read and understood these Terms</p>
                             </div>
-                            <div className="bg-green-50 p-3 md:p-4 rounded-lg">
-                              <p className="font-semibold text-green-800 text-xs md:text-sm">Accepted Conditions</p>
-                              <p className="text-green-700 text-xs mt-0.5 md:mt-1">You accept all conditions and responsibilities</p>
+                            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                              <p className="font-semibold text-gray-800 text-xs md:text-sm">Accepted Conditions</p>
+                              <p className="text-gray-700 text-xs mt-0.5 md:mt-1">You accept all conditions and responsibilities</p>
                             </div>
-                            <div className="bg-green-50 p-3 md:p-4 rounded-lg">
-                              <p className="font-semibold text-green-800 text-xs md:text-sm">Legally Bound</p>
-                              <p className="text-green-700 text-xs mt-0.5 md:mt-1">You agree to be legally bound by this agreement</p>
+                            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                              <p className="font-semibold text-gray-800 text-xs md:text-sm">Legally Bound</p>
+                              <p className="text-gray-700 text-xs mt-0.5 md:mt-1">You agree to be legally bound by this agreement</p>
                             </div>
                           </div>
                           
-                          <div className="mt-4 md:mt-6 p-4 md:p-6 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg">
+                          <div className="mt-4 md:mt-6 p-4 md:p-6 bg-gradient-to-r from-black to-gray-900 text-white rounded-lg">
                             <p className="text-center font-bold text-sm md:text-lg">
                               By using JustBecho, you confirm your acceptance of these Terms & Conditions.
                             </p>
@@ -810,20 +810,20 @@ export default function BuyerTermsPage() {
               <div className="flex flex-col sm:flex-row justify-between items-center mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200 gap-3 md:gap-4">
                 <Link 
                   href="/terms/seller-terms" 
-                  className="text-blue-600 hover:text-blue-800 font-semibold text-sm md:text-base flex items-center gap-1 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="text-gray-800 hover:text-black font-semibold text-sm md:text-base flex items-center gap-1 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   <span>←</span> Seller Terms & Conditions
                 </Link>
                 <div className="flex items-center gap-2 md:gap-4">
                   <Link 
                     href="/privacy-policy" 
-                    className="text-blue-600 hover:text-blue-800 font-semibold text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="text-gray-800 hover:text-black font-semibold text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
                     Privacy Policy
                   </Link>
                   <Link 
                     href="/contact-us" 
-                    className="text-blue-600 hover:text-blue-800 font-semibold text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="text-gray-800 hover:text-black font-semibold text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
                     Contact Us
                   </Link>
