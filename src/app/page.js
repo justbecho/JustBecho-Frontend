@@ -91,86 +91,52 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ UPDATED: SIMPLE MARQUEE - SUPER SMOOTH WITHOUT JERKS AND REDUCED HEIGHT
+  // ✅ UPDATED: SIMPLE MARQUEE - COMPLETELY SEPARATE FROM HOME BANNER
   const BrandMarquee = () => {
     const containerRef = useRef(null);
     const contentRef = useRef(null);
     const animationRef = useRef(null);
     const [isHovered, setIsHovered] = useState(false);
-    const [currentPosition, setCurrentPosition] = useState(0);
     
-    // Calculate content width properly
-    const [contentWidth, setContentWidth] = useState(0);
+    // Create two sets of brands for seamless looping
+    const duplicatedBrands = useMemo(() => {
+      return [...allBrands, ...allBrands];
+    }, [allBrands]);
     
     useEffect(() => {
-      // Calculate initial content width
-      const calculateWidth = () => {
-        if (contentRef.current) {
-          // Get width of one set of brands
-          const items = contentRef.current.children;
-          if (items.length > 0) {
-            const itemWidth = items[0].offsetWidth || 120;
-            const gap = 32; // px-8 = 2rem = 32px
-            const singleSetWidth = allBrands.length * (itemWidth + gap);
-            setContentWidth(singleSetWidth);
-          }
-        }
-      };
+      let animationId;
+      let position = 0;
+      const speed = 0.8; // pixels per frame
       
-      calculateWidth();
-      window.addEventListener('resize', calculateWidth);
-      
-      return () => {
-        window.removeEventListener('resize', calculateWidth);
-      };
-    }, [allBrands.length]);
-    
-    // Animation with requestAnimationFrame for butter smoothness
-    useEffect(() => {
-      let lastTime = 0;
-      const speed = 0.5; // pixels per frame (slower = smoother)
-      
-      const animate = (currentTime) => {
+      const animate = () => {
         if (!contentRef.current || isHovered) {
-          lastTime = currentTime;
-          animationRef.current = requestAnimationFrame(animate);
+          animationId = requestAnimationFrame(animate);
           return;
         }
         
-        if (lastTime === 0) lastTime = currentTime;
-        const deltaTime = currentTime - lastTime;
-        lastTime = currentTime;
+        position -= speed;
         
-        // Calculate movement based on time for consistent speed
-        const movement = speed * (deltaTime / 16.67); // Normalize to 60fps
-        
-        setCurrentPosition(prev => {
-          let newPosition = prev - movement;
-          
-          // Reset when we've scrolled one complete set
-          if (contentWidth > 0 && Math.abs(newPosition) >= contentWidth) {
-            newPosition = 0;
+        // Reset when we've scrolled one complete set
+        if (contentRef.current) {
+          const contentWidth = contentRef.current.scrollWidth / 2;
+          if (Math.abs(position) >= contentWidth) {
+            position = 0;
           }
           
-          // Update transform
-          if (contentRef.current) {
-            contentRef.current.style.transform = `translateX(${newPosition}px)`;
-          }
-          
-          return newPosition;
-        });
+          contentRef.current.style.transform = `translateX(${position}px)`;
+        }
         
-        animationRef.current = requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate);
       };
       
-      animationRef.current = requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
       
       return () => {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
+        if (animationId) {
+          cancelAnimationFrame(animationId);
         }
       };
-    }, [isHovered, contentWidth]);
+    }, [isHovered]);
     
     const handleMouseEnter = () => {
       setIsHovered(true);
@@ -180,14 +146,9 @@ function HomeContent() {
       setIsHovered(false);
     };
     
-    // Duplicate brands for seamless loop (need 3 copies for smooth looping)
-    const duplicatedBrands = useMemo(() => {
-      return [...allBrands, ...allBrands, ...allBrands];
-    }, [allBrands]);
-    
     return (
       <div 
-        className="marquee-container w-full overflow-hidden py-2 sm:py-3 relative" // ✅ REDUCED HEIGHT: py-2 instead of py-4
+        className="marquee-container w-full overflow-hidden py-2 sm:py-3 relative"
         ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -201,15 +162,15 @@ function HomeContent() {
             width: 'fit-content',
             display: 'flex',
             alignItems: 'center',
-            transition: isHovered ? 'transform 0.2s ease' : 'none'
+            transition: isHovered ? 'transform 0.3s ease' : 'none'
           }}
         >
           {duplicatedBrands.map((brand, idx) => (
             <div 
               key={`${brand.name}-${idx}`} 
-              className="flex-shrink-0 px-6 sm:px-8" // ✅ REDUCED SPACING
+              className="flex-shrink-0 px-4 sm:px-6"
             >
-              <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center"> {/* ✅ REDUCED SIZE */}
+              <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
                 <img
                   src={brand.logo}
                   alt={brand.name}
@@ -225,8 +186,8 @@ function HomeContent() {
         </div>
         
         {/* Gradient overlays for smooth edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-gray-100 to-transparent pointer-events-none z-10"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-r from-gray-100 to-transparent pointer-events-none z-10"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-l from-gray-100 to-transparent pointer-events-none z-10"></div>
       </div>
     );
   };
@@ -472,7 +433,7 @@ function HomeContent() {
     router.push(`/shop?budget=${filterType}`)
   }
 
-  // ✅ UPDATED: SIMPLE CAROUSEL - Right to Left Swipe Only with simultaneous text and image
+  // ✅ UPDATED: SIMPLE CAROUSEL - With separate state management
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
   }
@@ -485,7 +446,7 @@ function HomeContent() {
     setCurrentSlide(index);
   }
 
-  // ✅ Start carousel auto-play - SIMPLE RIGHT TO LEFT SWIPE
+  // ✅ Start carousel auto-play - INDEPENDENT from brand marquee
   useEffect(() => {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
@@ -498,7 +459,7 @@ function HomeContent() {
         clearInterval(carouselIntervalRef.current);
       }
     };
-  }, [carouselSlides.length, currentSlide])
+  }, [carouselSlides.length])
 
   // ✅ Helper function to get category image
   const getCategoryImage = (categoryName) => {
@@ -803,7 +764,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - UPDATED: Reduced height and super smooth */}
+        {/* ✅ 3. Brand Carousel - UPDATED: COMPLETELY SEPARATE ANIMATION */}
         <section className="py-6 sm:py-8 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <BrandMarquee />
