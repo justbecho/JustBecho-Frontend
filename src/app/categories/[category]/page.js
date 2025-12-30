@@ -54,7 +54,7 @@ function getCategoryConfig(categorySlug) {
     'men': {
       title: "MEN'S FASHION",
       subtitle: 'Discover luxury pre-loved fashion for men - Premium brands at amazing prices',
-      banner: '/banners/mens new.jpeg',
+      banner: '/banners/mensnew.jpeg',
       metaTitle: "Men's Luxury Fashion | Pre-Loved Designer Brands",
       metaDescription: 'Shop authentic pre-loved luxury fashion for men. Designer brands at 50-80% off. Verified authenticity.',
       whyTitle: "WHY SHOP MEN'S FASHION AT JUST BECHO",
@@ -81,7 +81,7 @@ function getCategoryConfig(categorySlug) {
     'women': {
       title: "WOMEN'S FASHION",
       subtitle: 'Explore curated luxury fashion for women - Designer pieces reimagined',
-      banner: '/banners/womens new.png',
+      banner: '/banners/womensnew.jpeg',
       metaTitle: "Women's Luxury Fashion | Pre-Loved Designer Collection",
       metaDescription: 'Discover authentic pre-loved luxury fashion for women. Premium brands at unbeatable prices.',
       whyTitle: "WHY SHOP WOMEN'S FASHION AT JUST BECHO",
@@ -108,7 +108,7 @@ function getCategoryConfig(categorySlug) {
     'footwear': {
       title: 'FOOTWEAR',
       subtitle: 'Step into style with luxury pre-loved footwear',
-      banner: '/banners/footwear new.png',
+      banner: '/banners/footwearnew.jpeg',
       metaTitle: 'Luxury Footwear | Pre-Loved Designer Shoes',
       metaDescription: 'Authentic pre-loved luxury footwear. From sneakers to formal shoes, all verified.',
       whyTitle: 'WHY SHOP FOOTWEAR AT JUST BECHO',
@@ -135,7 +135,7 @@ function getCategoryConfig(categorySlug) {
     'accessories': {
       title: 'ACCESSORIES',
       subtitle: 'Complete your look with luxury accessories',
-      banner: '/banners/accessories new.png',
+      banner: '/banners/accessoriesnew.jpeg',
       metaTitle: 'Luxury Accessories | Pre-Loved Designer Accessories',
       metaDescription: 'Authentic pre-loved luxury accessories. Bags, belts, jewelry and more.',
       whyTitle: 'WHY SHOP ACCESSORIES AT JUST BECHO',
@@ -162,7 +162,7 @@ function getCategoryConfig(categorySlug) {
     'watches': {
       title: 'WATCHES',
       subtitle: 'Timeless luxury timepieces',
-      banner: '/banners/watches new.png',
+      banner: '/banners/watchesnew.jpeg',
       metaTitle: 'Luxury Watches | Pre-Loved Designer Watches',
       metaDescription: 'Authentic pre-loved luxury watches. Rolex, Omega, Tag Heuer and more.',
       whyTitle: 'WHY SHOP WATCHES AT JUST BECHO',
@@ -189,7 +189,7 @@ function getCategoryConfig(categorySlug) {
     'perfumes': {
       title: 'PERFUMES',
       subtitle: 'Signature scents and luxury fragrances',
-      banner: '/banners/perfumes new.png',
+      banner: '/banners/perfumenew.jpeg',
       metaTitle: 'Luxury Perfumes | Designer Fragrances',
       metaDescription: 'Authentic luxury perfumes and fragrances. Chanel, Dior, Gucci and more.',
       whyTitle: 'WHY SHOP PERFUMES AT JUST BECHO',
@@ -216,7 +216,7 @@ function getCategoryConfig(categorySlug) {
     'toys': {
       title: 'TOYS & COLLECTIBLES',
       subtitle: 'Luxury toys and collectible treasures',
-      banner: '/banners/Toys and Figurines.png',
+      banner: '/banners/toysnew.jpeg',
       metaTitle: 'Luxury Toys | Collectibles & Figurines',
       metaDescription: 'Rare and luxury toys & collectibles. Authentic items at great prices.',
       whyTitle: 'WHY SHOP TOYS AT JUST BECHO',
@@ -243,7 +243,7 @@ function getCategoryConfig(categorySlug) {
     'kids-fashion': {
       title: "KID'S FASHION",
       subtitle: 'Adorable luxury fashion for kids',
-      banner: '/banners/kids new.png',
+      banner: '/banners/kidsnew.jpeg',
       metaTitle: 'Kids Luxury Fashion | Designer Kids Clothes',
       metaDescription: 'Authentic pre-loved luxury fashion for kids. Premium brands for children.',
       whyTitle: "WHY SHOP KIDS FASHION AT JUST BECHO",
