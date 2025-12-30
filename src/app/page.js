@@ -25,6 +25,10 @@ function HomeContent() {
   // ✅ Carousel states
   const [currentSlide, setCurrentSlide] = useState(0)
   const carouselIntervalRef = useRef(null)
+  
+  // ✅ NEW: Brand carousel pause state
+  const [isBrandCarouselPaused, setIsBrandCarouselPaused] = useState(false)
+  const brandMarqueeRef = useRef(null)
 
   // ✅ UPDATED: All brands combined into single array for unified carousel
   const allBrands = useMemo(() => [
@@ -91,7 +95,7 @@ function HomeContent() {
     "default": "/banners/default.jpg"
   }), [])
 
-  // ✅ ✅✅✅✅✅ FIXED: BRAND CAROUSEL - PURE CSS ANIMATION (NO JAVASCRIPT)
+  // ✅ UPDATED: BRAND CAROUSEL - PURE CSS ANIMATION with pause control
   const BrandMarquee = () => {
     // Duplicate brands 3 times for seamless looping
     const duplicatedBrands = useMemo(() => {
@@ -99,9 +103,15 @@ function HomeContent() {
     }, [allBrands]);
     
     return (
-      <div className="marquee-container w-full overflow-hidden py-3 sm:py-4 relative">
-        {/* ✅ PURE CSS ANIMATION - No JavaScript lag */}
-        <div className="flex items-center animate-smooth-marquee whitespace-nowrap">
+      <div 
+        className="marquee-container w-full overflow-hidden py-3 sm:py-4 relative"
+        ref={brandMarqueeRef}
+      >
+        {/* ✅ PURE CSS ANIMATION - With pause control */}
+        <div 
+          className={`flex items-center animate-smooth-marquee whitespace-nowrap ${isBrandCarouselPaused ? 'animation-paused' : ''}`}
+          style={{ animationDuration: '15s' }} // ✅ Speed thodi si badayi hai
+        >
           {duplicatedBrands.map((brand, idx) => (
             <div 
               key={`${brand.name}-${idx}`} 
@@ -370,30 +380,71 @@ function HomeContent() {
     router.push(`/shop?budget=${filterType}`)
   }
 
-  // ✅ UPDATED: SIMPLE CAROUSEL - With separate state management
+  // ✅ UPDATED: SIMPLE CAROUSEL - With pause control for brand carousel
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    // ✅ Pause brand carousel when home banner image changes
+    setIsBrandCarouselPaused(true)
+    
+    setCurrentSlide((prev) => {
+      const nextSlideIndex = (prev + 1) % carouselSlides.length
+      
+      // ✅ Restart brand carousel after 500ms
+      setTimeout(() => {
+        setIsBrandCarouselPaused(false)
+      }, 500)
+      
+      return nextSlideIndex
+    })
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+    // ✅ Pause brand carousel when home banner image changes
+    setIsBrandCarouselPaused(true)
+    
+    setCurrentSlide((prev) => {
+      const prevSlideIndex = (prev - 1 + carouselSlides.length) % carouselSlides.length
+      
+      // ✅ Restart brand carousel after 500ms
+      setTimeout(() => {
+        setIsBrandCarouselPaused(false)
+      }, 500)
+      
+      return prevSlideIndex
+    })
   }
 
   const goToSlide = (index) => {
-    setCurrentSlide(index);
+    if (index !== currentSlide) {
+      // ✅ Pause brand carousel when manually changing slide
+      setIsBrandCarouselPaused(true)
+      
+      setCurrentSlide(index)
+      
+      // ✅ Restart brand carousel after 500ms
+      setTimeout(() => {
+        setIsBrandCarouselPaused(false)
+      }, 500)
+    }
   }
 
-  // ✅ Start carousel auto-play - INDEPENDENT from brand marquee
+  // ✅ Start carousel auto-play - WITH BRAND CAROUSEL PAUSE CONTROL
   useEffect(() => {
     if (carouselSlides.length > 1) {
       carouselIntervalRef.current = setInterval(() => {
-        nextSlide();
+        // ✅ Pause brand carousel when auto-changing slide
+        setIsBrandCarouselPaused(true)
+        setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
+        
+        // ✅ Restart brand carousel after 500ms
+        setTimeout(() => {
+          setIsBrandCarouselPaused(false)
+        }, 500)
       }, 4000); // 4 seconds interval
     }
     
     return () => {
       if (carouselIntervalRef.current) {
-        clearInterval(carouselIntervalRef.current);
+        clearInterval(carouselIntervalRef.current)
       }
     };
   }, [carouselSlides.length])
@@ -617,7 +668,12 @@ function HomeContent() {
             onMouseEnter={() => carouselIntervalRef.current && clearInterval(carouselIntervalRef.current)}
             onMouseLeave={() => {
               if (carouselSlides.length > 1) {
-                carouselIntervalRef.current = setInterval(() => nextSlide(), 4000);
+                carouselIntervalRef.current = setInterval(() => {
+                  // ✅ Pause brand carousel on auto change
+                  setIsBrandCarouselPaused(true)
+                  setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
+                  setTimeout(() => setIsBrandCarouselPaused(false), 500)
+                }, 4000)
               }
             }}
           >
@@ -634,20 +690,20 @@ function HomeContent() {
                         : 'opacity-0 translate-x-full'
                   }`}
                 >
+                  {/* ✅ UPDATED: Image ko pure banner area mein fit karne ke liye - object-contain se object-cover */}
                   <div className="absolute inset-0 bg-gray-900">
                     <Image
                       src={slide.image}
                       alt={slide.title}
                       fill
-                      className="object-contain object-center"
+                      className="object-cover object-center" 
                       priority={index === 0}
                       sizes="100vw"
                       style={{ 
                         userSelect: 'none', 
                         WebkitUserSelect: 'none',
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        margin: '0 auto'
+                        width: '100%',
+                        height: '100%'
                       }}
                       onError={(e) => {
                         e.target.src = '/images/hero-placeholder.jpg';
@@ -709,7 +765,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ✅ 3. Brand Carousel - UPDATED: PURE CSS ANIMATION - NO LAG */}
+        {/* ✅ 3. Brand Carousel - UPDATED: PURE CSS ANIMATION - WITH PAUSE CONTROL */}
         <section className="py-6 sm:py-8 bg-gray-100 border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <BrandMarquee />
@@ -897,8 +953,8 @@ function HomeContent() {
                   <div className="text-center mt-8 sm:mt-12">
                     <button
                       onClick={() => router.push(category.href)}
-                      // ✅ UPDATED: Premium Textured Gold Button
-                      className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white font-light tracking-widest uppercase hover:from-amber-600 hover:via-amber-700 hover:to-amber-800 transition-all duration-500 px-8 py-3 rounded-none shadow-lg hover:shadow-xl border border-amber-400/30 relative overflow-hidden group"
+                      // ✅ UPDATED: Premium Textured Gold Button (logo color ka)
+                      className="bg-gradient-to-r from-[#D4AF37] via-[#B8860B] to-[#DAA520] text-white font-light tracking-widest uppercase hover:from-[#B8860B] hover:via-[#D4AF37] hover:to-[#B8860B] transition-all duration-500 px-8 py-3 rounded-none shadow-lg hover:shadow-xl border border-amber-400/30 relative overflow-hidden group"
                     >
                       <span className="relative z-10">→ VIEW ALL {category.name.toUpperCase()}</span>
                       <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>

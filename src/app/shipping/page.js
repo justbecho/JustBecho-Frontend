@@ -1,30 +1,126 @@
 // app/shipping-policy/page.js - MOBILE RESPONSIVE VERSION
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import { FiChevronDown, FiChevronUp, FiHome, FiMail, FiPhone, FiPackage } from 'react-icons/fi'
 
 export default function ShippingPolicyPage() {
+  const [isMobile, setIsMobile] = useState(false)
+  const [showMobileNav, setShowMobileNav] = useState(false)
+
+  // Check for mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
 
+  // Mobile Header Component
+  const MobileHeader = () => (
+    <div className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
+      <div className="px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowMobileNav(!showMobileNav)}
+            className="p-2 hover:bg-blue-800 rounded-lg transition-colors"
+          >
+            {showMobileNav ? (
+              <FiChevronUp className="w-6 h-6" />
+            ) : (
+              <FiChevronDown className="w-6 h-6" />
+            )}
+          </button>
+          <div className="flex items-center gap-2">
+            <FiPackage className="w-5 h-5" />
+            <span className="text-sm font-medium">Shipping Policy</span>
+          </div>
+        </div>
+        
+        <button
+          onClick={() => window.location.href = '/'}
+          className="p-2 hover:bg-blue-800 rounded-lg transition-colors"
+        >
+          <FiHome className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Mobile Navigation Dropdown */}
+      {showMobileNav && (
+        <div className="px-4 pb-4">
+          <div className="bg-white rounded-lg shadow-lg max-h-[70vh] overflow-y-auto">
+            <div className="p-4 border-b border-gray-200">
+              <p className="text-gray-600 text-sm">Jump to Section:</p>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {[
+                { id: 'section1', title: '1. Shipping Process Overview' },
+                { id: 'section2', title: '2. Seller Dispatch (2-3 Days)' },
+                { id: 'section3', title: '3. Transit to Warehouse (3-4 Days)' },
+                { id: 'section4', title: '4. Authentication (Becho Protect)' },
+                { id: 'section5', title: '5. Final Dispatch (1-2 Days)' },
+                { id: 'section6', title: '6. Order Tracking' },
+                { id: 'section7', title: '7. Estimated Delivery Time' },
+                { id: 'section8', title: '8. Delivery Areas' },
+                { id: 'section9', title: '9. Shipping Charges' },
+                { id: 'section10', title: '10. Failed Deliveries' },
+                { id: 'section11', title: '11. International Shipping' },
+                { id: 'section12', title: '12. Contact Information' }
+              ].map((section) => (
+                <a
+                  key={section.id}
+                  href={`#${section.id}`}
+                  onClick={() => setShowMobileNav(false)}
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
+                      {section.id.replace('section', '')}
+                    </div>
+                    <span className="text-sm font-medium">{section.title}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white pt-20 md:pt-40">
+      
+      {/* Main content with proper header padding */}
+      <main className="min-h-screen bg-white pt-[5rem] md:pt-[8rem]">
+        {/* Mobile Header */}
+        {isMobile && <MobileHeader />}
+
         {/* Hero Section - Full Width */}
-        <section className="w-full bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16">
-            <div className="max-w-7xl mx-auto text-center">
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-widest uppercase mb-3 md:mb-4">
+        <section className={`${isMobile ? 'pt-16' : ''} bg-gradient-to-r from-blue-900 to-indigo-900 text-white`}>
+          <div className={`${isMobile ? 'px-4 py-8' : 'px-6 lg:px-8 py-16'}`}>
+            <div className={`${isMobile ? '' : 'max-w-7xl'} mx-auto text-center`}>
+              <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl md:text-5xl'} font-light tracking-widest uppercase mb-3`}>
                 SHIPPING & DELIVERY POLICY
               </h1>
-              <div className="bg-blue-800 inline-block px-4 py-2 md:px-6 md:py-2 rounded-lg mt-2 md:mt-4">
-                <p className="text-blue-100 text-sm md:text-lg">Last Updated: {currentDate}</p>
+              <div className="bg-blue-800 inline-block px-4 py-2 rounded-lg mt-4">
+                <p className={`${isMobile ? 'text-sm' : 'text-lg'} text-blue-100`}>Last Updated: {currentDate}</p>
               </div>
-              <p className="text-blue-200 mt-4 md:mt-6 max-w-3xl mx-auto text-sm md:text-base lg:text-lg px-2">
+              <p className={`${isMobile ? 'text-sm mt-3' : 'text-lg mt-6'} text-blue-200 max-w-3xl mx-auto`}>
                 Transparent and reliable shipping process for your peace of mind. This policy outlines our delivery timelines and procedures.
               </p>
             </div>
@@ -32,14 +128,14 @@ export default function ShippingPolicyPage() {
         </section>
 
         {/* Content Section - Full Width */}
-        <section className="w-full py-8 md:py-16">
-          <div className="w-full px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
+        <section className={`${isMobile ? 'py-6' : 'py-16'}`}>
+          <div className={`${isMobile ? 'px-4' : 'px-6 lg:px-8'}`}>
+            <div className={`${isMobile ? '' : 'max-w-7xl'} mx-auto`}>
               {/* Important Notice Box */}
-              <div className="mb-8 md:mb-12 bg-green-50 border-l-4 border-green-500 p-4 md:p-6 rounded-r-lg">
+              <div className={`${isMobile ? 'mb-6 p-4' : 'mb-12 p-6'} bg-green-50 border-l-4 border-green-500 rounded-r-lg`}>
                 <div className="flex items-start gap-3 md:gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className={`${isMobile ? 'w-8 h-8' : 'w-12 h-12'} bg-green-100 rounded-full flex items-center justify-center`}>
                       <span className="text-green-600 text-base md:text-lg">🚚</span>
                     </div>
                   </div>
@@ -1060,6 +1156,18 @@ export default function ShippingPolicyPage() {
             </div>
           </div>
         </section>
+
+        {/* Mobile Back to Top */}
+        {isMobile && (
+          <div className="sticky bottom-4 left-0 right-0 px-4 z-30">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-medium shadow-lg"
+            >
+              Back to Top
+            </button>
+          </div>
+        )}
       </main>
       <Footer />
     </>
