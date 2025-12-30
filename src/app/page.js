@@ -579,9 +579,7 @@ function HomeContent() {
                       <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light tracking-widest uppercase mb-4 sm:mb-6 md:mb-8">
                         {slide.title}
                       </h1>
-                      <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light tracking-widest uppercase mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-4">
-                        {slide.description}
-                      </p>
+                     
                       <Link
                         href={slide.href}
                         className="bg-white text-gray-900 font-light tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 rounded-full inline-block px-10 py-4 sm:px-12 sm:py-5 text-base sm:text-lg shadow-lg hover:shadow-xl"
