@@ -204,37 +204,37 @@ function HomeContent() {
     }
     return [
       {
-        image: "/banners/mens new.jpeg",
+        image: "/banners/mensnew.jpeg",
         title: "Men's Fashion",
         description: "Discover premium men's fashion",
         href: "/categories/men"
       },
       {
-        image: "/banners/womens new.png",
+        image: "/banners/womensnew.jpeg",
         title: "Women's Fashion",
         description: "Explore luxury women's collections",
         href: "/categories/women"
       },
       {
-        image: "/banners/footwear new.png",
+        image: "/banners/footwearnew.jpeg",
         title: "Footwear",
         description: "Step into luxury footwear",
         href: "/categories/footwear"
       },
       {
-        image: "/banners/accessories new.png",
+        image: "/banners/accessoriesnew.jpeg",
         title: "Accessories",
         description: "Complete your look with accessories",
         href: "/categories/accessories"
       },
       {
-        image: "/banners/watches new.png",
+        image: "/banners/watchesnew.jpeg",
         title: "Watches",
         description: "Timeless luxury timepieces",
         href: "/categories/watches"
       },
       {
-        image: "/banners/perfumes new.png",
+        image: "/banners/perfumenew.jpeg",
         title: "Perfumes",
         description: "Signature scents and fragrances",
         href: "/categories/perfumes"
@@ -246,19 +246,19 @@ function HomeContent() {
   const featuredCollections = useMemo(() => [
     {
       title: "PRODUCTS UNDER ₹20K",
-      image: "/banners/mens new.jpeg",
+      image: "/banners/mensnew.jpeg",
       href: "/shop?budget=under-20k",
       filter: "under-20k"
     },
     {
       title: "PRODUCTS UNDER ₹40K",
-      image: "/banners/womens new.png",
+      image: "/banners/womensnew.png",
       href: "/shop?budget=under-40k",
       filter: "under-40k"
     },
     {
       title: "PRODUCTS UNDER ₹60K",
-      image: "/banners/footwear new.png",
+      image: "/banners/footwearnew.jpeg",
       href: "/shop?budget=under-60k",
       filter: "under-60k"
     }
