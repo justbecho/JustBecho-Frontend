@@ -2284,7 +2284,7 @@ export default function Dashboard() {
       <>
         <Header />
         {/* ✅ MOBILE: Start exactly after header ends (80px) - NO GAP */}
-        <main className="min-h-screen bg-gray-50 pt-[68px] pb-16">
+        <main className="min-h-screen bg-gray-50 pt-[67px] pb-16">
           
           {/* Welcome Banner */}
           <div className="bg-white border-b border-gray-200">
