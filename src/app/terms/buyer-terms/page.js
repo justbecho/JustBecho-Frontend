@@ -13,7 +13,7 @@ export default function BuyerTermsPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white pt-24 md:pt-40">
+      <main className="min-h-screen bg-white pt-16 md:pt-[138px]">
         {/* Hero Section - Full Width */}
         <section className="w-full bg-gradient-to-r from-black to-gray-900 text-white">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16">

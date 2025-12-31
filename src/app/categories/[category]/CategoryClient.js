@@ -660,7 +660,7 @@ export default function CategoryClient({
 
             <div className="bg-white">
                 {/* ✅ PROPER SPACING: Header के नीचे से start होगा */}
-                <div className="pt-16 md:pt-36"></div>
+                <div className="pt-16 md:pt-[140px]"></div>
 
                 {/* ✅ Hero Banner - Clean Version (No Text/Buttons) */}
                 <div className="relative w-full h-[30vh] md:h-[60vh] overflow-hidden">

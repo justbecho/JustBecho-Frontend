@@ -106,7 +106,7 @@ export default function ShippingPolicyPage() {
       <Header />
       
       {/* Main content with proper header padding */}
-      <main className="min-h-screen bg-white pt-[5rem] md:pt-[8rem]">
+      <main className="min-h-screen bg-white pt-16 md:pt-[138px]">
         {/* Mobile Header */}
         {isMobile && <MobileHeader />}
 

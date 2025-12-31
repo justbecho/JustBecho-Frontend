@@ -502,7 +502,7 @@ export default function ShopContent() {
             <Header />
             
             {/* Main content with proper header padding */}
-            <div className="bg-white pt-[5rem] md:pt-[8rem]">
+            <div className="bg-white pt-16 md:pt-[138px]">
 
                 {/* ✅ Hero Banner */}
                 <div className="relative w-full h-[30vh] md:h-[60vh] overflow-hidden">

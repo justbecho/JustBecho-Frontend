@@ -176,7 +176,7 @@ export default function ContactUs() {
       {/* 2. md:pt-[120px] - DESKTOP gap */}
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* ✅ Hero Section with proper spacing */}
-        <div className="pt-[100px] md:pt-[180px] pb-8 md:pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="pt-[90px] md:pt-[180px] pb-8 md:pb-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6">
               Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Touch</span>

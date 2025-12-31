@@ -1148,7 +1148,7 @@ export default function SellNowPage() {
     <>
       <Header />
       <UploadProgressOverlay />
-      <main className="min-h-screen bg-gray-50 pt-20 md:pt-40">
+      <main className="min-h-screen bg-gray-50 pt-16 md:pt-[140px]">
         {user?.sellerVerified && (
           <div className="bg-green-50 border-b border-green-200 py-2 md:py-3">
             <div className="max-w-[1700px] mx-auto px-3 md:px-4 sm:px-6">
