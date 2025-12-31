@@ -2284,7 +2284,7 @@ export default function Dashboard() {
       <>
         <Header />
         {/* ✅ MOBILE: Start exactly after header ends (80px) - NO GAP */}
-        <main className="min-h-screen bg-gray-50 pt-[80px] pb-16">
+        <main className="min-h-screen bg-gray-50 pt-[70px] pb-16">
           
           {/* Welcome Banner */}
           <div className="bg-white border-b border-gray-200">
@@ -2414,7 +2414,7 @@ export default function Dashboard() {
       
       {/* ✅ DESKTOP: Start exactly after header + subheader ends (120px) - NO GAP */}
       <main className="min-h-screen bg-gray-50">
-        <div className="pt-[120px] pb-16">
+        <div className="pt-[140px] pb-16">
           {renderSellerStatusBanner()}
           
           <section className="bg-white border-b border-gray-200">
