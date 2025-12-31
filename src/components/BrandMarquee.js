@@ -112,11 +112,11 @@ export default function BrandMarquee() {
   }, []);
 
   return (
-    <section className="w-full overflow-hidden py-4 bg-gray-100 border-y border-gray-200">
+    <section className="w-full overflow-hidden py-3 sm:py-4 bg-gray-100 border-y border-gray-200">
       <div className="relative">
-        {/* Gradient overlays */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-100 to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-100 to-transparent z-10 pointer-events-none"></div>
+        {/* Gradient overlays - thinner for mobile */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-12 md:w-20 bg-gradient-to-r from-gray-100 to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-12 md:w-20 bg-gradient-to-l from-gray-100 to-transparent z-10 pointer-events-none"></div>
         
         {/* ✅ MANUAL ANIMATION TRACK - NO CSS ANIMATION */}
         <div 
@@ -130,9 +130,11 @@ export default function BrandMarquee() {
           {duplicatedBrands.map((brand, idx) => (
             <div 
               key={`${brand.name}-${idx}`} 
-              className="flex-shrink-0 px-6"
+              // ✅ REDUCED GAP: Mobile: px-3, Tablet: px-4, Desktop: px-6
+              className="flex-shrink-0 px-3 sm:px-4 md:px-6"
             >
-              <div className="relative h-10 w-24 sm:h-12 sm:w-28 md:h-14 md:w-32 flex items-center justify-center">
+              {/* ✅ Logo container with responsive sizing */}
+              <div className="relative h-8 w-16 sm:h-10 sm:w-20 md:h-12 md:w-24 lg:h-14 lg:w-28 flex items-center justify-center">
                 <img
                   src={brand.logo}
                   alt={brand.name}

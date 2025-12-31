@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - FINAL VERSION FOR BOTH MOBILE & DESKTOP
+// app/products/[id]/page.js - FINAL PERFECT VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -410,7 +410,7 @@ export default function ProductPage() {
       <>
         <Header />
         {/* ✅ LOADING STATE - PROPER FOR BOTH */}
-        <main className="min-h-screen bg-white pt-16 md:pt-20"> {/* ✅ pt-20 for desktop (header + categories) */}
+        <main className="min-h-screen bg-white pt-16 md:pt-36"> {/* ✅ pt-36 for desktop (header + subheader) */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -435,7 +435,7 @@ export default function ProductPage() {
       <>
         <Header />
         {/* ✅ NOT FOUND STATE - PROPER FOR BOTH */}
-        <main className="min-h-screen bg-white pt-16 md:pt-20"> {/* ✅ pt-20 for desktop (header + categories) */}
+        <main className="min-h-screen bg-white pt-16 md:pt-36"> {/* ✅ pt-36 for desktop (header + subheader) */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-12 text-center">
             <h1 className="text-xl font-light text-gray-900">Product not found</h1>
             <p className="text-gray-600 mb-4">The product you're looking for doesn't exist or may have been removed.</p>
@@ -458,10 +458,10 @@ export default function ProductPage() {
     <>
       <Header />
       
-      {/* ✅ MAIN CONTENT - PERFECT FOR BOTH MOBILE & DESKTOP */}
+      {/* ✅ MAIN CONTENT - PERFECT POSITIONING */}
       <main className="min-h-screen bg-white">
-        {/* ✅ BREADCRUMB - PROPER POSITIONING FOR BOTH */}
-        <section className="border-b border-gray-200 pt-16 md:pt-20"> {/* ✅ pt-20 for desktop */}
+        {/* ✅ BREADCRUMB - EXACTLY BELOW HEADER/SUBHEADER */}
+        <section className="border-b border-gray-200 pt-16 md:pt-36"> {/* ✅ pt-36 = 144px for desktop */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2 sm:py-3">
             <nav className="flex flex-wrap items-center gap-1 sm:space-x-2 text-[10px] sm:text-xs font-light text-gray-600">
               <Link href="/" className="hover:text-gray-900 whitespace-nowrap">Home</Link>
@@ -479,13 +479,13 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* Product Section - Proper spacing for both */}
-        <section className="py-4 md:py-8"> {/* ✅ md:py-8 for desktop */}
+        {/* Product Section */}
+        <section className="py-4 md:py-8">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-6 lg:gap-12"> {/* ✅ lg:gap-12 for desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-6 lg:gap-12">
               
               {/* Product Images - Left side */}
-              <div className="space-y-3 md:space-y-6"> {/* ✅ md:space-y-6 for desktop */}
+              <div className="space-y-3 md:space-y-6">
                 {/* Main Image */}
                 <div className="flex-1">
                   <div className="aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center max-w-[650px] mx-auto">
@@ -502,7 +502,7 @@ export default function ProductPage() {
                 </div>
 
                 {/* Thumbnails */}
-                <div className="flex justify-center gap-2 md:gap-4"> {/* ✅ md:gap-4 for desktop */}
+                <div className="flex justify-center gap-2 md:gap-4">
                   {product.images && product.images.slice(0, 4).map((image, index) => (
                     <button
                       key={index}
@@ -526,7 +526,7 @@ export default function ProductPage() {
               </div>
 
               {/* Product Info - Right side */}
-              <div className="space-y-3 md:space-y-6 max-w-[550px]"> {/* ✅ md:space-y-6 for desktop */}
+              <div className="space-y-3 md:space-y-6 max-w-[550px]">
                 {/* Product Name */}
                 <div className="space-y-1">
                   <h1 className="text-gray-900 text-base md:text-lg font-light tracking-widest uppercase leading-tight">
@@ -548,7 +548,7 @@ export default function ProductPage() {
                   <p className="text-gray-600 text-[10px] md:text-xs">Seller's Price | GST calculated at checkout</p>
                 </div>
 
-                {/* ✅ BECHO PROTECT SECTION - COMPACT FOR MOBILE, FULL FOR DESKTOP */}
+                {/* ✅ BECHO PROTECT SECTION */}
                 <div className="relative">
                   <div className={`border ${isBechoProtectSelected ? 'border-black' : 'border-gray-300'} rounded-lg p-3 md:p-4 bg-white`}>
                     {/* First Row: Checkbox + Main Title + Price */}
@@ -580,10 +580,7 @@ export default function ProductPage() {
                           {/* Title Text */}
                           <div>
                             <span className="text-gray-900 font-bold text-xs md:text-sm">
-                              {window.innerWidth < 768 
-                                ? "AUTHENTICITY GUARANTEE WITH BECHO PROTECT"
-                                : "AUTHENTICITY AND MONEY-BACK GUARANTEE WITH BECHO PROTECT"
-                              }
+                              AUTHENTICITY AND MONEY-BACK GUARANTEE WITH BECHO PROTECT
                             </span>
                           </div>
                         </label>
@@ -597,18 +594,18 @@ export default function ProductPage() {
                     
                     {/* Features List */}
                     <ul className="space-y-1 text-gray-700 text-[10px] md:text-xs">
-                      <li className="flex items-start gap-1 md:gap-2">
-                        <span className="text-gray-800 font-bold mt-0.5">✓</span>
+                      <li className="flex items-center gap-2">
+                        <span className="text-gray-800 font-bold">✓</span>
                         <span>Professional authentication at our warehouse</span>
                       </li>
                       {window.innerWidth >= 768 && (
-                        <li className="flex items-start gap-1 md:gap-2">
-                          <span className="text-gray-800 font-bold mt-0.5">✓</span>
+                        <li className="flex items-center gap-2">
+                          <span className="text-gray-800 font-bold">✓</span>
                           <span>Your money is safe. Becho Protect covers counterfeits, quality issues, and non-shipment.</span>
                         </li>
                       )}
-                      <li className="flex items-start gap-1 md:gap-2">
-                        <span className="text-gray-800 font-bold mt-0.5">✓</span>
+                      <li className="flex items-center gap-2">
+                        <span className="text-gray-800 font-bold">✓</span>
                         <span>Genuine product guarantee with certificate</span>
                       </li>
                     </ul>
@@ -616,14 +613,14 @@ export default function ProductPage() {
                     {/* Warning message if unchecked */}
                     {showWarning && (
                       <div className="mt-2 md:mt-3 p-2 md:p-3 bg-gray-100 border border-gray-300 rounded">
-                        <div className="flex items-start gap-1 md:gap-2">
-                          <span className="text-gray-800 text-xs">⚠️</span>
+                        <div className="flex items-start gap-2">
+                          <span className="text-gray-800">⚠️</span>
                           <div>
                             <p className="text-gray-800 font-medium text-xs">
                               You are opting out of Authenticity Guarantee
                             </p>
-                            <p className="text-gray-700 text-[10px] md:text-xs mt-0.5 md:mt-1">
-                              Without Becho Protect, {window.innerWidth < 768 ? 'no authentication check will be performed.' : 'we will directly deliver the product without authentication check and no certificate will be provided.'}
+                            <p className="text-gray-700 text-[10px] md:text-xs mt-1">
+                              Without Becho Protect, we will directly deliver the product without authentication check and no certificate will be provided.
                             </p>
                           </div>
                         </div>
@@ -640,32 +637,29 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                {/* Condition - PROPER FOR BOTH */}
+                {/* Condition */}
                 <div className="space-y-1.5 md:space-y-2">
                   <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase">CONDITION</h3>
-                  <div className="flex flex-wrap md:flex-nowrap gap-1 bg-gray-100 p-1 rounded">
+                  <div className="flex gap-1 bg-gray-100 p-1 rounded">
                     {conditionOptions.map((condition) => (
                       <button
                         key={condition}
-                        className={`px-1.5 py-1 rounded text-[10px] md:text-xs font-light transition-all duration-200 ${
+                        className={`flex-1 px-2 py-1.5 rounded text-xs font-light transition-all duration-200 ${
                           product.condition === condition 
                             ? 'bg-white text-gray-900 shadow-sm border border-gray-300' 
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
-                        {window.innerWidth < 768 ? condition.split(' ')[0] : condition}
+                        {condition}
                       </button>
                     ))}
                   </div>
                   <p className="text-gray-600 text-[10px] md:text-xs">
-                    {window.innerWidth < 768 
-                      ? `Listed as ${product.condition}`
-                      : `Seller has listed this item as ${product.condition} condition`
-                    }
+                    Seller has listed this item as <span className="font-medium text-gray-900">{product.condition}</span> condition
                   </p>
                 </div>
 
-                {/* Shipping Info - PROPER FOR BOTH */}
+                {/* Shipping Info */}
                 <div className="space-y-2 md:space-y-3">
                   <div className="grid grid-cols-1 gap-2 md:gap-3">
                     <div className="grid grid-cols-2 gap-2 md:gap-3">
@@ -689,7 +683,7 @@ export default function ProductPage() {
                       </div>
                     </div>
 
-                    {/* Seller Info - PROPER FOR BOTH */}
+                    {/* Seller Info */}
                     <div className="bg-white rounded-lg p-2 md:p-3 border border-gray-300 shadow-sm">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 md:gap-3">
@@ -707,7 +701,7 @@ export default function ProductPage() {
                         
                         <div className="text-right">
                           <span className="bg-gray-100 text-gray-800 text-[10px] md:text-xs px-2 py-1 md:px-3 md:py-1.5 rounded-full font-medium">
-                            {window.innerWidth < 768 ? 'Verified' : 'Verified Seller'}
+                            Verified Seller
                           </span>
                         </div>
                       </div>
@@ -715,7 +709,7 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons - PROPER FOR BOTH */}
+                {/* Action Buttons */}
                 <div className="space-y-2 md:space-y-3 pt-3 md:pt-4 border-t border-gray-200">
                   <div className="flex gap-2 md:gap-3">
                     <button
@@ -749,7 +743,7 @@ export default function ProductPage() {
                     disabled={addingToCart}
                     className="w-full bg-gradient-to-r from-black to-gray-900 text-white py-2.5 md:py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    {addingToCart ? (window.innerWidth < 768 ? 'PROCESSING...' : 'PROCESSING...') : 'BUY NOW'}
+                    {addingToCart ? 'PROCESSING...' : 'BUY NOW'}
                   </button>
                 </div>
               </div>
@@ -757,7 +751,7 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* Product Details - Proper for both */}
+        {/* Product Details */}
         <section className="py-8 md:py-16 bg-white border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-6 md:mb-12">
@@ -778,7 +772,7 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* RELATED PRODUCTS - PROPER FOR BOTH */}
+        {/* RELATED PRODUCTS */}
         {relatedProducts.length > 0 && (
           <section className="py-8 md:py-16 bg-gray-50">
             <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
@@ -787,17 +781,14 @@ export default function ProductPage() {
                   MORE FROM {product.category?.toUpperCase()}
                 </h2>
                 <p className="text-gray-900 text-sm md:text-base font-light tracking-widest uppercase mt-2 md:mt-3">
-                  {window.innerWidth < 768 ? 'SIMILAR PRODUCTS' : 'EXPLORE SIMILAR PRODUCTS IN THIS CATEGORY'}
+                  EXPLORE SIMILAR PRODUCTS IN THIS CATEGORY
                 </p>
                 
                 {/* Category Info */}
                 <div className="mt-3 md:mt-4">
                   <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 md:px-4 md:py-2 rounded-full">
                     <span className="text-gray-600 text-xs md:text-sm">
-                      {window.innerWidth < 768 
-                        ? `${relatedProducts.length} products`
-                        : `Showing ${relatedProducts.length} related products`
-                      }
+                      Showing {relatedProducts.length} related products
                     </span>
                   </div>
                 </div>
@@ -819,18 +810,13 @@ export default function ProductPage() {
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                          <span className="text-gray-500 text-xs font-light">
-                            {window.innerWidth < 768 ? 'IMAGE' : 'PRODUCT IMAGE'}
-                          </span>
+                          <span className="text-gray-500 text-xs font-light">PRODUCT IMAGE</span>
                         </div>
                       )}
                       {relatedProduct.condition && (
                         <div className="absolute top-1.5 md:top-2 left-1.5 md:left-2">
                           <span className="text-gray-900 text-[10px] md:text-xs font-light tracking-widest uppercase bg-white px-1.5 py-0.5 md:px-2 md:py-1 rounded-full">
-                            {window.innerWidth < 768 
-                              ? relatedProduct.condition.split(' ')[0].toUpperCase()
-                              : relatedProduct.condition.toUpperCase()
-                            }
+                            {relatedProduct.condition.toUpperCase()}
                           </span>
                         </div>
                       )}
@@ -871,7 +857,7 @@ export default function ProductPage() {
                   href={`/categories/${product.category?.toLowerCase().replace(/\s+/g, '-')}`}
                   className="inline-flex items-center gap-1.5 md:gap-2 text-gray-900 border border-gray-300 px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-gray-50 transition-colors text-xs md:text-sm font-medium"
                 >
-                  <span>Browse All in {product.category}</span>
+                  <span>Browse All Products in {product.category}</span>
                   <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                   </svg>
