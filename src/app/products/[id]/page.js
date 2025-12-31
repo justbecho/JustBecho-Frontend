@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - MOBILE OPTIMIZED VERSION
+// app/products/[id]/page.js - MOBILE OPTIMIZED WITH PROPER SPACING
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -409,7 +409,8 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-white pt-40">
+        {/* ✅ LOADING STATE - MOBILE FIXED */}
+        <main className="min-h-screen bg-white pt-28 md:pt-40">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -433,7 +434,8 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-white pt-40">
+        {/* ✅ NOT FOUND STATE - MOBILE FIXED */}
+        <main className="min-h-screen bg-white pt-28 md:pt-40">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-12 text-center">
             <h1 className="text-xl font-light text-gray-900">Product not found</h1>
             <p className="text-gray-600 mb-4">The product you're looking for doesn't exist or may have been removed.</p>
@@ -456,10 +458,10 @@ export default function ProductPage() {
     <>
       <Header />
       
-      {/* ✅ MOBILE FIXES: Header के ठीक बाद product page start होगा */}
+      {/* ✅ MOBILE FIXED: Header ke niche proper margin दिया है */}
       <main className="min-h-screen bg-white">
-        {/* ✅ MOBILE FIX: breadcrumb के padding को कम किया */}
-        <section className="border-b border-gray-200">
+        {/* ✅ Breadcrumb with proper mobile margin */}
+        <section className="border-b border-gray-200 pt-24 md:pt-0"> {/* ✅ pt-24 added for mobile */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2 sm:py-3">
             <nav className="flex flex-wrap items-center gap-1 sm:space-x-2 text-[10px] sm:text-xs font-light text-gray-600">
               <Link href="/" className="hover:text-gray-900 whitespace-nowrap">Home</Link>
