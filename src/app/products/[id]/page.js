@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - MOBILE OPTIMIZED WITH PROPER SPACING
+// app/products/[id]/page.js - FINAL MOBILE OPTIMIZED VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -409,8 +409,8 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        {/* ✅ LOADING STATE - MOBILE FIXED */}
-        <main className="min-h-screen bg-white pt-28 md:pt-40">
+        {/* ✅ LOADING STATE - COMPACT FOR MOBILE */}
+        <main className="min-h-screen bg-white pt-16 md:pt-40"> {/* ✅ pt-16 for mobile, pt-40 for desktop */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -434,8 +434,8 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        {/* ✅ NOT FOUND STATE - MOBILE FIXED */}
-        <main className="min-h-screen bg-white pt-28 md:pt-40">
+        {/* ✅ NOT FOUND STATE - COMPACT FOR MOBILE */}
+        <main className="min-h-screen bg-white pt-16 md:pt-40"> {/* ✅ pt-16 for mobile, pt-40 for desktop */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-12 text-center">
             <h1 className="text-xl font-light text-gray-900">Product not found</h1>
             <p className="text-gray-600 mb-4">The product you're looking for doesn't exist or may have been removed.</p>
@@ -458,10 +458,10 @@ export default function ProductPage() {
     <>
       <Header />
       
-      {/* ✅ MOBILE FIXED: Header ke niche proper margin दिया है */}
+      {/* ✅ MAIN CONTENT - MINIMAL GAP FOR MOBILE */}
       <main className="min-h-screen bg-white">
-        {/* ✅ Breadcrumb with proper mobile margin */}
-        <section className="border-b border-gray-200 pt-24 md:pt-0"> {/* ✅ pt-24 added for mobile */}
+        {/* ✅ BREADCRUMB - RIGHT BELOW HEADER ON MOBILE */}
+        <section className="border-b border-gray-200 pt-16 md:pt-0"> {/* ✅ pt-16 for mobile only */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2 sm:py-3">
             <nav className="flex flex-wrap items-center gap-1 sm:space-x-2 text-[10px] sm:text-xs font-light text-gray-600">
               <Link href="/" className="hover:text-gray-900 whitespace-nowrap">Home</Link>
@@ -479,13 +479,13 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* Product Section */}
-        <section className="py-6 sm:py-8">
+        {/* Product Section - Reduced gap for mobile */}
+        <section className="py-4 sm:py-8"> {/* ✅ py-8 से py-4 कर दिया mobile के लिए */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-8 sm:gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-6 sm:gap-12"> {/* ✅ gap-12 से gap-6 कर दिया mobile के लिए */}
               
               {/* Product Images - Left side */}
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-3 sm:space-y-6"> {/* ✅ space-y-6 से space-y-3 कर दिया mobile के लिए */}
                 {/* Main Image */}
                 <div className="flex-1">
                   <div className="aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center max-w-[650px] mx-auto">
@@ -526,7 +526,7 @@ export default function ProductPage() {
               </div>
 
               {/* Product Info - Right side */}
-              <div className="space-y-4 sm:space-y-6 max-w-[550px]">
+              <div className="space-y-3 sm:space-y-6 max-w-[550px]"> {/* ✅ space-y-6 से space-y-3 कर दिया mobile के लिए */}
                 {/* Product Name */}
                 <div className="space-y-1">
                   <h1 className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase leading-tight">
@@ -749,10 +749,10 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* Product Details */}
-        <section className="py-10 sm:py-16 bg-white border-t border-gray-200">
+        {/* Product Details - Reduced padding for mobile */}
+        <section className="py-8 sm:py-16 bg-white border-t border-gray-200"> {/* ✅ py-16 से py-8 कर दिया mobile के लिए */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-8 sm:mb-12">
+            <div className="text-center mb-6 sm:mb-12"> {/* ✅ mb-12 से mb-6 कर दिया mobile के लिए */}
               <h2 className="text-gray-900 text-lg sm:text-xl md:text-3xl font-light tracking-widest uppercase">
                 PRODUCT DETAILS
               </h2>
@@ -772,9 +772,9 @@ export default function ProductPage() {
 
         {/* RELATED PRODUCTS - COMPACT FOR MOBILE */}
         {relatedProducts.length > 0 && (
-          <section className="py-10 sm:py-16 bg-gray-50">
+          <section className="py-8 sm:py-16 bg-gray-50"> {/* ✅ py-16 से py-8 कर दिया mobile के लिए */}
             <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-              <div className="text-center mb-8 sm:mb-12">
+              <div className="text-center mb-6 sm:mb-12"> {/* ✅ mb-12 से mb-6 कर दिया mobile के लिए */}
                 <h2 className="text-gray-900 text-lg sm:text-xl md:text-3xl font-light tracking-widest uppercase">
                   MORE FROM {product.category?.toUpperCase()}
                 </h2>
@@ -850,7 +850,7 @@ export default function ProductPage() {
               </div>
 
               {/* Browse More Link */}
-              <div className="text-center mt-8 sm:mt-12">
+              <div className="text-center mt-6 sm:mt-12"> {/* ✅ mt-12 से mt-6 कर दिया mobile के लिए */}
                 <Link
                   href={`/categories/${product.category?.toLowerCase().replace(/\s+/g, '-')}`}
                   className="inline-flex items-center gap-1.5 sm:gap-2 text-gray-900 border border-gray-300 px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium"
