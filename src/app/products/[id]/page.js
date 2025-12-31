@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - FINAL MOBILE OPTIMIZED VERSION
+// app/products/[id]/page.js - FINAL VERSION FOR BOTH MOBILE & DESKTOP
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -409,8 +409,8 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        {/* ✅ LOADING STATE - COMPACT FOR MOBILE */}
-        <main className="min-h-screen bg-white pt-16 md:pt-40"> {/* ✅ pt-16 for mobile, pt-40 for desktop */}
+        {/* ✅ LOADING STATE - PROPER FOR BOTH */}
+        <main className="min-h-screen bg-white pt-16 md:pt-20"> {/* ✅ pt-20 for desktop (header + categories) */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-8">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -434,8 +434,8 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        {/* ✅ NOT FOUND STATE - COMPACT FOR MOBILE */}
-        <main className="min-h-screen bg-white pt-16 md:pt-40"> {/* ✅ pt-16 for mobile, pt-40 for desktop */}
+        {/* ✅ NOT FOUND STATE - PROPER FOR BOTH */}
+        <main className="min-h-screen bg-white pt-16 md:pt-20"> {/* ✅ pt-20 for desktop (header + categories) */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-12 text-center">
             <h1 className="text-xl font-light text-gray-900">Product not found</h1>
             <p className="text-gray-600 mb-4">The product you're looking for doesn't exist or may have been removed.</p>
@@ -458,10 +458,10 @@ export default function ProductPage() {
     <>
       <Header />
       
-      {/* ✅ MAIN CONTENT - MINIMAL GAP FOR MOBILE */}
+      {/* ✅ MAIN CONTENT - PERFECT FOR BOTH MOBILE & DESKTOP */}
       <main className="min-h-screen bg-white">
-        {/* ✅ BREADCRUMB - RIGHT BELOW HEADER ON MOBILE */}
-        <section className="border-b border-gray-200 pt-16 md:pt-0"> {/* ✅ pt-16 for mobile only */}
+        {/* ✅ BREADCRUMB - PROPER POSITIONING FOR BOTH */}
+        <section className="border-b border-gray-200 pt-16 md:pt-20"> {/* ✅ pt-20 for desktop */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2 sm:py-3">
             <nav className="flex flex-wrap items-center gap-1 sm:space-x-2 text-[10px] sm:text-xs font-light text-gray-600">
               <Link href="/" className="hover:text-gray-900 whitespace-nowrap">Home</Link>
@@ -479,13 +479,13 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* Product Section - Reduced gap for mobile */}
-        <section className="py-4 sm:py-8"> {/* ✅ py-8 से py-4 कर दिया mobile के लिए */}
+        {/* Product Section - Proper spacing for both */}
+        <section className="py-4 md:py-8"> {/* ✅ md:py-8 for desktop */}
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-6 sm:gap-12"> {/* ✅ gap-12 से gap-6 कर दिया mobile के लिए */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-6 lg:gap-12"> {/* ✅ lg:gap-12 for desktop */}
               
               {/* Product Images - Left side */}
-              <div className="space-y-3 sm:space-y-6"> {/* ✅ space-y-6 से space-y-3 कर दिया mobile के लिए */}
+              <div className="space-y-3 md:space-y-6"> {/* ✅ md:space-y-6 for desktop */}
                 {/* Main Image */}
                 <div className="flex-1">
                   <div className="aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center max-w-[650px] mx-auto">
@@ -502,12 +502,12 @@ export default function ProductPage() {
                 </div>
 
                 {/* Thumbnails */}
-                <div className="flex justify-center gap-2 sm:gap-4">
+                <div className="flex justify-center gap-2 md:gap-4"> {/* ✅ md:gap-4 for desktop */}
                   {product.images && product.images.slice(0, 4).map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 transition-all duration-200 ${
+                      className={`w-16 h-16 md:w-20 md:h-20 rounded-lg border-2 transition-all duration-200 ${
                         selectedImage === index ? 'border-gray-900' : 'border-gray-300'
                       } bg-gray-50 flex items-center justify-center hover:border-gray-600`}
                     >
@@ -526,44 +526,44 @@ export default function ProductPage() {
               </div>
 
               {/* Product Info - Right side */}
-              <div className="space-y-3 sm:space-y-6 max-w-[550px]"> {/* ✅ space-y-6 से space-y-3 कर दिया mobile के लिए */}
+              <div className="space-y-3 md:space-y-6 max-w-[550px]"> {/* ✅ md:space-y-6 for desktop */}
                 {/* Product Name */}
                 <div className="space-y-1">
-                  <h1 className="text-gray-900 text-base sm:text-lg font-light tracking-widest uppercase leading-tight">
+                  <h1 className="text-gray-900 text-base md:text-lg font-light tracking-widest uppercase leading-tight">
                     {product.productName}
                   </h1>
-                  <p className="text-gray-600 text-xs sm:text-sm font-light uppercase">
+                  <p className="text-gray-600 text-xs md:text-sm font-light uppercase">
                     {product.brand}
                   </p>
                 </div>
 
                 {/* Price */}
                 <div className="space-y-1">
-                  <span className="text-gray-900 text-lg sm:text-xl font-light">₹{product.finalPrice?.toLocaleString()}</span>
+                  <span className="text-gray-900 text-lg md:text-xl font-light">₹{product.finalPrice?.toLocaleString()}</span>
                   {product.originalPrice && product.originalPrice > product.finalPrice && (
-                    <p className="text-gray-500 text-xs sm:text-sm line-through">
+                    <p className="text-gray-500 text-xs md:text-sm line-through">
                       ₹{product.originalPrice.toLocaleString()}
                     </p>
                   )}
-                  <p className="text-gray-600 text-[10px] sm:text-xs">Seller's Price | GST calculated at checkout</p>
+                  <p className="text-gray-600 text-[10px] md:text-xs">Seller's Price | GST calculated at checkout</p>
                 </div>
 
-                {/* ✅ BECHO PROTECT SECTION - COMPACT FOR MOBILE */}
+                {/* ✅ BECHO PROTECT SECTION - COMPACT FOR MOBILE, FULL FOR DESKTOP */}
                 <div className="relative">
-                  <div className={`border ${isBechoProtectSelected ? 'border-black' : 'border-gray-300'} rounded-lg p-3 sm:p-4 bg-white`}>
+                  <div className={`border ${isBechoProtectSelected ? 'border-black' : 'border-gray-300'} rounded-lg p-3 md:p-4 bg-white`}>
                     {/* First Row: Checkbox + Main Title + Price */}
-                    <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div className="flex items-center justify-between mb-2 md:mb-3">
                       {/* Left side: Checkbox and Title */}
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <label className="relative cursor-pointer flex items-center gap-2 sm:gap-3">
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <label className="relative cursor-pointer flex items-center gap-2 md:gap-3">
                           {/* Custom Checkbox */}
-                          <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded border flex items-center justify-center transition-all duration-200
+                          <div className={`w-4 h-4 md:w-5 md:h-5 rounded border flex items-center justify-center transition-all duration-200
                             ${isBechoProtectSelected 
                               ? 'border-black bg-black' 
                               : 'border-gray-400 bg-white hover:border-gray-600'
                             }`}>
                             {isBechoProtectSelected && (
-                              <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-2 h-2 md:w-3 md:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
                               </svg>
                             )}
@@ -577,10 +577,13 @@ export default function ProductPage() {
                             className="sr-only peer"
                           />
                           
-                          {/* Title Text - SHORTER FOR MOBILE */}
+                          {/* Title Text */}
                           <div>
-                            <span className="text-gray-900 font-bold text-xs sm:text-sm">
-                              AUTHENTICITY GUARANTEE WITH BECHO PROTECT
+                            <span className="text-gray-900 font-bold text-xs md:text-sm">
+                              {window.innerWidth < 768 
+                                ? "AUTHENTICITY GUARANTEE WITH BECHO PROTECT"
+                                : "AUTHENTICITY AND MONEY-BACK GUARANTEE WITH BECHO PROTECT"
+                              }
                             </span>
                           </div>
                         </label>
@@ -588,21 +591,23 @@ export default function ProductPage() {
                       
                       {/* Right side: Price */}
                       <div className="text-right">
-                        <p className="text-gray-900 font-bold text-lg sm:text-xl">₹{bechoProtectPrice}</p>
+                        <p className="text-gray-900 font-bold text-lg md:text-xl">₹{bechoProtectPrice}</p>
                       </div>
                     </div>
                     
-                    {/* Features List - COMPACT FOR MOBILE */}
-                    <ul className="space-y-1 text-gray-700 text-[10px] sm:text-xs">
-                      <li className="flex items-start gap-1 sm:gap-2">
+                    {/* Features List */}
+                    <ul className="space-y-1 text-gray-700 text-[10px] md:text-xs">
+                      <li className="flex items-start gap-1 md:gap-2">
                         <span className="text-gray-800 font-bold mt-0.5">✓</span>
                         <span>Professional authentication at our warehouse</span>
                       </li>
-                      <li className="flex items-start gap-1 sm:gap-2">
-                        <span className="text-gray-800 font-bold mt-0.5">✓</span>
-                        <span>Money-back guarantee for counterfeits & quality issues</span>
-                      </li>
-                      <li className="flex items-start gap-1 sm:gap-2">
+                      {window.innerWidth >= 768 && (
+                        <li className="flex items-start gap-1 md:gap-2">
+                          <span className="text-gray-800 font-bold mt-0.5">✓</span>
+                          <span>Your money is safe. Becho Protect covers counterfeits, quality issues, and non-shipment.</span>
+                        </li>
+                      )}
+                      <li className="flex items-start gap-1 md:gap-2">
                         <span className="text-gray-800 font-bold mt-0.5">✓</span>
                         <span>Genuine product guarantee with certificate</span>
                       </li>
@@ -610,15 +615,15 @@ export default function ProductPage() {
                     
                     {/* Warning message if unchecked */}
                     {showWarning && (
-                      <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-gray-100 border border-gray-300 rounded">
-                        <div className="flex items-start gap-1 sm:gap-2">
+                      <div className="mt-2 md:mt-3 p-2 md:p-3 bg-gray-100 border border-gray-300 rounded">
+                        <div className="flex items-start gap-1 md:gap-2">
                           <span className="text-gray-800 text-xs">⚠️</span>
                           <div>
                             <p className="text-gray-800 font-medium text-xs">
                               You are opting out of Authenticity Guarantee
                             </p>
-                            <p className="text-gray-700 text-[10px] sm:text-xs mt-0.5 sm:mt-1">
-                              Without Becho Protect, no authentication check will be performed.
+                            <p className="text-gray-700 text-[10px] md:text-xs mt-0.5 md:mt-1">
+                              Without Becho Protect, {window.innerWidth < 768 ? 'no authentication check will be performed.' : 'we will directly deliver the product without authentication check and no certificate will be provided.'}
                             </p>
                           </div>
                         </div>
@@ -627,79 +632,82 @@ export default function ProductPage() {
                   </div>
                   
                   {isBechoProtectSelected && (
-                    <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2">
-                      <div className="bg-black text-white text-[10px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full">
+                    <div className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2">
+                      <div className="bg-black text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full">
                         SELECTED
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Condition - COMPACT FOR MOBILE */}
-                <div className="space-y-1.5 sm:space-y-2">
+                {/* Condition - PROPER FOR BOTH */}
+                <div className="space-y-1.5 md:space-y-2">
                   <h3 className="text-gray-900 text-xs font-light tracking-widest uppercase">CONDITION</h3>
-                  <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded">
+                  <div className="flex flex-wrap md:flex-nowrap gap-1 bg-gray-100 p-1 rounded">
                     {conditionOptions.map((condition) => (
                       <button
                         key={condition}
-                        className={`px-1.5 py-1 rounded text-[10px] sm:text-xs font-light transition-all duration-200 ${
+                        className={`px-1.5 py-1 rounded text-[10px] md:text-xs font-light transition-all duration-200 ${
                           product.condition === condition 
                             ? 'bg-white text-gray-900 shadow-sm border border-gray-300' 
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
-                        {condition.split(' ')[0]}
+                        {window.innerWidth < 768 ? condition.split(' ')[0] : condition}
                       </button>
                     ))}
                   </div>
-                  <p className="text-gray-600 text-[10px] sm:text-xs">
-                    Listed as <span className="font-medium text-gray-900">{product.condition}</span>
+                  <p className="text-gray-600 text-[10px] md:text-xs">
+                    {window.innerWidth < 768 
+                      ? `Listed as ${product.condition}`
+                      : `Seller has listed this item as ${product.condition} condition`
+                    }
                   </p>
                 </div>
 
-                {/* Shipping Info - COMPACT FOR MOBILE */}
-                <div className="space-y-2 sm:space-y-3">
-                  <div className="grid grid-cols-1 gap-2 sm:gap-3">
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg border border-gray-300">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
+                {/* Shipping Info - PROPER FOR BOTH */}
+                <div className="space-y-2 md:space-y-3">
+                  <div className="grid grid-cols-1 gap-2 md:gap-3">
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
+                      <div className="flex items-center gap-1.5 md:gap-2 p-1.5 md:p-2 bg-gray-50 rounded-lg border border-gray-300">
+                        <div className="w-5 h-5 md:w-6 md:h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-xs">🚚</span>
                         </div>
                         <div>
                           <p className="text-gray-900 text-xs font-semibold">Shipping</p>
-                          <p className="text-gray-600 text-[10px] sm:text-xs">5-7 days</p>
+                          <p className="text-gray-600 text-[10px] md:text-xs">5-7 days</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg border border-gray-300">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="flex items-center gap-1.5 md:gap-2 p-1.5 md:p-2 bg-gray-50 rounded-lg border border-gray-300">
+                        <div className="w-5 h-5 md:w-6 md:h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-xs">💳</span>
                         </div>
                         <div>
                           <p className="text-gray-900 text-xs font-semibold">EMI</p>
-                          <p className="text-gray-600 text-[10px] sm:text-xs">Available</p>
+                          <p className="text-gray-600 text-[10px] md:text-xs">Available</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Seller Info - COMPACT */}
-                    <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-300 shadow-sm">
+                    {/* Seller Info - PROPER FOR BOTH */}
+                    <div className="bg-white rounded-lg p-2 md:p-3 border border-gray-300 shadow-sm">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-white font-medium text-xs sm:text-sm">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-medium text-xs md:text-sm">
                               {product.seller?.name?.charAt(0) || 'U'}
                             </span>
                           </div>
                           <div>
-                            <p className="text-gray-900 font-bold text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none">
+                            <p className="text-gray-900 font-bold text-xs md:text-sm truncate max-w-[100px] md:max-w-none">
                               {product.seller?.name || 'Seller'}
                             </p>
                           </div>
                         </div>
                         
                         <div className="text-right">
-                          <span className="bg-gray-100 text-gray-800 text-[10px] sm:text-xs px-2 py-1 sm:px-3 sm:py-1.5 rounded-full font-medium">
-                            Verified
+                          <span className="bg-gray-100 text-gray-800 text-[10px] md:text-xs px-2 py-1 md:px-3 md:py-1.5 rounded-full font-medium">
+                            {window.innerWidth < 768 ? 'Verified' : 'Verified Seller'}
                           </span>
                         </div>
                       </div>
@@ -707,30 +715,30 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons - COMPACT FOR MOBILE */}
-                <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4 border-t border-gray-200">
-                  <div className="flex gap-2 sm:gap-3">
+                {/* Action Buttons - PROPER FOR BOTH */}
+                <div className="space-y-2 md:space-y-3 pt-3 md:pt-4 border-t border-gray-200">
+                  <div className="flex gap-2 md:gap-3">
                     <button
                       onClick={handleAddToCart}
                       disabled={addingToCart}
-                      className="flex-1 border-2 border-black text-gray-900 py-2.5 sm:py-3 text-xs font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 border-2 border-black text-gray-900 py-2.5 md:py-3 text-xs font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {addingToCart ? 'ADDING...' : 'ADD TO CART'}
+                      {addingToCart ? (window.innerWidth < 768 ? 'ADDING...' : 'ADDING TO CART...') : 'ADD TO CART'}
                     </button>
                     <button
                       onClick={handleAddToWishlist}
-                      className={`w-10 sm:w-12 border-2 py-2.5 sm:py-3 flex items-center justify-center transition-all duration-300 rounded-lg ${
+                      className={`w-10 md:w-12 border-2 py-2.5 md:py-3 flex items-center justify-center transition-all duration-300 rounded-lg ${
                         isInWishlist 
                           ? 'border-gray-800 text-gray-800 bg-gray-100 hover:bg-gray-200' 
                           : 'border-gray-300 text-gray-600 hover:border-gray-900 hover:bg-gray-50'
                       }`}
                     >
                       {isInWishlist ? (
-                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                         </svg>
                       ) : (
-                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                       )}
@@ -739,9 +747,9 @@ export default function ProductPage() {
                   <button
                     onClick={handleBuyNow}
                     disabled={addingToCart}
-                    className="w-full bg-gradient-to-r from-black to-gray-900 text-white py-2.5 sm:py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-black to-gray-900 text-white py-2.5 md:py-3 text-xs font-bold tracking-widest uppercase hover:shadow-lg hover:scale-[1.02] transition-all duration-300 rounded-lg disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    {addingToCart ? 'PROCESSING...' : 'BUY NOW'}
+                    {addingToCart ? (window.innerWidth < 768 ? 'PROCESSING...' : 'PROCESSING...') : 'BUY NOW'}
                   </button>
                 </div>
               </div>
@@ -749,19 +757,19 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* Product Details - Reduced padding for mobile */}
-        <section className="py-8 sm:py-16 bg-white border-t border-gray-200"> {/* ✅ py-16 से py-8 कर दिया mobile के लिए */}
+        {/* Product Details - Proper for both */}
+        <section className="py-8 md:py-16 bg-white border-t border-gray-200">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-            <div className="text-center mb-6 sm:mb-12"> {/* ✅ mb-12 से mb-6 कर दिया mobile के लिए */}
-              <h2 className="text-gray-900 text-lg sm:text-xl md:text-3xl font-light tracking-widest uppercase">
+            <div className="text-center mb-6 md:mb-12">
+              <h2 className="text-gray-900 text-lg md:text-xl lg:text-3xl font-light tracking-widest uppercase">
                 PRODUCT DETAILS
               </h2>
             </div>
             
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+              <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200 shadow-sm">
                 <div className="prose max-w-none">
-                  <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-gray-700 text-xs md:text-sm leading-relaxed">
                     {product.description}
                   </p>
                 </div>
@@ -770,36 +778,39 @@ export default function ProductPage() {
           </div>
         </section>
 
-        {/* RELATED PRODUCTS - COMPACT FOR MOBILE */}
+        {/* RELATED PRODUCTS - PROPER FOR BOTH */}
         {relatedProducts.length > 0 && (
-          <section className="py-8 sm:py-16 bg-gray-50"> {/* ✅ py-16 से py-8 कर दिया mobile के लिए */}
+          <section className="py-8 md:py-16 bg-gray-50">
             <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
-              <div className="text-center mb-6 sm:mb-12"> {/* ✅ mb-12 से mb-6 कर दिया mobile के लिए */}
-                <h2 className="text-gray-900 text-lg sm:text-xl md:text-3xl font-light tracking-widest uppercase">
+              <div className="text-center mb-6 md:mb-12">
+                <h2 className="text-gray-900 text-lg md:text-xl lg:text-3xl font-light tracking-widest uppercase">
                   MORE FROM {product.category?.toUpperCase()}
                 </h2>
-                <p className="text-gray-900 text-sm sm:text-base font-light tracking-widest uppercase mt-2 sm:mt-3">
-                  SIMILAR PRODUCTS
+                <p className="text-gray-900 text-sm md:text-base font-light tracking-widest uppercase mt-2 md:mt-3">
+                  {window.innerWidth < 768 ? 'SIMILAR PRODUCTS' : 'EXPLORE SIMILAR PRODUCTS IN THIS CATEGORY'}
                 </p>
                 
                 {/* Category Info */}
-                <div className="mt-3 sm:mt-4">
-                  <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full">
-                    <span className="text-gray-600 text-xs sm:text-sm">
-                      {relatedProducts.length} products
+                <div className="mt-3 md:mt-4">
+                  <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 md:px-4 md:py-2 rounded-full">
+                    <span className="text-gray-600 text-xs md:text-sm">
+                      {window.innerWidth < 768 
+                        ? `${relatedProducts.length} products`
+                        : `Showing ${relatedProducts.length} related products`
+                      }
                     </span>
                   </div>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 lg:gap-8">
                 {relatedProducts.map((relatedProduct) => (
                   <Link
                     key={relatedProduct._id}
                     href={`/products/${relatedProduct._id}`}
                     className="group cursor-pointer transform hover:-translate-y-1 transition-all duration-300"
                   >
-                    <div className="relative w-full aspect-square overflow-hidden mb-2 sm:mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                    <div className="relative w-full aspect-square overflow-hidden mb-2 md:mb-3 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
                       {relatedProduct.images?.[0]?.url ? (
                         <img
                           src={relatedProduct.images[0].url}
@@ -808,39 +819,44 @@ export default function ProductPage() {
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                          <span className="text-gray-500 text-xs font-light">IMAGE</span>
+                          <span className="text-gray-500 text-xs font-light">
+                            {window.innerWidth < 768 ? 'IMAGE' : 'PRODUCT IMAGE'}
+                          </span>
                         </div>
                       )}
                       {relatedProduct.condition && (
-                        <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2">
-                          <span className="text-gray-900 text-[10px] sm:text-xs font-light tracking-widest uppercase bg-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
-                            {relatedProduct.condition.split(' ')[0].toUpperCase()}
+                        <div className="absolute top-1.5 md:top-2 left-1.5 md:left-2">
+                          <span className="text-gray-900 text-[10px] md:text-xs font-light tracking-widest uppercase bg-white px-1.5 py-0.5 md:px-2 md:py-1 rounded-full">
+                            {window.innerWidth < 768 
+                              ? relatedProduct.condition.split(' ')[0].toUpperCase()
+                              : relatedProduct.condition.toUpperCase()
+                            }
                           </span>
                         </div>
                       )}
                     </div>
-                    <div className="text-left px-0.5 sm:px-1">
-                      <h3 className="text-gray-800 text-[10px] sm:text-xs font-light tracking-widest uppercase mb-0.5 sm:mb-1 line-clamp-2">
+                    <div className="text-left px-0.5 md:px-1">
+                      <h3 className="text-gray-800 text-[10px] md:text-xs font-light tracking-widest uppercase mb-0.5 md:mb-1 line-clamp-2">
                         {relatedProduct.productName?.toUpperCase()}
                       </h3>
                       
                       {/* Product Type (if available) */}
                       {relatedProduct.productType && (
-                        <div className="mb-1 sm:mb-2">
-                          <span className="text-gray-600 text-[10px] sm:text-xs bg-gray-100 px-1.5 py-0.5 rounded">
+                        <div className="mb-1 md:mb-2">
+                          <span className="text-gray-600 text-[10px] md:text-xs bg-gray-100 px-1.5 py-0.5 rounded">
                             {relatedProduct.productType}
                           </span>
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between mb-0.5 sm:mb-1">
-                        <p className="text-gray-900 text-xs sm:text-sm font-light tracking-widest uppercase">
+                      <div className="flex items-center justify-between mb-0.5 md:mb-1">
+                        <p className="text-gray-900 text-xs md:text-sm font-light tracking-widest uppercase">
                           ₹{relatedProduct.finalPrice?.toLocaleString()}
                         </p>
                       </div>
                       
                       {relatedProduct.originalPrice && relatedProduct.originalPrice > relatedProduct.finalPrice && (
-                        <p className="text-gray-500 text-[10px] sm:text-xs line-through">
+                        <p className="text-gray-500 text-[10px] md:text-xs line-through">
                           ₹{relatedProduct.originalPrice.toLocaleString()}
                         </p>
                       )}
@@ -850,13 +866,13 @@ export default function ProductPage() {
               </div>
 
               {/* Browse More Link */}
-              <div className="text-center mt-6 sm:mt-12"> {/* ✅ mt-12 से mt-6 कर दिया mobile के लिए */}
+              <div className="text-center mt-6 md:mt-12">
                 <Link
                   href={`/categories/${product.category?.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="inline-flex items-center gap-1.5 sm:gap-2 text-gray-900 border border-gray-300 px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium"
+                  className="inline-flex items-center gap-1.5 md:gap-2 text-gray-900 border border-gray-300 px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-gray-50 transition-colors text-xs md:text-sm font-medium"
                 >
                   <span>Browse All in {product.category}</span>
-                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                   </svg>
                 </Link>
