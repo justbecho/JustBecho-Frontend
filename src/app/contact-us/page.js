@@ -170,9 +170,28 @@ export default function ContactUs() {
       <Header />
       
       {/* ✅ PROPER SPACING: Header के नीचे से start होगा */}
+      {/* ✅ यहाँ मैंने gap adjust करने के लिए pt-[80px] और md:pt-[120px] दिया है */}
+      {/* ✅ तुम्हें सिर्फ इन 2 values को change करना है: */}
+      {/* 1. pt-[80px] - MOBILE gap */}
+      {/* 2. md:pt-[120px] - DESKTOP gap */}
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* ✅ Hero Section with proper spacing */}
-       
+        <div className="pt-[100px] md:pt-[180px] pb-8 md:pb-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto text-center">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6">
+              Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Touch</span>
+            </h1>
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto">
+              We're here to help you with any questions or concerns. Reach out to us through any channel that works best for you.
+            </p>
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-full px-4 md:px-6 py-2 md:py-3">
+              <FiClock className="w-5 h-5 text-blue-600" />
+              <span className="text-blue-700 font-medium text-sm md:text-base">
+                Response Time: <span className="font-bold">Within 24 Hours</span>
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* ✅ Main Content with responsive padding */}
         <div className="pb-12 md:pb-20 px-4 sm:px-6 lg:px-8 -mt-2 md:-mt-4">
