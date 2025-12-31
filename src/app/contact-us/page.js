@@ -172,43 +172,7 @@ export default function ContactUs() {
       {/* ✅ PROPER SPACING: Header के नीचे से start होगा */}
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* ✅ Hero Section with proper spacing */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800">
-          {/* Decorative elements */}
-          <div className="absolute inset-0">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-            <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-          </div>
-          
-          {/* ✅ Proper top padding for header */}
-          <div className="relative pt-24 md:pt-36 pb-8 md:pb-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
-                  Contact Us
-                </h1>
-                <p className="text-base sm:text-lg md:text-xl text-blue-100 max-w-3xl mx-auto px-2 sm:px-4">
-                  We're here to help. Reach out through the right channel for your needs and get timely assistance.
-                </p>
-                
-                {/* Quick Stats - COMPACT FOR MOBILE */}
-                <div className="mt-6 md:mt-12 flex flex-wrap justify-center gap-3 md:gap-6 lg:gap-8">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3">
-                    <p className="text-white text-xs md:text-sm">Response Time</p>
-                    <p className="text-white font-bold text-lg md:text-xl">Within 24 Hours</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3">
-                    <p className="text-white text-xs md:text-sm">Support Available</p>
-                    <p className="text-white font-bold text-lg md:text-xl">6 Days a Week</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3">
-                    <p className="text-white text-xs md:text-sm">Customer Rating</p>
-                    <p className="text-white font-bold text-lg md:text-xl">4.8/5 Stars</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+       
 
         {/* ✅ Main Content with responsive padding */}
         <div className="pb-12 md:pb-20 px-4 sm:px-6 lg:px-8 -mt-2 md:-mt-4">

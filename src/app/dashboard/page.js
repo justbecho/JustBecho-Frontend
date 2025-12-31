@@ -1,4 +1,4 @@
-// pages/dashboard.js - COMPLETE FIXED VERSION
+// pages/dashboard.js - PERFECTLY ALIGNED VERSION
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -931,13 +931,13 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ LOADING STATE - Fixed with perfect header alignment
+  // ✅ LOADING STATE - Fixed with exact header alignment
   if (loading) {
     return (
       <>
         <Header />
-        {/* ✅ CORRECT SPACING: Mobile pt-[135px], Desktop pt-[140px] */}
-        <div className="min-h-screen bg-gray-50 pt-[135px] md:pt-[140px] pb-16 flex flex-col items-center justify-center p-4">
+        {/* ✅ EXACT SPACING: Mobile pt-[80px], Desktop pt-[120px] */}
+        <div className="min-h-screen bg-gray-50 pt-[80px] md:pt-[120px] pb-16 flex flex-col items-center justify-center p-4">
           <div className="text-center">
             <div className="relative w-16 h-16 mx-auto mb-4">
               <div className="animate-spin rounded-full h-full w-full border-4 border-gray-200 border-t-gray-900"></div>
@@ -963,7 +963,7 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 pt-[135px] md:pt-[140px] pb-16 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 pt-[80px] md:pt-[120px] pb-16 flex items-center justify-center p-4">
           <div className="text-center max-w-sm">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiAlertCircle className="w-8 h-8 text-red-600" />
@@ -2278,13 +2278,13 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ MOBILE VERSION - PERFECT HEADER ALIGNMENT
+  // ✅ MOBILE VERSION - PERFECT HEADER ALIGNMENT (EXACT HEIGHT)
   if (isMobile) {
     return (
       <>
         <Header />
-        {/* ✅ MOBILE: Start exactly after header ends (135px) */}
-        <main className="min-h-screen bg-gray-50 pt-[135px] pb-16">
+        {/* ✅ MOBILE: Start exactly after header ends (80px) - NO GAP */}
+        <main className="min-h-screen bg-gray-50 pt-[80px] pb-16">
           
           {/* Welcome Banner */}
           <div className="bg-white border-b border-gray-200">
@@ -2407,14 +2407,14 @@ export default function Dashboard() {
     )
   }
 
-  // ✅ DESKTOP VERSION - PERFECT HEADER ALIGNMENT
+  // ✅ DESKTOP VERSION - PERFECT HEADER ALIGNMENT (EXACT HEIGHT)
   return (
     <>
       <Header />
       
-      {/* ✅ DESKTOP: Start exactly after header + subheader ends (140px) */}
+      {/* ✅ DESKTOP: Start exactly after header + subheader ends (120px) - NO GAP */}
       <main className="min-h-screen bg-gray-50">
-        <div className="pt-[140px] pb-16">
+        <div className="pt-[120px] pb-16">
           {renderSellerStatusBanner()}
           
           <section className="bg-white border-b border-gray-200">
