@@ -96,19 +96,19 @@ function HomeContent() {
   const featuredCollections = useMemo(() => [
     {
       title: "PRODUCTS UNDER ₹20K",
-      image: "/banners/mensnew.jpeg",
+      image: "/banners/under20k.jpeg",
       href: "/shop?budget=under-20k",
       filter: "under-20k"
     },
     {
       title: "PRODUCTS UNDER ₹40K",
-      image: "/banners/womensnew.jpeg",
+      image: "/banners/under40k.jpeg",
       href: "/shop?budget=under-40k",
       filter: "under-40k"
     },
     {
       title: "PRODUCTS UNDER ₹60K",
-      image: "/banners/footwearnew.jpeg",
+      image: "/banners/under60k.jpeg",
       href: "/shop?budget=under-60k",
       filter: "under-60k"
     }
