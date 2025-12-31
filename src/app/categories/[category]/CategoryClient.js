@@ -1,3 +1,4 @@
+// app/categories/[categorySlug]/page.js - MOBILE & DESKTOP OPTIMIZED
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
@@ -658,8 +659,8 @@ export default function CategoryClient({
             <Header />
 
             <div className="bg-white">
-                {/* ✅ Header Spacing Adjustment */}
-                <div className="pt-24 md:pt-40"></div>
+                {/* ✅ PROPER SPACING: Header के नीचे से start होगा */}
+                <div className="pt-16 md:pt-36"></div>
 
                 {/* ✅ Hero Banner - Clean Version (No Text/Buttons) */}
                 <div className="relative w-full h-[30vh] md:h-[60vh] overflow-hidden">
@@ -680,8 +681,8 @@ export default function CategoryClient({
                     </div>
                 </div>
 
-                {/* ✅ Products Section */}
-                <section id="products" className="py-12 md:py-16">
+                {/* ✅ Products Section - MOBILE: Reduced padding */}
+                <section id="products" className="py-6 md:py-16">
                     <div className="max-w-[1700px] mx-auto px-4 sm:px-6">
 
                         {/* ✅ Error Message */}
@@ -700,37 +701,37 @@ export default function CategoryClient({
                             </div>
                         )}
 
-                        {/* MOBILE FILTERS TOGGLE */}
-                        <div className="lg:hidden mb-6">
-                            <div className="flex items-center justify-between gap-4">
+                        {/* MOBILE FILTERS TOGGLE - COMPACT FOR MOBILE */}
+                        <div className="lg:hidden mb-4">
+                            <div className="flex items-center justify-between gap-2">
                                 <button
                                     onClick={() => setShowMobileFilters(!showMobileFilters)}
-                                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-50 transition-colors"
+                                    className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-light tracking-widest uppercase hover:bg-gray-50 transition-colors"
                                 >
-                                    <FiFilter className="w-4 h-4" />
+                                    <FiFilter className="w-3.5 h-3.5" />
                                     Filters
                                     {activeFiltersCount > 0 && (
-                                        <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                        <span className="bg-black text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                                             {activeFiltersCount}
                                         </span>
                                     )}
                                 </button>
                                 
-                                <div className="flex-1">
+                                <div className="flex-1 max-w-[140px]">
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-black bg-white"
                                     >
-                                        <option value="newest">Newest First</option>
-                                        <option value="price-low">Price: Low to High</option>
-                                        <option value="price-high">Price: High to Low</option>
+                                        <option value="newest">Newest</option>
+                                        <option value="price-low">Price: Low</option>
+                                        <option value="price-high">Price: High</option>
                                     </select>
                                 </div>
                                 
                                 <button
                                     onClick={handleSellItems}
-                                    className="bg-black text-white px-4 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap"
+                                    className="bg-black text-white px-3 py-1.5 rounded-lg text-xs font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap"
                                 >
                                     + SELL
                                 </button>
@@ -738,46 +739,46 @@ export default function CategoryClient({
 
                             {/* Active Filters Badges - Mobile */}
                             {(filters.brands.length > 0 || filters.conditions.length > 0 || filters.minPrice || filters.maxPrice) && (
-                                <div className="mt-3 flex flex-wrap gap-2">
+                                <div className="mt-2 flex flex-wrap gap-1">
                                     {filters.brands.map(brand => (
-                                        <div key={brand} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
-                                            <span className="text-gray-700">{brand}</span>
+                                        <div key={brand} className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded text-xs">
+                                            <span className="text-gray-700 truncate max-w-[60px]">{brand}</span>
                                             <button
                                                 onClick={() => handleBrandChange(brand)}
-                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                                className="text-gray-400 hover:text-gray-600 text-[10px]"
                                             >
                                                 ×
                                             </button>
                                         </div>
                                     ))}
                                     {filters.conditions.map(condition => (
-                                        <div key={condition} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
-                                            <span className="text-gray-700">{condition}</span>
+                                        <div key={condition} className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded text-xs">
+                                            <span className="text-gray-700 truncate max-w-[60px]">{condition}</span>
                                             <button
                                                 onClick={() => handleConditionChange(condition)}
-                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                                className="text-gray-400 hover:text-gray-600 text-[10px]"
                                             >
                                                 ×
                                             </button>
                                         </div>
                                     ))}
                                     {filters.minPrice && (
-                                        <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                        <div className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded text-xs">
                                             <span className="text-gray-700">Min: ₹{filters.minPrice}</span>
                                             <button
                                                 onClick={() => handlePriceChange('', filters.maxPrice)}
-                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                                className="text-gray-400 hover:text-gray-600 text-[10px]"
                                             >
                                                 ×
                                             </button>
                                         </div>
                                     )}
                                     {filters.maxPrice && (
-                                        <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                        <div className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded text-xs">
                                             <span className="text-gray-700">Max: ₹{filters.maxPrice}</span>
                                             <button
                                                 onClick={() => handlePriceChange(filters.minPrice, '')}
-                                                className="text-gray-400 hover:text-gray-600 text-xs"
+                                                className="text-gray-400 hover:text-gray-600 text-[10px]"
                                             >
                                                 ×
                                             </button>
@@ -792,11 +793,11 @@ export default function CategoryClient({
                             <div className="lg:hidden fixed inset-0 z-50 bg-white overflow-y-auto">
                                 {/* Header */}
                                 <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
-                                    <h3 className="text-lg font-light tracking-widest uppercase">Filters</h3>
+                                    <h3 className="text-base font-light tracking-widest uppercase">Filters</h3>
                                     <div className="flex items-center gap-3">
                                         <button
                                             onClick={handleClearFilters}
-                                            className="text-sm text-gray-500 hover:text-gray-700"
+                                            className="text-xs text-gray-500 hover:text-gray-700"
                                         >
                                             Clear All
                                         </button>
@@ -804,16 +805,16 @@ export default function CategoryClient({
                                             onClick={() => setShowMobileFilters(false)}
                                             className="p-1 hover:bg-gray-100 rounded-full"
                                         >
-                                            <FiX className="w-5 h-5" />
+                                            <FiX className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Filters Content */}
-                                <div className="p-4 space-y-6 pb-24">
+                                <div className="p-4 space-y-4 pb-20">
                                     {/* Brands Filter */}
                                     {availableBrands.length > 0 && (
-                                        <div className="border-b border-gray-200 pb-4">
+                                        <div className="border-b border-gray-200 pb-3">
                                             <button
                                                 onClick={() => toggleSection('brands')}
                                                 className="flex items-center justify-between w-full text-left mb-2"
@@ -829,19 +830,19 @@ export default function CategoryClient({
                                             </button>
                                             
                                             {expandedSections.brands && (
-                                                <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                                <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
                                                     {availableBrands.map(brand => (
-                                                        <label key={brand} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                        <label key={brand} className="flex items-center space-x-2 cursor-pointer group py-0.5">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={filters.brands.includes(brand)}
                                                                 onChange={() => handleBrandChange(brand)}
-                                                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                                className="w-3.5 h-3.5 text-black border-gray-300 rounded focus:ring-black"
                                                             />
-                                                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                            <span className="text-gray-600 text-xs font-light group-hover:text-gray-900 transition-colors truncate">
                                                                 {brand}
                                                             </span>
-                                                            <span className="text-gray-400 text-xs ml-auto">
+                                                            <span className="text-gray-400 text-[10px] ml-auto">
                                                                 ({products.filter(p => p.brand === brand).length})
                                                             </span>
                                                         </label>
@@ -853,7 +854,7 @@ export default function CategoryClient({
 
                                     {/* Condition Filter */}
                                     {availableConditions.length > 0 && (
-                                        <div className="border-b border-gray-200 pb-4">
+                                        <div className="border-b border-gray-200 pb-3">
                                             <button
                                                 onClick={() => toggleSection('conditions')}
                                                 className="flex items-center justify-between w-full text-left mb-2"
@@ -869,19 +870,19 @@ export default function CategoryClient({
                                             </button>
                                             
                                             {expandedSections.conditions && (
-                                                <div className="space-y-2">
+                                                <div className="space-y-1">
                                                     {availableConditions.map(condition => (
-                                                        <label key={condition} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                        <label key={condition} className="flex items-center space-x-2 cursor-pointer group py-0.5">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={filters.conditions.includes(condition)}
                                                                 onChange={() => handleConditionChange(condition)}
-                                                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                                className="w-3.5 h-3.5 text-black border-gray-300 rounded focus:ring-black"
                                                             />
-                                                            <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                            <span className="text-gray-600 text-xs font-light group-hover:text-gray-900 transition-colors">
                                                                 {condition}
                                                             </span>
-                                                            <span className="text-gray-400 text-xs ml-auto">
+                                                            <span className="text-gray-400 text-[10px] ml-auto">
                                                                 ({products.filter(p => p.condition === condition).length})
                                                             </span>
                                                         </label>
@@ -892,7 +893,7 @@ export default function CategoryClient({
                                     )}
 
                                     {/* Price Filter */}
-                                    <div className="border-b border-gray-200 pb-4">
+                                    <div className="border-b border-gray-200 pb-3">
                                         <button
                                             onClick={() => toggleSection('price')}
                                             className="flex items-center justify-between w-full text-left mb-2"
@@ -908,27 +909,27 @@ export default function CategoryClient({
                                         </button>
                                         
                                         {expandedSections.price && (
-                                            <div className="space-y-4">
+                                            <div className="space-y-3">
                                                 <div className="flex gap-2">
                                                     <div className="flex-1">
-                                                        <label className="text-xs text-gray-500 block mb-1">Min</label>
+                                                        <label className="text-[10px] text-gray-500 block mb-1">Min</label>
                                                         <input
                                                             type="number"
                                                             placeholder="₹0"
                                                             value={filters.minPrice}
                                                             onChange={(e) => handlePriceChange(e.target.value, filters.maxPrice)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-black"
                                                             min="0"
                                                         />
                                                     </div>
                                                     <div className="flex-1">
-                                                        <label className="text-xs text-gray-500 block mb-1">Max</label>
+                                                        <label className="text-[10px] text-gray-500 block mb-1">Max</label>
                                                         <input
                                                             type="number"
                                                             placeholder="₹100000"
                                                             value={filters.maxPrice}
                                                             onChange={(e) => handlePriceChange(filters.minPrice, e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-black"
                                                             min="0"
                                                         />
                                                     </div>
@@ -939,10 +940,10 @@ export default function CategoryClient({
                                 </div>
 
                                 {/* Apply Button */}
-                                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+                                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3">
                                     <button
                                         onClick={() => setShowMobileFilters(false)}
-                                        className="w-full bg-black text-white py-3 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors"
+                                        className="w-full bg-black text-white py-2.5 rounded-lg text-xs font-light tracking-widest uppercase hover:bg-gray-800 transition-colors"
                                     >
                                         Apply Filters ({activeFiltersCount})
                                     </button>
@@ -950,19 +951,19 @@ export default function CategoryClient({
                             </div>
                         )}
 
-                        <div className="flex flex-col lg:flex-row gap-8">
+                        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
                             {/* ✅ DESKTOP Sidebar Filters */}
-                            <div className="hidden lg:block lg:w-80 flex-shrink-0">
-                                <div className="bg-gray-50 rounded-2xl p-6 sticky top-44">
+                            <div className="hidden lg:block lg:w-64 xl:w-72 flex-shrink-0">
+                                <div className="bg-gray-50 rounded-xl lg:rounded-2xl p-4 lg:p-6 sticky top-36">
 
                                     {/* Filters Header */}
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase">
+                                    <div className="flex justify-between items-center mb-4 lg:mb-6">
+                                        <h3 className="text-gray-900 text-base lg:text-lg font-light tracking-widest uppercase">
                                             FILTERS
                                         </h3>
                                         <button
                                             onClick={handleClearFilters}
-                                            className="text-sm text-gray-500 hover:text-gray-700"
+                                            className="text-xs lg:text-sm text-gray-500 hover:text-gray-700"
                                         >
                                             Clear All
                                         </button>
@@ -970,23 +971,23 @@ export default function CategoryClient({
 
                                     {/* Brands Filter */}
                                     {availableBrands.length > 0 && (
-                                        <div className="mb-8">
-                                            <h4 className="text-gray-700 text-sm font-medium mb-3">
+                                        <div className="mb-6 lg:mb-8">
+                                            <h4 className="text-gray-700 text-xs lg:text-sm font-medium mb-2 lg:mb-3">
                                                 BRANDS ({availableBrands.length})
                                             </h4>
-                                            <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                            <div className="space-y-1 lg:space-y-2 max-h-48 lg:max-h-60 overflow-y-auto pr-2">
                                                 {availableBrands.map(brand => (
-                                                    <label key={brand} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                    <label key={brand} className="flex items-center space-x-2 lg:space-x-3 cursor-pointer group py-0.5 lg:py-1">
                                                         <input
                                                             type="checkbox"
                                                             checked={filters.brands.includes(brand)}
                                                             onChange={() => handleBrandChange(brand)}
-                                                            className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                            className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black border-gray-300 rounded focus:ring-black"
                                                         />
-                                                        <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                        <span className="text-gray-600 text-xs lg:text-sm font-light group-hover:text-gray-900 transition-colors truncate">
                                                             {brand}
                                                         </span>
-                                                        <span className="text-gray-400 text-xs ml-auto">
+                                                        <span className="text-gray-400 text-[10px] lg:text-xs ml-auto">
                                                             ({products.filter(p => p.brand === brand).length})
                                                         </span>
                                                     </label>
@@ -997,23 +998,23 @@ export default function CategoryClient({
 
                                     {/* Condition Filter */}
                                     {availableConditions.length > 0 && (
-                                        <div className="mb-8">
-                                            <h4 className="text-gray-700 text-sm font-medium mb-3">
+                                        <div className="mb-6 lg:mb-8">
+                                            <h4 className="text-gray-700 text-xs lg:text-sm font-medium mb-2 lg:mb-3">
                                                 CONDITION ({availableConditions.length})
                                             </h4>
-                                            <div className="space-y-2">
+                                            <div className="space-y-1 lg:space-y-2">
                                                 {availableConditions.map(condition => (
-                                                    <label key={condition} className="flex items-center space-x-3 cursor-pointer group py-1">
+                                                    <label key={condition} className="flex items-center space-x-2 lg:space-x-3 cursor-pointer group py-0.5 lg:py-1">
                                                         <input
                                                             type="checkbox"
                                                             checked={filters.conditions.includes(condition)}
                                                             onChange={() => handleConditionChange(condition)}
-                                                            className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+                                                            className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black border-gray-300 rounded focus:ring-black"
                                                         />
-                                                        <span className="text-gray-600 text-sm font-light group-hover:text-gray-900 transition-colors">
+                                                        <span className="text-gray-600 text-xs lg:text-sm font-light group-hover:text-gray-900 transition-colors">
                                                             {condition}
                                                         </span>
-                                                        <span className="text-gray-400 text-xs ml-auto">
+                                                        <span className="text-gray-400 text-[10px] lg:text-xs ml-auto">
                                                             ({products.filter(p => p.condition === condition).length})
                                                         </span>
                                                     </label>
@@ -1024,30 +1025,30 @@ export default function CategoryClient({
 
                                     {/* Price Filter */}
                                     <div>
-                                        <h4 className="text-gray-700 text-sm font-medium mb-3">
+                                        <h4 className="text-gray-700 text-xs lg:text-sm font-medium mb-2 lg:mb-3">
                                             PRICE RANGE
                                         </h4>
-                                        <div className="space-y-4">
+                                        <div className="space-y-3 lg:space-y-4">
                                             <div className="flex gap-2">
                                                 <div className="flex-1">
-                                                    <label className="text-xs text-gray-500 block mb-1">Min</label>
+                                                    <label className="text-[10px] lg:text-xs text-gray-500 block mb-1">Min</label>
                                                     <input
                                                         type="number"
                                                         placeholder="₹0"
                                                         value={filters.minPrice}
                                                         onChange={(e) => handlePriceChange(e.target.value, filters.maxPrice)}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                        className="w-full px-2 lg:px-3 py-1.5 lg:py-2 border border-gray-300 rounded-lg text-xs lg:text-sm focus:outline-none focus:border-black"
                                                         min="0"
                                                     />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <label className="text-xs text-gray-500 block mb-1">Max</label>
+                                                    <label className="text-[10px] lg:text-xs text-gray-500 block mb-1">Max</label>
                                                     <input
                                                         type="number"
                                                         placeholder="₹100000"
                                                         value={filters.maxPrice}
                                                         onChange={(e) => handlePriceChange(filters.minPrice, e.target.value)}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black"
+                                                        className="w-full px-2 lg:px-3 py-1.5 lg:py-2 border border-gray-300 rounded-lg text-xs lg:text-sm focus:outline-none focus:border-black"
                                                         min="0"
                                                     />
                                                 </div>
@@ -1057,50 +1058,50 @@ export default function CategoryClient({
 
                                     {/* Active Filters Summary */}
                                     {(filters.brands.length > 0 || filters.conditions.length > 0 || filters.minPrice || filters.maxPrice) && (
-                                        <div className="mt-6 pt-6 border-t border-gray-200">
-                                            <h4 className="text-gray-700 text-sm font-medium mb-2">
+                                        <div className="mt-4 lg:mt-6 pt-4 lg:pt-6 border-t border-gray-200">
+                                            <h4 className="text-gray-700 text-xs lg:text-sm font-medium mb-1 lg:mb-2">
                                                 ACTIVE FILTERS
                                             </h4>
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="flex flex-wrap gap-1 lg:gap-2">
                                                 {filters.brands.map(brand => (
-                                                    <div key={brand} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
-                                                        <span className="text-gray-700">{brand}</span>
+                                                    <div key={brand} className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded text-xs">
+                                                        <span className="text-gray-700 truncate max-w-[80px] lg:max-w-none">{brand}</span>
                                                         <button
                                                             onClick={() => handleBrandChange(brand)}
-                                                            className="text-gray-400 hover:text-gray-600 text-xs"
+                                                            className="text-gray-400 hover:text-gray-600 text-[10px] lg:text-xs"
                                                         >
                                                             ×
                                                         </button>
                                                     </div>
                                                 ))}
                                                 {filters.conditions.map(condition => (
-                                                    <div key={condition} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
-                                                        <span className="text-gray-700">{condition}</span>
+                                                    <div key={condition} className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded text-xs">
+                                                        <span className="text-gray-700 truncate max-w-[80px] lg:max-w-none">{condition}</span>
                                                         <button
                                                             onClick={() => handleConditionChange(condition)}
-                                                            className="text-gray-400 hover:text-gray-600 text-xs"
+                                                            className="text-gray-400 hover:text-gray-600 text-[10px] lg:text-xs"
                                                         >
                                                             ×
                                                         </button>
                                                     </div>
                                                 ))}
                                                 {filters.minPrice && (
-                                                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                                    <div className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded text-xs">
                                                         <span className="text-gray-700">Min: ₹{filters.minPrice}</span>
                                                         <button
                                                             onClick={() => handlePriceChange('', filters.maxPrice)}
-                                                            className="text-gray-400 hover:text-gray-600 text-xs"
+                                                            className="text-gray-400 hover:text-gray-600 text-[10px] lg:text-xs"
                                                         >
                                                             ×
                                                         </button>
                                                     </div>
                                                 )}
                                                 {filters.maxPrice && (
-                                                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
+                                                    <div className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded text-xs">
                                                         <span className="text-gray-700">Max: ₹{filters.maxPrice}</span>
                                                         <button
                                                             onClick={() => handlePriceChange(filters.minPrice, '')}
-                                                            className="text-gray-400 hover:text-gray-600 text-xs"
+                                                            className="text-gray-400 hover:text-gray-600 text-[10px] lg:text-xs"
                                                         >
                                                             ×
                                                         </button>
@@ -1117,9 +1118,9 @@ export default function CategoryClient({
                             <div className="flex-1">
 
                                 {/* DESKTOP Header with Stats */}
-                                <div className="hidden lg:flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                                <div className="hidden lg:flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 lg:mb-8 gap-4">
                                     <div>
-                                        <h2 className="text-gray-900 text-2xl font-light tracking-widest uppercase mb-1">
+                                        <h2 className="text-gray-900 text-xl lg:text-2xl font-light tracking-widest uppercase mb-1">
                                             {config.title || 'PRODUCTS'}
                                         </h2>
                                         <p className="text-gray-600 text-sm font-light">
@@ -1128,35 +1129,33 @@ export default function CategoryClient({
                                         </p>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3 lg:gap-4">
                                         <select
                                             value={sortBy}
                                             onChange={(e) => setSortBy(e.target.value)}
-                                            className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
+                                            className="border border-gray-300 rounded-lg px-3 lg:px-4 py-1.5 lg:py-2 text-sm focus:outline-none focus:border-black bg-white"
                                         >
                                             <option value="newest">Newest First</option>
                                             <option value="price-low">Price: Low to High</option>
                                             <option value="price-high">Price: High to Low</option>
-                                            <option value="popular">Most Popular</option>
                                         </select>
 
                                         <button
                                             onClick={handleSellItems}
-                                            className="bg-black text-white px-6 py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap"
+                                            className="bg-black text-white px-4 lg:px-6 py-1.5 lg:py-2 rounded-lg text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-colors whitespace-nowrap"
                                         >
                                             + SELL ITEM
                                         </button>
                                     </div>
                                 </div>
 
-                                {/* MOBILE Header Title */}
-                                <div className="lg:hidden mb-6">
-                                    <h2 className="text-gray-900 text-xl font-light tracking-widest uppercase mb-1">
+                                {/* MOBILE Header Title - COMPACT */}
+                                <div className="lg:hidden mb-4">
+                                    <h2 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-0.5">
                                         {config.title || 'PRODUCTS'}
                                     </h2>
-                                    <p className="text-gray-600 text-sm font-light">
-                                        Showing {sortedProducts.length} of {products.length} products
-                                        {loading && ' • Loading...'}
+                                    <p className="text-gray-600 text-xs font-light">
+                                        {sortedProducts.length} products • {loading && 'Loading...'}
                                     </p>
                                 </div>
 
@@ -1166,28 +1165,28 @@ export default function CategoryClient({
                                 ) :
 
                                     sortedProducts.length === 0 ? (
-                                        <div className="text-center py-12">
-                                            <div className="text-gray-400 mb-4">
-                                                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="text-center py-8 lg:py-12">
+                                            <div className="text-gray-400 mb-3 lg:mb-4">
+                                                <svg className="w-12 h-12 lg:w-16 lg:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                                 </svg>
                                             </div>
-                                            <p className="text-gray-500 text-lg mb-2">No products found.</p>
-                                            <p className="text-gray-400 text-sm mb-6">
+                                            <p className="text-gray-500 text-base lg:text-lg mb-1 lg:mb-2">No products found.</p>
+                                            <p className="text-gray-400 text-xs lg:text-sm mb-4 lg:mb-6">
                                                 {products.length === 0
                                                     ? 'No products available in this category.'
                                                     : 'No products match your filters.'}
                                             </p>
-                                            <div className="flex gap-4 justify-center">
+                                            <div className="flex flex-col sm:flex-row gap-2 lg:gap-4 justify-center">
                                                 <button
                                                     onClick={handleClearFilters}
-                                                    className="border-2 border-black text-black px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all"
+                                                    className="border-2 border-black text-black px-4 py-1.5 lg:px-6 lg:py-2 rounded-lg text-xs lg:text-sm font-light tracking-widest uppercase hover:bg-black hover:text-white transition-all"
                                                 >
                                                     Clear Filters
                                                 </button>
                                                 <button
                                                     onClick={handleSellItems}
-                                                    className="bg-black text-white px-6 py-2 rounded-lg font-light tracking-widest uppercase hover:bg-gray-800 transition-all"
+                                                    className="bg-black text-white px-4 py-1.5 lg:px-6 lg:py-2 rounded-lg text-xs lg:text-sm font-light tracking-widest uppercase hover:bg-gray-800 transition-all"
                                                 >
                                                     Sell Items
                                                 </button>
@@ -1195,10 +1194,10 @@ export default function CategoryClient({
                                         </div>
                                     ) :
 
-                                        /* ✅ Products Grid */
+                                        /* ✅ Products Grid - COMPACT FOR MOBILE */
                                         (
                                             <>
-                                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 lg:gap-4 xl:gap-6">
                                                     {sortedProducts.map(product => (
                                                         <ProductCard key={product._id} product={product} />
                                                     ))}
@@ -1206,11 +1205,11 @@ export default function CategoryClient({
 
                                                 {/* Load More Button */}
                                                 {hasMore && !loading && sortedProducts.length > 0 && (
-                                                    <div className="text-center mt-12">
+                                                    <div className="text-center mt-8 lg:mt-12">
                                                         <button
                                                             onClick={handleLoadMore}
                                                             disabled={loadingMore}
-                                                            className={`border-2 border-black text-black px-8 py-3 font-light tracking-widest uppercase transition-all duration-300 rounded-full ${loadingMore ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black hover:text-white'}`}
+                                                            className={`border-2 border-black text-black px-6 lg:px-8 py-2 lg:py-3 text-xs lg:text-sm font-light tracking-widest uppercase transition-all duration-300 rounded-full ${loadingMore ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black hover:text-white'}`}
                                                         >
                                                             {loadingMore ? 'Loading...' : 'LOAD MORE PRODUCTS'}
                                                         </button>
@@ -1223,25 +1222,25 @@ export default function CategoryClient({
                     </div>
                 </section>
 
-                {/* ✅ Why Shop Section */}
-                <section className="py-12 md:py-16 bg-gray-50">
+                {/* ✅ Why Shop Section - MOBILE: Reduced padding */}
+                <section className="py-8 lg:py-16 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                        <div className="text-center mb-12">
-                            <h2 className="text-gray-900 text-3xl sm:text-4xl font-light tracking-widest uppercase mb-4">
+                        <div className="text-center mb-8 lg:mb-12">
+                            <h2 className="text-gray-900 text-xl lg:text-2xl xl:text-3xl font-light tracking-widest uppercase mb-3 lg:mb-4">
                                 {config.whyTitle || 'WHY SHOP AT JUST BECHO'}
                             </h2>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
                             {(config.features || []).map((feature, index) => (
-                                <div key={index} className="text-center p-6">
-                                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-black flex items-center justify-center">
-                                        <span className="text-white text-2xl">{feature.icon || '✨'}</span>
+                                <div key={index} className="text-center p-4 lg:p-6">
+                                    <div className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-3 lg:mb-4 rounded-full bg-black flex items-center justify-center">
+                                        <span className="text-white text-xl lg:text-2xl">{feature.icon || '✨'}</span>
                                     </div>
-                                    <h3 className="text-gray-900 text-lg font-light tracking-widest uppercase mb-2">
+                                    <h3 className="text-gray-900 text-sm lg:text-base xl:text-lg font-light tracking-widest uppercase mb-1 lg:mb-2">
                                         {feature.title || 'FEATURE'}
                                     </h3>
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-600 text-xs lg:text-sm">
                                         {feature.description || 'Premium service and quality guaranteed'}
                                     </p>
                                 </div>

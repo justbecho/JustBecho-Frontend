@@ -1,4 +1,4 @@
-// app/contact-us/page.jsx
+// app/contact-us/page.jsx - MOBILE & DESKTOP OPTIMIZED
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -169,9 +169,9 @@ export default function ContactUs() {
     <>
       <Header />
       
-      {/* Enhanced Hero Section with Gradient */}
+      {/* ✅ PROPER SPACING: Header के नीचे से start होगा */}
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        {/* Hero Section */}
+        {/* ✅ Hero Section with proper spacing */}
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800">
           {/* Decorative elements */}
           <div className="absolute inset-0">
@@ -179,29 +179,30 @@ export default function ContactUs() {
             <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
           </div>
           
-          <div className="relative pt-[5rem] md:pt-[8rem] pb-8 md:pb-12 px-4 sm:px-6 lg:px-8">
+          {/* ✅ Proper top padding for header */}
+          <div className="relative pt-24 md:pt-36 pb-8 md:pb-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
               <div className="text-center">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 md:mb-6">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
                   Contact Us
                 </h1>
-                <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto px-4">
+                <p className="text-base sm:text-lg md:text-xl text-blue-100 max-w-3xl mx-auto px-2 sm:px-4">
                   We're here to help. Reach out through the right channel for your needs and get timely assistance.
                 </p>
                 
-                {/* Quick Stats */}
-                <div className="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 md:gap-8">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3">
-                    <p className="text-white text-sm">Response Time</p>
-                    <p className="text-white font-bold text-xl">Within 24 Hours</p>
+                {/* Quick Stats - COMPACT FOR MOBILE */}
+                <div className="mt-6 md:mt-12 flex flex-wrap justify-center gap-3 md:gap-6 lg:gap-8">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3">
+                    <p className="text-white text-xs md:text-sm">Response Time</p>
+                    <p className="text-white font-bold text-lg md:text-xl">Within 24 Hours</p>
                   </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3">
-                    <p className="text-white text-sm">Support Available</p>
-                    <p className="text-white font-bold text-xl">6 Days a Week</p>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3">
+                    <p className="text-white text-xs md:text-sm">Support Available</p>
+                    <p className="text-white font-bold text-lg md:text-xl">6 Days a Week</p>
                   </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3">
-                    <p className="text-white text-sm">Customer Rating</p>
-                    <p className="text-white font-bold text-xl">4.8/5 Stars</p>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3">
+                    <p className="text-white text-xs md:text-sm">Customer Rating</p>
+                    <p className="text-white font-bold text-lg md:text-xl">4.8/5 Stars</p>
                   </div>
                 </div>
               </div>
@@ -209,67 +210,68 @@ export default function ContactUs() {
           </div>
         </div>
 
-        <div className="pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 -mt-4">
-          {/* Success Message - Floating */}
+        {/* ✅ Main Content with responsive padding */}
+        <div className="pb-12 md:pb-20 px-4 sm:px-6 lg:px-8 -mt-2 md:-mt-4">
+          {/* Success Message - COMPACT FOR MOBILE */}
           {isSubmitted && (
-            <div className="max-w-2xl mx-auto mb-8 animate-fade-in-up">
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-6 shadow-2xl">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <FiCheckCircle className="w-6 h-6" />
+            <div className="max-w-2xl mx-auto mb-6 md:mb-8 animate-fade-in-up">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-4 md:p-6 shadow-2xl">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <FiCheckCircle className="w-5 h-5 md:w-6 md:h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-1">Message Sent Successfully!</h3>
-                    <p className="text-green-100">We'll get back to you within 24 hours. Check your email for confirmation.</p>
+                    <h3 className="text-base md:text-xl font-bold mb-0.5 md:mb-1">Message Sent Successfully!</h3>
+                    <p className="text-green-100 text-xs md:text-sm">We'll get back to you within 24 hours. Check your email for confirmation.</p>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Contact Methods Grid - Enhanced */}
-          <div className="max-w-7xl mx-auto mb-12 md:mb-16">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">
+          {/* ✅ Contact Methods Grid - COMPACT FOR MOBILE */}
+          <div className="max-w-7xl mx-auto mb-8 md:mb-16">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
               Quick Contact Channels
             </h2>
-            <p className="text-gray-600 text-center mb-8 md:mb-12 max-w-3xl mx-auto">
+            <p className="text-gray-600 text-center mb-6 md:mb-12 max-w-3xl mx-auto text-sm md:text-base">
               Choose the right contact method based on your query type for faster resolution
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
               {contactMethods.map((method, index) => {
                 const Icon = method.icon
                 return (
                   <div 
                     key={index} 
-                    className={`bg-gradient-to-br ${method.bgColor} border border-gray-200/50 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
+                    className={`bg-gradient-to-br ${method.bgColor} border border-gray-200/50 rounded-xl md:rounded-2xl p-4 md:p-6 hover:shadow-lg md:hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
                   >
                     <div className="flex flex-col h-full">
-                      {/* Icon Header */}
-                      <div className="flex items-start gap-4 mb-6">
-                        <div className={`${method.iconBg} w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg`}>
-                          <Icon className="w-7 h-7 text-white" />
+                      {/* Icon Header - COMPACT */}
+                      <div className="flex items-start gap-3 md:gap-4 mb-4 md:mb-6">
+                        <div className={`${method.iconBg} w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-2xl flex items-center justify-center shadow-lg`}>
+                          <Icon className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-xl mb-2">
+                          <h3 className="font-bold text-gray-900 text-base md:text-lg lg:text-xl mb-1 md:mb-2">
                             {method.title}
                           </h3>
-                          <p className="text-gray-600 text-sm">
+                          <p className="text-gray-600 text-xs md:text-sm">
                             {method.description}
                           </p>
                         </div>
                       </div>
                       
-                      {/* Contact Details */}
-                      <div className="space-y-4 mb-6 flex-1">
+                      {/* Contact Details - COMPACT */}
+                      <div className="space-y-3 md:space-y-4 mb-4 md:mb-6 flex-1">
                         <div>
-                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                            <FiMail className="w-4 h-4" />
+                          <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-500 mb-0.5 md:mb-1">
+                            <FiMail className="w-3 h-3 md:w-4 md:h-4" />
                             <span>Email</span>
                           </div>
                           <a 
                             href={`mailto:${method.email}`}
-                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors break-all text-lg"
+                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors break-all text-sm md:text-base lg:text-lg"
                           >
                             {method.email}
                           </a>
@@ -277,13 +279,13 @@ export default function ContactUs() {
                         
                         {method.contactNumber && (
                           <div>
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                              <FiPhone className="w-4 h-4" />
+                            <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-500 mb-0.5 md:mb-1">
+                              <FiPhone className="w-3 h-3 md:w-4 md:h-4" />
                               <span>Phone</span>
                             </div>
                             <a 
                               href={`tel:${method.contactNumber}`}
-                              className="font-medium text-gray-900 hover:text-blue-600 transition-colors text-lg"
+                              className="font-medium text-gray-900 hover:text-blue-600 transition-colors text-sm md:text-base lg:text-lg"
                             >
                               {method.contactNumber}
                             </a>
@@ -292,22 +294,22 @@ export default function ContactUs() {
                         
                         {method.workingHours && (
                           <div>
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                              <FiClock className="w-4 h-4" />
+                            <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-500 mb-0.5 md:mb-1">
+                              <FiClock className="w-3 h-3 md:w-4 md:h-4" />
                               <span>Working Hours</span>
                             </div>
-                            <p className="font-medium text-gray-900 text-lg">
+                            <p className="font-medium text-gray-900 text-sm md:text-base lg:text-lg">
                               {method.workingHours}
                             </p>
                           </div>
                         )}
                       </div>
                       
-                      {/* Action Buttons */}
-                      <div className="space-y-3 pt-4 border-t border-gray-200/50">
+                      {/* Action Buttons - COMPACT */}
+                      <div className="space-y-2 md:space-y-3 pt-3 md:pt-4 border-t border-gray-200/50">
                         <a 
                           href={`mailto:${method.email}`}
-                          className="block w-full bg-white border-2 border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-gray-400 py-3 px-4 rounded-xl font-medium transition-all text-center"
+                          className="block w-full bg-white border border-gray-300 md:border-2 text-gray-800 hover:bg-gray-50 hover:border-gray-400 py-2 md:py-3 px-3 md:px-4 rounded-lg md:rounded-xl font-medium transition-all text-center text-sm md:text-base"
                         >
                           Send Email
                         </a>
@@ -317,9 +319,9 @@ export default function ContactUs() {
                             href={`https://wa.me/${method.whatsapp}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 py-3 px-4 rounded-xl font-medium transition-all"
+                            className="flex items-center justify-center gap-1 md:gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 py-2 md:py-3 px-3 md:px-4 rounded-lg md:rounded-xl font-medium transition-all text-sm md:text-base"
                           >
-                            <FaWhatsapp className="w-5 h-5" />
+                            <FaWhatsapp className="w-4 h-4 md:w-5 md:h-5" />
                             Message on WhatsApp
                           </a>
                         )}
@@ -331,30 +333,30 @@ export default function ContactUs() {
             </div>
           </div>
 
-          {/* Main Content Grid - Contact Form & Info Side by Side */}
+          {/* ✅ Main Content Grid - Contact Form & Info Side by Side */}
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
               {/* Contact Form - Takes 2 columns */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <FiMessageCircle className="w-8 h-8 text-white" />
+                <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-4 md:p-6 lg:p-8">
+                  <div className="text-center mb-6 md:mb-8">
+                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg md:rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4">
+                      <FiMessageCircle className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-white" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
                       Send Us a Message
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm md:text-base">
                       Fill out the form below and we'll respond as soon as possible
                     </p>
                   </div>
                   
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          <span className="flex items-center gap-2">
-                            <FiUser className="w-4 h-4" />
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                          <span className="flex items-center gap-1 md:gap-2">
+                            <FiUser className="w-3 h-3 md:w-4 md:h-4" />
                             Your Name *
                           </span>
                         </label>
@@ -363,16 +365,16 @@ export default function ContactUs() {
                           name="name"
                           value={formData.name}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                          className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm md:text-base"
                           placeholder="John Doe"
                           required
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          <span className="flex items-center gap-2">
-                            <FiMail className="w-4 h-4" />
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                          <span className="flex items-center gap-1 md:gap-2">
+                            <FiMail className="w-3 h-3 md:w-4 md:h-4" />
                             Email Address *
                           </span>
                         </label>
@@ -381,18 +383,18 @@ export default function ContactUs() {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                          className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm md:text-base"
                           placeholder="john@example.com"
                           required
                         />
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          <span className="flex items-center gap-2">
-                            <FiPhone className="w-4 h-4" />
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                          <span className="flex items-center gap-1 md:gap-2">
+                            <FiPhone className="w-3 h-3 md:w-4 md:h-4" />
                             Phone Number (Optional)
                           </span>
                         </label>
@@ -401,20 +403,20 @@ export default function ContactUs() {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                          className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm md:text-base"
                           placeholder="+91 9876543210"
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                           Query Type
                         </label>
                         <select
                           name="contactType"
                           value={formData.contactType}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                          className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm md:text-base bg-white"
                         >
                           <option value="general">General Inquiry</option>
                           <option value="support">Customer Support</option>
@@ -426,7 +428,7 @@ export default function ContactUs() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                         Subject
                       </label>
                       <input
@@ -434,21 +436,21 @@ export default function ContactUs() {
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm md:text-base"
                         placeholder="Brief description of your query"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                         Message *
                       </label>
                       <textarea
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        rows={isMobile ? 5 : 6}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                        rows={isMobile ? 4 : 6}
+                        className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none text-sm md:text-base"
                         placeholder="Please provide detailed information about your query..."
                         required
                       />
@@ -457,7 +459,7 @@ export default function ContactUs() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`w-full py-4 px-6 rounded-xl font-bold text-white flex items-center justify-center transition-all duration-300 ${
+                      className={`w-full py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl font-bold text-white flex items-center justify-center transition-all duration-300 text-sm md:text-base ${
                         isSubmitting 
                           ? 'bg-gradient-to-r from-blue-400 to-blue-500 cursor-not-allowed' 
                           : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:scale-[0.98] shadow-lg hover:shadow-xl'
@@ -465,12 +467,12 @@ export default function ContactUs() {
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent mr-3"></div>
+                          <div className="animate-spin rounded-full h-5 h-6 md:w-6 border-2 md:border-3 border-white border-t-transparent mr-2 md:mr-3"></div>
                           Sending Your Message...
                         </>
                       ) : (
                         <>
-                          <FiSend className="w-6 h-6 mr-3" />
+                          <FiSend className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 mr-2 md:mr-3" />
                           Send Message
                         </>
                       )}
@@ -479,50 +481,50 @@ export default function ContactUs() {
                 </div>
               </div>
               
-              {/* Contact Info Sidebar - Takes 1 column */}
-              <div className="space-y-8">
+              {/* ✅ Contact Info Sidebar - COMPACT FOR MOBILE */}
+              <div className="space-y-6 md:space-y-8">
                 {/* Contact Info Card */}
-                <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 text-white">
-                  <h3 className="text-xl font-bold mb-6">Contact Information</h3>
+                <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl md:rounded-2xl p-4 md:p-6 lg:p-8 text-white">
+                  <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6">Contact Information</h3>
                   
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <FiPhone className="w-6 h-6" />
+                  <div className="space-y-4 md:space-y-6">
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FiPhone className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
                       <div>
-                        <p className="font-bold text-lg mb-1">Phone Support</p>
+                        <p className="font-bold text-base md:text-lg mb-0.5 md:mb-1">Phone Support</p>
                         <a 
                           href="tel:+919301847748"
-                          className="text-blue-300 hover:text-blue-200 text-lg font-medium"
+                          className="text-blue-300 hover:text-blue-200 text-base md:text-lg font-medium"
                         >
                           +91 9301847748
                         </a>
-                        <p className="text-gray-300 text-sm mt-1">
+                        <p className="text-gray-300 text-xs md:text-sm mt-0.5 md:mt-1">
                           Monday to Saturday, 9AM - 6PM
                         </p>
                       </div>
                     </div>
                     
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <FiMapPin className="w-6 h-6" />
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FiMapPin className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
                       <div>
-                        <p className="font-bold text-lg mb-1">Office Address</p>
-                        <p className="text-gray-300">
+                        <p className="font-bold text-base md:text-lg mb-0.5 md:mb-1">Office Address</p>
+                        <p className="text-gray-300 text-xs md:text-sm">
                           Registered Office: 11 USHAGANJ 1ST FLOOR BETALA COMPLEX, INDORE, M.P – 452001
                         </p>
                       </div>
                     </div>
                     
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <FiShield className="w-6 h-6" />
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FiShield className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
                       <div>
-                        <p className="font-bold text-lg mb-1">Support Guarantee</p>
-                        <p className="text-gray-300">
+                        <p className="font-bold text-base md:text-lg mb-0.5 md:mb-1">Support Guarantee</p>
+                        <p className="text-gray-300 text-xs md:text-sm">
                           We guarantee a response within 24 hours on business days
                         </p>
                       </div>
@@ -530,25 +532,25 @@ export default function ContactUs() {
                   </div>
                   
                   {/* Emergency Contact Button */}
-                  <div className="mt-8 pt-6 border-t border-white/20">
+                  <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-white/20">
                     <a 
                       href="tel:+919301847748"
-                      className="block w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-3 px-4 rounded-xl font-bold text-center transition-all"
+                      className="block w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-2 md:py-3 px-3 md:px-4 rounded-lg md:rounded-xl font-bold text-center transition-all text-sm md:text-base"
                     >
                       Emergency Contact
                     </a>
                   </div>
                 </div>
                 
-                {/* WhatsApp Quick Contact */}
-                <div className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 rounded-2xl p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
-                      <FaWhatsapp className="w-8 h-8 text-white" />
+                {/* WhatsApp Quick Contact - COMPACT */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-lg md:rounded-2xl flex items-center justify-center">
+                      <FaWhatsapp className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-lg">WhatsApp Support</h4>
-                      <p className="text-gray-600 text-sm">Instant messaging support</p>
+                      <h4 className="font-bold text-gray-900 text-base md:text-lg">WhatsApp Support</h4>
+                      <p className="text-gray-600 text-xs md:text-sm">Instant messaging support</p>
                     </div>
                   </div>
                   
@@ -556,9 +558,9 @@ export default function ContactUs() {
                     href="https://wa.me/919301847748"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl font-bold text-center transition-all flex items-center justify-center gap-2"
+                    className="block w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 md:py-3 px-3 md:px-4 rounded-lg md:rounded-xl font-bold text-center transition-all flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base"
                   >
-                    <FaWhatsapp className="w-5 h-5" />
+                    <FaWhatsapp className="w-4 h-4 md:w-5 md:h-5" />
                     Chat on WhatsApp
                   </a>
                 </div>
@@ -566,50 +568,50 @@ export default function ContactUs() {
             </div>
           </div>
 
-          {/* FAQ Section - Enhanced */}
-          <div className="max-w-4xl mx-auto mt-16 md:mt-20">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+          {/* ✅ FAQ Section - COMPACT FOR MOBILE */}
+          <div className="max-w-4xl mx-auto mt-12 md:mt-16 lg:mt-20">
+            <div className="text-center mb-6 md:mb-10">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 md:mb-3">
                 Frequently Asked Questions
               </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
                 Find quick answers to common questions about our services and support
               </p>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {faqItems.map((item, index) => (
                 <div 
                   key={index} 
-                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-gray-300 transition-all"
+                  className="bg-white border border-gray-200 rounded-xl md:rounded-2xl overflow-hidden hover:border-gray-300 transition-all"
                 >
                   <button
                     onClick={() => toggleFaq(index)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 md:px-6 py-3 md:py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    <div className="flex items-center gap-3 md:gap-4">
+                      <div className={`w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs md:text-sm ${
                         expandedFaq === index 
                           ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white' 
                           : 'bg-gray-100 text-gray-600'
                       }`}>
                         {index + 1}
                       </div>
-                      <span className="font-semibold text-gray-900 text-base md:text-lg pr-4">
+                      <span className="font-semibold text-gray-900 text-sm md:text-base lg:text-lg pr-4">
                         {item.question}
                       </span>
                     </div>
                     {expandedFaq === index ? (
-                      <FiChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                      <FiChevronUp className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                     ) : (
-                      <FiChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                      <FiChevronDown className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                     )}
                   </button>
                   
                   {expandedFaq === index && (
-                    <div className="px-6 pb-6 animate-fade-in">
-                      <div className="pl-12 border-l-2 border-blue-500">
-                        <p className="text-gray-600">
+                    <div className="px-4 md:px-6 pb-4 md:pb-6 animate-fade-in">
+                      <div className="pl-10 md:pl-12 border-l-2 border-blue-500">
+                        <p className="text-gray-600 text-sm md:text-base">
                           {item.answer}
                         </p>
                       </div>
@@ -619,24 +621,24 @@ export default function ContactUs() {
               ))}
             </div>
             
-            {/* Still have questions */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-600 mb-4">
+            {/* Still have questions - COMPACT */}
+            <div className="mt-6 md:mt-8 text-center">
+              <p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
                 Still have questions? We're here to help!
               </p>
-              <div className="flex flex-wrap gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <a 
                   href="mailto:support@justbecho.com"
-                  className="inline-flex items-center gap-2 bg-gray-900 text-white hover:bg-black py-3 px-6 rounded-xl font-medium transition-all"
+                  className="inline-flex items-center justify-center gap-1 md:gap-2 bg-gray-900 text-white hover:bg-black py-2 md:py-3 px-4 md:px-6 rounded-lg md:rounded-xl font-medium transition-all text-sm md:text-base"
                 >
-                  <FiMail className="w-5 h-5" />
+                  <FiMail className="w-4 h-4 md:w-5 md:h-5" />
                   Email Us
                 </a>
                 <a 
                   href="tel:+919301847748"
-                  className="inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 py-3 px-6 rounded-xl font-medium transition-all"
+                  className="inline-flex items-center justify-center gap-1 md:gap-2 bg-blue-600 text-white hover:bg-blue-700 py-2 md:py-3 px-4 md:px-6 rounded-lg md:rounded-xl font-medium transition-all text-sm md:text-base"
                 >
-                  <FiPhone className="w-5 h-5" />
+                  <FiPhone className="w-4 h-4 md:w-5 md:h-5" />
                   Call Now
                 </a>
               </div>

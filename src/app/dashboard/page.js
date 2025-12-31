@@ -87,9 +87,9 @@ export default function Dashboard() {
     cancelled: 0
   })
 
-  const [cartCount, setCartCount] = useState(0) // ✅ Added cartCount state
+  const [cartCount, setCartCount] = useState(0)
 
-  // ✅ Check for mobile device with updated breakpoints
+  // ✅ Calculate isMobile based on window width
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -195,7 +195,6 @@ export default function Dashboard() {
     };
   };
 
-  // ✅ Function to fetch cart count
   const fetchCartCount = useCallback(async () => {
     try {
       const token = getLocalStorage('token');
@@ -528,7 +527,7 @@ export default function Dashboard() {
           fetchMyProducts(),
           fetchWishlist(),
           fetchOrders(),
-          fetchCartCount() // ✅ Fetch cart count
+          fetchCartCount()
         ]);
         
         setAuthChecked(true);
@@ -716,7 +715,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'pending') {
       return (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4 mx-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4 mx-4 md:mx-8">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiClock className="w-5 h-5 text-yellow-600" />
@@ -734,7 +733,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'approved') {
       return (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 mx-4">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 mx-4 md:mx-8">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiCheckCircle className="w-5 h-5 text-green-600" />
@@ -757,7 +756,7 @@ export default function Dashboard() {
     
     if (sellerStatus.status === 'rejected') {
       return (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 mx-4">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 mx-4 md:mx-8">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
               <FiAlertCircle className="w-5 h-5 text-red-600" />
@@ -932,12 +931,12 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ LOADING STATE - Optimized for mobile
+  // ✅ LOADING STATE - Fixed with perfect header alignment
   if (loading) {
     return (
       <>
         <Header />
-        {/* ✅ Fixed spacing for header */}
+        {/* ✅ CORRECT SPACING: Mobile pt-[135px], Desktop pt-[140px] */}
         <div className="min-h-screen bg-gray-50 pt-[135px] md:pt-[140px] pb-16 flex flex-col items-center justify-center p-4">
           <div className="text-center">
             <div className="relative w-16 h-16 mx-auto mb-4">
@@ -2279,12 +2278,12 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ MOBILE VERSION
+  // ✅ MOBILE VERSION - PERFECT HEADER ALIGNMENT
   if (isMobile) {
     return (
       <>
         <Header />
-        {/* ✅ Fixed spacing: pt-[135px] for header + search, pb-16 for bottom nav */}
+        {/* ✅ MOBILE: Start exactly after header ends (135px) */}
         <main className="min-h-screen bg-gray-50 pt-[135px] pb-16">
           
           {/* Welcome Banner */}
@@ -2408,13 +2407,13 @@ export default function Dashboard() {
     )
   }
 
-  // ✅ DESKTOP VERSION
+  // ✅ DESKTOP VERSION - PERFECT HEADER ALIGNMENT
   return (
     <>
       <Header />
       
+      {/* ✅ DESKTOP: Start exactly after header + subheader ends (140px) */}
       <main className="min-h-screen bg-gray-50">
-        {/* ✅ Fixed spacing: pt-[140px] for header + subheader */}
         <div className="pt-[140px] pb-16">
           {renderSellerStatusBanner()}
           
