@@ -177,26 +177,26 @@ function HomeContent() {
     {
       name: "Priya Sharma",
       location: "Mumbai",
-      comment: "Sold my Chanel bag effortlessly! The authentication process was smooth and payment was instant after verification.",
+      comment: "Sold my Louis Vuitton loafers effortlessly! The authentication process was smooth and payment was instant after verification.",
       role: "Luxury Seller",
       rating: 5,
-      productImage: "/reviews/review1.jpg"
+      productImage: "/reviews/review1.jpeg"
     },
     {
       name: "Rahul Mehta",
       location: "Delhi",
-      comment: "Bought a Rolex watch. The authenticity certificate gave me complete confidence. Amazing service!",
+      comment: "Bought Hermes Chypre sandals, The deal was smooth!!!. The authenticity verification gave me complete confidence in my purchase.",
       role: "Watch Collector",
       rating: 5,
-      productImage: "/reviews/review2.jpg"
+      productImage: "/reviews/review2.jpeg"
     },
     {
       name: "Ananya Patel",
       location: "Bangalore",
-      comment: "As both buyer and seller, Just Becho's managed process makes luxury trading completely secure.",
+      comment: "Bough A Cartier Watch,As both buyer and seller, Just Becho's managed process makes luxury trading completely secure.",
       role: "Fashion Influencer",
       rating: 5,
-      productImage: "/reviews/review3.jpg"
+      productImage: "/reviews/review3.jpeg"
     },
     {
       name: "Vikram Singh",
@@ -204,7 +204,7 @@ function HomeContent() {
       comment: "The white glove delivery and premium packaging made my luxury shopping experience exceptional.",
       role: "Business Executive",
       rating: 5,
-      productImage: "/reviews/review4.jpg"
+      productImage: "/reviews/review4.jpeg"
     },
     {
       name: "Sneha Reddy",
@@ -212,7 +212,7 @@ function HomeContent() {
       comment: "Quick verification process and instant payment. Best platform for selling luxury items safely.",
       role: "Luxury Enthusiast",
       rating: 5,
-      productImage: "/reviews/review5.jpg"
+      productImage: "/reviews/review5.jpeg"
     }
   ], [])
 
