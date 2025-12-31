@@ -56,7 +56,7 @@ export default function ShopContent() {
         'under-20k': {
             title: "PRODUCTS UNDER ₹20K",
             subtitle: "Affordable luxury items under ₹20,000",
-            banner: "/banners/budget-20k.jpg",
+            banner: "/banners/under20k.jpeg",
             maxPrice: 20000,
             whyTitle: "WHY SHOP UNDER ₹20K AT JUST BECHO",
             features: [
@@ -81,7 +81,7 @@ export default function ShopContent() {
         'under-40k': {
             title: "PRODUCTS UNDER ₹40K", 
             subtitle: "Premium items under ₹40,000",
-            banner: "/banners/budget-40k.jpg",
+            banner: "/banners/under40k.jpeg",
             maxPrice: 40000,
             whyTitle: "WHY SHOP UNDER ₹40K AT JUST BECHO",
             features: [
@@ -106,7 +106,7 @@ export default function ShopContent() {
         'under-60k': {
             title: "PRODUCTS UNDER ₹60K",
             subtitle: "High-end luxury under ₹60,000",
-            banner: "/banners/budget-60k.jpg",
+            banner: "/banners/under60k.jpeg",
             maxPrice: 60000,
             whyTitle: "WHY SHOP UNDER ₹60K AT JUST BECHO",
             features: [
