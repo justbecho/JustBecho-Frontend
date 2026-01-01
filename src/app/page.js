@@ -178,7 +178,7 @@ function HomeContent() {
       name: "Priya Sharma",
       location: "Mumbai",
       comment: "Sold my Louis Vuitton loafers effortlessly! The authentication process was smooth and payment was instant after verification.",
-      role: "Luxury Seller",
+      
       rating: 5,
       productImage: "/reviews/review1.jpeg"
     },
@@ -186,7 +186,7 @@ function HomeContent() {
       name: "Rahul Mehta",
       location: "Delhi",
       comment: "Bought Hermes Chypre sandals, The deal was smooth!!!. The authenticity verification gave me complete confidence in my purchase.",
-      role: "Watch Collector",
+      
       rating: 5,
       productImage: "/reviews/review2.jpeg"
     },
@@ -194,7 +194,7 @@ function HomeContent() {
       name: "Ananya Patel",
       location: "Bangalore",
       comment: "Bough A Cartier Watch,As both buyer and seller, Just Becho's managed process makes luxury trading completely secure.",
-      role: "Fashion Influencer",
+      
       rating: 5,
       productImage: "/reviews/review3.jpeg"
     },
@@ -202,7 +202,7 @@ function HomeContent() {
       name: "Vikram Singh",
       location: "Chennai",
       comment: "The white glove delivery and premium packaging made my luxury shopping experience exceptional.",
-      role: "Business Executive",
+      
       rating: 5,
       productImage: "/reviews/review4.jpeg"
     },
@@ -210,7 +210,7 @@ function HomeContent() {
       name: "Sneha Reddy",
       location: "Hyderabad",
       comment: "Quick verification process and instant payment. Best platform for selling luxury items safely.",
-      role: "Luxury Enthusiast",
+     
       rating: 5,
       productImage: "/reviews/review5.jpeg"
     }
@@ -819,177 +819,176 @@ function HomeContent() {
           )
         })}
 
-        {/* ✅ Testimonials Section (Mobile: Carousel, Desktop: Grid) */}
-        <section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
-          <div className="max-w-[1400px] mx-auto">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
-                VOICES OF TRUST
-              </h2>
-              <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-1 sm:mt-2">
-                DISCOVER WHY THOUSANDS CHOOSE JUST BECHO
+       {/* ✅ Testimonials Section (Mobile: Carousel, Desktop: Grid) */}
+<section className="py-10 sm:py-16 bg-gray-50 section-padding safe-area-padding">
+  <div className="max-w-[1400px] mx-auto">
+    <div className="text-center mb-8 sm:mb-12">
+      <h2 className="text-gray-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-widest uppercase mb-2 sm:mb-3">
+        VOICES OF TRUST
+      </h2>
+      <p className="text-gray-900 text-sm sm:text-base md:text-lg font-light tracking-widest uppercase mt-1 sm:mt-2">
+        DISCOVER WHY THOUSANDS CHOOSE JUST BECHO
+      </p>
+    </div>
+
+    {/* ✅ Mobile: Carousel (Single testimonial at a time) */}
+    <div className="block lg:hidden">
+      <div className="relative">
+        {/* Testimonial Card */}
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-5 sm:p-6 shadow-lg border border-gray-200/50 h-auto flex flex-col relative overflow-hidden testimonial-card">
+          {/* ✅ UPDATED: Product Image Section - BADA SIZE Mobile */}
+          <div className="relative w-full h-[280px] sm:h-[320px] mb-4 rounded-xl overflow-hidden">
+            <Image
+              src={testimonials[currentTestimonialIndex].productImage}
+              alt={`Product reviewed by ${testimonials[currentTestimonialIndex].name}`}
+              fill
+              className="object-cover"
+              sizes="100vw"
+              onError={(e) => {
+                e.target.src = '/images/placeholder.jpg';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-between">
+            <div>
+              {/* ✅ Rating and Verified Badge */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex">
+                  {[...Array(testimonials[currentTestimonialIndex].rating)].map((_, i) => (
+                    <span key={i} className="text-yellow-500 text-sm sm:text-base mr-1 drop-shadow-sm">★</span>
+                  ))}
+                </div>
+                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs sm:text-sm font-light tracking-widest uppercase px-3 py-1.5 rounded-full">
+                  Verified
+                </div>
+              </div>
+
+              {/* ✅ Review Comment */}
+              <p className="text-gray-700 mb-4 leading-relaxed text-sm sm:text-base font-light tracking-wide min-h-[80px]">
+                "{testimonials[currentTestimonialIndex].comment}"
               </p>
             </div>
 
-            {/* ✅ Mobile: Carousel (Single testimonial at a time) */}
-            <div className="block lg:hidden">
-              <div className="relative">
-                {/* Testimonial Card */}
-                <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-5 sm:p-6 shadow-lg border border-gray-200/50 h-auto flex flex-col relative overflow-hidden testimonial-card">
-                  {/* ✅ Product Image Section - Larger for mobile */}
-                  <div className="relative w-full h-56 sm:h-64 mb-4 rounded-xl overflow-hidden">
-                    <Image
-                      src={testimonials[currentTestimonialIndex].productImage}
-                      alt={`Product reviewed by ${testimonials[currentTestimonialIndex].name}`}
-                      fill
-                      className="object-cover"
-                      sizes="100vw"
-                      onError={(e) => {
-                        e.target.src = '/images/placeholder.jpg';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                  </div>
-
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      {/* ✅ Rating and Verified Badge */}
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex">
-                          {[...Array(testimonials[currentTestimonialIndex].rating)].map((_, i) => (
-                            <span key={i} className="text-yellow-500 text-sm sm:text-base mr-1 drop-shadow-sm">★</span>
-                          ))}
-                        </div>
-                        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs sm:text-sm font-light tracking-widest uppercase px-3 py-1.5 rounded-full">
-                          Verified
-                        </div>
-                      </div>
-
-                      {/* ✅ Review Comment */}
-                      <p className="text-gray-700 mb-4 leading-relaxed text-sm sm:text-base font-light tracking-wide min-h-[80px]">
-                        "{testimonials[currentTestimonialIndex].comment}"
-                      </p>
-                    </div>
-
-                    {/* ✅ User Info */}
-                    <div className="pt-4 border-t border-gray-200/50">
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center text-white font-light text-base sm:text-lg mr-3 shadow-md">
-                          {testimonials[currentTestimonialIndex].name?.charAt(0) || 'U'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-gray-900 text-sm sm:text-base font-light tracking-wide mb-1">{testimonials[currentTestimonialIndex].name || 'User'}</h4>
-                          <p className="text-gray-600 text-xs sm:text-sm font-light">{testimonials[currentTestimonialIndex].location || 'India'}</p>
-                          <div className="mt-1">
-                            <span className="inline-block bg-gray-200/70 text-gray-700 text-xs font-light tracking-wider px-2 sm:px-3 py-1 rounded-full">
-                              {testimonials[currentTestimonialIndex].role || 'Customer'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            {/* ✅ User Info */}
+            <div className="pt-4 border-t border-gray-200/50">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center text-white font-light text-base sm:text-lg mr-3 shadow-md">
+                  {testimonials[currentTestimonialIndex].name?.charAt(0) || 'U'}
                 </div>
-
-                {/* ✅ Navigation Buttons for Mobile */}
-                <button
-                  onClick={prevTestimonial}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group w-10 h-10 shadow-lg border border-gray-200"
-                  aria-label="Previous testimonial"
-                >
-                  <svg className="w-5 h-5 text-gray-900 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                
-                <button
-                  onClick={nextTestimonial}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group w-10 h-10 shadow-lg border border-gray-200"
-                  aria-label="Next testimonial"
-                >
-                  <svg className="w-5 h-5 text-gray-900 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                {/* ✅ Dots Indicator */}
-                <div className="flex justify-center mt-6 space-x-2">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToTestimonial(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentTestimonialIndex ? 'bg-gray-900 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
-                    />
-                  ))}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-gray-900 text-sm sm:text-base font-light tracking-wide mb-1">{testimonials[currentTestimonialIndex].name || 'User'}</h4>
+                  <p className="text-gray-600 text-xs sm:text-sm font-light">{testimonials[currentTestimonialIndex].location || 'India'}</p>
+                  <div className="mt-1">
+                    <span className="inline-block bg-gray-200/70 text-gray-700 text-xs font-light tracking-wider px-2 sm:px-3 py-1 rounded-full">
+                      {testimonials[currentTestimonialIndex].role || 'Customer'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* ✅ Desktop: Grid (All 5 testimonials) */}
-            <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 testimonials-grid">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-auto sm:h-[420px] flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer testimonial-card tap-highlight">
-                  <div className="absolute top-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-700 group-hover:w-full transition-all duration-500"></div>
-                  
-                  {/* ✅ Product Image Section - Larger for desktop */}
-                  <div className="relative w-full h-40 sm:h-44 mb-3 sm:mb-4 rounded-lg sm:rounded-xl overflow-hidden">
-                    <Image
-                      src={testimonial.productImage}
-                      alt={`Product reviewed by ${testimonial.name}`}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 20vw"
-                      onError={(e) => {
-                        e.target.src = '/images/placeholder.jpg';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  </div>
+        {/* ✅ Navigation Buttons for Mobile */}
+        <button
+          onClick={prevTestimonial}
+          className="absolute left-2 top-[140px] sm:top-[160px] transform -translate-y-1/2 z-20 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group w-10 h-10 shadow-lg border border-gray-200"
+          aria-label="Previous testimonial"
+        >
+          <svg className="w-5 h-5 text-gray-900 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <button
+          onClick={nextTestimonial}
+          className="absolute right-2 top-[140px] sm:top-[160px] transform -translate-y-1/2 z-20 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group w-10 h-10 shadow-lg border border-gray-200"
+          aria-label="Next testimonial"
+        >
+          <svg className="w-5 h-5 text-gray-900 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
 
-                  <div className="flex-1 flex flex-col justify-between relative z-10">
-                    <div>
-                      {/* ✅ Rating and Verified Badge */}
-                      <div className="flex items-center justify-between mb-2 sm:mb-3">
-                        <div className="flex">
-                          {[...Array(testimonial.rating)].map((_, i) => (
-                            <span key={i} className="text-yellow-500 text-xs sm:text-sm mr-0.5 sm:mr-1 drop-shadow-sm">★</span>
-                          ))}
-                        </div>
-                        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[8px] sm:text-[9px] font-light tracking-widest uppercase px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
-                          Verified
-                        </div>
-                      </div>
+        {/* ✅ Dots Indicator */}
+        <div className="flex justify-center mt-6 space-x-2">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToTestimonial(index)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentTestimonialIndex ? 'bg-gray-900 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
 
-                      {/* ✅ Review Comment */}
-                      <p className="text-gray-700 mb-2 sm:mb-3 leading-relaxed text-xs sm:text-[13px] font-light line-clamp-4 tracking-wide min-h-[80px]">
-                        "{testimonial.comment}"
-                      </p>
-                    </div>
+    {/* ✅ Desktop: Grid (All 5 testimonials) */}
+    <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 testimonials-grid">
+      {testimonials.map((testimonial, index) => (
+        <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-200/50 group hover:border-gray-300 h-auto sm:h-[480px] flex flex-col relative overflow-hidden hover:transform hover:-translate-y-1 cursor-pointer testimonial-card tap-highlight">
+          <div className="absolute top-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-700 group-hover:w-full transition-all duration-500"></div>
+          
+          {/* ✅ UPDATED: Product Image Section - BADA SIZE Desktop */}
+          <div className="relative w-full h-[200px] sm:h-[220px] mb-3 sm:mb-4 rounded-lg sm:rounded-xl overflow-hidden">
+            <Image
+              src={testimonial.productImage}
+              alt={`Product reviewed by ${testimonial.name}`}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 20vw"
+              onError={(e) => {
+                e.target.src = '/images/placeholder.jpg';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
 
-                    {/* ✅ User Info */}
-                    <div className="pt-2 sm:pt-3 border-t border-gray-200/50">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-light text-sm sm:text-base mr-2 sm:mr-3 shadow-md">
-                          {testimonial.name?.charAt(0) || 'U'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-gray-900 text-xs sm:text-sm font-light tracking-wide mb-0.5">{testimonial.name || 'User'}</h4>
-                          <p className="text-gray-600 text-xs font-light">{testimonial.location || 'India'}</p>
-                          <div className="mt-0.5 sm:mt-1">
-                            <span className="inline-block bg-gray-200/70 text-gray-700 text-[8px] sm:text-[9px] font-light tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full">
-                              {testimonial.role || 'Customer'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+          <div className="flex-1 flex flex-col justify-between relative z-10">
+            <div>
+              {/* ✅ Rating and Verified Badge */}
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className="flex">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <span key={i} className="text-yellow-500 text-xs sm:text-sm mr-0.5 sm:mr-1 drop-shadow-sm">★</span>
+                  ))}
+                </div>
+                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[8px] sm:text-[9px] font-light tracking-widest uppercase px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                  Verified
+                </div>
+              </div>
+
+              {/* ✅ Review Comment */}
+              <p className="text-gray-700 mb-2 sm:mb-3 leading-relaxed text-xs sm:text-[13px] font-light line-clamp-4 tracking-wide min-h-[80px]">
+                "{testimonial.comment}"
+              </p>
+            </div>
+
+            {/* ✅ User Info */}
+            <div className="pt-2 sm:pt-3 border-t border-gray-200/50">
+              <div className="flex items-center">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-light text-sm sm:text-base mr-2 sm:mr-3 shadow-md">
+                  {testimonial.name?.charAt(0) || 'U'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-gray-900 text-xs sm:text-sm font-light tracking-wide mb-0.5">{testimonial.name || 'User'}</h4>
+                  <p className="text-gray-600 text-xs font-light">{testimonial.location || 'India'}</p>
+                  <div className="mt-0.5 sm:mt-1">
+                    <span className="inline-block bg-gray-200/70 text-gray-700 text-[8px] sm:text-[9px] font-light tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full">
+                      {testimonial.role || 'Customer'}
+                    </span>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </section>
-
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
         {/* ✅ Why Choose Just Becho */}
         <section className="py-10 sm:py-16 bg-white section-padding safe-area-padding">
           <div className="max-w-[1700px] mx-auto">
