@@ -1289,16 +1289,7 @@ export default function Dashboard() {
                       <div className="flex gap-1">
                         {item.status === 'active' && (
                           <>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/edit-listing/${item._id}`);
-                              }}
-                              className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
-                            >
-                              <FiEdit className="w-2.5 h-2.5" />
-                              Edit
-                            </button>
+                           
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
