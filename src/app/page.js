@@ -178,7 +178,7 @@ function HomeContent() {
       name: "Priya Sharma",
       location: "Mumbai",
       comment: "Sold my Louis Vuitton loafers effortlessly! The authentication process was smooth and payment was instant after verification.",
-      
+       role: "Seller",
       rating: 5,
       productImage: "/reviews/review1.jpeg"
     },
