@@ -210,7 +210,7 @@ function HomeContent() {
       name: "Sneha Reddy",
       location: "Hyderabad",
       comment: "Quick verification process and instant payment. Best platform for selling luxury items safely.",
-     
+      role: "Seller",
       rating: 5,
       productImage: "/reviews/review5.jpeg"
     }
