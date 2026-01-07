@@ -254,7 +254,7 @@ export default function CartPage() {
     }
   }
 
-  // Calculate frontend totals (matching backend logic)
+  // ✅ Calculate frontend totals (matching backend logic) - FIXED 10%
   const calculateFrontendTotals = () => {
     if (!cart || cart.items.length === 0) {
       return {
@@ -266,33 +266,21 @@ export default function CartPage() {
       }
     }
 
-    const subtotal = cart.subtotal || 0
-    const bechoProtectTotal = cart.bechoProtectTotal || 0
+    const subtotal = cart.subtotal || 0;
+    const bechoProtectTotal = cart.bechoProtectTotal || 0;
     
-    // Hidden platform fee calculation (exactly same as backend)
-    let platformFeePercentage = 0
-    if (subtotal <= 2000) {
-      platformFeePercentage = 30
-    } else if (subtotal >= 2001 && subtotal <= 5000) {
-      platformFeePercentage = 28
-    } else if (subtotal >= 5001 && subtotal <= 10000) {
-      platformFeePercentage = 25
-    } else if (subtotal >= 10001 && subtotal <= 15000) {
-      platformFeePercentage = 20
-    } else {
-      platformFeePercentage = 15
-    }
+    // ✅ Hidden platform fee calculation - FIXED 10%
+    const platformFeePercentage = 10; // ✅ Fixed 10% for all orders
+    const platformFee = Math.round((subtotal * platformFeePercentage) / 100);
+    const gst = Math.round(platformFee * 0.18); // 18% GST on platform fee
+    const grandTotal = subtotal + bechoProtectTotal + gst + SHIPPING_CHARGE;
     
-    const platformFee = Math.round((subtotal * platformFeePercentage) / 100)
-    const gst = Math.round(platformFee * 0.18) // 18% GST on platform fee
-    const grandTotal = subtotal + bechoProtectTotal + gst + SHIPPING_CHARGE
-    
-    console.log("🧮 Frontend calculation:")
-    console.log("- Subtotal:", subtotal)
-    console.log("- Platform Fee %:", platformFeePercentage)
-    console.log("- Platform Fee:", platformFee)
-    console.log("- GST:", gst)
-    console.log("- Grand Total:", grandTotal)
+    console.log("🧮 Frontend calculation:");
+    console.log("- Subtotal:", subtotal);
+    console.log("- Platform Fee %:", platformFeePercentage);
+    console.log("- Platform Fee:", platformFee);
+    console.log("- GST:", gst);
+    console.log("- Grand Total:", grandTotal);
     
     return {
       subtotal,

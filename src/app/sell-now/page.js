@@ -505,34 +505,22 @@ export default function SellNowPage() {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 25 }, (_, i) => currentYear - i)
 
-  // Calculate Just Becho Price based on asking price
+  // ✅ Calculate Just Becho Price based on asking price - FIXED 10%
   useEffect(() => {
     if (formData.askingPrice) {
-      const price = parseInt(formData.askingPrice)
-      let feePercentage = 0
-
-      if (price <= 2000) {
-        feePercentage = 30
-      } else if (price >= 2001 && price <= 5000) {
-        feePercentage = 28
-      } else if (price >= 5001 && price <= 10000) {
-        feePercentage = 25
-      } else if (price >= 10001 && price <= 15000) {
-        feePercentage = 20
-      } else {
-        feePercentage = 15
-      }
-
-      const feeAmount = (price * feePercentage) / 100
-      const finalPrice = Math.ceil(price + feeAmount)
-
-      setPlatformFee(feePercentage)
-      setJustBechoPrice(finalPrice)
+      const price = parseInt(formData.askingPrice);
+      const feePercentage = 10; // ✅ Fixed 10% platform fee
+    
+      const feeAmount = (price * feePercentage) / 100;
+      const finalPrice = Math.ceil(price + feeAmount);
+      
+      setPlatformFee(feePercentage);
+      setJustBechoPrice(finalPrice);
     } else {
-      setJustBechoPrice(0)
-      setPlatformFee(0)
+      setPlatformFee(0);
+      setJustBechoPrice(0);
     }
-  }, [formData.askingPrice])
+  }, [formData.askingPrice]);
 
   // ✅ UPDATE PRODUCT TYPES WHEN CATEGORY CHANGES
   useEffect(() => {
@@ -1453,30 +1441,14 @@ export default function SellNowPage() {
 
                           <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 md:w-64 bg-gray-900 text-white text-xs rounded-lg p-2 md:p-3 z-10">
                             <div className="font-medium mb-1">Platform Fee Structure:</div>
-                            <div className="space-y-0.5 md:space-y-1">
+                            <div className="space-y-0.5 md:space-y-1 text-center">
                               <div className="flex justify-between">
-                                <span>₹0 - ₹2,000</span>
-                                <span>30% fee</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>₹2,001 - ₹5,000</span>
-                                <span>28% fee</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>₹5,001 - ₹10,000</span>
-                                <span>25% fee</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>₹10,001 - ₹15,000</span>
-                                <span>20% fee</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>₹15,000+</span>
-                                <span>15% fee</span>
+                                <span>All Price Ranges</span>
+                                <span className="text-green-400 font-bold">10% fee</span>
                               </div>
                             </div>
                             <div className="border-t border-gray-700 mt-1 md:mt-2 pt-1 md:pt-2 text-gray-300 text-xs">
-                              Final price includes platform fees for marketing, payment processing, and buyer protection.
+                              Fixed 10% platform fee for all products. Includes marketing, payment processing, and buyer protection.
                             </div>
 
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
@@ -1827,7 +1799,7 @@ export default function SellNowPage() {
                       </div>
                       <div className="bg-white rounded-lg p-3 md:p-4 border border-yellow-300">
                         <p className="text-yellow-800 text-xs md:text-sm">
-                          <span className="font-semibold">Note:</span> The platform fee covers marketing,
+                          <span className="font-semibold">Note:</span> Fixed 10% platform fee covers marketing,
                           payment processing, customer support, and buyer protection services.
                         </p>
                         {isMobile && (
