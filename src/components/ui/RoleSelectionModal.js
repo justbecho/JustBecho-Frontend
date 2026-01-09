@@ -531,6 +531,7 @@ export default function RoleSelectionModal({ isOpen, onClose, token, userEmail, 
               <p className="text-blue-800 text-sm">
                 After submitting, your verification will be sent to admin for approval.
                 You'll get a @justbecho username once approved. You'll receive real-time notifications.
+                Make sure there are no spaces before and after the name.
               </p>
             </div>
           </div>
