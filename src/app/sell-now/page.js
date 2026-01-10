@@ -162,6 +162,8 @@ export default function SellNowPage() {
         'cartier': 'Cartier',
         'rolex': 'Rolex',
         'omega': 'Omega',
+        'Michael Kors': 'Michael Kors',
+        'Tory Burch': 'Tory Burch',
         'ray-ban': 'Ray-Ban',
         'louis vuitton': 'Louis Vuitton',
         'dolce & gabbana': 'Dolce & Gabbana',

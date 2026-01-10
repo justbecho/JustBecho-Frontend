@@ -390,48 +390,48 @@ function HomeContent() {
               }
             })
             
-            // ✅ 1. For Explore Categories: Show all categories EXCEPT INFLUENCER
-            const allCategoriesExceptInfluencer = formattedCategories.filter(cat => 
-              cat.name !== "INFLUENCER"
-            );
-            setAllCategoriesFromBackend(allCategoriesExceptInfluencer);
-            
-            // ✅ 2. For Product by Category: Only show Men's Fashion, Women's Fashion, and Footwear
-            const allowedCategories = ["Men's Fashion", "Women's Fashion", "Footwear"];
-            const filteredCategories = formattedCategories.filter(cat => 
-              allowedCategories.includes(cat.name)
-            );
-            setCategoriesFromBackend(filteredCategories);
-            
-            // Fetch products for filtered categories only
-            const productsByCategory = {}
-            
-            for (const category of filteredCategories) {
-              try {
-                if (category.apiCategory) {
-                  const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
-                  
-                  const response = await fetch(apiUrl)
-                  
-                  if (response.ok) {
-                    const data = await response.json()
-                    
-                    if (data.success && data.products) {
-                      productsByCategory[category.name] = data.products.slice(0, 4)
-                    } else {
-                      productsByCategory[category.name] = []
-                    }
-                  } else {
-                    productsByCategory[category.name] = []
-                  }
-                }
-              } catch (error) {
-                console.error(`Error fetching products for ${category.name}:`, error)
-                productsByCategory[category.name] = []
-              }
-            }
-            
-            setCategoryProducts(productsByCategory)
+          // ✅ 1. For Explore Categories: Show all categories EXCEPT INFLUENCER
+const allCategoriesExceptInfluencer = formattedCategories.filter(cat => 
+  cat.name !== "INFLUENCER"
+);
+setAllCategoriesFromBackend(allCategoriesExceptInfluencer);
+
+// ✅ 2. For Product by Category: Show Men's Fashion, Women's Fashion, Footwear, AND Accessories
+const allowedCategories = ["Men's Fashion", "Women's Fashion", "Footwear", "Accessories"];
+const filteredCategories = formattedCategories.filter(cat => 
+  allowedCategories.includes(cat.name)
+);
+setCategoriesFromBackend(filteredCategories);
+
+// Fetch products for filtered categories only
+const productsByCategory = {}
+
+for (const category of filteredCategories) {
+  try {
+    if (category.apiCategory) {
+      const apiUrl = `https://just-becho-backend.vercel.app/api/products?category=${encodeURIComponent(category.apiCategory)}&limit=4`
+      
+      const response = await fetch(apiUrl)
+      
+      if (response.ok) {
+        const data = await response.json()
+        
+        if (data.success && data.products) {
+          productsByCategory[category.name] = data.products.slice(0, 4)
+        } else {
+          productsByCategory[category.name] = []
+        }
+      } else {
+        productsByCategory[category.name] = []
+      }
+    }
+  } catch (error) {
+    console.error(`Error fetching products for ${category.name}:`, error)
+    productsByCategory[category.name] = []
+  }
+}
+
+setCategoryProducts(productsByCategory)
           } else {
             setAllCategoriesFromBackend([])
             setCategoriesFromBackend([])
