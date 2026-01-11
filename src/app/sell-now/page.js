@@ -170,7 +170,7 @@ export default function SellNowPage() {
         'alexander mcqueen': 'Alexander McQueen',
         'yves saint laurent': 'Yves Saint Laurent',
         'ysl': 'YSL',
-        'Karl Lagerfeld': 'Karl Lagerfeld',
+        'Kl': 'Karl Lagerfeld',
         'tom ford': 'Tom Ford',
         'calvin klein': 'Calvin Klein',
         'ck': 'Calvin Klein',
