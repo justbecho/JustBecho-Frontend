@@ -1,4 +1,4 @@
-// app/layout.js - SERVER COMPONENT (NO 'use client')
+// app/layout.js - SERVER COMPONENT (NO 'us client')
 import './globals.css'
 import { Quicksand } from 'next/font/google'
 
