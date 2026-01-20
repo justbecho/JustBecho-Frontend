@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-const RecentTable = ({ title, data, columns, emptyMessage, viewAllLink }) => {
+const RecentTable = ({ title, data, columns, emptyMessage, viewAllLink, viewLink }) => {
   const formatValue = (item, column) => {
     // Check if item or column.key exists
     if (!item || typeof item[column.key] === 'undefined' || item[column.key] === null) {
@@ -14,7 +14,11 @@ const RecentTable = ({ title, data, columns, emptyMessage, viewAllLink }) => {
     if (column.format) return column.format(value)
     
     if (column.key === 'createdAt' || column.key === 'updatedAt') {
-      return new Date(value).toLocaleDateString()
+      try {
+        return new Date(value).toLocaleDateString()
+      } catch (e) {
+        return '-'
+      }
     }
     
     if (column.truncate && typeof value === 'string') {
@@ -77,12 +81,16 @@ const RecentTable = ({ title, data, columns, emptyMessage, viewAllLink }) => {
                     </td>
                   ))}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      href={`/admin/users/${item._id}`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      View
-                    </Link>
+                    {item?._id && viewLink ? (
+                      <Link
+                        href={`${viewLink}/${item._id}`}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        View
+                      </Link>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </td>
                 </tr>
               ))}

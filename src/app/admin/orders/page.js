@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Search, Eye, CheckCircle, XCircle, Filter } from 'lucide-react'
+import { Search, Eye, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 
@@ -36,18 +36,27 @@ export default function OrdersPage() {
       const data = await response.json()
       
       if (data.success) {
-        setOrders(data.orders)
-        setTotalPages(data.pagination.totalPages)
+        setOrders(data.orders || [])
+        setTotalPages(data.pagination?.totalPages || 1)
+      } else {
+        toast.error(data.message || 'Failed to fetch orders')
+        setOrders([])
       }
     } catch (error) {
       console.error('Error fetching orders:', error)
       toast.error('Failed to fetch orders')
+      setOrders([])
     } finally {
       setLoading(false)
     }
   }
 
   const handleUpdateStatus = async (orderId, newStatus) => {
+    if (!orderId) {
+      toast.error('Invalid order ID')
+      return
+    }
+
     try {
       const token = localStorage.getItem('adminToken')
       const response = await fetch(`https://just-becho-backend.vercel.app/api/admin/dashboard/orders/${orderId}/status`, {
@@ -85,7 +94,7 @@ export default function OrdersPage() {
   }
 
   const formatAmount = (amount) => {
-    return `₹${amount?.toLocaleString('en-IN')}`
+    return `₹${amount ? amount.toLocaleString('en-IN') : '0'}`
   }
 
   const getStatusOptions = () => {
@@ -95,6 +104,18 @@ export default function OrdersPage() {
       'out_for_delivery', 'delivered', 
       'cancelled', 'return_requested', 'returned', 'refunded'
     ]
+  }
+
+  const getOrderIdDisplay = (orderId) => {
+    if (!orderId) return 'N/A'
+    return typeof orderId === 'string' && orderId.length > 8 
+      ? `#${orderId.substring(0, 8)}...` 
+      : `#${orderId}`
+  }
+
+  const getRazorpayIdDisplay = (razorpayId) => {
+    if (!razorpayId || typeof razorpayId !== 'string') return null
+    return `Razorpay: ${razorpayId.length > 12 ? razorpayId.substring(0, 12) + '...' : razorpayId}`
   }
 
   return (
@@ -150,9 +171,17 @@ export default function OrdersPage() {
               <p className="mt-2 text-gray-600">Loading orders...</p>
             </div>
           </div>
-        ) : orders.length === 0 ? (
+        ) : !orders || orders.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">No orders found</p>
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="mt-2 text-blue-600 hover:text-blue-500"
+              >
+                Clear search
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -181,15 +210,13 @@ export default function OrdersPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-50">
+                  <tr key={order._id || order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        Order #{order._id.substring(0, 8)}...
+                        {getOrderIdDisplay(order._id)}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {order.razorpayOrderId && (
-                          <span>Razorpay: {order.razorpayOrderId.substring(0, 12)}...</span>
-                        )}
+                        {getRazorpayIdDisplay(order.razorpayOrderId)}
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
                         Items: {order.items?.length || 0}
@@ -202,7 +229,7 @@ export default function OrdersPage() {
                             {order.user.name || 'Customer'}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {order.user.email}
+                            {order.user.email || 'No email'}
                           </div>
                         </>
                       ) : (
@@ -222,11 +249,11 @@ export default function OrdersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(order.status)}`}>
-                          {order.status}
+                          {order.status || 'pending'}
                         </span>
                         <div className="ml-2">
                           <select
-                            value={order.status}
+                            value={order.status || 'pending'}
                             onChange={(e) => handleUpdateStatus(order._id, e.target.value)}
                             className="text-xs border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                           >
@@ -245,22 +272,30 @@ export default function OrdersPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                      <div className="text-xs text-gray-400">
-                        {new Date(order.createdAt).toLocaleTimeString()}
-                      </div>
+                      {order.createdAt ? (
+                        <>
+                          {new Date(order.createdAt).toLocaleDateString()}
+                          <div className="text-xs text-gray-400">
+                            {new Date(order.createdAt).toLocaleTimeString()}
+                          </div>
+                        </>
+                      ) : (
+                        'N/A'
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-3">
-                        <Link
-                          href={`/admin/orders/${order._id}`}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="View Details"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
+                        {order._id && (
+                          <Link
+                            href={`/admin/orders/${order._id}`}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="View Details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        )}
                         
-                        {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                        {order._id && order.status !== 'delivered' && order.status !== 'cancelled' && (
                           <button
                             onClick={() => handleUpdateStatus(order._id, 'delivered')}
                             className="text-green-600 hover:text-green-900"
@@ -270,7 +305,7 @@ export default function OrdersPage() {
                           </button>
                         )}
                         
-                        {order.status !== 'cancelled' && (
+                        {order._id && order.status !== 'cancelled' && (
                           <button
                             onClick={() => handleUpdateStatus(order._id, 'cancelled')}
                             className="text-red-600 hover:text-red-900"

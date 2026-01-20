@@ -14,9 +14,15 @@ import RecentTable from '../components/RecentTable'
 import Chart from '../components/Chart'
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(null)
+  const [stats, setStats] = useState({
+    totals: { users: 0, products: 0, orders: 0, verifiedSellers: 0 },
+    products: { active: 0, sold: 0 },
+    orders: { pending: 0, delivered: 0 },
+    sales: { total: 0 },
+    recent: { users: [], orders: [] }
+  })
   const [loading, setLoading] = useState(true)
-  const [chartData, setChartData] = useState(null)
+  const [chartData, setChartData] = useState([])
 
   useEffect(() => {
     fetchDashboardData()
@@ -35,7 +41,33 @@ export default function Dashboard() {
       const data = await response.json()
       
       if (data.success) {
-        setStats(data.stats)
+        // Safe assignment with fallbacks
+        setStats({
+          totals: {
+            users: data.stats?.totals?.users || 0,
+            products: data.stats?.totals?.products || 0,
+            orders: data.stats?.totals?.orders || 0,
+            verifiedSellers: data.stats?.totals?.verifiedSellers || 0
+          },
+          products: {
+            active: data.stats?.products?.active || 0,
+            sold: data.stats?.products?.sold || 0
+          },
+          orders: {
+            pending: data.stats?.orders?.pending || 0,
+            delivered: data.stats?.orders?.delivered || 0
+          },
+          sales: {
+            total: data.stats?.sales?.total || 0
+          },
+          recent: {
+            users: Array.isArray(data.stats?.recent?.users) ? data.stats.recent.users : [],
+            orders: Array.isArray(data.stats?.recent?.orders) ? data.stats.recent.orders : []
+          }
+        })
+      } else {
+        // If API returns error, keep default state
+        console.error('Failed to fetch stats:', data.message)
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -55,11 +87,14 @@ export default function Dashboard() {
 
       const data = await response.json()
       
-      if (data.success) {
+      if (data.success && Array.isArray(data.report)) {
         setChartData(data.report)
+      } else {
+        setChartData([])
       }
     } catch (error) {
       console.error('Error fetching chart data:', error)
+      setChartData([])
     }
   }
 
@@ -87,7 +122,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatsCard
           title="Total Users"
-          value={stats?.totals?.users || 0}
+          value={stats.totals.users}
           icon={Users}
           change="+12%"
           trend="up"
@@ -96,7 +131,7 @@ export default function Dashboard() {
         
         <StatsCard
           title="Total Products"
-          value={stats?.totals?.products || 0}
+          value={stats.totals.products}
           icon={Package}
           change="+5%"
           trend="up"
@@ -105,7 +140,7 @@ export default function Dashboard() {
         
         <StatsCard
           title="Total Orders"
-          value={stats?.totals?.orders || 0}
+          value={stats.totals.orders}
           icon={ShoppingCart}
           change="+18%"
           trend="up"
@@ -114,7 +149,7 @@ export default function Dashboard() {
         
         <StatsCard
           title="Total Sales"
-          value={`₹${(stats?.sales?.total || 0).toLocaleString('en-IN')}`}
+          value={`₹${stats.sales.total.toLocaleString('en-IN')}`}
           icon={DollarSign}
           change="+24%"
           trend="up"
@@ -134,23 +169,23 @@ export default function Dashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Active Products</span>
-              <span className="font-semibold">{stats?.products?.active || 0}</span>
+              <span className="font-semibold">{stats.products.active}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Sold Products</span>
-              <span className="font-semibold">{stats?.products?.sold || 0}</span>
+              <span className="font-semibold">{stats.products.sold}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Pending Orders</span>
-              <span className="font-semibold">{stats?.orders?.pending || 0}</span>
+              <span className="font-semibold">{stats.orders.pending}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Delivered Orders</span>
-              <span className="font-semibold">{stats?.orders?.delivered || 0}</span>
+              <span className="font-semibold">{stats.orders.delivered}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Verified Sellers</span>
-              <span className="font-semibold">{stats?.totals?.verifiedSellers || 0}</span>
+              <span className="font-semibold">{stats.totals.verifiedSellers}</span>
             </div>
           </div>
         </div>
@@ -160,7 +195,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <RecentTable
           title="Recent Users"
-          data={stats?.recent?.users || []}
+          data={stats.recent.users}
           columns={[
             { key: 'name', label: 'Name' },
             { key: 'email', label: 'Email' },
@@ -168,18 +203,22 @@ export default function Dashboard() {
             { key: 'createdAt', label: 'Joined' }
           ]}
           emptyMessage="No recent users"
+          viewAllLink="/admin/users"
+          viewLink="/admin/users"
         />
         
         <RecentTable
           title="Recent Orders"
-          data={stats?.recent?.orders || []}
+          data={stats.recent.orders}
           columns={[
-            { key: '_id', label: 'Order ID', truncate: true },
-            { key: 'totalAmount', label: 'Amount', format: (val) => `₹${val}` },
+            { key: '_id', label: 'Order ID', truncate: 8 },
+            { key: 'totalAmount', label: 'Amount', format: (val) => `₹${val || 0}` },
             { key: 'status', label: 'Status' },
             { key: 'createdAt', label: 'Date' }
           ]}
           emptyMessage="No recent orders"
+          viewAllLink="/admin/orders"
+          viewLink="/admin/orders"
         />
       </div>
     </div>

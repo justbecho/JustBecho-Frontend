@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 
 export default function CategoriesPage() {
@@ -39,11 +40,15 @@ export default function CategoriesPage() {
       const data = await response.json()
       
       if (data.success) {
-        setCategories(data.categories)
+        setCategories(data.categories || [])
+      } else {
+        toast.error(data.message || 'Failed to fetch categories')
+        setCategories([])
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
       toast.error('Failed to fetch categories')
+      setCategories([])
     } finally {
       setLoading(false)
     }
@@ -51,6 +56,11 @@ export default function CategoriesPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (!formData.name.trim()) {
+      toast.error('Category name is required')
+      return
+    }
     
     try {
       const token = localStorage.getItem('adminToken')
@@ -93,6 +103,11 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async (categoryId, categoryName) => {
+    if (!categoryId) {
+      toast.error('Invalid category ID')
+      return
+    }
+
     if (!confirm(`Are you sure you want to delete category "${categoryName}"?`)) {
       return
     }
@@ -121,21 +136,39 @@ export default function CategoriesPage() {
   }
 
   const handleEdit = (category) => {
+    if (!category) return
+    
     setEditingCategory(category)
     setFormData({
-      name: category.name,
+      name: category.name || '',
       description: category.description || '',
       image: category.image || '',
       href: category.href || '',
-      isActive: category.isActive
+      isActive: category.isActive !== undefined ? category.isActive : true
     })
     setShowAddModal(true)
   }
 
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(search.toLowerCase()) ||
-    category.description?.toLowerCase().includes(search.toLowerCase())
-  )
+  const getCategorySlug = (category) => {
+    if (!category) return ''
+    
+    if (category.href) return category.href
+    
+    if (category.name) {
+      return category.name.toLowerCase().replace(/\s+/g, '-')
+    }
+    
+    return ''
+  }
+
+  const filteredCategories = categories.filter(category => {
+    if (!category) return false
+    
+    const nameMatch = category.name?.toLowerCase().includes(search.toLowerCase()) || false
+    const descMatch = category.description?.toLowerCase().includes(search.toLowerCase()) || false
+    
+    return nameMatch || descMatch
+  })
 
   return (
     <div>
@@ -216,7 +249,7 @@ export default function CategoriesPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900">
-                      {category.name}
+                      {category.name || 'Unnamed Category'}
                     </h3>
                     {category.description && (
                       <p className="mt-2 text-sm text-gray-600">
@@ -236,7 +269,7 @@ export default function CategoriesPage() {
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center text-sm text-gray-500">
                     <span className="font-medium mr-2">Slug:</span>
-                    <span>{category.href || category.name.toLowerCase().replace(/\s+/g, '-')}</span>
+                    <span>{getCategorySlug(category)}</span>
                   </div>
                   
                   {category.productCount !== undefined && (
@@ -259,8 +292,12 @@ export default function CategoriesPage() {
                     <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
                       <img
                         src={category.image}
-                        alt={category.name}
+                        alt={category.name || 'Category image'}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none'
+                          e.target.parentElement.classList.add('bg-gray-200')
+                        }}
                       />
                     </div>
                   </div>
@@ -285,14 +322,16 @@ export default function CategoriesPage() {
                     </button>
                   </div>
                   
-                  <Link
-                    href={`/categories/${category.href || category.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    target="_blank"
-                    className="inline-flex items-center text-sm text-blue-600 hover:text-blue-500"
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Link>
+                  {category.name && (
+                    <Link
+                      href={`/categories/${getCategorySlug(category)}`}
+                      target="_blank"
+                      className="inline-flex items-center text-sm text-blue-600 hover:text-blue-500"
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
