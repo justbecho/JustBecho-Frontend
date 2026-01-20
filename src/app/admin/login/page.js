@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('admin@justbecho.com')
+  const [password, setPassword] = useState('admin123')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -17,6 +18,8 @@ export default function AdminLogin() {
     setError('')
 
     try {
+      console.log('🔄 Sending login request...')
+      
       const response = await fetch('https://just-becho-backend.vercel.app/api/admin/auth/login', {
         method: 'POST',
         headers: {
@@ -25,21 +28,29 @@ export default function AdminLogin() {
         body: JSON.stringify({ email, password })
       })
 
+      console.log('Response status:', response.status)
+      
       const data = await response.json()
+      console.log('Response data:', data)
 
       if (data.success) {
         // Save token and user data
         localStorage.setItem('adminToken', data.token)
         localStorage.setItem('adminUser', JSON.stringify(data.user))
         
+        console.log('✅ Login successful, redirecting to dashboard')
+        toast.success('Login successful!')
+        
         // Redirect to dashboard
         router.push('/admin/dashboard')
       } else {
         setError(data.message || 'Login failed')
+        toast.error(data.message || 'Login failed')
       }
     } catch (err) {
       console.error('Login error:', err)
       setError('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -109,7 +120,15 @@ export default function AdminLogin() {
                 disabled={loading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </>
+                ) : 'Sign in'}
               </button>
             </div>
           </form>
@@ -124,7 +143,7 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            <div className="mt-6 text-center text-sm">
+            <div className="mt-6 text-center text-sm bg-gray-50 p-4 rounded-md">
               <p className="text-gray-600">
                 Email: <span className="font-semibold">admin@justbecho.com</span>
               </p>
@@ -133,6 +152,9 @@ export default function AdminLogin() {
               </p>
               <p className="text-red-500 mt-2 text-xs">
                 ⚠️ Change password after first login!
+              </p>
+              <p className="text-blue-500 mt-2 text-xs">
+                🔧 Backend URL: https://just-becho-backend.vercel.app
               </p>
             </div>
           </div>
