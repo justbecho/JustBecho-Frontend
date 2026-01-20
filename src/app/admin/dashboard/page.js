@@ -41,7 +41,6 @@ export default function Dashboard() {
       const data = await response.json()
       
       if (data.success) {
-        // Safe assignment with fallbacks
         setStats({
           totals: {
             users: data.stats?.totals?.users || 0,
@@ -66,7 +65,6 @@ export default function Dashboard() {
           }
         })
       } else {
-        // If API returns error, keep default state
         console.error('Failed to fetch stats:', data.message)
       }
     } catch (error) {
@@ -110,7 +108,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard Overview</h1>
         <p className="mt-1 text-sm text-gray-600">
@@ -118,7 +116,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Full width */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatsCard
           title="Total Users"
@@ -157,14 +155,14 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Charts */}
+      {/* Charts - Full width */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-6 w-full">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Sales Overview</h2>
           <Chart data={chartData} />
         </div>
         
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-6 w-full">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -191,7 +189,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Data */}
+      {/* Recent Data - Full width */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <RecentTable
           title="Recent Users"

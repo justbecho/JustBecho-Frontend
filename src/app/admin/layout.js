@@ -30,7 +30,6 @@ export default function AdminLayout({ children }) {
         const parsedUser = JSON.parse(userData)
         setUser(parsedUser)
 
-        // If on login page but already logged in, redirect to dashboard
         if (pathname === '/admin/login') {
           router.push('/admin/dashboard')
         }
@@ -48,7 +47,6 @@ export default function AdminLayout({ children }) {
 
     checkAuth()
     
-    // Listen for storage changes (for logout from other tabs)
     const handleStorageChange = (e) => {
       if (e.key === 'adminToken' && !e.newValue) {
         router.push('/admin/login')
@@ -69,7 +67,6 @@ export default function AdminLayout({ children }) {
     setSidebarOpen(!sidebarOpen)
   }
 
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -81,7 +78,6 @@ export default function AdminLayout({ children }) {
     )
   }
 
-  // Don't render sidebar/header for login page
   if (pathname === '/admin/login') {
     return (
       <>
@@ -91,7 +87,6 @@ export default function AdminLayout({ children }) {
     )
   }
 
-  // If no user but not on login page, show loading
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -136,24 +131,24 @@ export default function AdminLayout({ children }) {
         />
       )}
       
-      {/* Main Layout Structure */}
-      <div className="flex min-h-screen">
-        {/* Sidebar - Fixed on left */}
-        <aside className={`fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}>
-          <div className="h-full">
-            <Sidebar 
-              isOpen={sidebarOpen} 
-              onClose={() => setSidebarOpen(false)} 
-            />
-          </div>
+      {/* Main Layout Container */}
+      <div className="flex h-screen overflow-hidden">
+        {/* Sidebar - Full height */}
+        <aside 
+          className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:inset-0 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <Sidebar 
+            isOpen={sidebarOpen} 
+            onClose={() => setSidebarOpen(false)} 
+          />
         </aside>
         
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col lg:ml-64 transition-all duration-300">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header - Fixed at top */}
-          <header className="sticky top-0 z-20">
+          <header className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
             <Header 
               user={user}
               onToggleSidebar={toggleSidebar}
@@ -161,28 +156,28 @@ export default function AdminLayout({ children }) {
             />
           </header>
           
-          {/* Main Content */}
-          <main className="flex-1">
+          {/* Main Content - Scrollable */}
+          <main className="flex-1 overflow-y-auto bg-gray-100">
             <div className="py-6">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+              <div className="max-w-full px-4 sm:px-6 md:px-8">
                 {children}
               </div>
             </div>
-          </main>
-          
-          {/* Footer */}
-          <footer className="bg-white border-t border-gray-200">
-            <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 md:px-8">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">
-                  © {new Date().getFullYear()} JustBecho Admin Panel. All rights reserved.
-                </p>
-                <p className="text-sm text-gray-500">
-                  Version 1.0.0
-                </p>
+            
+            {/* Footer */}
+            <footer className="bg-white border-t border-gray-200 mt-auto">
+              <div className="max-w-full mx-auto py-4 px-4 sm:px-6 md:px-8">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-500">
+                    © {new Date().getFullYear()} JustBecho Admin Panel. All rights reserved.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Version 1.0.0
+                  </p>
+                </div>
               </div>
-            </div>
-          </footer>
+            </footer>
+          </main>
         </div>
       </div>
     </div>
