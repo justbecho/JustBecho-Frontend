@@ -4,21 +4,26 @@ import Link from 'next/link'
 
 const RecentTable = ({ title, data, columns, emptyMessage, viewAllLink }) => {
   const formatValue = (item, column) => {
-    if (!item[column.key]) return '-'
+    // Check if item or column.key exists
+    if (!item || typeof item[column.key] === 'undefined' || item[column.key] === null) {
+      return '-'
+    }
     
-    if (column.format) return column.format(item[column.key])
+    const value = item[column.key]
+    
+    if (column.format) return column.format(value)
     
     if (column.key === 'createdAt' || column.key === 'updatedAt') {
-      return new Date(item[column.key]).toLocaleDateString()
+      return new Date(value).toLocaleDateString()
     }
     
-    if (column.truncate) {
-      return typeof item[column.key] === 'string' 
-        ? item[column.key].substring(0, column.truncate) + '...'
-        : item[column.key]
+    if (column.truncate && typeof value === 'string') {
+      return value.length > column.truncate 
+        ? value.substring(0, column.truncate) + '...'
+        : value
     }
     
-    return item[column.key]
+    return value
   }
 
   return (
@@ -37,7 +42,7 @@ const RecentTable = ({ title, data, columns, emptyMessage, viewAllLink }) => {
         </div>
       </div>
       
-      {data.length === 0 ? (
+      {!data || data.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500">{emptyMessage}</p>
         </div>
