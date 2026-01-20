@@ -27,6 +27,13 @@ export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const searchInputRef = useRef(null)
+  
+  // ✅ FIX: Refs for hover handling with better state management
+  const hoverTimeoutRef = useRef(null)
+  const dropdownRef = useRef(null)
+  const categoryRefs = useRef({})
+  const isMouseInDropdown = useRef(false)
+  const isMouseInCategory = useRef(false)
 
   const isProductPage = pathname?.includes('/products/')
   const isSellNowPage = pathname === '/sell-now'
@@ -49,6 +56,83 @@ export default function Header() {
     
     return `${clean}@justbecho`;
   }, [])
+
+  // ✅ FIX: Optimized hover handlers with better state tracking
+  const handleCategoryMouseEnter = useCallback((categoryName) => {
+    // Clear any pending timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    
+    // Track mouse position
+    isMouseInCategory.current = true;
+    
+    // Set active category immediately
+    setActiveCategory(categoryName);
+  }, []);
+
+  const handleCategoryMouseLeave = useCallback(() => {
+    // Track mouse position
+    isMouseInCategory.current = false;
+    
+    // Clear any pending timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    
+    // Check if mouse moved to dropdown
+    if (!isMouseInDropdown.current) {
+      // Only close if mouse is not in dropdown
+      hoverTimeoutRef.current = setTimeout(() => {
+        if (!isMouseInDropdown.current && !isMouseInCategory.current) {
+          setActiveCategory(null);
+        }
+        hoverTimeoutRef.current = null;
+      }, 200); // Slight delay for better UX
+    }
+  }, []);
+
+  const handleDropdownMouseEnter = useCallback(() => {
+    // Track mouse position
+    isMouseInDropdown.current = true;
+    
+    // Clear any pending close timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  }, []);
+
+  const handleDropdownMouseLeave = useCallback(() => {
+    // Track mouse position
+    isMouseInDropdown.current = false;
+    
+    // Clear any pending timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    
+    // Check if mouse moved to category
+    if (!isMouseInCategory.current) {
+      // Only close if mouse is not in category
+      hoverTimeoutRef.current = setTimeout(() => {
+        if (!isMouseInCategory.current && !isMouseInDropdown.current) {
+          setActiveCategory(null);
+        }
+        hoverTimeoutRef.current = null;
+      }, 200);
+    }
+  }, []);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // ESC key handler for mobile search modal
   useEffect(() => {
@@ -82,7 +166,7 @@ export default function Header() {
     };
   }, [isMobileSearchOpen]);
 
-  // ✅ FIXED: Handle Google OAuth redirect from URL
+  // Handle Google OAuth redirect
   useEffect(() => {
     const handleGoogleAuthRedirect = () => {
       try {
@@ -93,28 +177,22 @@ export default function Header() {
         const profileCompleted = urlParams.get('profileCompleted') === 'true';
         const authError = urlParams.get('auth_error');
         
-        // Handle authentication errors
         if (authError) {
           console.error('❌ Google OAuth error from URL:', authError);
-          // Clear URL parameters
           const cleanUrl = window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
           return;
         }
         
-        // Handle successful Google OAuth
         if (token && source === 'google') {
           console.log('✅ Google OAuth token detected in URL');
           
-          // Save token
           localStorage.setItem('token', token);
           localStorage.setItem('isGoogleSignup', 'true');
           
-          // Clear URL parameters
           const cleanUrl = window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
           
-          // Fetch user data
           fetchUserData(token, isNewUser, profileCompleted);
         }
       } catch (error) {
@@ -137,13 +215,9 @@ export default function Header() {
           if (data.success && data.user) {
             console.log('✅ User data fetched:', data.user.email);
             
-            // Store user data
             localStorage.setItem('user', JSON.stringify(data.user));
-            
-            // Set user state
             setUser(data.user);
             
-            // Check what to do next
             if (isNewUser || !data.user.profileCompleted) {
               console.log('🔄 New user or profile not completed, redirecting to complete-profile');
               router.push('/complete-profile');
@@ -195,10 +269,7 @@ export default function Header() {
       }
     };
 
-    // First check for Google OAuth redirect
     handleGoogleAuthRedirect();
-    
-    // Then update user state
     updateUserState();
     
     const handleStorageChange = (e) => {
@@ -305,7 +376,6 @@ export default function Header() {
     };
     
     handleScroll();
-    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isCartPage]);
@@ -700,17 +770,33 @@ export default function Header() {
     setIsMenuOpen(false);
   }, [user, router]);
 
-  // Handle mobile search icon click
   const handleMobileSearchClick = () => {
     setIsMobileSearchOpen(true);
   };
 
-  // Handle close mobile search
   const handleCloseMobileSearch = () => {
     setIsMobileSearchOpen(false);
     setSearchQuery('');
     setShowSearchResults(false);
   };
+
+  // ✅ FIX: Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If click is outside both category and dropdown
+      const isClickInCategory = event.target.closest('.category-item');
+      const isClickInDropdown = event.target.closest('.category-dropdown');
+      
+      if (!isClickInCategory && !isClickInDropdown && activeCategory) {
+        setActiveCategory(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeCategory]);
 
   return (
     <>
@@ -742,7 +828,7 @@ export default function Header() {
                   </button>
                 </form>
                 
-                {/* SEARCH RESULTS - WITHOUT "VIEW ALL RESULTS" */}
+                {/* SEARCH RESULTS */}
                 {showSearchResults && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
                     {searchLoading ? (
@@ -972,11 +1058,9 @@ export default function Header() {
               </div>
             </div>
           </div>
-
-          {/* MOBILE SEARCH BAR - REMOVED */}
         </div>
 
-        {/* MOBILE SEARCH MODAL - IMPROVED VERSION */}
+        {/* MOBILE SEARCH MODAL */}
         {isMobileSearchOpen && (
           <div className="md:hidden fixed inset-0 z-[100] bg-white animate-fadeIn">
             {/* Search Header - Slim Design */}
@@ -1010,20 +1094,17 @@ export default function Header() {
                 </form>
               </div>
               
-              <div className="w-9"></div> {/* For spacing balance */}
+              <div className="w-9"></div>
             </div>
 
             {/* Search Content */}
             <div className="h-full overflow-y-auto pb-20">
-              {/* Recent Searches / Popular Searches Section (Optional) */}
               {!searchQuery.trim() && (
                 <div className="p-4">
                   <h3 className="text-sm font-medium text-gray-900 mb-3">Popular Searches</h3>
-                  
                 </div>
               )}
 
-              {/* Search Results */}
               {searchLoading ? (
                 <div className="p-8 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
@@ -1169,8 +1250,6 @@ export default function Header() {
                   <span className="font-light tracking-widest uppercase">SELL NOW</span>
                 </button>
                 
-                {/* COMMON LINKS FOR ALL USERS */}
-                
                 {/* Mobile Wishlist */}
                 <button 
                   onClick={handleMobileWishlistClick}
@@ -1223,7 +1302,7 @@ export default function Header() {
                   </button>
                 )}
 
-                {/* LOGOUT - MOVED TO VERY LAST */}
+                {/* LOGOUT */}
                 {user && (
                   <div className="border-t border-gray-200 pt-4 mt-4">
                     <button onClick={handleMobileLogout} className="flex items-center w-full py-3 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300 text-left">
@@ -1245,7 +1324,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* SUBHEADER WITH CATEGORIES */}
+      {/* SUBHEADER WITH CATEGORIES - FIXED HOVER ISSUE */}
       <div
         className="hidden md:block fixed top-20 left-0 right-0 z-40 bg-white shadow-md"
       >
@@ -1258,25 +1337,36 @@ export default function Header() {
               transformedCategories.map((category, index) => (
                 <div
                   key={category.name || index}
-                  className="relative group"
-                  onMouseEnter={() => setActiveCategory(category.name)}
-                  onMouseLeave={() => setActiveCategory(null)}
+                  className="relative category-item"
+                  onMouseEnter={() => handleCategoryMouseEnter(category.name)}
+                  onMouseLeave={handleCategoryMouseLeave}
                 >
                   {/* Category Link */}
                   <Link
                     href={category.href}
-                    className="text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 text-gray-800 hover:text-gray-600"
+                    className="text-sm font-light tracking-widest uppercase transition-all duration-300 hover:scale-105 text-gray-800 hover:text-gray-600 category-link"
                   >
                     {category.name.toUpperCase()}
                   </Link>
 
-                  {/* COMPACT DROPDOWN */}
+                  {/* ✅ FIXED: DROPDOWN - Smoother hover experience */}
                   {activeCategory === category.name && (
                     <div 
-                      className="fixed left-0 right-0 top-[130px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60]"
-                      onMouseEnter={() => setActiveCategory(category.name)}
-                      onMouseLeave={() => setActiveCategory(null)}
+                      ref={dropdownRef}
+                      className="category-dropdown fixed left-0 right-0 top-[130px] bg-white shadow-2xl border-t border-gray-100 py-8 z-[60] animate-dropdown"
+                      onMouseEnter={handleDropdownMouseEnter}
+                      onMouseLeave={handleDropdownMouseLeave}
+                      style={{
+                        pointerEvents: 'auto',
+                        animation: 'dropdownSlide 0.2s ease-out'
+                      }}
                     >
+                      {/* Hover bridge - prevents gap between category and dropdown */}
+                      <div 
+                        className="absolute -top-6 left-0 right-0 h-6"
+                        onMouseEnter={() => handleCategoryMouseEnter(category.name)}
+                      />
+                      
                       <div className="w-[95%] sm:w-[90%] mx-auto max-w-5xl">
                         <div className="grid grid-cols-5 gap-6">
                           {category.dropdown.sections.map((section, sectionIndex) => (
@@ -1293,6 +1383,7 @@ export default function Header() {
                                     <Link
                                       href={`${category.href}?subcategory=${(item || '').toLowerCase().replace(/\s+/g, '-')}`}
                                       className="text-gray-600 text-[12px] font-normal hover:text-gray-900 transition-colors duration-200 block py-0.5"
+                                      onClick={() => setActiveCategory(null)}
                                     >
                                       {item}
                                     </Link>
@@ -1308,6 +1399,7 @@ export default function Header() {
                           <Link
                             href={category.href}
                             className="inline-flex items-center text-gray-900 text-[13px] font-semibold tracking-wide uppercase hover:text-gray-700 transition-colors duration-200 group"
+                            onClick={() => setActiveCategory(null)}
                           >
                             View All {category.name} 
                             <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1343,8 +1435,50 @@ export default function Header() {
             opacity: 1;
           }
         }
+        
+        @keyframes dropdownSlide {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        .animate-dropdown {
+          animation: dropdownSlide 0.2s ease-out;
+        }
+        
+        /* Smooth transitions for better UX */
+        .category-item {
+          position: relative;
+        }
+        
+        .category-link {
+          position: relative;
+          z-index: 70;
+        }
+        
+        .category-dropdown {
+          animation: dropdownSlide 0.2s ease-out;
+          will-change: transform, opacity;
+        }
+        
+        /* Prevent accidental closes */
+        .category-dropdown::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          left: 0;
+          right: 0;
+          height: 10px;
+          background: transparent;
         }
       `}</style>
     </>

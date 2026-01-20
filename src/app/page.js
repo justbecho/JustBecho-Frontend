@@ -519,7 +519,7 @@ setCategoryProducts(productsByCategory)
       
       <div className="bg-white">
         {/* ✅ 1. Header ke baad reduced gap */}
-        <div className="pt-16"></div>
+        <div className="pt-14"></div>
         
         {/* ✅ 2. Home Banner */}
         <section className="relative h-[85vh] md:h-screen overflow-hidden md:mt-20">
