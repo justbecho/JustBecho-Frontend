@@ -7,7 +7,7 @@ import Script from 'next/script'
 import { 
   FiShoppingBag, FiTrash2, FiPlus, FiMinus, FiArrowLeft, 
   FiShoppingCart, FiShield, FiCheck, FiX, FiUser,
-  FiTruck, FiCreditCard
+  FiTruck, FiCreditCard, FiLoader
 } from 'react-icons/fi'
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
@@ -20,6 +20,7 @@ export default function CartPage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [user, setUser] = useState(null)
   const [checkoutTotals, setCheckoutTotals] = useState(null)
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false)
   const router = useRouter()
 
   // Constants
@@ -43,20 +44,16 @@ export default function CartPage() {
     if (cart && cart.items && cart.items.length > 0) {
       fetchCheckoutTotals()
     } else {
-      // Agar cart empty hai toh checkout totals reset karo
       setCheckoutTotals(null)
     }
   }, [cart])
 
-  // Debug useEffect - GST value check karne ke liye
+  // Check Razorpay script load
   useEffect(() => {
-    console.log("🛒 Cart data:", cart)
-    console.log("💰 Checkout totals from backend:", checkoutTotals)
-    if (checkoutTotals) {
-      console.log("🧮 GST value in totals:", checkoutTotals.gst)
-      console.log("🧾 Complete totals object:", checkoutTotals)
+    if (typeof window !== 'undefined' && window.Razorpay) {
+      setRazorpayLoaded(true)
     }
-  }, [cart, checkoutTotals])
+  }, [])
 
   const fetchUserData = async () => {
     try {
@@ -130,8 +127,6 @@ export default function CartPage() {
       
       if (data.success) {
         console.log("✅ Checkout totals fetched successfully")
-        console.log("- GST value:", data.totals?.gst)
-        console.log("- Complete totals:", data.totals)
         setCheckoutTotals(data.totals)
       } else {
         console.error('❌ Failed to fetch checkout totals:', data.message)
@@ -254,7 +249,7 @@ export default function CartPage() {
     }
   }
 
-  // ✅ Calculate frontend totals (matching backend logic) - FIXED 10%
+  // Calculate frontend totals
   const calculateFrontendTotals = () => {
     if (!cart || cart.items.length === 0) {
       return {
@@ -269,18 +264,11 @@ export default function CartPage() {
     const subtotal = cart.subtotal || 0;
     const bechoProtectTotal = cart.bechoProtectTotal || 0;
     
-    // ✅ Hidden platform fee calculation - FIXED 10%
-    const platformFeePercentage = 10; // ✅ Fixed 10% for all orders
+    // Fixed 10% platform fee
+    const platformFeePercentage = 10;
     const platformFee = Math.round((subtotal * platformFeePercentage) / 100);
     const gst = Math.round(platformFee * 0.18); // 18% GST on platform fee
     const grandTotal = subtotal + bechoProtectTotal + gst + SHIPPING_CHARGE;
-    
-    console.log("🧮 Frontend calculation:");
-    console.log("- Subtotal:", subtotal);
-    console.log("- Platform Fee %:", platformFeePercentage);
-    console.log("- Platform Fee:", platformFee);
-    console.log("- GST:", gst);
-    console.log("- Grand Total:", grandTotal);
     
     return {
       subtotal,
@@ -291,20 +279,18 @@ export default function CartPage() {
     }
   }
 
-  // Use backend totals if available, otherwise use frontend calculation
+  // Use backend totals if available
   const getDisplayTotals = () => {
     if (checkoutTotals) {
-      console.log("📊 Using backend totals for display")
       return checkoutTotals
     } else {
-      console.log("📊 Using frontend calculated totals")
       return calculateFrontendTotals()
     }
   }
 
   const displayTotals = getDisplayTotals()
 
-  // ✅ RAZORPAY CHECKOUT FUNCTION
+  // ✅ UPDATED RAZORPAY CHECKOUT FUNCTION
   const handleCheckout = async () => {
     if (!user) {
       alert('Please login to checkout')
@@ -330,6 +316,11 @@ export default function CartPage() {
       return
     }
 
+    if (!razorpayLoaded) {
+      alert('Payment gateway is loading. Please wait a moment and try again.')
+      return
+    }
+
     setCheckoutLoading(true)
 
     try {
@@ -338,9 +329,10 @@ export default function CartPage() {
 
       console.log('🚀 Starting checkout process...')
       console.log('📊 Total amount:', totals.grandTotal)
-      console.log('💳 GST included:', totals.gst)
+      console.log('📦 Cart ID:', cart._id)
 
-      // Step 1: Create order in backend
+      // ✅ STEP 1: Create Razorpay order (NO DB order yet)
+      console.log('📋 Step 1: Creating Razorpay order...')
       const orderResponse = await fetch('https://just-becho-backend.vercel.app/api/razorpay/create-order', {
         method: 'POST',
         headers: {
@@ -351,11 +343,15 @@ export default function CartPage() {
           amount: totals.grandTotal,
           cartId: cart._id,
           shippingAddress: {
+            name: user.name || user.email.split('@')[0],
+            phone: user.phone || '',
+            email: user.email || '',
             street: user.address.street,
             city: user.address.city,
             state: user.address.state,
             pincode: user.address.pincode,
-            phone: user.phone
+            country: 'India',
+            landmark: user.address.landmark || ''
           }
         })
       })
@@ -364,15 +360,10 @@ export default function CartPage() {
       console.log('📦 Order creation response:', orderData)
 
       if (!orderData.success) {
-        throw new Error(orderData.message || 'Failed to create order')
+        throw new Error(orderData.message || 'Failed to create payment order')
       }
 
-      // Step 2: Check if Razorpay script is loaded
-      if (typeof window.Razorpay === 'undefined') {
-        throw new Error('Razorpay payment gateway not loaded. Please refresh the page.')
-      }
-
-      // Step 3: Configure Razorpay options
+      // ✅ STEP 2: Configure Razorpay options
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.order.amount,
@@ -381,27 +372,40 @@ export default function CartPage() {
         description: 'Secure Payment for your order',
         order_id: orderData.order.id,
         handler: async function (response) {
-          console.log('✅ Payment successful, verifying...', response)
+          console.log('✅ Payment successful! Verifying...', response)
           
           try {
-            // Step 4: Verify payment with backend
+            // ✅ STEP 3: Verify payment and create DB order
+            console.log('🔐 Step 3: Verifying payment...')
             const verifyResponse = await fetch('https://just-becho-backend.vercel.app/api/razorpay/verify-payment', {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify(response)
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                cartId: cart._id,
+                shippingAddress: {
+                  name: user.name || user.email.split('@')[0],
+                  phone: user.phone || '',
+                  email: user.email || '',
+                  street: user.address.street,
+                  city: user.address.city,
+                  state: user.address.state,
+                  pincode: user.address.pincode,
+                  country: 'India'
+                }
+              })
             })
 
             const verifyData = await verifyResponse.json()
-            console.log('🔐 Verification response:', verifyData)
+            console.log('📋 Verification response:', verifyData)
 
             if (verifyData.success) {
-              console.log('🎉 Payment verified successfully!')
-              
-              // ✅ Show success message
-              alert('🎉 Payment Successful! Your order has been placed.')
+              console.log('🎉 Payment verified & order created!')
               
               // ✅ Clear cart after successful payment
               try {
@@ -423,23 +427,24 @@ export default function CartPage() {
                 console.error('Error clearing cart:', clearError)
               }
               
-              // ✅ IMPORTANT: Trigger cart update for other components
+              // ✅ Trigger cart update for other components
               window.dispatchEvent(new CustomEvent('cartUpdate', { 
                 detail: { cleared: true } 
               }))
               
-              // ✅ Store payment success flag for dashboard
+              // ✅ Store payment success
               localStorage.setItem('showOrderSuccess', 'true')
-              localStorage.setItem('lastOrderId', verifyData.order?._id || '')
+              localStorage.setItem('lastOrderId', verifyData.orderId || '')
               
-              // ✅ Redirect to DASHBOARD ORDERS SECTION with success parameter
+              // ✅ Redirect to orders with success message
               setTimeout(() => {
-                router.push('/dashboard?section=orders&payment=success')
-              }, 1500)
+                alert('🎉 Payment Successful! Your order has been placed.')
+                router.push(`/orders/${verifyData.orderId}?payment=success`)
+              }, 1000)
               
             } else {
               console.error('❌ Payment verification failed:', verifyData.message)
-              alert(`❌ Payment verification failed: ${verifyData.message}`)
+              alert(`❌ Payment verification failed: ${verifyData.message}\nPlease contact support with payment ID: ${response.razorpay_payment_id}`)
             }
           } catch (verifyError) {
             console.error('❌ Verification error:', verifyError)
@@ -466,23 +471,23 @@ export default function CartPage() {
         }
       }
 
-      // Step 5: Open Razorpay checkout
+      // ✅ STEP 4: Open Razorpay checkout
+      console.log('💳 Step 4: Opening Razorpay checkout...')
       const rzp = new window.Razorpay(options)
       rzp.open()
 
     } catch (error) {
       console.error('❌ Checkout error:', error)
       alert(`Checkout failed: ${error.message}`)
-    } finally {
       setCheckoutLoading(false)
     }
   }
 
+  // Loading state
   if (loading) {
     return (
       <>
         <Header />
-        {/* Mobile: Header + Search bar = ~135px, Desktop: Header + Subheader = 140px */}
         <div className="min-h-screen bg-gray-50 pt-[135px] md:pt-[140px]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-12">
@@ -498,27 +503,27 @@ export default function CartPage() {
 
   return (
     <>
-      {/* ✅ IMPORTANT: Add Razorpay Script */}
+      {/* ✅ Razorpay Script */}
       <Script 
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="lazyOnload"
-        onLoad={() => console.log('✅ Razorpay SDK loaded successfully')}
-        onError={() => console.error('❌ Failed to load Razorpay SDK')}
+        onLoad={() => {
+          console.log('✅ Razorpay SDK loaded successfully')
+          setRazorpayLoaded(true)
+        }}
+        onError={() => {
+          console.error('❌ Failed to load Razorpay SDK')
+          alert('Failed to load payment gateway. Please refresh the page.')
+        }}
       />
       
       <Header />
       
-      {/* Main Content - Header ke baad start */}
       <main className="min-h-screen bg-gray-50">
-        {/* 
-          Mobile: Header + Search bar = ~135px
-          Desktop: Header + Subheader = 140px
-        */}
         <div className="pt-[135px] md:pt-[140px] pb-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* ✅ HEADER SECTION */}
+            {/* Header Section */}
             <div className="mb-10">
-              {/* Breadcrumb */}
               <div className="flex items-center text-sm text-gray-600 mb-3">
                 <Link href="/" className="hover:text-gray-900 transition-colors">
                   Home
@@ -527,7 +532,6 @@ export default function CartPage() {
                 <span className="text-gray-900 font-medium">Shopping Cart</span>
               </div>
               
-              {/* Main Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-light tracking-widest uppercase text-gray-900 mb-2">
@@ -562,7 +566,7 @@ export default function CartPage() {
 
             {cart && cart.items && cart.items.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* ✅ LEFT SECTION - PRODUCTS */}
+                {/* Left Section - Products */}
                 <div className="lg:col-span-2">
                   {/* User Info Banner */}
                   {user && (
@@ -640,18 +644,6 @@ export default function CartPage() {
                                   <p className="text-gray-600 text-sm">
                                     <span className="font-medium">Condition:</span> {item.product?.condition || 'Not specified'}
                                   </p>
-                                  
-                                  {item.size && (
-                                    <p className="text-gray-600 text-sm">
-                                      <span className="font-medium">Size:</span> {item.size}
-                                    </p>
-                                  )}
-                                  
-                                  {item.color && (
-                                    <p className="text-gray-600 text-sm">
-                                      <span className="font-medium">Color:</span> {item.color}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
 
@@ -675,9 +667,6 @@ export default function CartPage() {
                                 <span className="text-sm font-medium text-gray-700">
                                   Becho Protect - ₹{item.bechoProtect?.price || 0}
                                 </span>
-                                <span className="text-xs text-gray-500">
-                                  (Authenticity Guaranteed Only With BECHO PROTECT)
-                                </span>
                               </div>
                               
                               <button
@@ -688,7 +677,7 @@ export default function CartPage() {
                                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'}`}
                               >
                                 {togglingBechoProtect === item._id ? (
-                                  'Updating...'
+                                  <FiLoader className="w-3 h-3 animate-spin" />
                                 ) : item.bechoProtect?.selected ? (
                                   <>
                                     <FiX className="w-3 h-3" />
@@ -703,7 +692,7 @@ export default function CartPage() {
                               </button>
                             </div>
 
-                            {/* Quantity Controls & Item Total */}
+                            {/* Quantity Controls */}
                             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                               <div className="flex items-center space-x-3">
                                 <button
@@ -715,7 +704,7 @@ export default function CartPage() {
                                 </button>
                                 
                                 <span className="w-8 text-center font-medium">
-                                  {updating === item._id ? '...' : item.quantity}
+                                  {updating === item._id ? <FiLoader className="w-4 h-4 animate-spin mx-auto" /> : item.quantity}
                                 </span>
                                 
                                 <button
@@ -752,7 +741,7 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                {/* ✅ RIGHT SECTION - CHECKOUT (FIXED GST DISPLAY) */}
+                {/* Right Section - Checkout */}
                 <div className="lg:col-span-1">
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-32">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
@@ -784,7 +773,7 @@ export default function CartPage() {
                         <span className="text-gray-900">₹{SHIPPING_CHARGE.toLocaleString()}</span>
                       </div>
                       
-                      {/* ✅ FIXED: GST Display */}
+                      {/* GST */}
                       <div className="flex justify-between text-sm">
                         <div className="flex items-center gap-1">
                           <FiCreditCard className="w-3 h-3 text-gray-500" />
@@ -810,21 +799,23 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    {/* ✅ CHECKOUT BUTTON */}
+                    {/* Checkout Button */}
                     <button
                       onClick={handleCheckout}
-                      disabled={checkoutLoading || !user?.profileCompleted || !user?.address || !user?.phone}
+                      disabled={checkoutLoading || !user?.profileCompleted || !user?.address || !user?.phone || !razorpayLoaded}
                       className={`w-full py-4 rounded-lg font-medium shadow-lg mb-4 transition-all duration-300 ${
-                        checkoutLoading || !user?.profileCompleted || !user?.address || !user?.phone
+                        checkoutLoading || !user?.profileCompleted || !user?.address || !user?.phone || !razorpayLoaded
                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           : 'bg-gradient-to-r from-gray-900 to-black text-white hover:from-gray-800 hover:to-gray-900 hover:shadow-xl'
                       }`}
                     >
                       {checkoutLoading ? (
                         <span className="flex items-center justify-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <FiLoader className="w-4 h-4 animate-spin" />
                           Processing...
                         </span>
+                      ) : !razorpayLoaded ? (
+                        'Loading Payment...'
                       ) : !user?.profileCompleted ? (
                         'Complete Profile to Checkout'
                       ) : !user?.address || !user?.phone ? (
@@ -856,7 +847,7 @@ export default function CartPage() {
                 </div>
                 <h2 className="text-2xl font-light text-gray-900 mb-4">Your cart is empty</h2>
                 <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                  Looks like you haven't added any items to your cart yet. Start shopping to discover amazing luxury products!
+                  Looks like you haven't added any items to your cart yet. Start shopping to discover amazing products!
                 </p>
                 <Link
                   href="/"
