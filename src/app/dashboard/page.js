@@ -1,4 +1,4 @@
-// pages/dashboard.js - PERFECTLY ALIGNED VERSION
+// pages/dashboard.js - WITH PRICE EDIT FEATURE
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -45,7 +45,11 @@ import {
   FiArrowRight,
   FiPercent,
   FiDollarSign as FiDollarSignIcon,
-  FiShoppingCart as FiShoppingCartIcon
+  FiShoppingCart as FiShoppingCartIcon,
+  FiEdit2,
+  FiCheck,
+  FiXCircle,
+  FiDollarSign as FiDollarIcon
 } from 'react-icons/fi'
 
 export default function Dashboard() {
@@ -88,6 +92,12 @@ export default function Dashboard() {
   })
 
   const [cartCount, setCartCount] = useState(0)
+  
+  // ✅ PRICE EDITING STATE
+  const [editingPriceId, setEditingPriceId] = useState(null)
+  const [newPrice, setNewPrice] = useState('')
+  const [isUpdatingPrice, setIsUpdatingPrice] = useState(false)
+  const [priceUpdateMessage, setPriceUpdateMessage] = useState({ type: '', text: '' })
 
   // ✅ Calculate isMobile based on window width
   useEffect(() => {
@@ -193,6 +203,113 @@ export default function Dashboard() {
       state: '',
       pincode: ''
     };
+  };
+
+  // ✅ PRICE UPDATE FUNCTION
+  const updateProductPrice = async (productId) => {
+    if (!productId || !newPrice || isNaN(parseFloat(newPrice)) || parseFloat(newPrice) <= 0) {
+      setPriceUpdateMessage({
+        type: 'error',
+        text: 'Please enter a valid price (greater than 0)'
+      });
+      return;
+    }
+
+    try {
+      setIsUpdatingPrice(true);
+      setPriceUpdateMessage({ type: '', text: '' });
+
+      const token = getLocalStorage('token');
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+
+      // Find the product to get current details
+      const product = listings.find(p => p._id === productId);
+      if (!product) {
+        throw new Error('Product not found');
+      }
+
+      // Prepare update data
+      const updateData = {
+        askingPrice: parseFloat(newPrice),
+        // The backend will calculate finalPrice with 10% platform fee automatically
+      };
+
+      // Send update request
+      const response = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update price: ${response.status} ${errorText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update local state
+        setListings(prevListings => 
+          prevListings.map(item => 
+            item._id === productId 
+              ? { 
+                  ...item, 
+                  askingPrice: updateData.askingPrice,
+                  finalPrice: result.product.finalPrice || item.finalPrice 
+                }
+              : item
+          )
+        );
+
+        // Show success message
+        setPriceUpdateMessage({
+          type: 'success',
+          text: 'Price updated successfully! Platform fee (10%) has been applied.'
+        });
+
+        // Reset editing state
+        setEditingPriceId(null);
+        setNewPrice('');
+
+        // Clear message after 3 seconds
+        setTimeout(() => {
+          setPriceUpdateMessage({ type: '', text: '' });
+        }, 3000);
+
+      } else {
+        throw new Error(result.message || 'Price update failed');
+      }
+
+    } catch (error) {
+      console.error('Error updating product price:', error);
+      setPriceUpdateMessage({
+        type: 'error',
+        text: error.message || 'Failed to update price. Please try again.'
+      });
+    } finally {
+      setIsUpdatingPrice(false);
+    }
+  };
+
+  // ✅ START PRICE EDITING
+  const startPriceEdit = (productId, currentPrice) => {
+    setEditingPriceId(productId);
+    setNewPrice(currentPrice.toString());
+    setPriceUpdateMessage({ type: '', text: '' });
+  };
+
+  // ✅ CANCEL PRICE EDITING
+  const cancelPriceEdit = () => {
+    setEditingPriceId(null);
+    setNewPrice('');
+    setPriceUpdateMessage({ type: '', text: '' });
   };
 
   const fetchCartCount = useCallback(async () => {
@@ -1186,6 +1303,24 @@ export default function Dashboard() {
               )}
             </div>
 
+            {/* Price Update Message */}
+            {priceUpdateMessage.text && (
+              <div className={`mb-4 p-3 rounded-lg ${
+                priceUpdateMessage.type === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {priceUpdateMessage.type === 'success' ? (
+                    <FiCheckCircle className="w-4 h-4" />
+                  ) : (
+                    <FiAlertCircle className="w-4 h-4" />
+                  )}
+                  <p className="text-sm font-medium">{priceUpdateMessage.text}</p>
+                </div>
+              </div>
+            )}
+
             {/* Filter Tabs */}
             <div className="flex overflow-x-auto scrollbar-hide gap-2 mb-4 pb-1">
               {['all', 'active', 'sold', 'shipped', 'delivered'].map((filter) => (
@@ -1240,85 +1375,170 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {filteredListings.map((item) => (
-                  <div
-                    key={item._id}
-                    onClick={() => handleProductClick(item._id)}
-                    className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-sm transition-shadow cursor-pointer"
-                  >
-                    <div className="relative aspect-square">
-                      <img
-                        src={item.images?.[0]?.url || '/placeholder-image.jpg'}
-                        alt={item.productName}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = '/placeholder-image.jpg';
-                        }}
-                      />
-                      
-                      {/* Status Badge */}
-                      <div className="absolute top-1 right-1">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                          item.status === 'active' 
-                            ? 'bg-green-100 text-green-800' :
-                          item.status === 'sold' && item.shippingStatus === 'shipped'
-                            ? 'bg-blue-100 text-blue-800' :
-                          item.status === 'sold' && item.shippingStatus === 'delivered'
-                            ? 'bg-purple-100 text-purple-800' :
-                          item.status === 'sold'
-                            ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                        }`}>
-                          {item.status === 'sold' && item.shippingStatus === 'shipped'
-                            ? 'Shipped' :
-                           item.status === 'sold' && item.shippingStatus === 'delivered'
-                            ? 'Delivered' :
-                           item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
-                        </span>
+                {filteredListings.map((item) => {
+                  const isEditingThis = editingPriceId === item._id;
+                  
+                  return (
+                    <div
+                      key={item._id}
+                      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-sm transition-shadow"
+                    >
+                      <div 
+                        onClick={() => !isEditingThis && handleProductClick(item._id)}
+                        className={`relative aspect-square ${!isEditingThis ? 'cursor-pointer' : ''}`}
+                      >
+                        <img
+                          src={item.images?.[0]?.url || '/placeholder-image.jpg'}
+                          alt={item.productName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-image.jpg';
+                          }}
+                        />
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-1 right-1">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                            item.status === 'active' 
+                              ? 'bg-green-100 text-green-800' :
+                            item.status === 'sold' && item.shippingStatus === 'shipped'
+                              ? 'bg-blue-100 text-blue-800' :
+                            item.status === 'sold' && item.shippingStatus === 'delivered'
+                              ? 'bg-purple-100 text-purple-800' :
+                            item.status === 'sold'
+                              ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                          }`}>
+                            {item.status === 'sold' && item.shippingStatus === 'shipped'
+                              ? 'Shipped' :
+                             item.status === 'sold' && item.shippingStatus === 'delivered'
+                              ? 'Delivered' :
+                             item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="p-2">
-                      <h3 className="text-xs font-medium text-gray-900 mb-1 line-clamp-2 h-6">
-                        {item.productName}
-                      </h3>
-                      <p className="text-gray-900 font-semibold text-sm mb-2">
-                        ₹{item.finalPrice?.toLocaleString()}
-                      </p>
                       
-                      <div className="flex gap-1">
-                        {item.status === 'active' && (
-                          <>
-                           
+                      <div className="p-2">
+                        <h3 className="text-xs font-medium text-gray-900 mb-1 line-clamp-2 h-6">
+                          {item.productName}
+                        </h3>
+                        
+                        {/* PRICE SECTION - EDITABLE FOR ACTIVE ITEMS */}
+                        {item.status === 'active' && isEditingThis ? (
+                          <div className="mb-2">
+                            <div className="flex items-center gap-1 mb-1">
+                              <label className="text-xs text-gray-600">New Price:</label>
+                              <div className="relative flex-1">
+                                <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">₹</span>
+                                <input
+                                  type="number"
+                                  value={newPrice}
+                                  onChange={(e) => setNewPrice(e.target.value)}
+                                  className="w-full pl-6 pr-2 py-1 border border-gray-300 rounded text-xs"
+                                  placeholder="Enter new price"
+                                  min="1"
+                                  step="1"
+                                  autoFocus
+                                />
+                              </div>
+                            </div>
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => updateProductPrice(item._id)}
+                                disabled={isUpdatingPrice}
+                                className="flex-1 px-1.5 py-1 bg-green-600 text-white text-[10px] rounded hover:bg-green-700 transition-colors flex items-center justify-center gap-0.5 disabled:opacity-50"
+                              >
+                                {isUpdatingPrice ? (
+                                  <div className="animate-spin rounded-full h-2 w-2 border-1 border-white border-t-transparent"></div>
+                                ) : (
+                                  <>
+                                    <FiCheck className="w-2.5 h-2.5" />
+                                    Save
+                                  </>
+                                )}
+                              </button>
+                              <button
+                                onClick={cancelPriceEdit}
+                                className="flex-1 px-1.5 py-1 bg-gray-500 text-white text-[10px] rounded hover:bg-gray-600 transition-colors flex items-center justify-center gap-0.5"
+                              >
+                                <FiX className="w-2.5 h-2.5" />
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mb-2">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-gray-900 font-semibold text-sm">
+                                  ₹{item.finalPrice?.toLocaleString()}
+                                </p>
+                                {item.status === 'active' && (
+                                  <p className="text-gray-500 text-[10px]">
+                                    Asking: ₹{item.askingPrice?.toLocaleString()} + 10% fee
+                                  </p>
+                                )}
+                              </div>
+                              {item.status === 'active' && (
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    startPriceEdit(item._id, item.askingPrice || item.finalPrice);
+                                  }}
+                                  className="p-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                                  title="Edit price"
+                                >
+                                  <FiEdit2 className="w-3 h-3 text-gray-600" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* ACTION BUTTONS */}
+                        <div className="flex gap-1">
+                          {item.status === 'active' && !isEditingThis && (
+                            <>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/edit-listing/${item._id}`);
+                                }}
+                                className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
+                              >
+                                <FiEdit className="w-2.5 h-2.5" />
+                                Edit
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteListing(item._id);
+                                }}
+                                className="flex-1 px-1.5 py-1 bg-red-600 text-white text-[10px] rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-0.5"
+                              >
+                                <FiTrash2 className="w-2.5 h-2.5" />
+                                Delete
+                              </button>
+                            </>
+                          )}
+                          
+                          {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                deleteListing(item._id);
+                                openLiveTracking(item.shippingDetails.awbNumber);
                               }}
-                              className="flex-1 px-1.5 py-1 bg-red-600 text-white text-[10px] rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-0.5"
+                              className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
                             >
-                              <FiTrash2 className="w-2.5 h-2.5" />
-                              Delete
+                              <FiTruck className="w-2.5 h-2.5" />
+                              Track
                             </button>
-                          </>
-                        )}
-                        
-                        {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openLiveTracking(item.shippingDetails.awbNumber);
-                            }}
-                            className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
-                            >
-                            <FiTruck className="w-2.5 h-2.5" />
-                            Track
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1826,6 +2046,29 @@ export default function Dashboard() {
               )}
             </div>
 
+            {/* Price Update Message */}
+            {priceUpdateMessage.text && (
+              <div className={`mb-6 p-4 rounded-lg ${
+                priceUpdateMessage.type === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <div className="flex items-center gap-3">
+                  {priceUpdateMessage.type === 'success' ? (
+                    <FiCheckCircle className="w-5 h-5" />
+                  ) : (
+                    <FiAlertCircle className="w-5 h-5" />
+                  )}
+                  <div>
+                    <p className="font-medium">{priceUpdateMessage.text}</p>
+                    {priceUpdateMessage.type === 'success' && (
+                      <p className="text-sm mt-1">Final price includes 10% platform fee.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Desktop Filter Tabs */}
             <div className="flex gap-2 mb-6">
               {['all', 'active', 'sold', 'shipped', 'delivered'].map((filter) => (
@@ -1880,94 +2123,181 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-6">
-                {filteredListings.map((item) => (
-                  <div
-                    key={item._id}
-                    onClick={() => handleProductClick(item._id)}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                  >
-                    <div className="relative aspect-square">
-                      <img
-                        src={item.images?.[0]?.url || '/placeholder-image.jpg'}
-                        alt={item.productName}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = '/placeholder-image.jpg';
-                        }}
-                      />
-                      
-                      {/* Status Badge */}
-                      <div className="absolute top-2 right-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.status === 'active' 
-                            ? 'bg-green-100 text-green-800' :
-                          item.status === 'sold' && item.shippingStatus === 'shipped'
-                            ? 'bg-blue-100 text-blue-800' :
-                          item.status === 'sold' && item.shippingStatus === 'delivered'
-                            ? 'bg-purple-100 text-purple-800' :
-                          item.status === 'sold'
-                            ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                        }`}>
-                          {item.status === 'sold' && item.shippingStatus === 'shipped'
-                            ? 'Shipped' :
-                           item.status === 'sold' && item.shippingStatus === 'delivered'
-                            ? 'Delivered' :
-                           item.status?.toUpperCase()}
-                        </span>
+                {filteredListings.map((item) => {
+                  const isEditingThis = editingPriceId === item._id;
+                  
+                  return (
+                    <div
+                      key={item._id}
+                      className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      <div 
+                        onClick={() => !isEditingThis && handleProductClick(item._id)}
+                        className={`relative aspect-square ${!isEditingThis ? 'cursor-pointer' : ''}`}
+                      >
+                        <img
+                          src={item.images?.[0]?.url || '/placeholder-image.jpg'}
+                          alt={item.productName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-image.jpg';
+                          }}
+                        />
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-3 right-3">
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${
+                            item.status === 'active' 
+                              ? 'bg-green-100 text-green-800' :
+                            item.status === 'sold' && item.shippingStatus === 'shipped'
+                              ? 'bg-blue-100 text-blue-800' :
+                            item.status === 'sold' && item.shippingStatus === 'delivered'
+                              ? 'bg-purple-100 text-purple-800' :
+                            item.status === 'sold'
+                              ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                          }`}>
+                            {item.status === 'sold' && item.shippingStatus === 'shipped'
+                              ? 'Shipped' :
+                             item.status === 'sold' && item.shippingStatus === 'delivered'
+                              ? 'Delivered' :
+                             item.status?.toUpperCase()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="p-4">
-                      <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
-                        {item.productName}
-                      </h3>
-                      <p className="text-gray-900 font-semibold text-lg mb-3">
-                        ₹{item.finalPrice?.toLocaleString()}
-                      </p>
                       
-                      <div className="flex gap-2">
-                        {item.status === 'active' && (
-                          <>
+                      <div className="p-4">
+                        <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
+                          {item.productName}
+                        </h3>
+                        
+                        {/* PRICE SECTION - EDITABLE FOR ACTIVE ITEMS */}
+                        {item.status === 'active' && isEditingThis ? (
+                          <div className="mb-3">
+                            <div className="space-y-3">
+                              <div>
+                                <label className="block text-sm text-gray-600 mb-2">New Asking Price</label>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                                  <input
+                                    type="number"
+                                    value={newPrice}
+                                    onChange={(e) => setNewPrice(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    placeholder="Enter new price"
+                                    min="1"
+                                    step="1"
+                                    autoFocus
+                                  />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">
+                                  Final price will be: ₹{(parseFloat(newPrice) * 1.1).toFixed(0)} (including 10% platform fee)
+                                </p>
+                              </div>
+                              
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => updateProductPrice(item._id)}
+                                  disabled={isUpdatingPrice}
+                                  className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                  {isUpdatingPrice ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                  ) : (
+                                    <>
+                                      <FiCheck className="w-4 h-4" />
+                                      Save New Price
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={cancelPriceEdit}
+                                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                                >
+                                  <FiX className="w-4 h-4" />
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-gray-900 font-semibold text-lg">
+                                  ₹{item.finalPrice?.toLocaleString()}
+                                </p>
+                                {item.status === 'active' && (
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <p className="text-gray-500 text-sm">
+                                      Asking: ₹{item.askingPrice?.toLocaleString()}
+                                    </p>
+                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">
+                                      +10% fee
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              {item.status === 'active' && (
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    startPriceEdit(item._id, item.askingPrice || item.finalPrice);
+                                  }}
+                                  className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+                                  title="Edit price"
+                                >
+                                  <FiEdit2 className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* ACTION BUTTONS */}
+                        <div className="flex gap-2">
+                          {item.status === 'active' && !isEditingThis && (
+                            <>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/edit-listing/${item._id}`);
+                                }}
+                                className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
+                              >
+                                <FiEdit className="w-3 h-3" />
+                                Edit Details
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteListing(item._id);
+                                }}
+                                className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
+                              >
+                                <FiTrash2 className="w-3 h-3" />
+                                Delete
+                              </button>
+                            </>
+                          )}
+                          
+                          {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/edit-listing/${item._id}`);
+                                openLiveTracking(item.shippingDetails.awbNumber);
                               }}
                               className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
                             >
-                              <FiEdit className="w-3 h-3" />
-                              Edit
+                              <FiTruck className="w-3 h-3" />
+                              Track Shipment
                             </button>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteListing(item._id);
-                              }}
-                              className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
-                            >
-                              <FiTrash2 className="w-3 h-3" />
-                              Delete
-                            </button>
-                          </>
-                        )}
-                        
-                        {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openLiveTracking(item.shippingDetails.awbNumber);
-                            }}
-                            className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
-                          >
-                            <FiTruck className="w-3 h-3" />
-                            Track
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
