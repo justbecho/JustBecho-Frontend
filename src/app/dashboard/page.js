@@ -1,4 +1,4 @@
-// pages/dashboard.js - WITH PRICE EDIT FEATURE
+// pages/dashboard.js - WITH PRICE EDIT ONLY
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -12,44 +12,21 @@ import {
   FiShoppingBag, 
   FiHeart,
   FiHome,
-  FiSettings,
-  FiBell,
-  FiTrendingUp,
-  FiDollarSign,
-  FiTruck,
-  FiCheckCircle,
-  FiAlertCircle,
-  FiGrid,
-  FiMenu,
-  FiX,
-  FiChevronRight,
-  FiClock,
-  FiStar,
-  FiMessageSquare,
-  FiHelpCircle,
-  FiExternalLink,
-  FiMapPin,
-  FiCalendar,
-  FiTag,
   FiEdit,
   FiTrash2,
   FiEye,
   FiShoppingCart,
   FiRefreshCw,
   FiSave,
-  FiBox,
-  FiCreditCard,
-  FiPackage as FiPackageIcon,
-  FiTruck as FiTruckIcon,
-  FiCheckSquare,
-  FiArrowRight,
-  FiPercent,
-  FiDollarSign as FiDollarSignIcon,
-  FiShoppingCart as FiShoppingCartIcon,
-  FiEdit2,
+  FiTruck,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiClock,
+  FiExternalLink,
   FiCheck,
-  FiXCircle,
-  FiDollarSign as FiDollarIcon
+  FiX,
+  FiEdit2,
+  FiDollarSign
 } from 'react-icons/fi'
 
 export default function Dashboard() {
@@ -60,7 +37,6 @@ export default function Dashboard() {
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const [redirectPath, setRedirectPath] = useState('')
   const [isMobile, setIsMobile] = useState(false)
-  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const router = useRouter()
   
   const [sellerStatus, setSellerStatus] = useState({
@@ -205,7 +181,7 @@ export default function Dashboard() {
     };
   };
 
-  // ✅ PRICE UPDATE FUNCTION
+  // ✅ PRICE UPDATE FUNCTION - SIMPLE VERSION
   const updateProductPrice = async (productId) => {
     if (!productId || !newPrice || isNaN(parseFloat(newPrice)) || parseFloat(newPrice) <= 0) {
       setPriceUpdateMessage({
@@ -225,19 +201,11 @@ export default function Dashboard() {
         return;
       }
 
-      // Find the product to get current details
-      const product = listings.find(p => p._id === productId);
-      if (!product) {
-        throw new Error('Product not found');
-      }
-
-      // Prepare update data
+      // Send update request with askingPrice only
       const updateData = {
-        askingPrice: parseFloat(newPrice),
-        // The backend will calculate finalPrice with 10% platform fee automatically
+        askingPrice: parseFloat(newPrice)
       };
 
-      // Send update request
       const response = await fetch(`https://just-becho-backend.vercel.app/api/products/${productId}`, {
         method: 'PUT',
         headers: {
@@ -248,8 +216,7 @@ export default function Dashboard() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update price: ${response.status} ${errorText}`);
+        throw new Error(`Failed to update price: ${response.status}`);
       }
 
       const result = await response.json();
@@ -271,7 +238,7 @@ export default function Dashboard() {
         // Show success message
         setPriceUpdateMessage({
           type: 'success',
-          text: 'Price updated successfully! Platform fee (10%) has been applied.'
+          text: 'Price updated successfully!'
         });
 
         // Reset editing state
@@ -291,7 +258,7 @@ export default function Dashboard() {
       console.error('Error updating product price:', error);
       setPriceUpdateMessage({
         type: 'error',
-        text: error.message || 'Failed to update price. Please try again.'
+        text: 'Failed to update price. Please try again.'
       });
     } finally {
       setIsUpdatingPrice(false);
@@ -342,7 +309,7 @@ export default function Dashboard() {
     } catch (error) {
       setCartCount(0);
     }
-  }, [getLocalStorage]);
+  }, [getLocalStorage])
 
   const fetchShippingTracking = async (orderId, forceRefresh = false) => {
     try {
@@ -393,9 +360,6 @@ export default function Dashboard() {
     switch(status) {
       case 'booked':
         return { label: 'Booked', color: 'bg-blue-100 text-blue-800', text: 'Shipment created' };
-      case 'pickup_scheduled':
-      case 'pickup_generated':
-        return { label: 'Pickup Scheduled', color: 'bg-yellow-100 text-yellow-800', text: 'Pickup scheduled' };
       case 'picked_up':
         return { label: 'Picked Up', color: 'bg-green-100 text-green-800', text: 'Picked up' };
       case 'in_transit':
@@ -404,8 +368,6 @@ export default function Dashboard() {
         return { label: 'Out for Delivery', color: 'bg-orange-100 text-orange-800', text: 'Will be delivered today' };
       case 'delivered':
         return { label: 'Delivered', color: 'bg-green-100 text-green-800', text: 'Successfully delivered' };
-      case 'failed':
-        return { label: 'Failed', color: 'bg-red-100 text-red-800', text: 'Delivery failed' };
       default:
         return { label: 'Processing', color: 'bg-gray-100 text-gray-800', text: 'Processing shipment' };
     }
@@ -422,7 +384,7 @@ export default function Dashboard() {
       case 'shipped':
         return { label: 'Shipped', color: 'bg-purple-100 text-purple-800', icon: <FiTruck className="w-4 h-4" /> };
       case 'delivered':
-        return { label: 'Delivered', color: 'bg-green-100 text-green-800', icon: <FiCheckSquare className="w-4 h-4" /> };
+        return { label: 'Delivered', color: 'bg-green-100 text-green-800', icon: <FiCheckCircle className="w-4 h-4" /> };
       case 'cancelled':
         return { label: 'Cancelled', color: 'bg-red-100 text-red-800', icon: <FiX className="w-4 h-4" /> };
       default:
@@ -502,11 +464,7 @@ export default function Dashboard() {
           setListings([]);
         }
       } else {
-        if (user?.role === 'seller') {
-          setListings([]);
-        } else {
-          setListings([]);
-        }
+        setListings([]);
       }
     } catch (error) {
       console.error('❌ Error fetching my products:', error);
@@ -901,25 +859,10 @@ export default function Dashboard() {
     return true;
   });
 
-  const readyForShipmentCount = listings.filter(item => 
-    item.status === 'sold' && (!item.shippingStatus || item.shippingStatus === 'pending')
-  ).length;
-  
-  const shippedCount = listings.filter(item => 
-    item.status === 'sold' && item.shippingStatus === 'shipped'
-  ).length;
-  
-  const deliveredCount = listings.filter(item => 
-    item.status === 'sold' && item.shippingStatus === 'delivered'
-  ).length;
-
   const stats = {
     totalListings: listings.length,
     activeListings: listings.filter(l => l.status === 'active').length,
     soldListings: listings.filter(l => l.status === 'sold').length,
-    readyForShipment: readyForShipmentCount,
-    shipped: shippedCount,
-    delivered: deliveredCount,
     totalOrders: orders.length,
     wishlistItems: wishlist.length,
     totalSales: user?.totalSales || 0
@@ -984,60 +927,40 @@ export default function Dashboard() {
         }
       };
       
-      const endpoints = [
-        'https://just-becho-backend.vercel.app/api/users/profile',
-        'https://just-becho-backend.vercel.app/api/auth/profile',
-        'https://just-becho-backend.vercel.app/api/users/update-profile'
-      ];
+      const response = await fetch('https://just-becho-backend.vercel.app/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updateData)
+      });
       
-      let response = null;
-      let success = false;
-      
-      for (const endpoint of endpoints) {
-        try {
-          response = await fetch(endpoint, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(updateData)
-          });
+      if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success) {
+          const updatedUser = {
+            ...user,
+            name: updateData.name,
+            phone: updateData.phone,
+            address: updateData.address
+          };
           
-          if (response.ok) {
-            success = true;
-            break;
-          }
-        } catch (endpointError) {
-          continue;
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          setUser(updatedUser);
+          
+          setIsEditing(false);
+          setUpdateSuccess(true);
+          
+          setTimeout(() => {
+            setUpdateSuccess(false);
+          }, 3000);
+        } else {
+          throw new Error(result.message || 'Update failed');
         }
-      }
-      
-      if (!success || !response) {
-        throw new Error('All update endpoints failed');
-      }
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        const updatedUser = {
-          ...user,
-          name: updateData.name,
-          phone: updateData.phone,
-          address: updateData.address
-        };
-        
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setUser(updatedUser);
-        
-        setIsEditing(false);
-        setUpdateSuccess(true);
-        
-        setTimeout(() => {
-          setUpdateSuccess(false);
-        }, 3000);
       } else {
-        throw new Error(result.message || 'Update failed');
+        throw new Error('Update failed');
       }
       
     } catch (error) {
@@ -1048,12 +971,11 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ LOADING STATE - Fixed with exact header alignment
+  // ✅ LOADING STATE
   if (loading) {
     return (
       <>
         <Header />
-        {/* ✅ EXACT SPACING: Mobile pt-[80px], Desktop pt-[120px] */}
         <div className="min-h-screen bg-gray-50 pt-[80px] md:pt-[120px] pb-16 flex flex-col items-center justify-center p-4">
           <div className="text-center">
             <div className="relative w-16 h-16 mx-auto mb-4">
@@ -1323,7 +1245,7 @@ export default function Dashboard() {
 
             {/* Filter Tabs */}
             <div className="flex overflow-x-auto scrollbar-hide gap-2 mb-4 pb-1">
-              {['all', 'active', 'sold', 'shipped', 'delivered'].map((filter) => (
+              {['all', 'active', 'sold'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setListingFilter(filter)}
@@ -1331,16 +1253,12 @@ export default function Dashboard() {
                     listingFilter === filter
                       ? filter === 'all' ? 'bg-gray-900 text-white' :
                         filter === 'active' ? 'bg-green-600 text-white' :
-                        filter === 'sold' ? 'bg-red-600 text-white' :
-                        filter === 'shipped' ? 'bg-blue-600 text-white' :
-                        'bg-purple-600 text-white'
+                        'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {filter === 'all' ? 'All' :
-                   filter === 'active' ? 'Active' :
-                   filter === 'sold' ? 'Sold' :
-                   filter === 'shipped' ? 'Shipped' : 'Delivered'}
+                   filter === 'active' ? 'Active' : 'Sold'}
                 </button>
               ))}
             </div>
@@ -1353,9 +1271,7 @@ export default function Dashboard() {
                 <h3 className="text-base font-semibold text-gray-900 mb-1">No listings found</h3>
                 <p className="text-gray-600 text-xs mb-4">
                   {listingFilter === 'all' ? 'Start selling your items!' :
-                   listingFilter === 'active' ? 'No active listings' :
-                   listingFilter === 'sold' ? 'No sold items' :
-                   'No items in this category'}
+                   listingFilter === 'active' ? 'No active listings' : 'No sold items'}
                 </p>
                 {user?.sellerVerified ? (
                   <button
@@ -1377,6 +1293,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-3">
                 {filteredListings.map((item) => {
                   const isEditingThis = editingPriceId === item._id;
+                  const isActive = item.status === 'active';
                   
                   return (
                     <div
@@ -1399,21 +1316,9 @@ export default function Dashboard() {
                         {/* Status Badge */}
                         <div className="absolute top-1 right-1">
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                            item.status === 'active' 
-                              ? 'bg-green-100 text-green-800' :
-                            item.status === 'sold' && item.shippingStatus === 'shipped'
-                              ? 'bg-blue-100 text-blue-800' :
-                            item.status === 'sold' && item.shippingStatus === 'delivered'
-                              ? 'bg-purple-100 text-purple-800' :
-                            item.status === 'sold'
-                              ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
+                            isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
-                            {item.status === 'sold' && item.shippingStatus === 'shipped'
-                              ? 'Shipped' :
-                             item.status === 'sold' && item.shippingStatus === 'delivered'
-                              ? 'Delivered' :
-                             item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
+                            {isActive ? 'Active' : 'Sold'}
                           </span>
                         </div>
                       </div>
@@ -1424,7 +1329,7 @@ export default function Dashboard() {
                         </h3>
                         
                         {/* PRICE SECTION - EDITABLE FOR ACTIVE ITEMS */}
-                        {item.status === 'active' && isEditingThis ? (
+                        {isActive && isEditingThis ? (
                           <div className="mb-2">
                             <div className="flex items-center gap-1 mb-1">
                               <label className="text-xs text-gray-600">New Price:</label>
@@ -1473,13 +1378,13 @@ export default function Dashboard() {
                                 <p className="text-gray-900 font-semibold text-sm">
                                   ₹{item.finalPrice?.toLocaleString()}
                                 </p>
-                                {item.status === 'active' && (
+                                {isActive && (
                                   <p className="text-gray-500 text-[10px]">
-                                    Asking: ₹{item.askingPrice?.toLocaleString()} + 10% fee
+                                    Asking: ₹{item.askingPrice?.toLocaleString()}
                                   </p>
                                 )}
                               </div>
-                              {item.status === 'active' && (
+                              {isActive && (
                                 <button 
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -1497,18 +1402,8 @@ export default function Dashboard() {
                         
                         {/* ACTION BUTTONS */}
                         <div className="flex gap-1">
-                          {item.status === 'active' && !isEditingThis && (
+                          {isActive && !isEditingThis && (
                             <>
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  router.push(`/edit-listing/${item._id}`);
-                                }}
-                                className="flex-1 px-1.5 py-1 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-0.5"
-                              >
-                                <FiEdit className="w-2.5 h-2.5" />
-                                Edit
-                              </button>
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -1522,7 +1417,7 @@ export default function Dashboard() {
                             </>
                           )}
                           
-                          {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
+                          {!isActive && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -2061,9 +1956,6 @@ export default function Dashboard() {
                   )}
                   <div>
                     <p className="font-medium">{priceUpdateMessage.text}</p>
-                    {priceUpdateMessage.type === 'success' && (
-                      <p className="text-sm mt-1">Final price includes 10% platform fee.</p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -2071,7 +1963,7 @@ export default function Dashboard() {
 
             {/* Desktop Filter Tabs */}
             <div className="flex gap-2 mb-6">
-              {['all', 'active', 'sold', 'shipped', 'delivered'].map((filter) => (
+              {['all', 'active', 'sold'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setListingFilter(filter)}
@@ -2079,16 +1971,12 @@ export default function Dashboard() {
                     listingFilter === filter
                       ? filter === 'all' ? 'bg-gray-900 text-white' :
                         filter === 'active' ? 'bg-green-600 text-white' :
-                        filter === 'sold' ? 'bg-red-600 text-white' :
-                        filter === 'shipped' ? 'bg-blue-600 text-white' :
-                        'bg-purple-600 text-white'
+                        'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {filter === 'all' ? 'All' :
-                   filter === 'active' ? 'Active' :
-                   filter === 'sold' ? 'Sold' :
-                   filter === 'shipped' ? 'Shipped' : 'Delivered'}
+                   filter === 'active' ? 'Active' : 'Sold'}
                 </button>
               ))}
             </div>
@@ -2101,9 +1989,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings found</h3>
                 <p className="text-gray-600 mb-6">
                   {listingFilter === 'all' ? 'Start selling your items!' :
-                   listingFilter === 'active' ? 'No active listings' :
-                   listingFilter === 'sold' ? 'No sold items' :
-                   'No items in this category'}
+                   listingFilter === 'active' ? 'No active listings' : 'No sold items'}
                 </p>
                 {user?.sellerVerified ? (
                   <button
@@ -2125,6 +2011,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-3 gap-6">
                 {filteredListings.map((item) => {
                   const isEditingThis = editingPriceId === item._id;
+                  const isActive = item.status === 'active';
                   
                   return (
                     <div
@@ -2147,21 +2034,9 @@ export default function Dashboard() {
                         {/* Status Badge */}
                         <div className="absolute top-3 right-3">
                           <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-                            item.status === 'active' 
-                              ? 'bg-green-100 text-green-800' :
-                            item.status === 'sold' && item.shippingStatus === 'shipped'
-                              ? 'bg-blue-100 text-blue-800' :
-                            item.status === 'sold' && item.shippingStatus === 'delivered'
-                              ? 'bg-purple-100 text-purple-800' :
-                            item.status === 'sold'
-                              ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
+                            isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
-                            {item.status === 'sold' && item.shippingStatus === 'shipped'
-                              ? 'Shipped' :
-                             item.status === 'sold' && item.shippingStatus === 'delivered'
-                              ? 'Delivered' :
-                             item.status?.toUpperCase()}
+                            {isActive ? 'Active' : 'Sold'}
                           </span>
                         </div>
                       </div>
@@ -2172,11 +2047,11 @@ export default function Dashboard() {
                         </h3>
                         
                         {/* PRICE SECTION - EDITABLE FOR ACTIVE ITEMS */}
-                        {item.status === 'active' && isEditingThis ? (
+                        {isActive && isEditingThis ? (
                           <div className="mb-3">
                             <div className="space-y-3">
                               <div>
-                                <label className="block text-sm text-gray-600 mb-2">New Asking Price</label>
+                                <label className="block text-sm text-gray-600 mb-2">New Price</label>
                                 <div className="relative">
                                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
                                   <input
@@ -2190,9 +2065,6 @@ export default function Dashboard() {
                                     autoFocus
                                   />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-2">
-                                  Final price will be: ₹{(parseFloat(newPrice) * 1.1).toFixed(0)} (including 10% platform fee)
-                                </p>
                               </div>
                               
                               <div className="flex gap-2">
@@ -2206,7 +2078,7 @@ export default function Dashboard() {
                                   ) : (
                                     <>
                                       <FiCheck className="w-4 h-4" />
-                                      Save New Price
+                                      Save Price
                                     </>
                                   )}
                                 </button>
@@ -2227,18 +2099,15 @@ export default function Dashboard() {
                                 <p className="text-gray-900 font-semibold text-lg">
                                   ₹{item.finalPrice?.toLocaleString()}
                                 </p>
-                                {item.status === 'active' && (
+                                {isActive && (
                                   <div className="flex items-center gap-2 mt-1">
                                     <p className="text-gray-500 text-sm">
                                       Asking: ₹{item.askingPrice?.toLocaleString()}
                                     </p>
-                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">
-                                      +10% fee
-                                    </span>
                                   </div>
                                 )}
                               </div>
-                              {item.status === 'active' && (
+                              {isActive && (
                                 <button 
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2256,18 +2125,8 @@ export default function Dashboard() {
                         
                         {/* ACTION BUTTONS */}
                         <div className="flex gap-2">
-                          {item.status === 'active' && !isEditingThis && (
+                          {isActive && !isEditingThis && (
                             <>
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  router.push(`/edit-listing/${item._id}`);
-                                }}
-                                className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
-                              >
-                                <FiEdit className="w-3 h-3" />
-                                Edit Details
-                              </button>
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -2281,7 +2140,7 @@ export default function Dashboard() {
                             </>
                           )}
                           
-                          {item.status === 'sold' && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
+                          {!isActive && item.shippingStatus === 'shipped' && item.shippingDetails?.awbNumber && (
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -2430,22 +2289,6 @@ export default function Dashboard() {
                                           <code className="bg-gray-100 px-3 py-1 rounded text-sm">
                                             {shipment.awbNumber}
                                           </code>
-                                        </p>
-                                        
-                                        <p className="text-sm text-gray-600">
-                                          {shipment.shipmentType === 'seller_to_warehouse' ? (
-                                            <span className="flex items-center gap-2">
-                                              <FiPackageIcon className="w-4 h-4" /> Seller → Warehouse
-                                            </span>
-                                          ) : shipment.shipmentType === 'warehouse_to_buyer' ? (
-                                            <span className="flex items-center gap-2">
-                                              <FiTruckIcon className="w-4 h-4" /> Warehouse → You
-                                            </span>
-                                          ) : (
-                                            <span className="flex items-center gap-2">
-                                              <FiTruck className="w-4 h-4" /> Direct Delivery
-                                            </span>
-                                          )}
                                         </p>
                                       </div>
                                     </div>
@@ -2599,12 +2442,11 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ MOBILE VERSION - PERFECT HEADER ALIGNMENT (EXACT HEIGHT)
+  // ✅ MOBILE VERSION
   if (isMobile) {
     return (
       <>
         <Header />
-        {/* ✅ MOBILE: Start exactly after header ends (80px) - NO GAP */}
         <main className="min-h-screen bg-gray-50 pt-[67px] pb-16">
           
           {/* Welcome Banner */}
@@ -2728,12 +2570,11 @@ export default function Dashboard() {
     )
   }
 
-  // ✅ DESKTOP VERSION - PERFECT HEADER ALIGNMENT (EXACT HEIGHT)
+  // ✅ DESKTOP VERSION
   return (
     <>
       <Header />
       
-      {/* ✅ DESKTOP: Start exactly after header + subheader ends (120px) - NO GAP */}
       <main className="min-h-screen bg-gray-50">
         <div className="pt-[140px] pb-16">
           
