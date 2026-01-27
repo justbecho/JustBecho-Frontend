@@ -133,31 +133,9 @@ export default function AdminLogin() {
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Default Credentials</span>
-              </div>
-            </div>
+         
 
-            <div className="mt-6 text-center text-sm bg-gray-50 p-4 rounded-md">
-              <p className="text-gray-600">
-                Email: <span className="font-semibold">admin@justbecho.com</span>
-              </p>
-              <p className="text-gray-600 mt-1">
-                Password: <span className="font-semibold">admin123</span>
-              </p>
-              <p className="text-red-500 mt-2 text-xs">
-                ⚠️ Change password after first login!
-              </p>
-              <p className="text-blue-500 mt-2 text-xs">
-                🔧 Backend URL: https://just-becho-backend.vercel.app
-              </p>
-            </div>
-          </div>
+        
 
           <div className="mt-6 text-center">
             <Link 
