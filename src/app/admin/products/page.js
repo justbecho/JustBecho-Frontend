@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Search, Edit, Trash2, Eye, Filter } from 'lucide-react'
+import { Search, Edit, Trash2, Eye, Filter, Plus } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 
@@ -152,10 +152,12 @@ export default function ProductsPage() {
             </p>
           </div>
           <div className="mt-4 md:mt-0">
+            {/* ✅ ADD THIS BUTTON */}
             <Link
               href="/admin/products/add"
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
+              <Plus className="h-4 w-4 mr-2" />
               Add New Product
             </Link>
           </div>
@@ -204,6 +206,16 @@ export default function ProductsPage() {
               ))}
             </select>
           </div>
+
+          <div>
+            <button
+              onClick={fetchProducts}
+              className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filter
+            </button>
+          </div>
         </div>
       </div>
 
@@ -219,6 +231,13 @@ export default function ProductsPage() {
         ) : products.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">No products found</p>
+            <Link
+              href="/admin/products/add"
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Product
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -274,7 +293,7 @@ export default function ProductsPage() {
                             {product.brand}
                           </div>
                           <div className="text-xs text-gray-400 mt-1">
-                            Seller: {product.seller?.name || 'Unknown'}
+                            Seller: {product.seller?.name || 'Admin'}
                           </div>
                         </div>
                       </div>
