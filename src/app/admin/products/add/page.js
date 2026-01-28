@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import AdminLayout from '@/components/layout/AdminLayout'
 import toast from 'react-hot-toast'
 
 export default function AdminAddProductPage() {
@@ -29,7 +28,7 @@ export default function AdminAddProductPage() {
   const [platformFee] = useState(10)
 
   // Fetch categories and sellers
-  useState(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch categories
@@ -174,19 +173,17 @@ export default function AdminAddProductPage() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading...</p>
-          </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
         </div>
-      </AdminLayout>
+      </div>
     )
   }
 
   return (
-    <AdminLayout>
+    <>
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -449,6 +446,6 @@ export default function AdminAddProductPage() {
           </button>
         </div>
       </form>
-    </AdminLayout>
+    </>
   )
 }
