@@ -1,4 +1,4 @@
-// app/products/[id]/page.js - FINAL PERFECT VERSION
+// app/products/[id]/page.js - 5 IMAGES VERSION
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -454,6 +454,9 @@ export default function ProductPage() {
 
   const bechoProtectPrice = product.finalPrice < 15000 ? 499 : 999
 
+  // ✅ Get first 5 images from product
+  const productImages = product.images?.slice(0, 5) || []
+
   return (
     <>
       <Header />
@@ -489,9 +492,9 @@ export default function ProductPage() {
                 {/* Main Image */}
                 <div className="flex-1">
                   <div className="aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center max-w-[650px] mx-auto">
-                    {product.images && product.images[selectedImage]?.url ? (
+                    {productImages[selectedImage]?.url ? (
                       <img
-                        src={product.images[selectedImage].url}
+                        src={productImages[selectedImage].url}
                         alt={product.productName}
                         className="w-full h-full object-cover"
                       />
@@ -501,9 +504,9 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                {/* Thumbnails */}
+                {/* ✅ Thumbnails - 5 images total */}
                 <div className="flex justify-center gap-2 md:gap-4">
-                  {product.images && product.images.slice(0, 4).map((image, index) => (
+                  {productImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
