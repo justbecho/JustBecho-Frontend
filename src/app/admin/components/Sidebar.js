@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
     { path: '/admin/categories', icon: Folder, label: 'Categories' },
     { path: '/admin/sales', icon: BarChart3, label: 'Sales Reports' },
-    { path: '/admin/settings', icon: Settings, label: 'Settings' },
+    
   ]
 
   const handleLogout = () => {
