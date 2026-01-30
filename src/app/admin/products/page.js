@@ -82,7 +82,7 @@ export default function ProductsPage() {
       
       if (data.success) {
         toast.success('Product deleted successfully')
-        fetchProducts() // Refresh list
+        fetchProducts() // Refresh 
       } else {
         toast.error(data.message || 'Failed to delete product')
       }
