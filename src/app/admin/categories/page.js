@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { 
   Plus, Edit, Trash2, Eye, Search, ChevronDown, ChevronUp, 
-  List, Tag, MoreVertical, CheckCircle, XCircle, Filter,
-  Grid, List as ListIcon, RefreshCw, Download
+  List, Tag, Grid, List as ListIcon, RefreshCw, Download,
+  CheckCircle, XCircle, Filter, MoreVertical
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
@@ -20,8 +20,8 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [categoryToDelete, setCategoryToDelete] = useState(null)
   const [expandedCategories, setExpandedCategories] = useState({})
-  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
-  const [activeFilter, setActiveFilter] = useState('all') // 'all', 'active', 'inactive'
+  const [viewMode, setViewMode] = useState('grid')
+  const [activeFilter, setActiveFilter] = useState('all')
   
   const [formData, setFormData] = useState({
     name: '',
@@ -68,7 +68,6 @@ export default function CategoriesPage() {
       const data = await response.json()
       
       if (data.success) {
-        // Apply filters
         let filteredCategories = data.categories || []
         
         if (activeFilter === 'active') {
@@ -163,7 +162,7 @@ export default function CategoriesPage() {
         setCategoryToDelete(null)
         fetchCategories()
       } else {
-        toast.error(data.message || data.details || 'Failed to delete category')
+        toast.error(data.message || 'Failed to delete category')
       }
     } catch (error) {
       console.error('Error deleting category:', error)
@@ -212,7 +211,6 @@ export default function CategoriesPage() {
       let url, method, body
       
       if (editingSubcategory) {
-        // Update existing subcategory
         url = `https://just-becho-backend.vercel.app/api/admin/dashboard/categories/${selectedCategory._id}/subcategories/${editingSubcategory.slug}`
         method = 'PUT'
         body = {
@@ -221,7 +219,6 @@ export default function CategoriesPage() {
           items: subcategoryForm.items
         }
       } else {
-        // Add new subcategory
         url = `https://just-becho-backend.vercel.app/api/admin/dashboard/categories/${selectedCategory._id}/subcategories`
         method = 'POST'
         body = subcategoryForm
@@ -290,6 +287,7 @@ export default function CategoriesPage() {
     })
   }
 
+  // ✅ FIXED: Delete Subcategory Function
   const handleDeleteSubcategory = async (subSlug) => {
     if (!confirm('Are you sure you want to delete this subcategory?')) {
       return
@@ -311,6 +309,9 @@ export default function CategoriesPage() {
       
       if (data.success) {
         toast.success('Subcategory deleted successfully')
+        // Update selected category with fresh data
+        setSelectedCategory(data.category)
+        // Refresh main categories list
         fetchCategories()
       } else {
         toast.error(data.message || 'Failed to delete subcategory')
@@ -342,6 +343,8 @@ export default function CategoriesPage() {
       
       if (data.success) {
         toast.success('Item removed successfully')
+        // Update selected category
+        setSelectedCategory(data.category)
         fetchCategories()
       } else {
         toast.error(data.message || 'Failed to remove item')
@@ -413,8 +416,6 @@ export default function CategoriesPage() {
     linkElement.setAttribute('download', exportFileDefaultName)
     linkElement.click()
   }
-
-  const filteredCategories = categories
 
   return (
     <div className="space-y-6">
@@ -521,7 +522,7 @@ export default function CategoriesPage() {
             <p className="mt-2 text-gray-600">Loading categories...</p>
           </div>
         </div>
-      ) : filteredCategories.length === 0 ? (
+      ) : categories.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow border border-gray-200">
           <div className="mx-auto w-12 h-12 text-gray-400 mb-4">
             <List className="w-full h-full" />
@@ -562,7 +563,7 @@ export default function CategoriesPage() {
       ) : viewMode === 'grid' ? (
         // Grid View
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCategories.map((category) => (
+          {categories.map((category) => (
             <div
               key={category._id}
               className="bg-white rounded-lg shadow overflow-hidden border border-gray-200 hover:shadow-md transition-shadow"
@@ -703,7 +704,7 @@ export default function CategoriesPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCategories.map((category) => (
+                {categories.map((category) => (
                   <tr key={category._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -742,16 +743,6 @@ export default function CategoriesPage() {
                                   <span className="text-xs text-gray-500">
                                     {sub.items?.length || 0} items
                                   </span>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedCategory(category)
-                                      handleEditSubcategory(sub)
-                                      setShowSubcategoryModal(true)
-                                    }}
-                                    className="text-blue-600 hover:text-blue-800 text-xs"
-                                  >
-                                    Edit
-                                  </button>
                                 </div>
                               </div>
                             ))}
@@ -1007,6 +998,7 @@ export default function CategoriesPage() {
                               >
                                 Edit
                               </button>
+                              {/* ✅ FIXED: Delete Button */}
                               <button
                                 onClick={() => handleDeleteSubcategory(sub.slug)}
                                 className="text-red-600 hover:text-red-800 text-sm"
